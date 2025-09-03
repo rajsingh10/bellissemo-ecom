@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
     return Sizer(
       builder: (context, orientation, deviceType) {
         return GetMaterialApp(
-          title: 'Inventory Billing',
+          title: 'Bellissemo App',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             scaffoldBackgroundColor: Colors.white,
