@@ -44,7 +44,7 @@ class CustomNetworkImage extends StatelessWidget {
         ),
       ),
       errorWidget: (context, url, error) => Image.asset(
-        isProfile ? Imgs.defaultprofile : Imgs.defaultimage,
+        isProfile ? Imgs.defaultProfile : Imgs.defaultImage,
         height: height,
         width: width,
         fit: BoxFit.cover,
