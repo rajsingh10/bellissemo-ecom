@@ -1,4 +1,4 @@
-import 'package:bellissemo_ecom/ui/products/view/productCatalogScreen.dart';
+import 'package:bellissemo_ecom/ui/home/view/homeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: Colors.white,
             primarySwatch: Colors.blue,
           ),
-          home: ProductCatalogScreen(),
+          home: Homescreen(),
         );
       },
     );

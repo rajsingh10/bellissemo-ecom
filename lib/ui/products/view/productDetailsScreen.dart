@@ -99,7 +99,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ),
               SizedBox(height: 2.h),
 
-              ProductImageTile(imageUrls: currentImages),
+              ImageSlider(
+                imageUrls: currentImages,
+                height: 25.h,
+                autoScroll: false,
+              ),
               SizedBox(height: 2.h),
 
               Text(

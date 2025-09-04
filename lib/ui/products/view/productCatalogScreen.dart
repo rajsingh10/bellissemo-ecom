@@ -432,7 +432,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
         if (product.inStock) {
           Get.to(
             () => ProductDetailsScreen(),
-            transition: Transition.fade,
+            transition: Transition.leftToRightWithFade,
             duration: const Duration(milliseconds: 450),
           );
         } else {
