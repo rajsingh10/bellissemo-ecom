@@ -8,4 +8,4 @@ class FontFamily {
   static const String semiBold = 'semiBold';
 }
 
-EdgeInsets pagePadding = EdgeInsets.symmetric(horizontal: 3.w);
+

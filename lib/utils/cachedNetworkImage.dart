@@ -1,3 +1,4 @@
+import 'package:bellissemo_ecom/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -8,6 +9,7 @@ class CustomNetworkImage extends StatelessWidget {
   final double height;
   final double width;
   final double radius;
+  final bool isCircle; // ✅ Added separate flag for circle
   final bool isProfile;
 
   const CustomNetworkImage({
@@ -16,6 +18,7 @@ class CustomNetworkImage extends StatelessWidget {
     required this.height,
     required this.width,
     this.radius = 0,
+    this.isCircle = false, // default is rectangle with radius
     this.isProfile = false,
   });
 
@@ -27,9 +30,9 @@ class CustomNetworkImage extends StatelessWidget {
         height: height,
         width: width,
         decoration: BoxDecoration(
-          shape: radius == 0 ? BoxShape.rectangle : BoxShape.circle,
-          borderRadius:
-          radius == 0 ? BorderRadius.circular(0) : BorderRadius.circular(radius),
+          // ✅ Use circle OR rectangle with dynamic radius
+          shape: isCircle ? BoxShape.circle : BoxShape.rectangle,
+          borderRadius: isCircle ? null : BorderRadius.circular(radius),
           image: DecorationImage(
             image: imageProvider,
             fit: BoxFit.cover,
@@ -40,15 +43,21 @@ class CustomNetworkImage extends StatelessWidget {
         height: height,
         width: width,
         child: const Center(
-          child: CircularProgressIndicator(strokeWidth: 2),
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            backgroundColor: AppColors.mainColor,
+          ),
         ),
       ),
-      errorWidget: (context, url, error) => Image.asset(
-        isProfile ? Imgs.defaultProfile : Imgs.defaultImage,
-        height: height,
-        width: width,
-        fit: BoxFit.cover,
-      ),
+      errorWidget: (context, url, error) {
+        debugPrint("❌ Image load failed: $url, error: $error");
+        return Image.asset(
+          isProfile ? Imgs.defaultProfile : Imgs.defaultImage,
+          height: height,
+          width: width,
+          fit: BoxFit.cover,
+        );
+      },
     );
   }
 }
