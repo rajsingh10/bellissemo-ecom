@@ -1,12 +1,18 @@
 import 'dart:async';
 
 import 'package:bellissemo_ecom/utils/colors.dart';
+import 'package:bellissemo_ecom/utils/multipleImagesSlider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../utils/cachedNetworkImage.dart';
+import '../../../utils/customBottombar.dart';
 import '../../../utils/fontFamily.dart';
 import '../../../utils/searchFields.dart';
+import '../../products/view/productCatalogScreen.dart';
+import '../../products/view/productDetailsScreen.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -31,47 +37,117 @@ class _HomescreenState extends State<Homescreen> {
     'https://static.vecteezy.com/system/resources/previews/017/764/762/non_2x/banner-for-sale-people-rush-to-shop-with-bags-the-girl-runs-to-the-supermarket-young-people-with-bags-vector.jpg',
   ];
 
-  final List<Map<String, dynamic>> orders = [
-    {
-      "name": "Wireless Earbuds",
-      "desc": "Bluetooth 5.0, Noise Cancelling",
-      "price": 49.99,
-      "rating": 4.6,
-      "image":
-          "https://images.unsplash.com/photo-1585386959984-a4155223f8d6?w=500",
-    },
-    {
-      "name": "Smart Watch",
-      "desc": "Fitness Tracker, Heart Rate Monitor",
-      "price": 89.50,
-      "rating": 4.3,
-      "image":
-          "https://images.unsplash.com/photo-1511732351157-1865efcb7b7b?w=500",
-    },
-    {
-      "name": "Gaming Mouse",
-      "desc": "RGB Lighting, Ergonomic Design",
-      "price": 39.99,
-      "rating": 4.7,
-      "image":
-          "https://images.unsplash.com/photo-1587202372775-9897e2c75c3a?w=500",
-    },
-    {
-      "name": "Running Shoes",
-      "desc": "Lightweight, Breathable",
-      "price": 65.00,
-      "rating": 4.4,
-      "image":
-          "https://images.unsplash.com/photo-1606813902794-99d7c92f22f3?w=500",
-    },
-    {
-      "name": "Laptop Backpack",
-      "desc": "Waterproof, USB Charging Port",
-      "price": 55.75,
-      "rating": 4.5,
-      "image":
-          "https://images.unsplash.com/photo-1598032895661-2d6a14e1e1e6?w=500",
-    },
+  final List<Product> products = [
+    Product(
+      name: "Apple iPhone 15 Pro",
+      imageUrl:
+          'https://m.media-amazon.com/images/I/81SigpJN1KL._UF1000,1000_QL80_.jpg',
+      packSize: "128GB",
+      pricePerUnit: 699.0,
+      inStock: true,
+    ),
+    Product(
+      name: "Samsung Galaxy Pro",
+      imageUrl: 'https://m.media-amazon.com/images/I/61KVX-MbIUL.jpg',
+      packSize: "1 Pair",
+      pricePerUnit: 69.0,
+      inStock: true,
+    ),
+    Product(
+      name: "Apple iPad Air",
+      imageUrl:
+          'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-storage-select-202405-13inch-space-gray-wifi_FMT_WHH?wid=1280&hei=720&fmt=p-jpg&qlt=80&.v=TENLTVRoeFdHUUI5ZE1ZZmxpQUlNMm5pQUoxb0NIVEJFSjRVRzZ4dzV5VE52YTlHWkltOWpNQVF4Y3VwTzdmWGl1WEttbFlFejZ0L0VqVlhGc0pKT3BmbTBuZmdjbmVyUEN6U1pnb2VjUDh3Qjhvd1BnZkhnUFFYU1JJMGh5alFTUzBLNXZ0QTA0SmlDNU1IU2czNjMzNXFNVzc5YkZmK2I4YzJ4ZndkZUdj&traceId=1',
+      packSize: "256GB",
+      pricePerUnit: 599.0,
+      inStock: true,
+    ),
+    Product(
+      name: "Sony WH-1000XM5",
+      imageUrl:
+          'https://computermania.co.za/cdn/shop/files/wh1000xm53.jpg?v=1694697686',
+      packSize: "1 Unit",
+      pricePerUnit: 329.0,
+      inStock: true,
+    ),
+    Product(
+      name: "Google Pixel 8",
+      imageUrl:
+          'https://media.tatacroma.com/Croma%20Assets/Communication/Mobiles/Images/309134_0_cv9vxa.png',
+      packSize: "128GB",
+      pricePerUnit: 649.0,
+      inStock: true,
+    ),
+    Product(
+      name: "Dell XPS Laptop",
+      imageUrl:
+          'https://dellstatic.luroconnect.com/media/catalog/product/cache/74ae05ef3745aec30d7f5a287debd7f5/i/n/indhs-xps-9530-co_2.jpg',
+      packSize: "512GB SSD",
+      pricePerUnit: 1099.0,
+      inStock: true,
+    ),
+    Product(
+      name: "Apple Watch Series 9",
+      imageUrl:
+          'https://m.media-amazon.com/images/I/81mHRsWENaL._UF1000,1000_QL80_.jpg',
+      packSize: "45mm",
+      pricePerUnit: 399.0,
+      inStock: false,
+    ),
+    Product(
+      name: "Logitech MX Master 3S",
+      imageUrl: 'https://m.media-amazon.com/images/I/61ni3t1ryQL.jpg',
+      packSize: "1 Unit",
+      pricePerUnit: 99.0,
+      inStock: true,
+    ),
+    Product(
+      name: "Samsung 4K Monitor",
+      imageUrl:
+          'https://computerspace.in/cdn/shop/products/NewProject-2021-06-10T163019.378.jpg?v=1629056157',
+      packSize: "32 inch",
+      pricePerUnit: 299.0,
+      inStock: true,
+    ),
+    Product(
+      name: "Bose QuietComfort Earbuds II",
+      imageUrl:
+          'https://m.media-amazon.com/images/I/51DOzlkiBTL._UF1000,1000_QL80_.jpg',
+      packSize: "1 Pair",
+      pricePerUnit: 249.0,
+      inStock: true,
+    ),
+    Product(
+      name: "Nintendo Switch OLED",
+      imageUrl:
+          'https://www.designinfo.in/wp-content/uploads/2023/05/Nintendo-Switch-OLED-Model-The-Legend-of-Zelda.webp',
+      packSize: "64GB",
+      pricePerUnit: 349.0,
+      inStock: false,
+    ),
+    Product(
+      name: "HP Envy Printer",
+      imageUrl:
+          'https://5.imimg.com/data5/SELLER/Default/2022/11/PX/RJ/PP/65193524/hp-envy-wifi-printer-4500.jpg',
+      packSize: "1 Unit",
+      pricePerUnit: 149.0,
+      inStock: true,
+    ),
+    Product(
+      name: "Apple AirPods Pro 2",
+      imageUrl:
+          'https://idestiny.in/wp-content/uploads/2024/10/Airpods-pro2-6.jpg',
+      packSize: "1 Pair",
+      pricePerUnit: 249.0,
+      inStock: true,
+    ),
+    Product(
+      name: "Samsung Galaxy Tab S9",
+      imageUrl:
+          'https://m.media-amazon.com/images/I/618Acjb5AhL._UF1000,1000_QL80_.jpg',
+      packSize: "256GB",
+      pricePerUnit: 799.0,
+      inStock: true,
+    ),
   ];
   final List<Map<String, dynamic>> recentOrders = [
     {
@@ -111,75 +187,10 @@ class _HomescreenState extends State<Homescreen> {
       "date": "2025-08-15",
     },
   ];
-  final List<Map<String, String>> items = [
-    {"title": "Laporan Meter Rusak"},
-    {"title": "Tagihan Belum Bayar"},
-    {"title": "Pengajuan Baru"},
-    {"title": "Riwayat Penggunaan"},
-  ];
-
-  final List<Map<String, String>> users = [
-    {
-      "name": "Nike Air",
-      "image":
-          "https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg",
-    },
-    {
-      "name": "Sony",
-      "image":
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkn0TdZw5jr0EOj9fdbG3RwmoSzJtpoN8g_Q&s",
-    },
-    {
-      "name": "Nike Air",
-      "image":
-          "https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg",
-    },
-    {
-      "name": "Sony",
-      "image":
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkn0TdZw5jr0EOj9fdbG3RwmoSzJtpoN8g_Q&s",
-    },
-    {
-      "name": "Nike Air",
-      "image":
-          "https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg",
-    },
-    {
-      "name": "Sony",
-      "image":
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkn0TdZw5jr0EOj9fdbG3RwmoSzJtpoN8g_Q&s",
-    },
-    {
-      "name": "Nike Air",
-      "image":
-          "https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg",
-    },
-    {
-      "name": "Sony",
-      "image":
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkn0TdZw5jr0EOj9fdbG3RwmoSzJtpoN8g_Q&s",
-    },
-  ];
-
-  final List<Map<String, String>> products = [];
-  final int itemsPerPage = 12;
-  int currentPage = 0;
-
-  void initProducts() {
-    for (int i = 0; i < 24; i++) {
-      products.add({
-        "image": "https://picsum.photos/200?random=$i",
-        "name": "Product ${i + 1}",
-        "price": "\$${(i + 1) * 10}",
-        "cancelPrice": "\$${(i + 1) * 12}",
-      });
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    initProducts();
     _pageController = PageController();
 
     _timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
@@ -203,20 +214,13 @@ class _HomescreenState extends State<Homescreen> {
     super.dispose();
   }
 
-  List<Map<String, String>> get currentProducts {
-    int startIndex = currentPage * itemsPerPage;
-    int endIndex = startIndex + itemsPerPage;
-    if (endIndex > products.length) endIndex = products.length;
-    return products.sublist(startIndex, endIndex);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKeyHome,
       backgroundColor: AppColors.containerColor,
       body: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
+        physics: ClampingScrollPhysics(),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 0.w, vertical: 0.h),
           child: Column(
@@ -231,7 +235,7 @@ class _HomescreenState extends State<Homescreen> {
                   color: AppColors.bgColor,
                 ),
                 child: Padding(
-                  padding: EdgeInsets.only(top: 6.5.h, right: 2.w, left: 2.w),
+                  padding: EdgeInsets.only(top: 6.5.h, right: 3.w, left: 3.w),
                   child: Column(
                     children: [
                       Row(
@@ -239,12 +243,12 @@ class _HomescreenState extends State<Homescreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           CircleAvatar(
-                            radius: 18,
-                            backgroundColor: AppColors.mainColor,
+                            radius: 25,
+                            backgroundColor: AppColors.containerColor,
                             child: Icon(
-                              Icons.settings,
-                              color: AppColors.whiteColor,
-                              size: 20,
+                              CupertinoIcons.bars,
+                              color: AppColors.blackColor,
+                              size: 30,
                             ),
                           ),
                           Column(
@@ -277,12 +281,12 @@ class _HomescreenState extends State<Homescreen> {
                                   });
                                 },
                                 child: CircleAvatar(
-                                  radius: 18,
+                                  radius: 25,
                                   backgroundColor: AppColors.containerColor,
                                   child: Icon(
                                     Icons.search,
                                     color: AppColors.blackColor,
-                                    size: 22,
+                                    size: 30,
                                   ),
                                 ),
                               ),
@@ -290,19 +294,19 @@ class _HomescreenState extends State<Homescreen> {
                               Stack(
                                 children: [
                                   CircleAvatar(
-                                    radius: 18,
+                                    radius: 25,
                                     backgroundColor: AppColors.containerColor,
                                     child: Icon(
                                       Icons.notifications_none,
                                       color: AppColors.blackColor,
-                                      size: 22,
+                                      size: 30,
                                     ),
                                   ),
                                   Positioned(
-                                    right: 4,
-                                    top: 4,
+                                    right: 2,
+                                    top: 2,
                                     child: CircleAvatar(
-                                      radius: 4,
+                                      radius: 6,
                                       backgroundColor: AppColors.counterColor,
                                     ),
                                   ),
@@ -320,58 +324,7 @@ class _HomescreenState extends State<Homescreen> {
                         ),
                       SizedBox(height: 1.h),
 
-                      SizedBox(
-                        height: 20.h,
-                        child: Stack(
-                          alignment: Alignment.bottomCenter,
-                          children: [
-                            PageView.builder(
-                              controller: _pageController,
-                              itemCount: carouselImages.length,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(20),
-                                    child: Image.network(
-                                      carouselImages[index],
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-
-                            // // Indicators
-                            // Positioned(
-                            //   bottom: 8,
-                            //   child: Row(
-                            //     mainAxisAlignment: MainAxisAlignment.center,
-                            //     children: [
-                            //       for (int i = 0; i < carouselImages.length; i++)
-                            //         Container(
-                            //           margin: const EdgeInsets.symmetric(
-                            //             horizontal: 3,
-                            //           ),
-                            //           width: currentIndex == i ? 12 : 8,
-                            //           height: currentIndex == i ? 12 : 8,
-                            //           decoration: BoxDecoration(
-                            //             shape: BoxShape.circle,
-                            //             color:
-                            //                 currentIndex == i
-                            //                     ? AppColors.mainColor
-                            //                     : Colors.grey[400],
-                            //           ),
-                            //         ),
-                            //     ],
-                            //   ),
-                            // ),
-                          ],
-                        ),
-                      ),
+                      ImageSlider(imageUrls: carouselImages, height: 18.h),
 
                       SizedBox(height: 2.h),
                     ],
@@ -417,12 +370,12 @@ class _HomescreenState extends State<Homescreen> {
                               ),
                               SizedBox(width: 1.w),
                               CircleAvatar(
-                                radius: 10,
+                                radius: 15,
                                 backgroundColor: AppColors.mainColor,
                                 child: Icon(
                                   Icons.arrow_forward,
                                   color: AppColors.whiteColor,
-                                  size: 10,
+                                  size: 20,
                                 ),
                               ),
                             ],
@@ -562,277 +515,261 @@ class _HomescreenState extends State<Homescreen> {
                         ),
                       ),
                       SizedBox(height: 1.h),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Catalog",
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontFamily: FontFamily.bold,
-                              color: AppColors.blackColor,
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              Text(
-                                "View All",
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontFamily: FontFamily.bold,
-                                  color: AppColors.gray,
-                                ),
+                      InkWell(
+                        onTap: () {
+                          Get.offAll(
+                            () => ProductCatalogScreen(),
+                            transition: Transition.fade,
+                            duration: const Duration(milliseconds: 450),
+                          );
+                        },
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Product Catalog",
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontFamily: FontFamily.bold,
+                                color: AppColors.blackColor,
                               ),
-                              SizedBox(width: 1.w),
-                              CircleAvatar(
-                                radius: 10,
-                                backgroundColor: AppColors.mainColor,
-                                child: Icon(
-                                  Icons.arrow_forward,
-                                  color: AppColors.whiteColor,
-                                  size: 10,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 1.h),
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: currentProducts.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 12,
-                          crossAxisSpacing: 12,
-                          childAspectRatio: 0.80,
-                        ),
-                        itemBuilder: (context, index) {
-                          final product = currentProducts[index];
-                          int quantity = 1;
-
-                          return Container(
-                            width: 30.w,
-                            height: 10.h,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: AppColors.whiteColor,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.containerColor,
-                                  blurRadius: 10,
-                                  offset: Offset(0, 4),
-                                ),
-                              ],
                             ),
-                            child: Stack(
+                            Row(
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Product Image with overlay icon
-                                    Stack(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.vertical(
-                                            top: Radius.circular(20),
-                                          ),
-                                          child: CustomNetworkImage(
-                                            imageUrl: product["image"]!,
-                                            height: 100,
-                                            width: double.infinity,
-                                            radius: 20,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 1.h),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0,
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            product["name"]!,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontFamily: FontFamily.bold,
-                                              fontSize: 18.sp,
-                                              color: AppColors.blackColor,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    // SizedBox(height: 0.5.h),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0,
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Text(
-                                            product["price"]!,
-                                            style: TextStyle(
-                                              color: AppColors.mainColor,
-                                              fontFamily: FontFamily.bold,
-                                              fontSize: 16.sp,
-                                            ),
-                                          ),
-                                          SizedBox(width: 6),
-                                          Text(
-                                            product["cancelPrice"]!,
-                                            style: TextStyle(
-                                              color: AppColors.gray,
-                                              decoration:
-                                                  TextDecoration.lineThrough,
-                                              fontFamily: FontFamily.semiBold,
-                                              fontSize: 15.sp,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    // SizedBox(height: 0.5.h,),
-                                    // Counter + Add to Cart
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0,
-                                        vertical: 8,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          // Counter
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              color: AppColors.mainColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    if (quantity > 1)
-                                                      setState(
-                                                        () => quantity--,
-                                                      );
-                                                  },
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.symmetric(
-                                                          horizontal: 6,
-                                                          vertical: 4,
-                                                        ),
-                                                    child: Icon(
-                                                      Icons.remove,
-                                                      size: 18,
-                                                      color:
-                                                          AppColors.whiteColor,
-                                                    ),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  quantity.toString(),
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: AppColors.whiteColor,
-                                                  ),
-                                                ),
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() => quantity++);
-                                                  },
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.symmetric(
-                                                          horizontal: 6,
-                                                          vertical: 4,
-                                                        ),
-                                                    child: Icon(
-                                                      Icons.add,
-                                                      size: 18,
-                                                      color:
-                                                          AppColors.whiteColor,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          // Add to Cart Button
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                              vertical: 6,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              // gradient: LinearGradient(
-                                              //   colors: [Colors.orangeAccent, Colors.deepOrange],
-                                              // ),
-                                              borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(20),
-                                                topRight: Radius.circular(10),
-                                                bottomLeft: Radius.circular(20),
-                                                bottomRight: Radius.circular(
-                                                  40,
-                                                ),
-                                              ),
-                                              color: AppColors.mainColor,
-                                            ),
-                                            child: Icon(
-                                              Icons.shopping_cart_outlined,
-                                              color: AppColors.whiteColor,
-                                              size: 20,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                                Text(
+                                  "View All",
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontFamily: FontFamily.bold,
+                                    color: AppColors.gray,
+                                  ),
                                 ),
-                                // Optional: discount badge
-                                Positioned(
-                                  top: 8,
-                                  left: 8,
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.redAccent,
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(10),
-                                        topRight: Radius.circular(20),
-                                        bottomLeft: Radius.circular(40),
-                                        bottomRight: Radius.circular(20),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      "-10%",
-                                      style: TextStyle(
-                                        color: AppColors.whiteColor,
-                                        fontSize: 15.sp,
-                                      ),
-                                    ),
+                                SizedBox(width: 1.w),
+                                CircleAvatar(
+                                  radius: 15,
+                                  backgroundColor: AppColors.mainColor,
+                                  child: Icon(
+                                    Icons.arrow_forward,
+                                    color: AppColors.whiteColor,
+                                    size: 20,
                                   ),
                                 ),
                               ],
                             ),
-                          );
-                        },
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 1.h),
+                      GridView.count(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.zero,
+                        physics: ClampingScrollPhysics(),
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.75,
+                        mainAxisSpacing: 1.h,
+                        crossAxisSpacing: 2.w,
+                        children:
+                            products
+                                .take(6)
+                                .map((p) => _buildGridItem(p))
+                                .toList(),
                       ),
 
                       SizedBox(height: 1.h),
                     ],
                   ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: SizedBox(
+        height: 12.h,
+        child: CustomBar(selected: 3),
+      ),
+    );
+  }
+
+  Widget _buildGridItem(Product product) {
+    return InkWell(
+      onTap: () {
+        Get.to(
+          () => ProductDetailsScreen(),
+          transition: Transition.leftToRightWithFade,
+          duration: const Duration(milliseconds: 450),
+        );
+      },
+      child: Opacity(
+        opacity: product.inStock ? 1.0 : 0.4,
+        child: Card(
+          color: AppColors.cardBgColor2,
+          elevation: 3,
+          shadowColor: Colors.black12,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Product Image
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  child: Stack(
+                    children: [
+                      CustomNetworkImage(
+                        imageUrl: product.imageUrl,
+                        height: double.infinity,
+                        width: double.infinity,
+                        isFit: true,
+                        radius: 20,
+                      ),
+                      if (!product.inStock)
+                        Positioned.fill(
+                          child: Container(
+                            color: Colors.black.withOpacity(0.4),
+                            child: Center(
+                              child: Text(
+                                "Out of Stock",
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontFamily: FontFamily.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Details
+              Padding(
+                padding: EdgeInsets.all(2.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title
+                    Text(
+                      product.name,
+                      style: TextStyle(
+                        fontFamily: FontFamily.bold,
+                        fontSize: 15.sp,
+                        color: AppColors.blackColor,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 0.5.h),
+
+                    // Pack Size
+                    Text(
+                      product.packSize,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontFamily: FontFamily.regular,
+                        color: AppColors.gray,
+                      ),
+                    ),
+                    SizedBox(height: 0.5.h),
+
+                    // Price
+                    Text(
+                      "£${product.pricePerUnit.toStringAsFixed(2)}",
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontFamily: FontFamily.semiBold,
+                        color: AppColors.mainColor,
+                      ),
+                    ),
+                    SizedBox(height: 1.h),
+
+                    // Quantity + Add Button
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Modern Quantity Selector
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 2.w,
+                            vertical: 0.5.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.bgColor,
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                onTap:
+                                    product.inStock && product.quantity > 0
+                                        ? () =>
+                                            setState(() => product.quantity--)
+                                        : null,
+                                child: Icon(
+                                  Icons.remove_circle,
+                                  size: 22.sp,
+                                  color: AppColors.mainColor,
+                                ),
+                              ),
+                              SizedBox(width: 2.w),
+                              Text(
+                                product.quantity.toString(),
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontFamily: FontFamily.semiBold,
+                                  color: AppColors.blackColor,
+                                ),
+                              ),
+                              SizedBox(width: 2.w),
+                              GestureDetector(
+                                onTap:
+                                    product.inStock
+                                        ? () =>
+                                            setState(() => product.quantity++)
+                                        : null,
+                                child: Icon(
+                                  Icons.add_circle,
+                                  size: 22.sp,
+                                  color: AppColors.mainColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Add to Cart Button
+                        InkWell(
+                          onTap:
+                              product.inStock
+                                  ? () {
+                                    // handle add to cart
+                                  }
+                                  : null,
+                          borderRadius: BorderRadius.circular(30),
+                          child: Container(
+                            padding: EdgeInsets.all(1.5.w),
+                            decoration: BoxDecoration(
+                              color:
+                                  product.inStock
+                                      ? AppColors.mainColor
+                                      : Colors.grey,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.shopping_cart_outlined,
+                              color: Colors.white,
+                              size: 18.sp,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],

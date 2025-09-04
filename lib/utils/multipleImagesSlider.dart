@@ -1,22 +1,67 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
 import '../../../utils/cachedNetworkImage.dart';
 
-class ProductImageTile extends StatefulWidget {
+class ImageSlider extends StatefulWidget {
   final List<String> imageUrls;
+  final double? height;
+  final Duration autoScrollDuration;
+  final bool autoScroll; // NEW: control auto-scroll
 
-  const ProductImageTile({super.key, required this.imageUrls});
+  ImageSlider({
+    super.key,
+    required this.imageUrls,
+    required this.height,
+    this.autoScrollDuration = const Duration(seconds: 3),
+    this.autoScroll = true, // default to true
+  });
 
   @override
-  State<ProductImageTile> createState() => _ProductImageTileState();
+  State<ImageSlider> createState() => _ImageSliderState();
 }
 
-class _ProductImageTileState extends State<ProductImageTile> {
+class _ImageSliderState extends State<ImageSlider> {
   final PageController _pageController = PageController();
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _setupAutoScroll();
+  }
+
+  void _setupAutoScroll() {
+    if (widget.autoScroll && widget.imageUrls.length > 1) {
+      _timer = Timer.periodic(widget.autoScrollDuration, (timer) {
+        int nextPage = _pageController.page!.toInt() + 1;
+        if (nextPage >= widget.imageUrls.length) nextPage = 0;
+        _pageController.animateToPage(
+          nextPage,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      });
+    }
+  }
+
+  /// Call this to stop auto-scroll
+  void stopAutoScroll() {
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  /// Call this to start auto-scroll
+  void startAutoScroll() {
+    stopAutoScroll(); // avoid multiple timers
+    _setupAutoScroll();
+  }
 
   @override
   void dispose() {
+    _timer?.cancel();
     _pageController.dispose();
     super.dispose();
   }
@@ -24,7 +69,7 @@ class _ProductImageTileState extends State<ProductImageTile> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 28.h,
+      height: widget.height,
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -59,8 +104,6 @@ class _ProductImageTileState extends State<ProductImageTile> {
                     );
                   },
                 ),
-
-            /// Dots Indicator
             if (widget.imageUrls.length > 1)
               Positioned(
                 bottom: 10,

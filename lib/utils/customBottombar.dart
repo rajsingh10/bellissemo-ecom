@@ -7,8 +7,8 @@ import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-
 import 'package:sizer/sizer.dart';
+
 import 'colors.dart';
 import 'images.dart';
 
@@ -79,7 +79,11 @@ class _CustomBarState extends State<CustomBar> {
                   if (!isActive) {
                     setState(() => selected = index + 1);
                     if (item["page"] != null) {
-                      Get.offAll(item["page"]);
+                      Get.offAll(
+                        item["page"],
+                        transition: Transition.fade,
+                        duration: const Duration(milliseconds: 450),
+                      );
                     }
                   }
                 },
