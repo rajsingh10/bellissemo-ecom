@@ -12,14 +12,14 @@ import 'package:sizer/sizer.dart';
 
 import '../../../utils/cachedNetworkImage.dart';
 
-class ProductCatalogScreen extends StatefulWidget {
-  const ProductCatalogScreen({super.key});
+class ProductsScreen extends StatefulWidget {
+  const ProductsScreen({super.key});
 
   @override
-  State<ProductCatalogScreen> createState() => _ProductCatalogScreenState();
+  State<ProductsScreen> createState() => _ProductsScreenState();
 }
 
-class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
+class _ProductsScreenState extends State<ProductsScreen> {
   int itemsPerPage = 4;
   int currentPage = 0;
 
@@ -27,121 +27,130 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
   List<Product> filteredProducts = [];
   final List<Product> products = [
     Product(
-      name: "Apple iPhone 15 Pro",
+      name: "L'Oreal Paris Lipstick",
       imageUrl:
-          'https://m.media-amazon.com/images/I/81SigpJN1KL._UF1000,1000_QL80_.jpg',
-      packSize: "128GB",
-      pricePerUnit: 699.0,
+          'https://static.beautytocare.com/media/catalog/product/l/-/l-oreal-paris-color-riche-intense-volume-matte-lipstick-480.jpg',
+      packSize: "Pack of 3",
+      pricePerUnit: 29.0,
       inStock: true,
     ),
     Product(
-      name: "Samsung Galaxy Pro",
-      imageUrl: 'https://m.media-amazon.com/images/I/61KVX-MbIUL.jpg',
-      packSize: "1 Pair",
-      pricePerUnit: 69.0,
+      name: "Maybelline Foundation",
+      imageUrl:
+          'https://m.media-amazon.com/images/I/51uTj0beKCL._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 2",
+      pricePerUnit: 35.0,
       inStock: true,
     ),
     Product(
-      name: "Iphone 12",
+      name: "Revlon Nail Polish",
+      imageUrl: 'https://m.media-amazon.com/images/I/41qteOLxDHL.jpg',
+      packSize: "Pack of 5",
+      pricePerUnit: 25.0,
+      inStock: true,
+    ),
+    Product(
+      name: "Nykaa Kajal",
       imageUrl:
-          'https://www.apple.com/newsroom/images/product/iphone/geo/apple_iphone-12_2-up_geo_10132020_inline.jpg.large.jpg',
-      packSize: "500ml",
-      pricePerUnit: 12.5,
+          'https://m.media-amazon.com/images/I/719eSwDuU7L._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 4",
+      pricePerUnit: 15.0,
+      inStock: true,
+    ),
+    Product(
+      name: "Lakme Blush",
+      imageUrl:
+          'https://m.media-amazon.com/images/I/71+yE3132GL._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 4",
+      pricePerUnit: 35.0,
+      inStock: true,
+    ),
+    Product(
+      name: "Huda Beauty Eyeshadow Palette",
+      imageUrl:
+          'https://cdn.fynd.com/v2/falling-surf-7c8bb8/fyprod/wrkr/products/pictures/item/free/original/000000000493860578/gAgZSjYsd2-000000000493860578_1.png',
+      packSize: "Pack of 1",
+      pricePerUnit: 49.0,
+      inStock: true,
+    ),
+    Product(
+      name: "MAC Lip Gloss",
+      imageUrl:
+          'https://m.media-amazon.com/images/I/418ynFWAe4L._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 2",
+      pricePerUnit: 32.0,
       inStock: false,
     ),
     Product(
-      name: "Apple iPad Air",
+      name: "Nykaa Matte Lipstick",
       imageUrl:
-          'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-storage-select-202405-13inch-space-gray-wifi_FMT_WHH?wid=1280&hei=720&fmt=p-jpg&qlt=80&.v=TENLTVRoeFdHUUI5ZE1ZZmxpQUlNMm5pQUoxb0NIVEJFSjRVRzZ4dzV5VE52YTlHWkltOWpNQVF4Y3VwTzdmWGl1WEttbFlFejZ0L0VqVlhGc0pKT3BmbTBuZmdjbmVyUEN6U1pnb2VjUDh3Qjhvd1BnZkhnUFFYU1JJMGh5alFTUzBLNXZ0QTA0SmlDNU1IU2czNjMzNXFNVzc5YkZmK2I4YzJ4ZndkZUdj&traceId=1',
-      packSize: "256GB",
-      pricePerUnit: 599.0,
+          'https://m.media-amazon.com/images/I/71hUeZd546L._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 3",
+      pricePerUnit: 27.0,
       inStock: true,
     ),
     Product(
-      name: "Sony WH-1000XM5",
+      name: "Lakme Eyeliner",
       imageUrl:
-          'https://computermania.co.za/cdn/shop/files/wh1000xm53.jpg?v=1694697686',
-      packSize: "1 Unit",
-      pricePerUnit: 329.0,
+          'https://www.lakmeindia.com/cdn/shop/files/24894_S1-8901030979552_1000x.jpg?v=1709807079',
+      packSize: "Pack of 2",
+      pricePerUnit: 18.0,
       inStock: true,
     ),
     Product(
-      name: "Google Pixel 8",
+      name: "Maybelline Lip Liner",
       imageUrl:
-          'https://media.tatacroma.com/Croma%20Assets/Communication/Mobiles/Images/309134_0_cv9vxa.png',
-      packSize: "128GB",
-      pricePerUnit: 649.0,
+          'https://m.media-amazon.com/images/I/71Y+L4lMHWL._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 3",
+      pricePerUnit: 22.0,
       inStock: true,
     ),
     Product(
-      name: "Dell XPS Laptop",
+      name: "Revlon Face Powder",
       imageUrl:
-          'https://dellstatic.luroconnect.com/media/catalog/product/cache/74ae05ef3745aec30d7f5a287debd7f5/i/n/indhs-xps-9530-co_2.jpg',
-      packSize: "512GB SSD",
-      pricePerUnit: 1099.0,
-      inStock: true,
-    ),
-    Product(
-      name: "Apple Watch Series 9",
-      imageUrl:
-          'https://m.media-amazon.com/images/I/81mHRsWENaL._UF1000,1000_QL80_.jpg',
-      packSize: "45mm",
-      pricePerUnit: 399.0,
+          'https://m.media-amazon.com/images/I/71JgzO1Pp5L._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 2",
+      pricePerUnit: 30.0,
       inStock: false,
     ),
     Product(
-      name: "Logitech MX Master 3S",
-      imageUrl: 'https://m.media-amazon.com/images/I/61ni3t1ryQL.jpg',
-      packSize: "1 Unit",
-      pricePerUnit: 99.0,
+      name: "L'Oreal Mascara",
+      imageUrl:
+          'https://m.media-amazon.com/images/I/61vuiK6d7RL._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 1",
+      pricePerUnit: 28.0,
       inStock: true,
     ),
     Product(
-      name: "Samsung 4K Monitor",
+      name: "Himalaya Lip Balm",
       imageUrl:
-          'https://computerspace.in/cdn/shop/products/NewProject-2021-06-10T163019.378.jpg?v=1629056157',
-      packSize: "32 inch",
-      pricePerUnit: 299.0,
+          'https://www.jiomart.com/images/product/original/491061263/himalaya-lip-care-balm-strawberry-shine-4-5-g-product-images-o491061263-p590087371-0-202203150923.jpg',
+      packSize: "Pack of 3",
+      pricePerUnit: 10.0,
       inStock: true,
     ),
     Product(
-      name: "Bose QuietComfort Earbuds II",
+      name: "Nykaa Compact Powder",
       imageUrl:
-          'https://m.media-amazon.com/images/I/51DOzlkiBTL._UF1000,1000_QL80_.jpg',
-      packSize: "1 Pair",
-      pricePerUnit: 249.0,
+          'https://m.media-amazon.com/images/I/41B-IgO4X2L._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 1",
+      pricePerUnit: 24.0,
       inStock: true,
     ),
     Product(
-      name: "Nintendo Switch OLED",
+      name: "Colorbar Lipstick",
       imageUrl:
-          'https://www.designinfo.in/wp-content/uploads/2023/05/Nintendo-Switch-OLED-Model-The-Legend-of-Zelda.webp',
-      packSize: "64GB",
-      pricePerUnit: 349.0,
-      inStock: false,
-    ),
-    Product(
-      name: "HP Envy Printer",
-      imageUrl:
-          'https://5.imimg.com/data5/SELLER/Default/2022/11/PX/RJ/PP/65193524/hp-envy-wifi-printer-4500.jpg',
-      packSize: "1 Unit",
-      pricePerUnit: 149.0,
+          'https://m.media-amazon.com/images/I/61btigSPLML._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 2",
+      pricePerUnit: 26.0,
       inStock: true,
     ),
     Product(
-      name: "Apple AirPods Pro 2",
+      name: "Forest Essentials Face Cream",
       imageUrl:
-          'https://idestiny.in/wp-content/uploads/2024/10/Airpods-pro2-6.jpg',
-      packSize: "1 Pair",
-      pricePerUnit: 249.0,
-      inStock: true,
-    ),
-    Product(
-      name: "Samsung Galaxy Tab S9",
-      imageUrl:
-          'https://m.media-amazon.com/images/I/618Acjb5AhL._UF1000,1000_QL80_.jpg',
-      packSize: "256GB",
-      pricePerUnit: 799.0,
+          'https://m.media-amazon.com/images/I/61mNSEOhpuL._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 1",
+      pricePerUnit: 40.0,
       inStock: true,
     ),
   ];
@@ -411,8 +420,6 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                             ),
                         ],
                       ),
-
-                  SizedBox(height: 2.h),
                 ],
               ),
             ),
@@ -420,7 +427,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
         ],
       ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
       bottomNavigationBar: SizedBox(
-        height: 12.h,
+        height: 10.h,
         child: CustomBar(selected: 1),
       ),
     );
@@ -470,7 +477,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                       if (!product.inStock)
                         Positioned.fill(
                           child: Container(
-                            color: Colors.black.withOpacity(0.4),
+                            color: Colors.black.withValues(alpha: 0.4),
                             child: Center(
                               child: Text(
                                 "Out of Stock",
@@ -540,7 +547,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                             vertical: 0.5.h,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.bgColor,
+                            color: AppColors.containerColor,
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: Row(
@@ -551,10 +558,17 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                                         ? () =>
                                             setState(() => product.quantity--)
                                         : null,
-                                child: Icon(
-                                  Icons.remove_circle,
-                                  size: 22.sp,
-                                  color: AppColors.mainColor,
+                                child: Container(
+                                  padding: EdgeInsets.all(1.5.w),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.cardBgColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.remove,
+                                    size: 16.sp,
+                                    color: AppColors.blackColor,
+                                  ),
                                 ),
                               ),
                               SizedBox(width: 2.w),
@@ -573,10 +587,17 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                                         ? () =>
                                             setState(() => product.quantity++)
                                         : null,
-                                child: Icon(
-                                  Icons.add_circle,
-                                  size: 22.sp,
-                                  color: AppColors.mainColor,
+                                child: Container(
+                                  padding: EdgeInsets.all(1.5.w),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.cardBgColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.add,
+                                    size: 16.sp,
+                                    color: AppColors.blackColor,
+                                  ),
                                 ),
                               ),
                             ],
@@ -625,7 +646,7 @@ class Product {
   final String name;
   final String imageUrl;
   final String packSize;
-  final double pricePerUnit;
+  var pricePerUnit;
   bool inStock;
   int quantity;
 

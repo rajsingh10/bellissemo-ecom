@@ -11,8 +11,8 @@ import '../../../utils/cachedNetworkImage.dart';
 import '../../../utils/customBottombar.dart';
 import '../../../utils/fontFamily.dart';
 import '../../../utils/searchFields.dart';
-import '../../products/view/productCatalogScreen.dart';
 import '../../products/view/productDetailsScreen.dart';
+import '../../products/view/productsScreen.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -39,146 +39,194 @@ class _HomescreenState extends State<Homescreen> {
 
   final List<Product> products = [
     Product(
-      name: "Apple iPhone 15 Pro",
+      name: "L'Oreal Paris Lipstick",
       imageUrl:
-          'https://m.media-amazon.com/images/I/81SigpJN1KL._UF1000,1000_QL80_.jpg',
-      packSize: "128GB",
-      pricePerUnit: 699.0,
+          'https://static.beautytocare.com/media/catalog/product/l/-/l-oreal-paris-color-riche-intense-volume-matte-lipstick-480.jpg',
+      packSize: "Pack of 3",
+      pricePerUnit: 29.0,
       inStock: true,
     ),
     Product(
-      name: "Samsung Galaxy Pro",
-      imageUrl: 'https://m.media-amazon.com/images/I/61KVX-MbIUL.jpg',
-      packSize: "1 Pair",
-      pricePerUnit: 69.0,
+      name: "Maybelline Foundation",
+      imageUrl:
+          'https://m.media-amazon.com/images/I/51uTj0beKCL._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 2",
+      pricePerUnit: 35.0,
       inStock: true,
     ),
     Product(
-      name: "Apple iPad Air",
-      imageUrl:
-          'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/ipad-air-storage-select-202405-13inch-space-gray-wifi_FMT_WHH?wid=1280&hei=720&fmt=p-jpg&qlt=80&.v=TENLTVRoeFdHUUI5ZE1ZZmxpQUlNMm5pQUoxb0NIVEJFSjRVRzZ4dzV5VE52YTlHWkltOWpNQVF4Y3VwTzdmWGl1WEttbFlFejZ0L0VqVlhGc0pKT3BmbTBuZmdjbmVyUEN6U1pnb2VjUDh3Qjhvd1BnZkhnUFFYU1JJMGh5alFTUzBLNXZ0QTA0SmlDNU1IU2czNjMzNXFNVzc5YkZmK2I4YzJ4ZndkZUdj&traceId=1',
-      packSize: "256GB",
-      pricePerUnit: 599.0,
+      name: "Revlon Nail Polish",
+      imageUrl: 'https://m.media-amazon.com/images/I/41qteOLxDHL.jpg',
+      packSize: "Pack of 5",
+      pricePerUnit: 25.0,
       inStock: true,
     ),
     Product(
-      name: "Sony WH-1000XM5",
+      name: "Nykaa Kajal",
       imageUrl:
-          'https://computermania.co.za/cdn/shop/files/wh1000xm53.jpg?v=1694697686',
-      packSize: "1 Unit",
-      pricePerUnit: 329.0,
+          'https://m.media-amazon.com/images/I/719eSwDuU7L._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 4",
+      pricePerUnit: 15.0,
       inStock: true,
     ),
     Product(
-      name: "Google Pixel 8",
+      name: "Lakme Blush",
       imageUrl:
-          'https://media.tatacroma.com/Croma%20Assets/Communication/Mobiles/Images/309134_0_cv9vxa.png',
-      packSize: "128GB",
-      pricePerUnit: 649.0,
+          'https://m.media-amazon.com/images/I/71+yE3132GL._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 4",
+      pricePerUnit: 35.0,
       inStock: true,
     ),
     Product(
-      name: "Dell XPS Laptop",
+      name: "Huda Beauty Eyeshadow Palette",
       imageUrl:
-          'https://dellstatic.luroconnect.com/media/catalog/product/cache/74ae05ef3745aec30d7f5a287debd7f5/i/n/indhs-xps-9530-co_2.jpg',
-      packSize: "512GB SSD",
-      pricePerUnit: 1099.0,
+          'https://cdn.fynd.com/v2/falling-surf-7c8bb8/fyprod/wrkr/products/pictures/item/free/original/000000000493860578/gAgZSjYsd2-000000000493860578_1.png',
+      packSize: "Pack of 1",
+      pricePerUnit: 49.0,
       inStock: true,
     ),
     Product(
-      name: "Apple Watch Series 9",
+      name: "MAC Lip Gloss",
       imageUrl:
-          'https://m.media-amazon.com/images/I/81mHRsWENaL._UF1000,1000_QL80_.jpg',
-      packSize: "45mm",
-      pricePerUnit: 399.0,
+          'https://m.media-amazon.com/images/I/418ynFWAe4L._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 2",
+      pricePerUnit: 32.0,
       inStock: false,
     ),
     Product(
-      name: "Logitech MX Master 3S",
-      imageUrl: 'https://m.media-amazon.com/images/I/61ni3t1ryQL.jpg',
-      packSize: "1 Unit",
-      pricePerUnit: 99.0,
+      name: "Nykaa Matte Lipstick",
+      imageUrl:
+          'https://m.media-amazon.com/images/I/71hUeZd546L._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 3",
+      pricePerUnit: 27.0,
       inStock: true,
     ),
     Product(
-      name: "Samsung 4K Monitor",
+      name: "Lakme Eyeliner",
       imageUrl:
-          'https://computerspace.in/cdn/shop/products/NewProject-2021-06-10T163019.378.jpg?v=1629056157',
-      packSize: "32 inch",
-      pricePerUnit: 299.0,
+          'https://www.lakmeindia.com/cdn/shop/files/24894_S1-8901030979552_1000x.jpg?v=1709807079',
+      packSize: "Pack of 2",
+      pricePerUnit: 18.0,
       inStock: true,
     ),
     Product(
-      name: "Bose QuietComfort Earbuds II",
+      name: "Maybelline Lip Liner",
       imageUrl:
-          'https://m.media-amazon.com/images/I/51DOzlkiBTL._UF1000,1000_QL80_.jpg',
-      packSize: "1 Pair",
-      pricePerUnit: 249.0,
+          'https://m.media-amazon.com/images/I/71Y+L4lMHWL._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 3",
+      pricePerUnit: 22.0,
       inStock: true,
     ),
     Product(
-      name: "Nintendo Switch OLED",
+      name: "Revlon Face Powder",
       imageUrl:
-          'https://www.designinfo.in/wp-content/uploads/2023/05/Nintendo-Switch-OLED-Model-The-Legend-of-Zelda.webp',
-      packSize: "64GB",
-      pricePerUnit: 349.0,
+          'https://m.media-amazon.com/images/I/71JgzO1Pp5L._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 2",
+      pricePerUnit: 30.0,
       inStock: false,
     ),
     Product(
-      name: "HP Envy Printer",
+      name: "L'Oreal Mascara",
       imageUrl:
-          'https://5.imimg.com/data5/SELLER/Default/2022/11/PX/RJ/PP/65193524/hp-envy-wifi-printer-4500.jpg',
-      packSize: "1 Unit",
-      pricePerUnit: 149.0,
+          'https://m.media-amazon.com/images/I/61vuiK6d7RL._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 1",
+      pricePerUnit: 28.0,
       inStock: true,
     ),
     Product(
-      name: "Apple AirPods Pro 2",
+      name: "Himalaya Lip Balm",
       imageUrl:
-          'https://idestiny.in/wp-content/uploads/2024/10/Airpods-pro2-6.jpg',
-      packSize: "1 Pair",
-      pricePerUnit: 249.0,
+          'https://www.jiomart.com/images/product/original/491061263/himalaya-lip-care-balm-strawberry-shine-4-5-g-product-images-o491061263-p590087371-0-202203150923.jpg',
+      packSize: "Pack of 3",
+      pricePerUnit: 10.0,
       inStock: true,
     ),
     Product(
-      name: "Samsung Galaxy Tab S9",
+      name: "Nykaa Compact Powder",
       imageUrl:
-          'https://m.media-amazon.com/images/I/618Acjb5AhL._UF1000,1000_QL80_.jpg',
-      packSize: "256GB",
-      pricePerUnit: 799.0,
+          'https://m.media-amazon.com/images/I/41B-IgO4X2L._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 1",
+      pricePerUnit: 24.0,
+      inStock: true,
+    ),
+    Product(
+      name: "Colorbar Lipstick",
+      imageUrl:
+          'https://m.media-amazon.com/images/I/61btigSPLML._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 2",
+      pricePerUnit: 26.0,
+      inStock: true,
+    ),
+    Product(
+      name: "Forest Essentials Face Cream",
+      imageUrl:
+          'https://m.media-amazon.com/images/I/61mNSEOhpuL._UF1000,1000_QL80_.jpg',
+      packSize: "Pack of 1",
+      pricePerUnit: 40.0,
       inStock: true,
     ),
   ];
+
   final List<Map<String, dynamic>> recentOrders = [
     {
       "id": 1,
       "name": "Skincare",
       "image":
-      "https://images.unsplash.com/photo-1612810806563-4ecf9c0f85ee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+          "https://m.media-amazon.com/images/I/51KNHIFxMIL._UF1000,1000_QL80_.jpg",
     },
     {
       "id": 2,
       "name": "Makeup",
       "image":
-      "https://images.unsplash.com/photo-1600185365280-9656cbb7c178?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+          "https://m.media-amazon.com/images/I/71SSYkFV4rL._UF1000,1000_QL80_.jpg",
     },
     {
       "id": 3,
       "name": "Fragrances",
       "image":
-      "https://images.unsplash.com/photo-1598032893319-2c7efb9a1f2a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+          "https://5.imimg.com/data5/SELLER/Default/2023/9/339832626/UT/AZ/ZC/2364872/attar-fragrance-perfume.jpg",
     },
     {
       "id": 4,
       "name": "Hair Care",
       "image":
-      "https://images.unsplash.com/photo-1596464716127-f2a82984de25?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+          "http://avimeeherbal.com/cdn/shop/files/1_2_a7db340e-21ea-483f-844e-22e51122e86a.png?v=1749107204&width=2048",
     },
     {
       "id": 5,
       "name": "Bath & Body",
       "image":
-      "https://images.unsplash.com/photo-1615397349754-7f02d572c9b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+          "https://m.media-amazon.com/images/I/71VG77T7ojL._UF1000,1000_QL80_.jpg",
+    },
+    {
+      "id": 6,
+      "name": "Nails",
+      "image":
+          "https://m.media-amazon.com/images/I/71kOxc1n8mL._UF1000,1000_QL80_.jpg",
+    },
+    {
+      "id": 7,
+      "name": "Eyes",
+      "image":
+          "https://media.fashionnetwork.com/cdn-cgi/image/fit=contain,width=1000,height=1000,format=auto/m/34d7/f0ae/1bd9/e583/1c02/c946/a410/34ed/8ad9/7a8a/7a8a.jpg",
+    },
+    {
+      "id": 8,
+      "name": "Lips",
+      "image":
+          "https://m.media-amazon.com/images/I/61RFhvrGTkL._UF1000,1000_QL80_.jpg",
+    },
+    {
+      "id": 9,
+      "name": "Body Oils",
+      "image":
+          "https://m.media-amazon.com/images/I/51qyzkZRZ4L._UF1000,1000_QL80_.jpg",
+    },
+    {
+      "id": 10,
+      "name": "Hair Styling",
+      "image":
+          "https://m.media-amazon.com/images/I/71ASI7UtiXL._UF1000,1000_QL80_.jpg",
     },
   ];
 
@@ -353,7 +401,6 @@ class _HomescreenState extends State<Homescreen> {
                             ),
                           ),
                           Row(
-
                             children: [
                               Text(
                                 "View All",
@@ -385,121 +432,44 @@ class _HomescreenState extends State<Homescreen> {
                           children: [
                             for (int i = 0; i < recentOrders.length; i++)
                               Padding(
-                                padding: const EdgeInsets.only(
-                                  top: 40,
-                                  left: 6,
-                                  right: 6,
-                                  bottom: 12,
+                                padding: EdgeInsets.only(
+                                  left: i == 0 ? 0 : 10,
+                                  right: 10,
                                 ),
-                                child: Stack(
-                                  clipBehavior: Clip.none,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    // Main Card
-                                    Container(
-                                      width: 35.w,
-                                      height: 7.h,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                        color: AppColors.whiteColor,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: AppColors.containerColor,
-                                            blurRadius: 10,
-                                            offset: Offset(0, 4),
+                                    Material(
+                                      shape: CircleBorder(),
+                                      elevation: 2,
+                                      clipBehavior: Clip.hardEdge,
+                                      child: InkWell(
+                                        onTap: () {
+                                          // handle tap
+                                        },
+                                        customBorder: CircleBorder(),
+                                        child: ClipOval(
+                                          child: CustomNetworkImage(
+                                            imageUrl: recentOrders[i]["image"],
+                                            width: 15.w,
+                                            height: 15.w,
                                           ),
-                                        ],
-                                      ),
-                                      child: Padding(
-                                        padding: EdgeInsets.only(
-                                          top: 25,
-                                          left: 12,
-                                          right: 12,
-                                          bottom: 12,
-                                        ),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              recentOrders[i]["name"],
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontSize: 18.sp,
-                                                fontFamily: FontFamily.bold,
-                                                color: AppColors.mainColor,
-                                              ),
-                                            ),
-                                            // Text(
-                                            //   recentOrders[i]["orderNumber"],
-                                            //   textAlign: TextAlign.center,
-                                            //   style: TextStyle(
-                                            //     fontSize: 18.sp,
-                                            //     fontFamily: FontFamily.bold,
-                                            //     color: AppColors.mainColor,
-                                            //   ),
-                                            // ),
-                                            // SizedBox(height: 6),
-                                            // Text(
-                                            //   "Qty: ${recentOrders[i]["quantity"]}",
-                                            //   style: TextStyle(
-                                            //     color: AppColors.blackColor,
-                                            //     fontFamily: FontFamily.semiBold,
-                                            //     fontSize: 16.sp,
-                                            //   ),
-                                            // ),
-                                            // SizedBox(height: 4),
-                                            // Text(
-                                            //   "\$${recentOrders[i]["price"].toStringAsFixed(2)}",
-                                            //   style: TextStyle(
-                                            //     fontFamily: FontFamily.semiBold,
-                                            //     fontSize: 16.sp,
-                                            //     color: AppColors.blackColor,
-                                            //   ),
-                                            // ),
-                                            // SizedBox(height: 4),
-                                            // Text(
-                                            //   recentOrders[i]["date"],
-                                            //   style: TextStyle(
-                                            //     color: AppColors.gray,
-                                            //     fontSize: 16.sp,
-                                            //     fontFamily: FontFamily.semiBold,
-                                            //   ),
-                                            // ),
-                                          ],
                                         ),
                                       ),
                                     ),
-
-                                    // Circle Image Positioned Above
-                                    Positioned(
-                                      top: -40, // Half outside card
-                                      left: 45,
-                                      child: Container(
-                                        height: 60,
-                                        width: 60,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: AppColors.whiteColor,
-                                            width: 3,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.grey.withOpacity(
-                                                0.4,
-                                              ),
-                                              blurRadius: 8,
-                                              offset: Offset(0, 4),
-                                            ),
-                                          ],
-                                          image: DecorationImage(
-                                            image: NetworkImage(
-                                              recentOrders[i]["image"],
-                                            ),
-                                            fit: BoxFit.cover,
-                                          ),
+                                    const SizedBox(height: 6),
+                                    SizedBox(
+                                      width: 70,
+                                      child: Text(
+                                        recentOrders[i]["name"],
+                                        textAlign: TextAlign.center,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          fontFamily: FontFamily.light,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.blackColor,
                                         ),
                                       ),
                                     ),
@@ -513,7 +483,7 @@ class _HomescreenState extends State<Homescreen> {
                       InkWell(
                         onTap: () {
                           Get.offAll(
-                            () => ProductCatalogScreen(),
+                            () => ProductsScreen(),
                             transition: Transition.fade,
                             duration: const Duration(milliseconds: 450),
                           );
@@ -581,7 +551,7 @@ class _HomescreenState extends State<Homescreen> {
         ),
       ),
       bottomNavigationBar: SizedBox(
-        height: 12.h,
+        height: 10.h,
         child: CustomBar(selected: 3),
       ),
     );
@@ -694,7 +664,7 @@ class _HomescreenState extends State<Homescreen> {
                             vertical: 0.5.h,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.bgColor,
+                            color: AppColors.containerColor,
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: Row(
@@ -705,10 +675,17 @@ class _HomescreenState extends State<Homescreen> {
                                         ? () =>
                                             setState(() => product.quantity--)
                                         : null,
-                                child: Icon(
-                                  Icons.remove_circle,
-                                  size: 22.sp,
-                                  color: AppColors.mainColor,
+                                child: Container(
+                                  padding: EdgeInsets.all(1.5.w),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.cardBgColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.remove,
+                                    size: 16.sp,
+                                    color: AppColors.blackColor,
+                                  ),
                                 ),
                               ),
                               SizedBox(width: 2.w),
@@ -727,10 +704,17 @@ class _HomescreenState extends State<Homescreen> {
                                         ? () =>
                                             setState(() => product.quantity++)
                                         : null,
-                                child: Icon(
-                                  Icons.add_circle,
-                                  size: 22.sp,
-                                  color: AppColors.mainColor,
+                                child: Container(
+                                  padding: EdgeInsets.all(1.5.w),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.cardBgColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.add,
+                                    size: 16.sp,
+                                    color: AppColors.blackColor,
+                                  ),
                                 ),
                               ),
                             ],
@@ -749,10 +733,7 @@ class _HomescreenState extends State<Homescreen> {
                           child: Container(
                             padding: EdgeInsets.all(1.5.w),
                             decoration: BoxDecoration(
-                              color:
-                                  product.inStock
-                                      ? AppColors.mainColor
-                                      : Colors.grey,
+                              color: AppColors.mainColor,
                               shape: BoxShape.circle,
                             ),
                             child: Icon(

@@ -207,7 +207,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             decoration: BoxDecoration(
                               color:
                                   selectedColor == colorName
-                                      ? AppColors.mainColor.withOpacity(0.2)
+                                      ? AppColors.mainColor.withValues(
+                                        alpha: 0.2,
+                                      )
                                       : Colors.transparent,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
@@ -279,7 +281,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             decoration: BoxDecoration(
                               color:
                                   selectedSize == size
-                                      ? AppColors.mainColor.withOpacity(0.2)
+                                      ? AppColors.mainColor.withValues(
+                                        alpha: 0.2,
+                                      )
                                       : Colors.transparent,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
@@ -380,11 +384,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           },
                           child: CircleAvatar(
                             radius: 16,
-                            backgroundColor: AppColors.mainColor,
+                            backgroundColor: AppColors.cardBgColor,
                             child: Icon(
                               Icons.remove,
                               size: 18.sp,
-                              color: Colors.white,
+                              color: AppColors.blackColor,
                             ),
                           ),
                         ),
@@ -401,11 +405,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           onTap: () => setState(() => quantity++),
                           child: CircleAvatar(
                             radius: 16,
-                            backgroundColor: AppColors.mainColor,
+                            backgroundColor: AppColors.cardBgColor,
                             child: Icon(
                               Icons.add,
                               size: 18.sp,
-                              color: Colors.white,
+                              color: AppColors.blackColor,
                             ),
                           ),
                         ),

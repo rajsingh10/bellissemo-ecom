@@ -11,7 +11,7 @@ class ImageSlider extends StatefulWidget {
   final Duration autoScrollDuration;
   final bool autoScroll; // NEW: control auto-scroll
 
-  ImageSlider({
+  const ImageSlider({
     super.key,
     required this.imageUrls,
     required this.height,
