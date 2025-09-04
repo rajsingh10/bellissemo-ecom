@@ -1,6 +1,6 @@
 import 'package:bellissemo_ecom/utils/colors.dart';
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 
 import 'images.dart';
 
@@ -26,29 +26,28 @@ class CustomNetworkImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return CachedNetworkImage(
       imageUrl: imageUrl ?? '',
-      imageBuilder: (context, imageProvider) => Container(
-        height: height,
-        width: width,
-        decoration: BoxDecoration(
-          // ✅ Use circle OR rectangle with dynamic radius
-          shape: isCircle ? BoxShape.circle : BoxShape.rectangle,
-          borderRadius: isCircle ? null : BorderRadius.circular(radius),
-          image: DecorationImage(
-            image: imageProvider,
-            fit: BoxFit.cover,
+      imageBuilder:
+          (context, imageProvider) => Container(
+            height: height,
+            width: width,
+            decoration: BoxDecoration(
+              // ✅ Use circle OR rectangle with dynamic radius
+              shape: isCircle ? BoxShape.circle : BoxShape.rectangle,
+              borderRadius: isCircle ? null : BorderRadius.circular(radius),
+              image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+            ),
           ),
-        ),
-      ),
-      placeholder: (context, url) => SizedBox(
-        height: height,
-        width: width,
-        child: const Center(
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            backgroundColor: AppColors.mainColor,
+      placeholder:
+          (context, url) => SizedBox(
+            height: height,
+            width: width,
+            child: const Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                backgroundColor: AppColors.mainColor,
+              ),
+            ),
           ),
-        ),
-      ),
       errorWidget: (context, url, error) {
         debugPrint("❌ Image load failed: $url, error: $error");
         return Image.asset(

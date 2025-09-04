@@ -73,7 +73,6 @@ Widget TitleBar({
             _buildButton(Icons.menu_rounded, drawerCallback)
           else
             SizedBox(width: 45), // responsive placeholder
-
           /// Title
           Expanded(
             child: Center(
@@ -81,7 +80,8 @@ Widget TitleBar({
                 title ?? "",
                 style: TextStyle(
                   fontSize: 19.sp,
-                  fontFamily: FontFamily.regular,fontWeight: FontWeight.bold,
+                  fontFamily: FontFamily.regular,
+                  fontWeight: FontWeight.bold,
                   color: AppColors.blackColor,
                 ),
                 maxLines: 1,
@@ -95,7 +95,7 @@ Widget TitleBar({
             Row(
               children: List.generate(
                 rightButtons.length,
-                    (i) => Row(
+                (i) => Row(
                   children: [
                     rightButtons[i],
                     if (i != rightButtons.length - 1) SizedBox(width: 3.w),

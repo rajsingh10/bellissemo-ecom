@@ -38,17 +38,14 @@ InkWell CustomButton({
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Visibility(
-              visible: iconData != null,
-              child: SizedBox(width: 2.w),
-            ),
+            Visibility(visible: iconData != null, child: SizedBox(width: 2.w)),
             if (iconData != null)
               Icon(iconData, color: fontcolor, size: iconsize),
             if (iconData != null) SizedBox(width: 2.w),
             Text(
               title.toString(),
               style: TextStyle(
-                fontFamily:FontFamily.regular,
+                fontFamily: FontFamily.regular,
                 color: fontcolor,
                 fontWeight: fontWeight == null ? FontWeight.bold : fontWeight,
                 letterSpacing: 1,

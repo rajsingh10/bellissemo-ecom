@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
 
 import 'colors.dart';
@@ -33,21 +32,13 @@ class SearchField extends StatelessWidget {
       validator: validator,
       cursorColor: AppColors.blackColor,
       onChanged: onChanged,
-      style: const TextStyle(
-        fontFamily: FontFamily.regular,
-      ),
+      style: const TextStyle(fontFamily: FontFamily.regular),
       decoration: InputDecoration(
-        prefixIcon: prefix ??
-            Icon(
-              Icons.search_rounded,
-              color: AppColors.mainColor,
-              size: 22,
-            ),
+        prefixIcon:
+            prefix ??
+            Icon(Icons.search_rounded, color: AppColors.mainColor, size: 22),
         suffixIcon: suffix,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 10,
-          vertical: 5,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         fillColor: AppColors.whiteColor,
         filled: true,
         hintText: hintText,
