@@ -151,40 +151,34 @@ class _HomescreenState extends State<Homescreen> {
   ];
   final List<Map<String, dynamic>> recentOrders = [
     {
-      "orderNumber": "#1001",
-      "name": "Nike Air",
+      "id": 1,
+      "name": "Skincare",
       "image":
-          "https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg",
-      "price": 120.0,
-      "quantity": 1,
-      "date": "2025-09-01",
+      "https://images.unsplash.com/photo-1612810806563-4ecf9c0f85ee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
     },
     {
-      "orderNumber": "#1002",
-      "name": "Sony",
+      "id": 2,
+      "name": "Makeup",
       "image":
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkn0TdZw5jr0EOj9fdbG3RwmoSzJtpoN8g_Q&s",
-      "price": 75.5,
-      "quantity": 2,
-      "date": "2025-08-28",
+      "https://images.unsplash.com/photo-1600185365280-9656cbb7c178?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
     },
     {
-      "orderNumber": "#1003",
-      "name": "Nike Air",
+      "id": 3,
+      "name": "Fragrances",
       "image":
-          "https://d2v5dzhdg4zhx3.cloudfront.net/web-assets/images/storypages/primary/ProductShowcasesampleimages/JPEG/Product+Showcase-1.jpg",
-      "price": 120.0,
-      "quantity": 3,
-      "date": "2025-08-20",
+      "https://images.unsplash.com/photo-1598032893319-2c7efb9a1f2a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
     },
     {
-      "orderNumber": "#1004",
-      "name": "Sony",
+      "id": 4,
+      "name": "Hair Care",
       "image":
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkn0TdZw5jr0EOj9fdbG3RwmoSzJtpoN8g_Q&s",
-      "price": 80.0,
-      "quantity": 1,
-      "date": "2025-08-15",
+      "https://images.unsplash.com/photo-1596464716127-f2a82984de25?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+    },
+    {
+      "id": 5,
+      "name": "Bath & Body",
+      "image":
+      "https://images.unsplash.com/photo-1615397349754-7f02d572c9b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
     },
   ];
 
@@ -351,7 +345,7 @@ class _HomescreenState extends State<Homescreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Recent Orders",
+                            "Categories",
                             style: TextStyle(
                               fontSize: 16.sp,
                               fontFamily: FontFamily.bold,
@@ -359,6 +353,7 @@ class _HomescreenState extends State<Homescreen> {
                             ),
                           ),
                           Row(
+
                             children: [
                               Text(
                                 "View All",
@@ -402,7 +397,7 @@ class _HomescreenState extends State<Homescreen> {
                                     // Main Card
                                     Container(
                                       width: 35.w,
-                                      height: 22.h,
+                                      height: 7.h,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(20),
                                         color: AppColors.whiteColor,
@@ -425,7 +420,7 @@ class _HomescreenState extends State<Homescreen> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                              CrossAxisAlignment.center,
                                           children: [
                                             Text(
                                               recentOrders[i]["name"],
@@ -436,42 +431,42 @@ class _HomescreenState extends State<Homescreen> {
                                                 color: AppColors.mainColor,
                                               ),
                                             ),
-                                            Text(
-                                              recentOrders[i]["orderNumber"],
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontSize: 18.sp,
-                                                fontFamily: FontFamily.bold,
-                                                color: AppColors.mainColor,
-                                              ),
-                                            ),
-                                            SizedBox(height: 6),
-                                            Text(
-                                              "Qty: ${recentOrders[i]["quantity"]}",
-                                              style: TextStyle(
-                                                color: AppColors.blackColor,
-                                                fontFamily: FontFamily.semiBold,
-                                                fontSize: 16.sp,
-                                              ),
-                                            ),
-                                            SizedBox(height: 4),
-                                            Text(
-                                              "\$${recentOrders[i]["price"].toStringAsFixed(2)}",
-                                              style: TextStyle(
-                                                fontFamily: FontFamily.semiBold,
-                                                fontSize: 16.sp,
-                                                color: AppColors.blackColor,
-                                              ),
-                                            ),
-                                            SizedBox(height: 4),
-                                            Text(
-                                              recentOrders[i]["date"],
-                                              style: TextStyle(
-                                                color: AppColors.gray,
-                                                fontSize: 16.sp,
-                                                fontFamily: FontFamily.semiBold,
-                                              ),
-                                            ),
+                                            // Text(
+                                            //   recentOrders[i]["orderNumber"],
+                                            //   textAlign: TextAlign.center,
+                                            //   style: TextStyle(
+                                            //     fontSize: 18.sp,
+                                            //     fontFamily: FontFamily.bold,
+                                            //     color: AppColors.mainColor,
+                                            //   ),
+                                            // ),
+                                            // SizedBox(height: 6),
+                                            // Text(
+                                            //   "Qty: ${recentOrders[i]["quantity"]}",
+                                            //   style: TextStyle(
+                                            //     color: AppColors.blackColor,
+                                            //     fontFamily: FontFamily.semiBold,
+                                            //     fontSize: 16.sp,
+                                            //   ),
+                                            // ),
+                                            // SizedBox(height: 4),
+                                            // Text(
+                                            //   "\$${recentOrders[i]["price"].toStringAsFixed(2)}",
+                                            //   style: TextStyle(
+                                            //     fontFamily: FontFamily.semiBold,
+                                            //     fontSize: 16.sp,
+                                            //     color: AppColors.blackColor,
+                                            //   ),
+                                            // ),
+                                            // SizedBox(height: 4),
+                                            // Text(
+                                            //   recentOrders[i]["date"],
+                                            //   style: TextStyle(
+                                            //     color: AppColors.gray,
+                                            //     fontSize: 16.sp,
+                                            //     fontFamily: FontFamily.semiBold,
+                                            //   ),
+                                            // ),
                                           ],
                                         ),
                                       ),
@@ -480,7 +475,7 @@ class _HomescreenState extends State<Homescreen> {
                                     // Circle Image Positioned Above
                                     Positioned(
                                       top: -40, // Half outside card
-                                      left: 25,
+                                      left: 45,
                                       child: Container(
                                         height: 60,
                                         width: 60,
