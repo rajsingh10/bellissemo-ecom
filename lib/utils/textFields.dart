@@ -75,7 +75,7 @@ class _AppTextFieldState extends State<AppTextField> {
                 TextSpan(
                   text: widget.text,
                   style: TextStyle(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                     fontFamily: FontFamily.light,
                     color: AppColors.blackColor,
                     fontSize: 16.sp,
@@ -162,7 +162,7 @@ class _AppTextFieldState extends State<AppTextField> {
                 borderSide: const BorderSide(
                   width: 1.5,
                   style: BorderStyle.solid,
-                  color: AppColors.blackColor,
+                  color: AppColors.border,
                 ),
               ),
               filled: true,

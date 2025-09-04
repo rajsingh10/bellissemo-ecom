@@ -21,7 +21,7 @@ Widget TitleBar({
       borderRadius: BorderRadius.circular(12),
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(10),
+        padding: EdgeInsets.all(2.w), // responsive padding
         decoration: BoxDecoration(
           color: AppColors.mainColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
@@ -38,19 +38,28 @@ Widget TitleBar({
     rightButtons.add(_buildButton(Icons.search_rounded, onSearch));
   }
 
+  // Drawer logic (right side only if back is enabled)
+  if (isDrawerEnabled && isBackEnabled) {
+    rightButtons.add(_buildButton(Icons.menu_rounded, drawerCallback));
+  }
+
+  // Check if only one button total
+  final int totalButtons =
+      (isBackEnabled || isDrawerEnabled ? 1 : 0) + rightButtons.length;
+
   return Container(
     margin: EdgeInsets.only(top: 5.h, bottom: 2.h),
-    padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.h),
+    padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
     decoration: BoxDecoration(
       color: clr ?? Colors.white,
       boxShadow: [
         BoxShadow(
           color: Colors.black.withValues(alpha: 0.1),
-          blurRadius: 10,
+          blurRadius: 8, // kept small for cleaner look
           offset: const Offset(0, 4),
         ),
       ],
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(14),
     ),
     child: SizedBox(
       height: 6.h,
@@ -63,7 +72,7 @@ Widget TitleBar({
           else if (isDrawerEnabled)
             _buildButton(Icons.menu_rounded, drawerCallback)
           else
-            const SizedBox(width: 45),
+            SizedBox(width: 45), // responsive placeholder
 
           /// Title
           Expanded(
@@ -72,7 +81,7 @@ Widget TitleBar({
                 title ?? "",
                 style: TextStyle(
                   fontSize: 19.sp,
-                  fontFamily: FontFamily.semiBold,
+                  fontFamily: FontFamily.regular,fontWeight: FontWeight.bold,
                   color: AppColors.blackColor,
                 ),
                 maxLines: 1,
@@ -81,18 +90,23 @@ Widget TitleBar({
             ),
           ),
 
-          /// Right Side (only search if enabled)
-          Row(
-            children: List.generate(
-              rightButtons.length,
-              (i) => Row(
-                children: [
-                  rightButtons[i],
-                  if (i != rightButtons.length - 1) SizedBox(width: 2.w),
-                ],
+          /// Right Side
+          if (rightButtons.isNotEmpty)
+            Row(
+              children: List.generate(
+                rightButtons.length,
+                    (i) => Row(
+                  children: [
+                    rightButtons[i],
+                    if (i != rightButtons.length - 1) SizedBox(width: 3.w),
+                  ],
+                ),
               ),
-            ),
-          ),
+            )
+          else if (totalButtons == 1)
+            SizedBox(width: 12.w) // balance with left side
+          else
+            const SizedBox.shrink(),
         ],
       ),
     ),

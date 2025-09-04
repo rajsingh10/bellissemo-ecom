@@ -5,7 +5,7 @@ import 'package:sizer/sizer.dart';
 import 'colors.dart';
 import 'fontFamily.dart';
 
-class SearchBarWithFilter extends StatelessWidget {
+class SearchField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final Function(String)? onChanged;
@@ -14,7 +14,7 @@ class SearchBarWithFilter extends StatelessWidget {
   final bool readOnly;
   final FormFieldValidator? validator;
 
-  const SearchBarWithFilter({
+  const SearchField({
     super.key,
     required this.controller,
     this.hintText = "Search...",
@@ -40,7 +40,7 @@ class SearchBarWithFilter extends StatelessWidget {
         prefixIcon: prefix ??
             Icon(
               Icons.search_rounded,
-              color: AppColors.whiteColor,
+              color: AppColors.mainColor,
               size: 22,
             ),
         suffixIcon: suffix,
@@ -78,7 +78,7 @@ class SearchBarWithFilter extends StatelessWidget {
           borderSide: const BorderSide(
             width: 1.5,
             style: BorderStyle.solid,
-            color: AppColors.blackColor,
+            color: AppColors.border,
           ),
         ),
         errorBorder: OutlineInputBorder(
