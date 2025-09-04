@@ -10,6 +10,7 @@ class CustomNetworkImage extends StatelessWidget {
   final double width;
   final double radius;
   final bool isCircle; // ✅ Added separate flag for circle
+  final bool isFit; // ✅ Added separate flag for circle
   final bool isProfile;
 
   const CustomNetworkImage({
@@ -19,6 +20,7 @@ class CustomNetworkImage extends StatelessWidget {
     required this.width,
     this.radius = 0,
     this.isCircle = false, // default is rectangle with radius
+    this.isFit = true, // default is rectangle with radius
     this.isProfile = false,
   });
 
@@ -34,7 +36,10 @@ class CustomNetworkImage extends StatelessWidget {
               // ✅ Use circle OR rectangle with dynamic radius
               shape: isCircle ? BoxShape.circle : BoxShape.rectangle,
               borderRadius: isCircle ? null : BorderRadius.circular(radius),
-              image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+              image: DecorationImage(
+                image: imageProvider,
+                fit: isFit ? BoxFit.cover : BoxFit.contain,
+              ),
             ),
           ),
       placeholder:

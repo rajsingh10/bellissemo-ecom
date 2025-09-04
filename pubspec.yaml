@@ -58,8 +58,11 @@ dependencies:
   modal_progress_hud_nsn:
   syncfusion_flutter_pdfviewer: ^29.2.10
   dio:
+  smooth_page_indicator:
+  flutter_svg:
 
 
+  device_info_plus: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -86,6 +89,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/defaults/
+    - assets/images/bottomBarSvg/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

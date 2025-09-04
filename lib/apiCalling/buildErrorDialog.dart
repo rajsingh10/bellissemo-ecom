@@ -122,6 +122,9 @@ buildErrorDialog1(
   String? buttonname,
 }) {
   Widget okButton = GestureDetector(
+    onTap:
+        // if (callback == null) {
+        callback,
     child: Container(
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
@@ -144,9 +147,6 @@ buildErrorDialog1(
         ),
       ),
     ),
-    onTap:
-        // if (callback == null) {
-        callback,
 
     // } else {
 

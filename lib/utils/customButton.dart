@@ -47,7 +47,7 @@ InkWell CustomButton({
               style: TextStyle(
                 fontFamily: FontFamily.regular,
                 color: fontcolor,
-                fontWeight: fontWeight == null ? FontWeight.bold : fontWeight,
+                fontWeight: fontWeight ?? FontWeight.bold,
                 letterSpacing: 1,
                 fontSize: fontsize,
               ),
