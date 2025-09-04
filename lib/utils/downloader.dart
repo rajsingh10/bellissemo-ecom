@@ -82,10 +82,9 @@ Future<void> downloadFile(
       return;
     }
 
-    Dio dio = Dio(BaseOptions(headers: {
-      "User-Agent": "Mozilla/5.0",
-      "Accept": "*/*",
-    }));
+    Dio dio = Dio(
+      BaseOptions(headers: {"User-Agent": "Mozilla/5.0", "Accept": "*/*"}),
+    );
     Directory? downloadDir = await getDownloadDirectory();
 
     if (downloadDir == null) {
@@ -98,8 +97,9 @@ Future<void> downloadFile(
       log('Created directory: ${appDir.path}');
     }
 
-    String formattedTime =
-        DateFormat('yyyy-MM-dd-hh-mm-ss-a').format(DateTime.now());
+    String formattedTime = DateFormat(
+      'yyyy-MM-dd-hh-mm-ss-a',
+    ).format(DateTime.now());
     String filePath = '${appDir.path}/$filename-$formattedTime.$extension';
 
     ValueNotifier<double> downloadProgress = ValueNotifier(0.0);
@@ -114,7 +114,8 @@ Future<void> downloadFile(
           builder: (context, value, child) {
             return Dialog(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
+                borderRadius: BorderRadius.circular(16),
+              ),
               backgroundColor: const Color(0xff232323),
               child: Container(
                 width: 300,
@@ -187,7 +188,9 @@ Future<void> downloadFile(
       onReceiveProgress: (received, total) {
         if (total != -1) {
           downloadProgress.value = received / total;
-          log('Download progress: ${(received / total * 100).toStringAsFixed(2)}%');
+          log(
+            'Download progress: ${(received / total * 100).toStringAsFixed(2)}%',
+          );
         }
       },
     );
@@ -231,11 +234,15 @@ Future<void> downloadFileWithCookies(
     bool permissionGranted = await requestStoragePermission();
     if (!permissionGranted && !Platform.isIOS) return;
 
-    Dio dio = Dio(BaseOptions(headers: {
-      "User-Agent": "Mozilla/5.0",
-      "Accept": "*/*",
-      if (cookies != null) "Cookie": cookies,
-    }));
+    Dio dio = Dio(
+      BaseOptions(
+        headers: {
+          "User-Agent": "Mozilla/5.0",
+          "Accept": "*/*",
+          if (cookies != null) "Cookie": cookies,
+        },
+      ),
+    );
 
     Directory? downloadDir = await getDownloadDirectory();
     if (downloadDir == null) throw Exception("Download directory is null");
@@ -243,8 +250,9 @@ Future<void> downloadFileWithCookies(
     Directory appDir = Directory('${downloadDir.path}/Advice Center');
     if (!appDir.existsSync()) appDir.createSync(recursive: true);
 
-    String formattedTime =
-        DateFormat('yyyy-MM-dd-hh-mm-ss-a').format(DateTime.now());
+    String formattedTime = DateFormat(
+      'yyyy-MM-dd-hh-mm-ss-a',
+    ).format(DateTime.now());
     String filePath = '${appDir.path}/$filename-$formattedTime.$extension';
 
     ValueNotifier<double> downloadProgress = ValueNotifier(0.0);
@@ -259,7 +267,8 @@ Future<void> downloadFileWithCookies(
           builder: (context, value, _) {
             return Dialog(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
+                borderRadius: BorderRadius.circular(16),
+              ),
               backgroundColor: const Color(0xff232323),
               child: Container(
                 width: 300,

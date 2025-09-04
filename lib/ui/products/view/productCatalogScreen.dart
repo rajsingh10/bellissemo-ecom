@@ -24,7 +24,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
             isSearchEnabled: true,
           ),
         ],
-      ).paddingSymmetric(horizontal: 3.w,vertical: 0.5.h),
+      ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
     );
   }
 }

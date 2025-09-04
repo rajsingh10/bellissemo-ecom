@@ -34,8 +34,10 @@ void showCustomErrorSnackbar({required String title, required String message}) {
   );
 }
 
-void showCustomSuccessSnackbar(
-    {required String title, required String message}) {
+void showCustomSuccessSnackbar({
+  required String title,
+  required String message,
+}) {
   Get.snackbar(
     '',
     '',

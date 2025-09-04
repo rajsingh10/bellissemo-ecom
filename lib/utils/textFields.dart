@@ -104,27 +104,26 @@ class _AppTextFieldState extends State<AppTextField> {
             keyboardType: widget.textInputType,
             controller: widget.controller,
             validator: widget.validator,
-            style: const TextStyle(
-              fontFamily: FontFamily.regular,
-            ),
+            style: const TextStyle(fontFamily: FontFamily.regular),
             inputFormatters: [
-              LengthLimitingTextInputFormatter(widget.maxLength)
+              LengthLimitingTextInputFormatter(widget.maxLength),
             ],
             onChanged: widget.onChanged,
             decoration: InputDecoration(
-              suffixIcon: widget.obscureText == true
-                  ? IconButton(
-                      icon: Icon(
-                        isObscured ? Icons.visibility_off : Icons.visibility,
-                        color: Colors.grey,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          isObscured = !isObscured;
-                        });
-                      },
-                    )
-                  : widget.suffix,
+              suffixIcon:
+                  widget.obscureText == true
+                      ? IconButton(
+                        icon: Icon(
+                          isObscured ? Icons.visibility_off : Icons.visibility,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            isObscured = !isObscured;
+                          });
+                        },
+                      )
+                      : widget.suffix,
               prefixIcon: widget.prefix,
               enabled: widget.enable ?? true,
               contentPadding: const EdgeInsets.symmetric(
