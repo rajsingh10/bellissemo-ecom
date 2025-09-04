@@ -16,7 +16,7 @@ Widget TitleBar({
   bool isBackEnabled = false,
 }) {
   /// Helper: Build button
-  Widget _buildButton(IconData icon, VoidCallback? onTap) {
+  Widget buildButton(IconData icon, VoidCallback? onTap) {
     return InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: onTap,
@@ -35,12 +35,12 @@ Widget TitleBar({
   final List<Widget> rightButtons = [];
 
   if (isSearchEnabled) {
-    rightButtons.add(_buildButton(Icons.search_rounded, onSearch));
+    rightButtons.add(buildButton(Icons.search_rounded, onSearch));
   }
 
   // Drawer logic (right side only if back is enabled)
   if (isDrawerEnabled && isBackEnabled) {
-    rightButtons.add(_buildButton(Icons.menu_rounded, drawerCallback));
+    rightButtons.add(buildButton(Icons.menu_rounded, drawerCallback));
   }
 
   // Check if only one button total
@@ -48,7 +48,7 @@ Widget TitleBar({
       (isBackEnabled || isDrawerEnabled ? 1 : 0) + rightButtons.length;
 
   return Container(
-    margin: EdgeInsets.only(top: 5.h, bottom: 2.h),
+    margin: EdgeInsets.only(top: 5.h, bottom: 1.h),
     padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
     decoration: BoxDecoration(
       color: clr ?? Colors.white,
@@ -68,9 +68,9 @@ Widget TitleBar({
         children: [
           /// Left Side
           if (isBackEnabled)
-            _buildButton(Icons.arrow_back_rounded, () => Get.back())
+            buildButton(Icons.arrow_back_rounded, () => Get.back())
           else if (isDrawerEnabled)
-            _buildButton(Icons.menu_rounded, drawerCallback)
+            buildButton(Icons.menu_rounded, drawerCallback)
           else
             SizedBox(width: 45), // responsive placeholder
           /// Title

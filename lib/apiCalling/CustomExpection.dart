@@ -5,6 +5,7 @@ class CustomException implements Exception {
 
   CustomException([this._message, this._prefix, this.context]);
 
+  @override
   String toString() {
     // Utils.dismissProgressBar(context);
 
