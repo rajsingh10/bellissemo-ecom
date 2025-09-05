@@ -13,7 +13,8 @@ import 'package:sizer/sizer.dart';
 import '../../../utils/cachedNetworkImage.dart';
 
 class ProductsScreen extends StatefulWidget {
-  const ProductsScreen({super.key});
+  String? cate;
+   ProductsScreen({super.key,this.cate});
 
   @override
   State<ProductsScreen> createState() => _ProductsScreenState();
@@ -221,9 +222,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
       body: Column(
         children: [
           TitleBar(
-            title: 'Products',
+            title:widget.cate==null? 'Products':widget.cate.toString(),
             isDrawerEnabled: true,
-            isSearchEnabled: true,
+            isSearchEnabled: true,isBackEnabled: true,
             onSearch: () {
               setState(() {
                 isSearchEnabled = !isSearchEnabled;
@@ -508,7 +509,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
       ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
       bottomNavigationBar: SizedBox(
         height: 10.h,
-        child: CustomBar(selected: 1),
+        child: CustomBar(selected: 8,),
       ),
     );
   }

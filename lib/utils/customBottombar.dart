@@ -2,13 +2,13 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:bellissemo_ecom/ui/home/view/homeScreen.dart';
-import 'package:bellissemo_ecom/ui/products/view/productsScreen.dart';
 import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
+import '../ui/category/view/categoryScreen.dart';
 import 'colors.dart';
 import 'images.dart';
 
@@ -26,9 +26,9 @@ class _CustomBarState extends State<CustomBar> {
 
   final List<Map<String, dynamic>> _items = [
     {
-      "title": "Products",
+      "title": "Catalogs",
       "icon": Imgs.firstImage,
-      "page": () => ProductsScreen(),
+      "page": () => CategoriesScreen(),
     },
     {"title": "Orders", "icon": Imgs.secondImage, "page": () {}},
     {"title": "Home", "icon": Imgs.thirdImage, "page": () => Homescreen()},
