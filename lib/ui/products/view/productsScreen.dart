@@ -171,7 +171,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     });
   }
 
-  void _filterProducts([String query=""]) {
+  void _filterProducts([String query = ""]) {
     setState(() {
       if (query.isEmpty) {
         filteredProducts = List.from(products);
@@ -187,9 +187,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
       }
 
       if (selectedSort == "Low to High") {
-        filteredProducts.sort((a, b) => a.pricePerUnit.compareTo(b.pricePerUnit));
+        filteredProducts.sort(
+          (a, b) => a.pricePerUnit.compareTo(b.pricePerUnit),
+        );
       } else if (selectedSort == "High to Low") {
-        filteredProducts.sort((a, b) => b.pricePerUnit.compareTo(a.pricePerUnit));
+        filteredProducts.sort(
+          (a, b) => b.pricePerUnit.compareTo(a.pricePerUnit),
+        );
       }
       // else if (selectedSort == "Latest") {
       //   filteredProducts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -255,31 +259,38 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           ),
                           child: Row(
                             children: [
-                              Text("Sort by",style: TextStyle(
-                                fontSize: 15.sp,
-                                fontFamily: FontFamily.semiBold,
-                                color: AppColors.blackColor,
-                              ),),
+                              Text(
+                                "Sort by",
+                                style: TextStyle(
+                                  fontSize: 15.sp,
+                                  fontFamily: FontFamily.semiBold,
+                                  color: AppColors.blackColor,
+                                ),
+                              ),
                               SizedBox(width: 3.w),
                               DropdownButtonHideUnderline(
                                 child: DropdownButton<String>(
                                   value: selectedSort,
                                   borderRadius: BorderRadius.circular(12),
                                   dropdownColor: Colors.white,
-                                  icon: Icon(Icons.sort, color: AppColors.mainColor),
-                                  items: sortOptions.map((e) {
-                                    return DropdownMenuItem(
-                                      value: e,
-                                      child: Text(
-                                        e,
-                                        style: TextStyle(
-                                          fontSize: 15.sp,
-                                          fontFamily: FontFamily.semiBold,
-                                          color: AppColors.mainColor,
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
+                                  icon: Icon(
+                                    Icons.sort,
+                                    color: AppColors.mainColor,
+                                  ),
+                                  items:
+                                      sortOptions.map((e) {
+                                        return DropdownMenuItem(
+                                          value: e,
+                                          child: Text(
+                                            e,
+                                            style: TextStyle(
+                                              fontSize: 15.sp,
+                                              fontFamily: FontFamily.semiBold,
+                                              color: AppColors.mainColor,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
                                   onChanged: (value) {
                                     if (value != null) {
                                       setState(() {
@@ -292,7 +303,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               ),
                             ],
                           ),
-
                         ),
 
                         Container(

@@ -427,12 +427,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           context: context,
                           builder: (BuildContext context) {
                             String? selectedCustomer;
-                            List<String> customers = ["Customer 1", "Customer 2", "Customer 3"];
+                            List<String> customers = [
+                              "Customer 1",
+                              "Customer 2",
+                              "Customer 3",
+                            ];
                             String? errorText;
                             return StatefulBuilder(
                               builder: (context, setState) {
-
-
                                 return AlertDialog(
                                   backgroundColor: AppColors.whiteColor,
                                   shape: RoundedRectangleBorder(
@@ -462,30 +464,35 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                         isExpanded: true,
                                         decoration: InputDecoration(
                                           border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(12),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                           ),
                                           contentPadding: EdgeInsets.symmetric(
                                             vertical: 12,
                                             horizontal: 10,
                                           ),
                                         ),
-                                        items: customers.map((String customer) {
-                                          return DropdownMenuItem<String>(
-                                            value: customer,
-                                            child: Text(
-                                              customer,
-                                              style: TextStyle(
-                                                fontSize: 16.sp,
-                                                fontFamily: FontFamily.regular,
-                                                color: AppColors.gray,
-                                              ),
-                                            ),
-                                          );
-                                        }).toList(),
+                                        items:
+                                            customers.map((String customer) {
+                                              return DropdownMenuItem<String>(
+                                                value: customer,
+                                                child: Text(
+                                                  customer,
+                                                  style: TextStyle(
+                                                    fontSize: 16.sp,
+                                                    fontFamily:
+                                                        FontFamily.regular,
+                                                    color: AppColors.gray,
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
                                         onChanged: (newValue) {
                                           setState(() {
                                             selectedCustomer = newValue;
-                                            errorText = null; // Clear error on selection
+                                            errorText =
+                                                null; // Clear error on selection
                                           });
                                         },
                                       ),
@@ -493,9 +500,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                         SizedBox(height: 8),
                                         Text(
                                           errorText!,
-                                          style: TextStyle(color: Colors.red, fontSize: 14.sp),
+                                          style: TextStyle(
+                                            color: Colors.red,
+                                            fontSize: 14.sp,
+                                          ),
                                         ),
-                                      ]
+                                      ],
                                     ],
                                   ),
                                   actions: [
@@ -517,14 +527,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                         if (selectedCustomer != null) {
                                           Navigator.pop(context);
                                           Get.offAll(
-                                                () => CartScreen(customerName: selectedCustomer!),
+                                            () => CartScreen(
+                                              customerName: selectedCustomer!,
+                                            ),
                                             transition: Transition.fade,
-                                            duration: const Duration(milliseconds: 450),
+                                            duration: const Duration(
+                                              milliseconds: 450,
+                                            ),
                                           );
                                         } else {
                                           // Use the setState of StatefulBuilder
                                           setState(() {
-                                            errorText = "Please select a customer!";
+                                            errorText =
+                                                "Please select a customer!";
                                           });
                                         }
                                       },
