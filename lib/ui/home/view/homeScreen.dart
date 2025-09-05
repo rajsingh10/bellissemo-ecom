@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:bellissemo_ecom/ui/Category%20Product/view/CategoryProductScreen.dart';
 import 'package:bellissemo_ecom/utils/colors.dart';
 import 'package:bellissemo_ecom/utils/multipleImagesSlider.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,6 +11,7 @@ import '../../../utils/cachedNetworkImage.dart';
 import '../../../utils/customBottombar.dart';
 import '../../../utils/fontFamily.dart';
 import '../../../utils/searchFields.dart';
+import '../../category/view/categoryScreen.dart';
 import '../../products/view/productDetailsScreen.dart';
 import '../../products/view/productsScreen.dart';
 
@@ -434,7 +434,7 @@ class _HomescreenState extends State<Homescreen> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 1.h),
+                      SizedBox(height: 2.h),
 
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
@@ -489,12 +489,12 @@ class _HomescreenState extends State<Homescreen> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 1.h),
+                      SizedBox(height: 2.h),
                       InkWell(
                         onTap: () {
-                          Get.offAll(
+                          Get.to(
                             () => ProductsScreen(),
-                            transition: Transition.fade,
+                            transition: Transition.leftToRightWithFade,
                             duration: const Duration(milliseconds: 450),
                           );
                         },
@@ -503,7 +503,7 @@ class _HomescreenState extends State<Homescreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Product Catalog",
+                              "Products",
                               style: TextStyle(
                                 fontSize: 16.sp,
                                 fontFamily: FontFamily.bold,

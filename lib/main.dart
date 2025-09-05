@@ -1,3 +1,4 @@
+import 'package:bellissemo_ecom/ui/customers/view/customersScreen.dart';
 import 'package:bellissemo_ecom/ui/home/view/homeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: Colors.white,
             primarySwatch: Colors.blue,
           ),
-          home: Homescreen(),
+          home: CustomersScreen(),
         );
       },
     );

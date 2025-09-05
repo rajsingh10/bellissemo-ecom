@@ -10,6 +10,7 @@ import '../../../utils/fontFamily.dart';
 import '../../../utils/searchFields.dart';
 import '../../../utils/snackBars.dart';
 import '../../../utils/titlebarWidget.dart';
+import '../../products/view/productsScreen.dart';
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
@@ -422,10 +423,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   Widget _buildGridItem(Category category) {
     return InkWell(
       onTap: () {
-        // Navigate to category details or product list of that category
-        showCustomSuccessSnackbar(
-          title: "Category Selected",
-          message: "You tapped on ${category.name}",
+        Get.to(
+              () => ProductsScreen(cate: category.name,),
+          transition: Transition.leftToRightWithFade,
+          duration: const Duration(milliseconds: 450),
         );
       },
       child: Card(
