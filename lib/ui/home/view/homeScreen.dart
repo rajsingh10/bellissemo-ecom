@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bellissemo_ecom/ui/Category%20Product/view/CategoryProductScreen.dart';
 import 'package:bellissemo_ecom/utils/colors.dart';
 import 'package:bellissemo_ecom/utils/multipleImagesSlider.dart';
 import 'package:flutter/cupertino.dart';
@@ -400,27 +401,36 @@ class _HomescreenState extends State<Homescreen> {
                               color: AppColors.blackColor,
                             ),
                           ),
-                          Row(
-                            children: [
-                              Text(
-                                "View All",
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontFamily: FontFamily.bold,
-                                  color: AppColors.gray,
+                          InkWell(
+                            onTap: () {
+                              Get.offAll(
+                                    () => CategoriesScreen(),
+                                transition: Transition.fade,
+                                duration: const Duration(milliseconds: 450),
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                Text(
+                                  "View All",
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontFamily: FontFamily.bold,
+                                    color: AppColors.gray,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(width: 1.w),
-                              CircleAvatar(
-                                radius: 15,
-                                backgroundColor: AppColors.mainColor,
-                                child: Icon(
-                                  Icons.arrow_forward,
-                                  color: AppColors.whiteColor,
-                                  size: 20,
+                                SizedBox(width: 1.w),
+                                CircleAvatar(
+                                  radius: 15,
+                                  backgroundColor: AppColors.mainColor,
+                                  child: Icon(
+                                    Icons.arrow_forward,
+                                    color: AppColors.whiteColor,
+                                    size: 20,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
