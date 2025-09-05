@@ -25,6 +25,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   final List<int> itemsPerPageOptions = [4, 8, 12, 16];
   List<Product> filteredProducts = [];
+
+  String selectedSort = "Low to High";
+  final List<String> sortOptions = ["Low to High", "High to Low", "Latest"];
+
   final List<Product> products = [
     Product(
       name: "L'Oreal Paris Lipstick",
@@ -167,7 +171,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     });
   }
 
-  void _filterProducts(String query) {
+  void _filterProducts([String query=""]) {
     setState(() {
       if (query.isEmpty) {
         filteredProducts = List.from(products);
@@ -181,6 +185,16 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 )
                 .toList();
       }
+
+      if (selectedSort == "Low to High") {
+        filteredProducts.sort((a, b) => a.pricePerUnit.compareTo(b.pricePerUnit));
+      } else if (selectedSort == "High to Low") {
+        filteredProducts.sort((a, b) => b.pricePerUnit.compareTo(a.pricePerUnit));
+      }
+      // else if (selectedSort == "Latest") {
+      //   filteredProducts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      // }
+
       currentPage = 0; // reset to first page on search
     });
   }
@@ -223,8 +237,64 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 children: [
                   if (filteredProducts.isNotEmpty)
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 3.w),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(30),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 6,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Text("Sort by",style: TextStyle(
+                                fontSize: 15.sp,
+                                fontFamily: FontFamily.semiBold,
+                                color: AppColors.blackColor,
+                              ),),
+                              SizedBox(width: 3.w),
+                              DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  value: selectedSort,
+                                  borderRadius: BorderRadius.circular(12),
+                                  dropdownColor: Colors.white,
+                                  icon: Icon(Icons.sort, color: AppColors.mainColor),
+                                  items: sortOptions.map((e) {
+                                    return DropdownMenuItem(
+                                      value: e,
+                                      child: Text(
+                                        e,
+                                        style: TextStyle(
+                                          fontSize: 15.sp,
+                                          fontFamily: FontFamily.semiBold,
+                                          color: AppColors.mainColor,
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      setState(() {
+                                        selectedSort = value;
+                                        _filterProducts();
+                                      });
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+
+                        ),
+
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 3.w),
                           decoration: BoxDecoration(
