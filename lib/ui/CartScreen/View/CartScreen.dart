@@ -42,8 +42,6 @@ class _CartScreenState extends State<CartScreen> {
     },
   ];
 
-
-
   @override
   Widget build(BuildContext context) {
     double subtotal = 0;
@@ -166,53 +164,75 @@ class _CartScreenState extends State<CartScreen> {
 
                                                 IntrinsicWidth(
                                                   child: Container(
-                                                    padding: EdgeInsets.symmetric(
-                                                      horizontal: 2.w,
-                                                      vertical: 0.5.h,
-                                                    ),
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                          horizontal: 2.w,
+                                                          vertical: 0.5.h,
+                                                        ),
                                                     decoration: BoxDecoration(
-                                                      color: AppColors.containerColor,
-                                                      borderRadius: BorderRadius.circular(30),
+                                                      color:
+                                                          AppColors
+                                                              .containerColor,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            30,
+                                                          ),
                                                     ),
                                                     child: Row(
                                                       children: [
                                                         // Decrease
                                                         GestureDetector(
-                                                          onTap: cartItems[i]["qty"] > 1
-                                                              ? () {
-                                                            setState(() {
-                                                              cartItems[i]["qty"]--;
-                                                            });
-                                                          }
-                                                              : null,
+                                                          onTap:
+                                                              cartItems[i]["qty"] >
+                                                                      1
+                                                                  ? () {
+                                                                    setState(() {
+                                                                      cartItems[i]["qty"]--;
+                                                                    });
+                                                                  }
+                                                                  : null,
                                                           child: Container(
-                                                            padding: EdgeInsets.all(1.5.w),
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                  1.5.w,
+                                                                ),
                                                             decoration: BoxDecoration(
-                                                              color: AppColors.cardBgColor,
-                                                              shape: BoxShape.circle,
+                                                              color:
+                                                                  AppColors
+                                                                      .cardBgColor,
+                                                              shape:
+                                                                  BoxShape
+                                                                      .circle,
                                                             ),
                                                             child: Icon(
                                                               Icons.remove,
                                                               size: 16.sp,
-                                                              color: AppColors.blackColor,
+                                                              color:
+                                                                  AppColors
+                                                                      .blackColor,
                                                             ),
                                                           ),
                                                         ),
-                                                  
+
                                                         SizedBox(width: 2.w),
-                                                  
+
                                                         // Quantity text
                                                         Text(
-                                                          cartItems[i]["qty"].toString(),
+                                                          cartItems[i]["qty"]
+                                                              .toString(),
                                                           style: TextStyle(
                                                             fontSize: 14.sp,
-                                                            fontFamily: FontFamily.semiBold,
-                                                            color: AppColors.blackColor,
+                                                            fontFamily:
+                                                                FontFamily
+                                                                    .semiBold,
+                                                            color:
+                                                                AppColors
+                                                                    .blackColor,
                                                           ),
                                                         ),
-                                                  
+
                                                         SizedBox(width: 2.w),
-                                                  
+
                                                         // Increase
                                                         GestureDetector(
                                                           onTap: () {
@@ -221,15 +241,24 @@ class _CartScreenState extends State<CartScreen> {
                                                             });
                                                           },
                                                           child: Container(
-                                                            padding: EdgeInsets.all(1.5.w),
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                  1.5.w,
+                                                                ),
                                                             decoration: BoxDecoration(
-                                                              color: AppColors.cardBgColor,
-                                                              shape: BoxShape.circle,
+                                                              color:
+                                                                  AppColors
+                                                                      .cardBgColor,
+                                                              shape:
+                                                                  BoxShape
+                                                                      .circle,
                                                             ),
                                                             child: Icon(
                                                               Icons.add,
                                                               size: 16.sp,
-                                                              color: AppColors.blackColor,
+                                                              color:
+                                                                  AppColors
+                                                                      .blackColor,
                                                             ),
                                                           ),
                                                         ),
@@ -253,16 +282,17 @@ class _CartScreenState extends State<CartScreen> {
                                                   });
                                                 },
                                                 child: Container(
-                                                  padding: EdgeInsets.all(1.5.w),
+                                                  padding: EdgeInsets.all(
+                                                    1.5.w,
+                                                  ),
                                                   decoration: BoxDecoration(
-                                                    color:
-                                                    AppColors.mainColor,
+                                                    color: AppColors.mainColor,
                                                     shape: BoxShape.circle,
                                                   ),
                                                   child: Icon(
-                                                    Icons.delete_outline_rounded,
-                                                    color:
-                                                        AppColors.whiteColor,
+                                                    Icons
+                                                        .delete_outline_rounded,
+                                                    color: AppColors.whiteColor,
                                                   ),
                                                 ),
                                               ),
@@ -272,7 +302,8 @@ class _CartScreenState extends State<CartScreen> {
                                                 style: TextStyle(
                                                   color: AppColors.blackColor,
                                                   fontSize: 14.sp,
-                                                  fontFamily: FontFamily.semiBold,
+                                                  fontFamily:
+                                                      FontFamily.semiBold,
                                                 ),
                                               ),
                                             ],
@@ -289,164 +320,165 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                     ),
                   ),
-              SizedBox(height: 1.h,),
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: AppColors.whiteColor,
-                ),
-                padding: EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Summary Order",
-                      style: TextStyle(
-                        color: AppColors.blackColor,
-                        fontSize: 18.sp,
-                        fontFamily: FontFamily.semiBold,
-                      ),
+                  SizedBox(height: 1.h),
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: AppColors.whiteColor,
                     ),
-                    SizedBox(height: 1.h),
-                    Row(
+                    padding: EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: "Enter Discount Code",
-                              contentPadding: EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 12,
+                        Text(
+                          "Summary Order",
+                          style: TextStyle(
+                            color: AppColors.blackColor,
+                            fontSize: 18.sp,
+                            fontFamily: FontFamily.semiBold,
+                          ),
+                        ),
+                        SizedBox(height: 1.h),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  hintText: "Enter Discount Code",
+                                  contentPadding: EdgeInsets.symmetric(
+                                    vertical: 12,
+                                    horizontal: 12,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey.shade400,
+                                    ),
+                                  ),
+                                  filled: true,
+                                  fillColor: AppColors.containerColor,
+                                ),
                               ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.grey.shade400),
+                            ),
+                            SizedBox(width: 2.w),
+                            ElevatedButton(
+                              onPressed: () {
+                                // Apply discount code logic here
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.mainColor,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 12,
+                                  horizontal: 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
                               ),
-                              filled: true,
-                              fillColor: AppColors.containerColor,
+                              child: Text(
+                                "Apply",
+                                style: TextStyle(
+                                  color: AppColors.whiteColor,
+                                  fontSize: 16.sp,
+                                  fontFamily: FontFamily.semiBold,
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                        SizedBox(width: 2.w),
-                        ElevatedButton(
-                          onPressed: () {
-                            // Apply discount code logic here
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.mainColor,
-                            padding: EdgeInsets.symmetric(
-                              vertical: 12,
-                              horizontal: 16,
+                        SizedBox(height: 2.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Subtotal",
+                              style: TextStyle(
+                                color: AppColors.blackColor,
+                                fontSize: 16.sp,
+                                fontFamily: FontFamily.semiBold,
+                              ),
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                            Text(
+                              "\$ ${subtotal.toStringAsFixed(2)}",
+                              style: TextStyle(
+                                color: AppColors.blackColor,
+                                fontSize: 16.sp,
+                                fontFamily: FontFamily.semiBold,
+                              ),
                             ),
-                          ),
-                          child: Text(
-                            "Apply",
-                            style: TextStyle(
-                              color: AppColors.whiteColor,
-                              fontSize: 16.sp,
-                              fontFamily: FontFamily.semiBold,
+                          ],
+                        ),
+                        SizedBox(height: 1.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Shipping",
+                              style: TextStyle(
+                                color: AppColors.blackColor,
+                                fontSize: 16.sp,
+                                fontFamily: FontFamily.semiBold,
+                              ),
                             ),
-                          ),
+                            Text(
+                              "\$ ${shipping.toStringAsFixed(2)}",
+                              style: TextStyle(
+                                color: AppColors.blackColor,
+                                fontSize: 16.sp,
+                                fontFamily: FontFamily.semiBold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 1.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Tax",
+                              style: TextStyle(
+                                color: AppColors.blackColor,
+                                fontSize: 16.sp,
+                                fontFamily: FontFamily.semiBold,
+                              ),
+                            ),
+                            Text(
+                              "\$ ${tax.toStringAsFixed(2)}",
+                              style: TextStyle(
+                                color: AppColors.blackColor,
+                                fontSize: 16.sp,
+                                fontFamily: FontFamily.semiBold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 2.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Total",
+                              style: TextStyle(
+                                color: AppColors.blackColor,
+                                fontSize: 16.sp,
+                                fontFamily: FontFamily.semiBold,
+                              ),
+                            ),
+                            Text(
+                              "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
+                              style: TextStyle(
+                                color: AppColors.blackColor,
+                                fontSize: 16.sp,
+                                fontFamily: FontFamily.semiBold,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    SizedBox(height: 2.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Subtotal",
-                          style: TextStyle(
-                            color: AppColors.blackColor,
-                            fontSize: 16.sp,
-                            fontFamily: FontFamily.semiBold,
-                          ),
-                        ),
-                        Text(
-                          "\$ ${subtotal.toStringAsFixed(2)}",
-                          style: TextStyle(
-                            color: AppColors.blackColor,
-                            fontSize: 16.sp,
-                            fontFamily: FontFamily.semiBold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 1.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Shipping",
-                          style: TextStyle(
-                            color: AppColors.blackColor,
-                            fontSize: 16.sp,
-                            fontFamily: FontFamily.semiBold,
-                          ),
-                        ),
-                        Text(
-                          "\$ ${shipping.toStringAsFixed(2)}",
-                          style: TextStyle(
-                            color: AppColors.blackColor,
-                            fontSize: 16.sp,
-                            fontFamily: FontFamily.semiBold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 1.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Tax",
-                          style: TextStyle(
-                            color: AppColors.blackColor,
-                            fontSize: 16.sp,
-                            fontFamily: FontFamily.semiBold,
-                          ),
-                        ),
-                        Text(
-                          "\$ ${tax.toStringAsFixed(2)}",
-                          style: TextStyle(
-                            color: AppColors.blackColor,
-                            fontSize: 16.sp,
-                            fontFamily: FontFamily.semiBold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 2.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Total",
-                          style: TextStyle(
-                            color: AppColors.blackColor,
-                            fontSize: 16.sp,
-                            fontFamily: FontFamily.semiBold,
-                          ),
-                        ),
-                        Text(
-                          "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
-                          style: TextStyle(
-                            color: AppColors.blackColor,
-                            fontSize: 16.sp,
-                            fontFamily: FontFamily.semiBold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              ],
+                  ),
+                ],
               ),
             ),
           ),
@@ -524,10 +556,7 @@ class _CartScreenState extends State<CartScreen> {
               ],
             ),
           ),
-          SizedBox(
-            height: 10.h,
-            child: CustomBar(selected: 1),
-          ),
+          SizedBox(height: 10.h, child: CustomBar(selected: 1)),
         ],
       ),
     );

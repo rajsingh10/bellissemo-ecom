@@ -404,7 +404,7 @@ class _HomescreenState extends State<Homescreen> {
                           InkWell(
                             onTap: () {
                               Get.offAll(
-                                    () => CategoriesScreen(),
+                                () => CategoriesScreen(),
                                 transition: Transition.fade,
                                 duration: const Duration(milliseconds: 450),
                               );
