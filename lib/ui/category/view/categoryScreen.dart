@@ -180,7 +180,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       body: Column(
         children: [
           TitleBar(
-            title: 'Categories',
+            title: 'Catalog',
             isDrawerEnabled: true,
             isSearchEnabled: true,
             onSearch: () {

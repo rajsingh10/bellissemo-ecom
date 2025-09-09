@@ -1,3 +1,4 @@
+import 'package:bellissemo_ecom/ui/cart/View/chekOutScreen.dart';
 import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,6 +8,7 @@ import '../../../utils/cachedNetworkImage.dart';
 import '../../../utils/colors.dart';
 import '../../../utils/customBottombar.dart';
 import '../../../utils/titlebarWidget.dart';
+
 
 class CartScreen extends StatefulWidget {
   final String customerName;
@@ -57,7 +59,7 @@ class _CartScreenState extends State<CartScreen> {
           TitleBar(
             title: 'Cart',
             isDrawerEnabled: true,
-            isSearchEnabled: true,
+            isSearchEnabled: false,
             onSearch: () {
               setState(() {
                 isSearchEnabled = !isSearchEnabled;
@@ -346,6 +348,9 @@ class _CartScreenState extends State<CartScreen> {
                               child: TextField(
                                 decoration: InputDecoration(
                                   hintText: "Enter Discount Code",
+                                  hintStyle: TextStyle(fontSize: 16.sp,
+                                  fontFamily: FontFamily.semiBold
+                                  ),
                                   contentPadding: EdgeInsets.symmetric(
                                     vertical: 12,
                                     horizontal: 12,
@@ -511,7 +516,7 @@ class _CartScreenState extends State<CartScreen> {
                       "Estimated Total",
                       style: TextStyle(
                         color: AppColors.blackColor,
-                        fontSize: 15.sp,
+                        fontSize: 17.5.sp,
                         fontFamily: FontFamily.semiBold,
                       ),
                     ),
@@ -520,7 +525,7 @@ class _CartScreenState extends State<CartScreen> {
                       "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
                       style: TextStyle(
                         color: AppColors.blackColor,
-                        fontSize: 16.sp,
+                        fontSize: 18.sp,
                         fontFamily: FontFamily.semiBold,
                       ),
                     ),
@@ -531,23 +536,29 @@ class _CartScreenState extends State<CartScreen> {
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.only(left: 4.w),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Add checkout logic here
+                    child: InkWell(
+                      onTap: () {
+                        Get.offAll(
+                              () => CheckOutScreen(),
+                          transition: Transition.fade,
+                          duration: const Duration(milliseconds: 450),
+                        );
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.mainColor,
+                      child: Container(
                         padding: EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
+                        decoration: BoxDecoration(
+                          color: AppColors.mainColor,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                      ),
-                      child: Text(
-                        "Checkout",
-                        style: TextStyle(
-                          color: AppColors.whiteColor,
-                          fontSize: 16.sp,
-                          fontFamily: FontFamily.semiBold,
+                        child: Center(
+                          child: Text(
+                            "Checkout",
+                            style: TextStyle(
+                              color: AppColors.whiteColor,
+                              fontSize: 18.sp,
+                              fontFamily: FontFamily.semiBold,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -556,7 +567,7 @@ class _CartScreenState extends State<CartScreen> {
               ],
             ),
           ),
-          SizedBox(height: 10.h, child: CustomBar(selected: 1)),
+          SizedBox(height: 10.h, child: CustomBar(selected: 4)),
         ],
       ),
     );
