@@ -1,7 +1,10 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:bellissemo_ecom/ui/cart/View/cartScreen.dart';
+import 'package:bellissemo_ecom/ui/home/view/homeMenuScreen.dart';
 import 'package:bellissemo_ecom/ui/home/view/homeScreen.dart';
+import 'package:bellissemo_ecom/ui/orderhistory/view/orderHistoryScreen.dart';
 import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,6 +12,7 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 import '../ui/category/view/categoryScreen.dart';
+import '../ui/profile/view/profileScreen.dart';
 import 'colors.dart';
 import 'images.dart';
 
@@ -30,10 +34,26 @@ class _CustomBarState extends State<CustomBar> {
       "icon": Imgs.firstImage,
       "page": () => CategoriesScreen(),
     },
-    {"title": "Orders", "icon": Imgs.secondImage, "page": () {}},
-    {"title": "Home", "icon": Imgs.thirdImage, "page": () => Homescreen()},
-    {"title": "Cart", "icon": Imgs.fourthImage, "page": () {}},
-    {"title": "Profile", "icon": Imgs.fifthImage, "page": () {}},
+    {
+      "title": "Orders",
+      "icon": Imgs.secondImage,
+      "page": () => OrderHistoryScreen()
+    },
+    {
+      "title": "Home",
+      "icon": Imgs.thirdImage,
+      "page": () => Homescreen()
+    },
+    {
+      "title": "Cart",
+      "icon": Imgs.fourthImage,
+      "page": () => CartScreen(customerName: '')
+    },
+    {
+      "title": "Profile",
+      "icon": Imgs.fifthImage,
+      "page": () => HomeMenuScreen()
+    },
   ];
 
   @override
