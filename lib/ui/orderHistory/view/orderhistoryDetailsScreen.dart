@@ -1,6 +1,5 @@
 import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../utils/cachedNetworkImage.dart';
@@ -11,7 +10,8 @@ class OrderhistoryDetailsScreen extends StatefulWidget {
   const OrderhistoryDetailsScreen({super.key});
 
   @override
-  State<OrderhistoryDetailsScreen> createState() => _OrderhistoryDetailsScreenState();
+  State<OrderhistoryDetailsScreen> createState() =>
+      _OrderhistoryDetailsScreenState();
 }
 
 class _OrderhistoryDetailsScreenState extends State<OrderhistoryDetailsScreen> {
@@ -19,7 +19,7 @@ class _OrderhistoryDetailsScreenState extends State<OrderhistoryDetailsScreen> {
     Product(
       name: "L'Oreal Paris Lipstick",
       imageUrl:
-      'https://static.beautytocare.com/media/catalog/product/l/-/l-oreal-paris-color-riche-intense-volume-matte-lipstick-480.jpg',
+          'https://static.beautytocare.com/media/catalog/product/l/-/l-oreal-paris-color-riche-intense-volume-matte-lipstick-480.jpg',
       packSize: "Pack of 3",
       pricePerUnit: 29.0,
       inStock: true,
@@ -27,7 +27,7 @@ class _OrderhistoryDetailsScreenState extends State<OrderhistoryDetailsScreen> {
     Product(
       name: "Maybelline Foundation",
       imageUrl:
-      'https://m.media-amazon.com/images/I/51uTj0beKCL._UF1000,1000_QL80_.jpg',
+          'https://m.media-amazon.com/images/I/51uTj0beKCL._UF1000,1000_QL80_.jpg',
       packSize: "Pack of 2",
       pricePerUnit: 35.0,
       inStock: true,
@@ -42,7 +42,7 @@ class _OrderhistoryDetailsScreenState extends State<OrderhistoryDetailsScreen> {
     Product(
       name: "Nykaa Kajal",
       imageUrl:
-      'https://m.media-amazon.com/images/I/719eSwDuU7L._UF1000,1000_QL80_.jpg',
+          'https://m.media-amazon.com/images/I/719eSwDuU7L._UF1000,1000_QL80_.jpg',
       packSize: "Pack of 4",
       pricePerUnit: 15.0,
       inStock: true,
@@ -50,13 +50,13 @@ class _OrderhistoryDetailsScreenState extends State<OrderhistoryDetailsScreen> {
     Product(
       name: "Lakme Blush",
       imageUrl:
-      'https://m.media-amazon.com/images/I/71+yE3132GL._UF1000,1000_QL80_.jpg',
+          'https://m.media-amazon.com/images/I/71+yE3132GL._UF1000,1000_QL80_.jpg',
       packSize: "Pack of 4",
       pricePerUnit: 35.0,
       inStock: true,
     ),
-
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,7 +74,6 @@ class _OrderhistoryDetailsScreenState extends State<OrderhistoryDetailsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   Container(
                     width: double.infinity,
                     padding: EdgeInsets.all(12),
@@ -92,23 +91,32 @@ class _OrderhistoryDetailsScreenState extends State<OrderhistoryDetailsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Order ID: #123456",
-                            style: TextStyle(
-                                fontFamily: FontFamily.bold,
+                        Text(
+                          "Order ID: #123456",
+                          style: TextStyle(
+                            fontFamily: FontFamily.bold,
 
-                                fontSize: 18.sp)),
+                            fontSize: 18.sp,
+                          ),
+                        ),
                         SizedBox(height: 0.5.h),
-                        Text("Order Date: 08-09-2025",
-                            style: TextStyle(
-                                fontFamily: FontFamily.regular,
-                                fontSize: 16.sp,
-                                color:AppColors.gray)),
+                        Text(
+                          "Order Date: 08-09-2025",
+                          style: TextStyle(
+                            fontFamily: FontFamily.regular,
+                            fontSize: 16.sp,
+                            color: AppColors.gray,
+                          ),
+                        ),
                         SizedBox(height: 4),
-                        Text("Status: Delivered",
-                            style: TextStyle(
-                                fontFamily: FontFamily.bold,
-                                fontSize: 16.sp,
-                                color: AppColors.greenColor)),
+                        Text(
+                          "Status: Delivered",
+                          style: TextStyle(
+                            fontFamily: FontFamily.bold,
+                            fontSize: 16.sp,
+                            color: AppColors.greenColor,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -130,14 +138,20 @@ class _OrderhistoryDetailsScreenState extends State<OrderhistoryDetailsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Shipping Address",
-                            style: TextStyle(
-                                fontFamily: FontFamily.bold, fontSize: 18.sp)),
+                        Text(
+                          "Shipping Address",
+                          style: TextStyle(
+                            fontFamily: FontFamily.bold,
+                            fontSize: 18.sp,
+                          ),
+                        ),
                         SizedBox(height: 0.5.h),
                         Text(
                           "John Doe\n123, Main Street\nSurat, Gujarat\nIndia - 395001",
                           style: TextStyle(
-                              fontFamily: FontFamily.regular, fontSize: 16.sp),
+                            fontFamily: FontFamily.regular,
+                            fontSize: 16.sp,
+                          ),
                         ),
                       ],
                     ),
@@ -160,11 +174,19 @@ class _OrderhistoryDetailsScreenState extends State<OrderhistoryDetailsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("5 Item(s)",
-                            style: TextStyle(
-                                fontFamily: FontFamily.bold, fontSize: 18.sp)),
+                        Text(
+                          "5 Item(s)",
+                          style: TextStyle(
+                            fontFamily: FontFamily.bold,
+                            fontSize: 18.sp,
+                          ),
+                        ),
                         SizedBox(height: 0.5.h),
-                        for (int index = 0; index < products.length; index++) ...[
+                        for (
+                          int index = 0;
+                          index < products.length;
+                          index++
+                        ) ...[
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -179,29 +201,39 @@ class _OrderhistoryDetailsScreenState extends State<OrderhistoryDetailsScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(products[index].name,
-                                        style: TextStyle(
-                                            fontFamily: FontFamily.bold,
-                                            fontSize: 16.sp)),
+                                    Text(
+                                      products[index].name,
+                                      style: TextStyle(
+                                        fontFamily: FontFamily.bold,
+                                        fontSize: 16.sp,
+                                      ),
+                                    ),
                                     SizedBox(height: 2),
-                                    Text("${products[index].packSize} | ₹${products[index].pricePerUnit.toStringAsFixed(2)}",
-                                        style: TextStyle(
-                                            fontFamily: FontFamily.regular,
-                                            fontSize: 16.sp,
-                                            color: Colors.grey)),
+                                    Text(
+                                      "${products[index].packSize} | ₹${products[index].pricePerUnit.toStringAsFixed(2)}",
+                                      style: TextStyle(
+                                        fontFamily: FontFamily.regular,
+                                        fontSize: 16.sp,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
                                     if (!products[index].inStock)
-                                      Text("Out of Stock",
-                                          style: TextStyle(
-                                              fontFamily: FontFamily.regular,
-                                              fontSize: 16.sp,
-                                              color: Colors.red)),
+                                      Text(
+                                        "Out of Stock",
+                                        style: TextStyle(
+                                          fontFamily: FontFamily.regular,
+                                          fontSize: 16.sp,
+                                          color: Colors.red,
+                                        ),
+                                      ),
                                   ],
                                 ),
-                              )
+                              ),
                             ],
                           ),
-                          if (index != products.length - 1) Divider(), // Divider except last
-                        ]
+                          if (index != products.length - 1) Divider(),
+                          // Divider except last
+                        ],
                       ],
                     ),
                   ),
@@ -224,43 +256,71 @@ class _OrderhistoryDetailsScreenState extends State<OrderhistoryDetailsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Price Summary",
-                            style: TextStyle(
-                                fontFamily: FontFamily.bold, fontSize: 18.sp)),
+                        Text(
+                          "Price Summary",
+                          style: TextStyle(
+                            fontFamily: FontFamily.bold,
+                            fontSize: 18.sp,
+                          ),
+                        ),
                         SizedBox(height: 6),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("Subtotal",
-                                style: TextStyle(
-                                    fontFamily: FontFamily.regular, fontSize: 16.sp)),
-                            Text("₹139",
-                                style: TextStyle(
-                                    fontFamily: FontFamily.bold, fontSize: 16.sp)),
+                            Text(
+                              "Subtotal",
+                              style: TextStyle(
+                                fontFamily: FontFamily.regular,
+                                fontSize: 16.sp,
+                              ),
+                            ),
+                            Text(
+                              "₹139",
+                              style: TextStyle(
+                                fontFamily: FontFamily.bold,
+                                fontSize: 16.sp,
+                              ),
+                            ),
                           ],
                         ),
                         SizedBox(height: 4),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("Shipping",
-                                style: TextStyle(
-                                    fontFamily: FontFamily.regular, fontSize: 16.sp)),
-                            Text("₹50",
-                                style: TextStyle(
-                                    fontFamily: FontFamily.bold, fontSize: 16.sp)),
+                            Text(
+                              "Shipping",
+                              style: TextStyle(
+                                fontFamily: FontFamily.regular,
+                                fontSize: 16.sp,
+                              ),
+                            ),
+                            Text(
+                              "₹50",
+                              style: TextStyle(
+                                fontFamily: FontFamily.bold,
+                                fontSize: 16.sp,
+                              ),
+                            ),
                           ],
                         ),
                         Divider(height: 20, thickness: 1),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("Total",
-                                style: TextStyle(
-                                    fontFamily: FontFamily.bold, fontSize: 16.sp)),
-                            Text("₹189",
-                                style: TextStyle(
-                                    fontFamily: FontFamily.bold, fontSize: 16.sp)),
+                            Text(
+                              "Total",
+                              style: TextStyle(
+                                fontFamily: FontFamily.bold,
+                                fontSize: 16.sp,
+                              ),
+                            ),
+                            Text(
+                              "₹189",
+                              style: TextStyle(
+                                fontFamily: FontFamily.bold,
+                                fontSize: 16.sp,
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -275,6 +335,7 @@ class _OrderhistoryDetailsScreenState extends State<OrderhistoryDetailsScreen> {
     );
   }
 }
+
 class Product {
   final String name;
   final String imageUrl;

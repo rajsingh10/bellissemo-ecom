@@ -18,15 +18,17 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   final List<Product> products = [
     Product(
       name: "Maybelline Lip Liner",
-      imageUrl: "https://m.media-amazon.com/images/I/71Y+L4lMHWL._UF1000,1000_QL80_.jpg",
+      imageUrl:
+          "https://m.media-amazon.com/images/I/71Y+L4lMHWL._UF1000,1000_QL80_.jpg",
       quantity: 1,
-      price:19.99,
+      price: 19.99,
     ),
     Product(
       name: "Revlon Face Powder",
-      imageUrl: "https://m.media-amazon.com/images/I/71JgzO1Pp5L._UF1000,1000_QL80_.jpg",
+      imageUrl:
+          "https://m.media-amazon.com/images/I/71JgzO1Pp5L._UF1000,1000_QL80_.jpg",
       quantity: 1,
-      price:  79.99,
+      price: 79.99,
     ),
   ];
 
@@ -36,8 +38,10 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
       backgroundColor: AppColors.containerColor,
       body: Column(
         children: [
-          TitleBar(title: 'Chekout', isDrawerEnabled: false,
-          isBackEnabled: true,
+          TitleBar(
+            title: 'Chekout',
+            isDrawerEnabled: false,
+            isBackEnabled: true,
           ),
           SizedBox(height: 1.h),
           Expanded(
@@ -82,7 +86,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                 // Product Details
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         product.name,
@@ -117,7 +122,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                             ),
                             SizedBox(height: 1.h),
                             Divider(),
-                          ]
+                          ],
                         ],
                       ),
                     ),
@@ -143,9 +148,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                             ),
                           ),
                           Divider(),
+
                           // SizedBox(height: 1.h),
-
-
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -253,10 +257,9 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                       fontFamily: FontFamily.regular,
                       fontSize: 16.sp,
                       color: AppColors.gray,
-
                     ),
                   ),
-                  SizedBox(height: 1.h,),
+                  SizedBox(height: 1.h),
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -313,7 +316,6 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                   fontFamily: FontFamily.semiBold,
                                 ),
                               ),
-
                             ],
                           ),
                           SizedBox(height: 1.h),
@@ -332,7 +334,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         child: InkWell(
           onTap: () {
             Get.offAll(
-                  () => CheckOutScreen(),
+              () => CheckOutScreen(),
               transition: Transition.fade,
               duration: const Duration(milliseconds: 450),
             );
@@ -373,4 +375,3 @@ class Product {
     required this.price,
   });
 }
-

@@ -9,7 +9,6 @@ import '../../../utils/colors.dart';
 import '../../../utils/customBottombar.dart';
 import '../../../utils/titlebarWidget.dart';
 
-
 class CartScreen extends StatefulWidget {
   final String customerName;
 
@@ -25,6 +24,7 @@ class _CartScreenState extends State<CartScreen> {
 
   List<bool> selectedItems = List.generate(5, (_) => false);
   bool selectAll = false;
+  bool isIpad = 100.w >= 800;
 
   List<Map<String, dynamic>> cartItems = [
     {
@@ -88,7 +88,7 @@ class _CartScreenState extends State<CartScreen> {
                           Row(
                             children: [
                               Text(
-                                "${widget.customerName}!",
+                                widget.customerName,
                                 style: TextStyle(
                                   color: AppColors.blackColor,
                                   fontSize: 18.sp,
@@ -168,7 +168,8 @@ class _CartScreenState extends State<CartScreen> {
                                                   child: Container(
                                                     padding:
                                                         EdgeInsets.symmetric(
-                                                          horizontal: 2.w,
+                                                          horizontal:
+                                                              isIpad ? 0 : 2.w,
                                                           vertical: 0.5.h,
                                                         ),
                                                     decoration: BoxDecoration(
@@ -208,7 +209,10 @@ class _CartScreenState extends State<CartScreen> {
                                                             ),
                                                             child: Icon(
                                                               Icons.remove,
-                                                              size: 16.sp,
+                                                              size:
+                                                                  isIpad
+                                                                      ? 12.sp
+                                                                      : 16.sp,
                                                               color:
                                                                   AppColors
                                                                       .blackColor,
@@ -216,7 +220,7 @@ class _CartScreenState extends State<CartScreen> {
                                                           ),
                                                         ),
 
-                                                        SizedBox(width: 2.w),
+                                                        SizedBox(width: 1.w),
 
                                                         // Quantity text
                                                         Text(
@@ -233,7 +237,7 @@ class _CartScreenState extends State<CartScreen> {
                                                           ),
                                                         ),
 
-                                                        SizedBox(width: 2.w),
+                                                        SizedBox(width: 1.w),
 
                                                         // Increase
                                                         GestureDetector(
@@ -257,7 +261,10 @@ class _CartScreenState extends State<CartScreen> {
                                                             ),
                                                             child: Icon(
                                                               Icons.add,
-                                                              size: 16.sp,
+                                                              size:
+                                                                  isIpad
+                                                                      ? 12.sp
+                                                                      : 16.sp,
                                                               color:
                                                                   AppColors
                                                                       .blackColor,
@@ -284,8 +291,9 @@ class _CartScreenState extends State<CartScreen> {
                                                   });
                                                 },
                                                 child: Container(
+                                                  height: isIpad ? 24.sp : 0.sp,
                                                   padding: EdgeInsets.all(
-                                                    1.5.w,
+                                                    isIpad ? 1.w : 1.5.w,
                                                   ),
                                                   decoration: BoxDecoration(
                                                     color: AppColors.mainColor,
@@ -295,6 +303,7 @@ class _CartScreenState extends State<CartScreen> {
                                                     Icons
                                                         .delete_outline_rounded,
                                                     color: AppColors.whiteColor,
+                                                    size: isIpad ? 16.sp : 0,
                                                   ),
                                                 ),
                                               ),
@@ -348,8 +357,9 @@ class _CartScreenState extends State<CartScreen> {
                               child: TextField(
                                 decoration: InputDecoration(
                                   hintText: "Enter Discount Code",
-                                  hintStyle: TextStyle(fontSize: 16.sp,
-                                  fontFamily: FontFamily.semiBold
+                                  hintStyle: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontFamily: FontFamily.semiBold,
                                   ),
                                   contentPadding: EdgeInsets.symmetric(
                                     vertical: 12,
@@ -539,7 +549,7 @@ class _CartScreenState extends State<CartScreen> {
                     child: InkWell(
                       onTap: () {
                         Get.offAll(
-                              () => CheckOutScreen(),
+                          () => CheckOutScreen(),
                           transition: Transition.fade,
                           duration: const Duration(milliseconds: 450),
                         );
@@ -567,7 +577,7 @@ class _CartScreenState extends State<CartScreen> {
               ],
             ),
           ),
-          SizedBox(height: 10.h, child: CustomBar(selected: 4)),
+          SizedBox(height: isIpad ? 12.h : 10.h, child: CustomBar(selected: 4)),
         ],
       ),
     );

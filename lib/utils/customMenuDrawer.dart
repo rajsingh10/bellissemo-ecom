@@ -13,9 +13,7 @@ import 'cachedNetworkImage.dart';
 import 'customButton.dart';
 
 class CustomDrawer extends StatefulWidget {
-  final VoidCallback? onClose;
-
-  const CustomDrawer({super.key, this.onClose});
+  const CustomDrawer({super.key});
 
   @override
   State<CustomDrawer> createState() => _CustomDrawerState();
@@ -91,31 +89,24 @@ class _CustomDrawerState extends State<CustomDrawer> {
           ),
           SizedBox(height: 0.5.h),
           _drawerItem(Icons.home_outlined, "Home", () {
-            widget.onClose?.call(); // close drawer
             Get.to(() => Homescreen());
           }),
           _drawerItem(Icons.shopping_bag_outlined, "Orders", () {
-            widget.onClose?.call();
             Get.to(() => OrderHistoryScreen());
           }),
           _drawerItem(Icons.menu_book_outlined, "Catalog", () {
-            widget.onClose?.call();
             Get.to(() => CategoriesScreen());
           }),
           _drawerItem(Icons.people_alt_outlined, "Customers", () {
-            widget.onClose?.call();
             Get.to(() => CustomersScreen());
           }),
           _drawerItem(Icons.shopping_cart_outlined, "Cart", () {
-            widget.onClose?.call();
             Get.to(() => CartScreen(customerName: ''));
           }),
           _drawerItem(Icons.person_outline, "Account", () {
-            widget.onClose?.call();
             // navigate to Account screen if exists
           }),
           _drawerItem(Icons.settings_outlined, "Settings", () {
-            widget.onClose?.call();
             // navigate to Settings screen if exists
           }),
 
@@ -125,7 +116,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
             child: CustomButton(
               title: "Log Out",
               route: () {
-
                 debugPrint("Log Out clicked");
               },
               color: AppColors.mainColor,
@@ -143,10 +133,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   blurRadius: 4,
                   spreadRadius: 1,
                   offset: Offset(0, 2),
-                )
+                ),
               ],
             ),
-
           ),
         ],
       ),

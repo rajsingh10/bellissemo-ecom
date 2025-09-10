@@ -60,9 +60,8 @@ dependencies:
   dio:
   smooth_page_indicator:
   flutter_svg:
-
-
   device_info_plus: any
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -8,7 +8,6 @@ import '../../../utils/customBottombar.dart';
 import '../../../utils/emptyWidget.dart';
 import '../../../utils/fontFamily.dart';
 import '../../../utils/searchFields.dart';
-import '../../../utils/snackBars.dart';
 import '../../../utils/titlebarWidget.dart';
 import '../../products/view/productsScreen.dart';
 
@@ -136,6 +135,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     searchController.addListener(() {
       _filterCategories(searchController.text);
     });
+    setState(() {
+      itemsPerPage = 100.w >= 800 ? 8 : 4;
+    });
   }
 
   void _filterCategories([String query = ""]) {
@@ -160,6 +162,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
       currentPage = 0;
     });
+  }
+
+  int _getCrossAxisCount(BuildContext context) {
+    if (100.w >= 800) {
+      return 4;
+    } else {
+      return 2;
+    }
   }
 
   @override
@@ -348,7 +358,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           GridView.count(
                             shrinkWrap: true,
                             physics: ClampingScrollPhysics(),
-                            crossAxisCount: 2,
+                            crossAxisCount: _getCrossAxisCount(context),
                             childAspectRatio: 0.8,
                             mainAxisSpacing: 1.h,
                             crossAxisSpacing: 2.w,
@@ -414,17 +424,19 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         ],
       ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
       bottomNavigationBar: SizedBox(
-        height: 10.h,
+        height: isIpad ? 12.h : 10.h,
         child: CustomBar(selected: 1),
       ),
     );
   }
 
+  bool isIpad = 100.w >= 800;
+
   Widget _buildGridItem(Category category) {
     return InkWell(
       onTap: () {
         Get.to(
-              () => ProductsScreen(cate: category.name,),
+          () => ProductsScreen(cate: category.name),
           transition: Transition.leftToRightWithFade,
           duration: const Duration(milliseconds: 450),
         );

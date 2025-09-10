@@ -14,7 +14,8 @@ import '../../../utils/cachedNetworkImage.dart';
 
 class ProductsScreen extends StatefulWidget {
   String? cate;
-   ProductsScreen({super.key,this.cate});
+
+  ProductsScreen({super.key, this.cate});
 
   @override
   State<ProductsScreen> createState() => _ProductsScreenState();
@@ -23,6 +24,14 @@ class ProductsScreen extends StatefulWidget {
 class _ProductsScreenState extends State<ProductsScreen> {
   int itemsPerPage = 4;
   int currentPage = 0;
+
+  int _getCrossAxisCount(BuildContext context) {
+    if (100.w >= 800) {
+      return 4;
+    } else {
+      return 2;
+    }
+  }
 
   final List<int> itemsPerPageOptions = [4, 8, 12, 16];
   List<Product> filteredProducts = [];
@@ -222,9 +231,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
       body: Column(
         children: [
           TitleBar(
-            title:widget.cate==null? 'Products':widget.cate.toString(),
+            title: widget.cate == null ? 'Products' : widget.cate.toString(),
             isDrawerEnabled: true,
-            isSearchEnabled: true,isBackEnabled: true,
+            isSearchEnabled: true,
+            isBackEnabled: true,
             onSearch: () {
               setState(() {
                 isSearchEnabled = !isSearchEnabled;
@@ -390,7 +400,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             shrinkWrap: true,
                             padding: EdgeInsets.zero,
                             physics: ClampingScrollPhysics(),
-                            crossAxisCount: 2,
+                            crossAxisCount: _getCrossAxisCount(context),
                             childAspectRatio: 0.75,
                             mainAxisSpacing: 1.h,
                             crossAxisSpacing: 2.w,
@@ -508,11 +518,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
         ],
       ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
       bottomNavigationBar: SizedBox(
-        height: 10.h,
-        child: CustomBar(selected: 8,),
+        height: isIpad ? 12.h : 10.h,
+        child: CustomBar(selected: 8),
       ),
     );
   }
+
+  bool isIpad = 100.w >= 800;
 
   Widget _buildGridItem(Product product) {
     return InkWell(
