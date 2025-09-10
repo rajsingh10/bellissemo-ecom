@@ -12,7 +12,6 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 import '../ui/category/view/categoryScreen.dart';
-import '../ui/profile/view/profileScreen.dart';
 import 'colors.dart';
 import 'images.dart';
 
@@ -37,22 +36,18 @@ class _CustomBarState extends State<CustomBar> {
     {
       "title": "Orders",
       "icon": Imgs.secondImage,
-      "page": () => OrderHistoryScreen()
+      "page": () => OrderHistoryScreen(),
     },
-    {
-      "title": "Home",
-      "icon": Imgs.thirdImage,
-      "page": () => Homescreen()
-    },
+    {"title": "Home", "icon": Imgs.thirdImage, "page": () => Homescreen()},
     {
       "title": "Cart",
       "icon": Imgs.fourthImage,
-      "page": () => CartScreen(customerName: '')
+      "page": () => CartScreen(customerName: ''),
     },
     {
       "title": "Profile",
       "icon": Imgs.fifthImage,
-      "page": () => HomeMenuScreen()
+      "page": () => HomeMenuScreen(),
     },
   ];
 
@@ -103,15 +98,25 @@ class _CustomBarState extends State<CustomBar> {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SvgPicture.asset(
-                      item["icon"],
-                      width: 8.w,
-                      height: 8.w,
-                      colorFilter: ColorFilter.mode(
-                        isActive ? AppColors.mainColor : AppColors.gray,
-                        BlendMode.srcIn,
-                      ),
-                    ),
+                    100.w >= 800
+                        ? SvgPicture.asset(
+                          item["icon"],
+                          width: 4.5.w,
+                          height: 4.5.w,
+                          colorFilter: ColorFilter.mode(
+                            isActive ? AppColors.mainColor : AppColors.gray,
+                            BlendMode.srcIn,
+                          ),
+                        )
+                        : SvgPicture.asset(
+                          item["icon"],
+                          width: 8.w,
+                          height: 8.w,
+                          colorFilter: ColorFilter.mode(
+                            isActive ? AppColors.mainColor : AppColors.gray,
+                            BlendMode.srcIn,
+                          ),
+                        ),
                     SizedBox(height: 0.5.h),
                     Text(
                       item["title"],

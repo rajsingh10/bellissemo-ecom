@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:bellissemo_ecom/utils/colors.dart';
 import 'package:bellissemo_ecom/utils/multipleImagesSlider.dart';
 import 'package:flutter/cupertino.dart';
@@ -25,11 +23,16 @@ class Homescreen extends StatefulWidget {
 class _HomescreenState extends State<Homescreen> {
   final GlobalKey<ScaffoldState> _scaffoldKeyHome = GlobalKey<ScaffoldState>();
   final TextEditingController searchController = TextEditingController();
-  late final PageController _pageController;
-  int _currentIndex = 0;
-  Timer? _timer;
 
   bool searchBar = false;
+
+  int _getCrossAxisCount(BuildContext context) {
+    if (isIpad) {
+      return 4;
+    } else {
+      return 2;
+    }
+  }
 
   final List<String> carouselImages = [
     'https://static.vecteezy.com/system/resources/thumbnails/004/707/493/small_2x/online-shopping-on-phone-buy-sell-business-digital-web-banner-application-money-advertising-payment-ecommerce-illustration-search-vector.jpg',
@@ -230,30 +233,15 @@ class _HomescreenState extends State<Homescreen> {
           "https://m.media-amazon.com/images/I/71ASI7UtiXL._UF1000,1000_QL80_.jpg",
     },
   ];
+  bool isIpad = 100.w >= 800;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
-
-    _timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
-      if (_currentIndex < carouselImages.length - 1) {
-        _currentIndex++;
-      } else {
-        _currentIndex = 0;
-      }
-      _pageController.animateToPage(
-        _currentIndex,
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeInOut,
-      );
-    });
   }
 
   @override
   void dispose() {
-    _pageController.dispose();
-    _timer?.cancel();
     super.dispose();
   }
 
@@ -414,7 +402,7 @@ class _HomescreenState extends State<Homescreen> {
                                 Text(
                                   "View All",
                                   style: TextStyle(
-                                    fontSize: 16.sp,
+                                    fontSize: isIpad ? 14.sp : 16.sp,
                                     fontFamily: FontFamily.bold,
                                     color: AppColors.gray,
                                   ),
@@ -459,17 +447,26 @@ class _HomescreenState extends State<Homescreen> {
                                         },
                                         customBorder: CircleBorder(),
                                         child: ClipOval(
-                                          child: CustomNetworkImage(
-                                            imageUrl: recentOrders[i]["image"],
-                                            width: 15.w,
-                                            height: 15.w,
-                                          ),
+                                          child:
+                                              isIpad
+                                                  ? CustomNetworkImage(
+                                                    imageUrl:
+                                                        recentOrders[i]["image"],
+                                                    width: 10.w,
+                                                    height: 10.w,
+                                                  )
+                                                  : CustomNetworkImage(
+                                                    imageUrl:
+                                                        recentOrders[i]["image"],
+                                                    width: 15.w,
+                                                    height: 15.w,
+                                                  ),
                                         ),
                                       ),
                                     ),
                                     const SizedBox(height: 6),
                                     SizedBox(
-                                      width: 70,
+                                      width: 10.w,
                                       child: Text(
                                         recentOrders[i]["name"],
                                         textAlign: TextAlign.center,
@@ -489,7 +486,7 @@ class _HomescreenState extends State<Homescreen> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 2.h),
+                      SizedBox(height: isIpad ? 4.h : 2.h),
                       InkWell(
                         onTap: () {
                           Get.to(
@@ -515,7 +512,7 @@ class _HomescreenState extends State<Homescreen> {
                                 Text(
                                   "View All",
                                   style: TextStyle(
-                                    fontSize: 16.sp,
+                                    fontSize: isIpad ? 14.sp : 16.sp,
                                     fontFamily: FontFamily.bold,
                                     color: AppColors.gray,
                                   ),
@@ -540,7 +537,7 @@ class _HomescreenState extends State<Homescreen> {
                         shrinkWrap: true,
                         padding: EdgeInsets.zero,
                         physics: ClampingScrollPhysics(),
-                        crossAxisCount: 2,
+                        crossAxisCount: _getCrossAxisCount(context),
                         childAspectRatio: 0.75,
                         mainAxisSpacing: 1.h,
                         crossAxisSpacing: 2.w,
@@ -561,7 +558,7 @@ class _HomescreenState extends State<Homescreen> {
         ),
       ),
       bottomNavigationBar: SizedBox(
-        height: 10.h,
+        height: isIpad ? 12.h : 10.h,
         child: CustomBar(selected: 3),
       ),
     );
@@ -670,7 +667,7 @@ class _HomescreenState extends State<Homescreen> {
                         // Modern Quantity Selector
                         Container(
                           padding: EdgeInsets.symmetric(
-                            horizontal: 2.w,
+                            horizontal: isIpad ? 0 : 2.w,
                             vertical: 0.5.h,
                           ),
                           decoration: BoxDecoration(
@@ -693,12 +690,12 @@ class _HomescreenState extends State<Homescreen> {
                                   ),
                                   child: Icon(
                                     Icons.remove,
-                                    size: 16.sp,
+                                    size: isIpad ? 12.sp : 16.sp,
                                     color: AppColors.blackColor,
                                   ),
                                 ),
                               ),
-                              SizedBox(width: 2.w),
+                              SizedBox(width: 1.w),
                               Text(
                                 product.quantity.toString(),
                                 style: TextStyle(
@@ -707,7 +704,7 @@ class _HomescreenState extends State<Homescreen> {
                                   color: AppColors.blackColor,
                                 ),
                               ),
-                              SizedBox(width: 2.w),
+                              SizedBox(width: 1.w),
                               GestureDetector(
                                 onTap:
                                     product.inStock
@@ -722,7 +719,7 @@ class _HomescreenState extends State<Homescreen> {
                                   ),
                                   child: Icon(
                                     Icons.add,
-                                    size: 16.sp,
+                                    size: isIpad ? 12.sp : 16.sp,
                                     color: AppColors.blackColor,
                                   ),
                                 ),
@@ -749,7 +746,7 @@ class _HomescreenState extends State<Homescreen> {
                             child: Icon(
                               Icons.shopping_cart_outlined,
                               color: Colors.white,
-                              size: 18.sp,
+                              size: isIpad ? 15.sp : 18.sp,
                             ),
                           ),
                         ),

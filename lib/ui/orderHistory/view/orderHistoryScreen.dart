@@ -1,9 +1,9 @@
-import 'package:bellissemo_ecom/ui/orderhistory/view/orderhistoryDetailsScreen.dart';
 import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../utils/cachedNetworkImage.dart';
 import '../../../utils/colors.dart';
 import '../../../utils/customBottombar.dart';
 import '../../../utils/customButton.dart';
@@ -22,6 +22,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   TextEditingController searchController = TextEditingController();
 
   String selectedSort = "Newest First";
+  bool isIpad = 100.w >= 800;
 
   final List<String> sortOptions = [
     "Newest First",
@@ -29,7 +30,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     "Price: Low to High",
     "Price: High to Low",
   ];
-
 
   final List<Order> orders = [
     Order(
@@ -40,13 +40,15 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       items: [
         OrderItem(
           name: "Green Controller",
-          imageUrl: "https://m.media-amazon.com/images/I/71hUeZd546L._UF1000,1000_QL80_.jpg",
+          imageUrl:
+              "https://m.media-amazon.com/images/I/71hUeZd546L._UF1000,1000_QL80_.jpg",
           price: 25.00,
           qty: 1,
         ),
         OrderItem(
           name: "Black Smartwatch",
-          imageUrl: "https://m.media-amazon.com/images/I/51uTj0beKCL._UF1000,1000_QL80_.jpg",
+          imageUrl:
+              "https://m.media-amazon.com/images/I/51uTj0beKCL._UF1000,1000_QL80_.jpg",
           price: 14.99,
           qty: 2,
         ),
@@ -60,7 +62,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       items: [
         OrderItem(
           name: "Lipstick Kit",
-          imageUrl: "https://m.media-amazon.com/images/I/51uTj0beKCL._UF1000,1000_QL80_.jpg",
+          imageUrl:
+              "https://m.media-amazon.com/images/I/51uTj0beKCL._UF1000,1000_QL80_.jpg",
           price: 12.50,
           qty: 1,
         ),
@@ -148,50 +151,58 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 ),
               ),
               Container(
-                  padding: EdgeInsets.symmetric(horizontal: 3.w),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 6,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Text("Sort By ",  style: TextStyle(
+                padding: EdgeInsets.symmetric(horizontal: 3.w),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 6,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      "Sort By ",
+                      style: TextStyle(
                         fontSize: 15.sp,
                         fontFamily: FontFamily.semiBold,
                         color: AppColors.blackColor,
-                      ),),
-                      SizedBox(width: 3.w,),
-                      DropdownButtonHideUnderline(  // <-- Wrap to remove underline
-                        child: DropdownButton<String>(
-                          value: selectedSort,
-                          icon: Icon(
-                            Icons.sort,
-                            color: AppColors.mainColor,
-                          ),
-                          items: sortOptions
-                              .map((option) => DropdownMenuItem(
-                            value: option,
-                            child: Text(option,style: TextStyle(
-                              fontSize: 15.sp,
-                              fontFamily: FontFamily.semiBold,
-                              color: AppColors.mainColor,
-                            ),),
-                          ))
-                              .toList(),
-                          onChanged: (value) {
-                            if (value != null) sortOrders(value);
-                          },
-                        ),
                       ),
-                    ],
-                  )),
+                    ),
+                    SizedBox(width: 3.w),
+                    DropdownButtonHideUnderline(
+                      // <-- Wrap to remove underline
+                      child: DropdownButton<String>(
+                        value: selectedSort,
+                        icon: Icon(Icons.sort, color: AppColors.mainColor),
+                        items:
+                            sortOptions
+                                .map(
+                                  (option) => DropdownMenuItem(
+                                    value: option,
+                                    child: Text(
+                                      option,
+                                      style: TextStyle(
+                                        fontSize: 15.sp,
+                                        fontFamily: FontFamily.semiBold,
+                                        color: AppColors.mainColor,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                        onChanged: (value) {
+                          if (value != null) sortOrders(value);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
 
@@ -212,7 +223,10 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                         ),
                         color: AppColors.whiteColor,
                         child: ExpansionTile(
-                          tilePadding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          tilePadding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 4,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -232,16 +246,23 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                               ),
                               SizedBox(height: 0.5.h),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 4,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: order.status == "Delivered"
-                                          ? AppColors.greenColor.withOpacity(0.1)
-                                          : order.status == "Pending"
-                                          ? AppColors.orangeColor.withOpacity(0.1)
-                                          : Colors.red.withOpacity(0.1),
+                                      color:
+                                          order.status == "Delivered"
+                                              ? AppColors.greenColor
+                                                  .withOpacity(0.1)
+                                              : order.status == "Pending"
+                                              ? AppColors.orangeColor
+                                                  .withOpacity(0.1)
+                                              : Colors.red.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
@@ -250,11 +271,12 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                         fontSize: 16.sp,
                                         fontWeight: FontWeight.bold,
                                         fontFamily: FontFamily.bold,
-                                        color: order.status == "Delivered"
-                                            ? AppColors.greenColor
-                                            : order.status == "Pending"
-                                            ? AppColors.orangeColor
-                                            : Colors.red,
+                                        color:
+                                            order.status == "Delivered"
+                                                ? AppColors.greenColor
+                                                : order.status == "Pending"
+                                                ? AppColors.orangeColor
+                                                : Colors.red,
                                       ),
                                     ),
                                   ),
@@ -263,7 +285,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                     style: TextStyle(
                                       fontSize: 16.sp,
                                       color: AppColors.gray,
-                                      fontFamily: FontFamily.bold
+                                      fontFamily: FontFamily.bold,
                                     ),
                                   ),
                                 ],
@@ -275,28 +297,37 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                               children: [
                                 for (var item in order.items)
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 6,
+                                      horizontal: 12,
+                                    ),
                                     child: Row(
                                       children: [
                                         ClipRRect(
-                                          borderRadius: BorderRadius.circular(8),
-                                          child: Image.network(
-                                            item.imageUrl,
-                                            height: 50,
-                                            width: 50,
-                                            fit: BoxFit.cover,
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                          child: CustomNetworkImage(
+                                            imageUrl: item.imageUrl,
+                                            height: 100,
+                                            width: 100,
+                                            isCircle: true,
+                                            isFit: true,
+                                            isProfile: true,
                                           ),
                                         ),
                                         SizedBox(width: 2.w),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 item.name,
                                                 style: TextStyle(
                                                   fontSize: 16.sp,
-                                                  fontFamily: FontFamily.semiBold,
+                                                  fontFamily:
+                                                      FontFamily.semiBold,
                                                   color: AppColors.blackColor,
                                                 ),
                                               ),
@@ -306,7 +337,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                 style: TextStyle(
                                                   fontSize: 16.sp,
                                                   color: AppColors.gray,
-                                                  fontFamily: FontFamily.semiBold
+                                                  fontFamily:
+                                                      FontFamily.semiBold,
                                                 ),
                                               ),
                                             ],
@@ -317,30 +349,39 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                   ),
                                 Divider(),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text("Total:",
-                                          style: TextStyle(
-                                            fontSize: 16.sp,
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: FontFamily.bold,
-                                          )),
-                                      Text("\$${order.price.toStringAsFixed(2)}",
-                                          style: TextStyle(
-                                            fontSize: 16.sp,
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: FontFamily.bold,
-                                            color: AppColors.blackColor,
-                                          )),
+                                      Text(
+                                        "Total:",
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: FontFamily.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        "\$${order.price.toStringAsFixed(2)}",
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: FontFamily.bold,
+                                          color: AppColors.blackColor,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
                                 SizedBox(height: 0.5.h),
 
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
                                   child: Align(
                                     alignment: Alignment.center,
                                     child: CustomButton(
@@ -348,17 +389,20 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                       route: () {
                                         print("Get Invoice tapped");
                                       },
-                                      color: AppColors.mainColor,           // Transparent background
-                                      fontcolor: AppColors.whiteColor,     // Text color
+                                      color: AppColors.mainColor,
+                                      // Transparent background
+                                      fontcolor: AppColors.whiteColor,
+                                      // Text color
                                       height: 5.h,
-                                      width: double.infinity,                         // Adjust width for spacing
+                                      width: double.infinity,
+                                      // Adjust width for spacing
                                       fontsize: 16.sp,
                                       radius: 12.0,
                                       // No border
                                     ),
                                   ),
                                 ),
-                                SizedBox(height: 1.5.h,)
+                                SizedBox(height: 1.5.h),
 
                                 // Padding(
                                 //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -394,9 +438,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                 //     ],
                                 //   ),
                                 // ),
-
-
-
                               ],
                             ),
                           ],
@@ -410,7 +451,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         ],
       ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
       bottomNavigationBar: SizedBox(
-        height: 10.h,
+        height: isIpad ? 12.h : 10.h,
         child: CustomBar(selected: 2),
       ),
     );

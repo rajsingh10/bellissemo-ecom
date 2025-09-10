@@ -9,7 +9,6 @@ import 'package:sizer/sizer.dart';
 import '../../../utils/multipleImagesSlider.dart';
 import '../../../utils/titlebarWidget.dart';
 import '../../cart/View/cartScreen.dart';
-import '../../cart/View/cartScreen.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   const ProductDetailsScreen({super.key});
