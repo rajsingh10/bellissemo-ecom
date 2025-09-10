@@ -15,54 +15,64 @@ Widget TitleBar({
   bool isDrawerEnabled = true,
   bool isBackEnabled = false,
 }) {
+  /// Determine if device is tablet/iPad based on width
+  final bool isTablet = 100.w >= 800;
+
   /// Helper: Build button
   Widget buildButton(IconData icon, VoidCallback? onTap) {
     return InkWell(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(2.w), // responsive padding
+        padding: EdgeInsets.all(12.sp),
         decoration: BoxDecoration(
-          color: AppColors.mainColor.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
+          color: AppColors.mainColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
         ),
-        child: Icon(icon, color: AppColors.mainColor, size: 22.sp),
+        child: Icon(
+          icon,
+          color: AppColors.mainColor,
+          size: isTablet ? 20.sp : 22.sp,
+        ),
       ),
     );
   }
 
   /// Build right-side buttons dynamically
   final List<Widget> rightButtons = [];
-
   if (isSearchEnabled) {
     rightButtons.add(buildButton(Icons.search_rounded, onSearch));
   }
-
-  // Drawer logic (right side only if back is enabled)
   if (isDrawerEnabled && isBackEnabled) {
     rightButtons.add(buildButton(Icons.menu_rounded, drawerCallback));
   }
 
-  // Check if only one button total
+  // Total buttons for spacing logic
   final int totalButtons =
       (isBackEnabled || isDrawerEnabled ? 1 : 0) + rightButtons.length;
 
   return Container(
-    margin: EdgeInsets.only(top: 5.h, bottom: 1.h),
-    padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
+    margin: EdgeInsets.only(
+      top: isTablet ? 6.h : 5.h,
+      bottom: isTablet ? 2.h : 1.h,
+    ),
+    padding: EdgeInsets.symmetric(
+      horizontal: isTablet ? 2.w : 3.w,
+      vertical: isTablet ? 2.h : 1.h,
+    ),
     decoration: BoxDecoration(
       color: clr ?? Colors.white,
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.1),
-          blurRadius: 8, // kept small for cleaner look
+          color: Colors.black.withOpacity(0.1),
+          blurRadius: 8,
           offset: const Offset(0, 4),
         ),
       ],
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(isTablet ? 20 : 14),
     ),
     child: SizedBox(
-      height: 6.h,
+      height: isTablet ? 8.h : 6.h,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -72,7 +82,8 @@ Widget TitleBar({
           else if (isDrawerEnabled)
             buildButton(Icons.menu_rounded, drawerCallback)
           else
-            SizedBox(width: 45), // responsive placeholder
+            SizedBox(width: isTablet ? 60 : 45),
+
           /// Title
           Expanded(
             child: Center(
@@ -98,13 +109,14 @@ Widget TitleBar({
                 (i) => Row(
                   children: [
                     rightButtons[i],
-                    if (i != rightButtons.length - 1) SizedBox(width: 3.w),
+                    if (i != rightButtons.length - 1)
+                      SizedBox(width: isTablet ? 4.w : 3.w),
                   ],
                 ),
               ),
             )
           else if (totalButtons == 1)
-            SizedBox(width: 12.w) // balance with left side
+            SizedBox(width: isTablet ? 15.w : 12.w)
           else
             const SizedBox.shrink(),
         ],

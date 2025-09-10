@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../utils/cachedNetworkImage.dart';
+import '../../../utils/customBottombar.dart';
 import '../../../utils/fontFamily.dart';
 import '../../../utils/titlebarWidget.dart';
 import 'editProfileScreen.dart';
@@ -14,6 +15,8 @@ class ProfileScreen extends StatefulWidget {
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
+
+final bool isTablet = 100.w >= 800;
 
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
@@ -33,7 +36,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               clipBehavior: Clip.none, // allows the image to overflow
               children: [
                 Container(
-                  height: 16.h,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: AppColors.mainColor,
@@ -71,33 +73,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 Positioned(
-                  bottom: -40,
+                  top: isTablet ? 13.5.h : 10.h,
                   left: 0,
                   right: 0,
                   child: Align(
                     alignment: Alignment.center,
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 4),
-                      ),
-                      child: CustomNetworkImage(
-                        imageUrl:
-                            'https://images.unsplash.com/photo-1633332755192-727a05c4013d?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8dXNlcnxlbnwwfHwwfHx8MA%3D%3D',
-                        height: 80,
-                        width: 80,
-                        isCircle: true,
-                        isProfile: true,
-                        isFit: true,
-                      ),
-                    ),
+                    child:
+                        isTablet
+                            ? Container(
+                              width: 10.w,
+                              height: 10.w,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 4,
+                                ),
+                              ),
+                              child: CustomNetworkImage(
+                                imageUrl:
+                                    'https://images.unsplash.com/photo-1633332755192-727a05c4013d?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8dXNlcnxlbnwwfHwwfHx8MA%3D%3D',
+                                height: 10.w,
+                                width: 10.w,
+                                isCircle: true,
+                                isProfile: true,
+                                isFit: true,
+                              ),
+                            )
+                            : Container(
+                              width: 20.w,
+                              height: 20.w,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 4,
+                                ),
+                              ),
+                              child: CustomNetworkImage(
+                                imageUrl:
+                                    'https://images.unsplash.com/photo-1633332755192-727a05c4013d?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8dXNlcnxlbnwwfHwwfHx8MA%3D%3D',
+                                height: 20.w,
+                                width: 20.w,
+                                isCircle: true,
+                                isProfile: true,
+                                isFit: true,
+                              ),
+                            ),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 7.h),
+            SizedBox(height: isTablet ? 13.h : 9.h),
             Container(
               width: double.infinity,
               padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
@@ -120,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Icon(
                         Icons.male_rounded,
                         color: AppColors.mainColor,
-                        size: 16,
+                        size: 18.sp,
                       ),
                       SizedBox(width: 2.w),
                       Text(
@@ -145,7 +172,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Divider(height: 2.h, color: Colors.grey[300]),
                   Row(
                     children: [
-                      Icon(Icons.phone, color: AppColors.mainColor, size: 16),
+                      Icon(
+                        Icons.phone,
+                        color: AppColors.mainColor,
+                        size: 18.sp,
+                      ),
                       SizedBox(width: 2.w),
                       Text(
                         'Phone',
@@ -173,7 +204,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Icon(
                         Icons.location_city_rounded,
                         color: AppColors.mainColor,
-                        size: 16,
+                        size: 18.sp,
                       ),
                       SizedBox(width: 2.w),
                       Text(
@@ -201,7 +232,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Icon(
                         Icons.location_city_rounded,
                         color: AppColors.mainColor,
-                        size: 16,
+                        size: 18.sp,
                       ),
                       SizedBox(width: 2.w),
                       Text(
@@ -229,7 +260,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Icon(
                         Icons.location_city_rounded,
                         color: AppColors.mainColor,
-                        size: 16,
+                        size: 18.sp,
                       ),
                       SizedBox(width: 2.w),
                       Text(
@@ -257,7 +288,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Icon(
                         Icons.location_city_rounded,
                         color: AppColors.mainColor,
-                        size: 16,
+                        size: 18.sp,
                       ),
                       SizedBox(width: 2.w),
                       Text(
@@ -285,7 +316,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Icon(
                         Icons.date_range_rounded,
                         color: AppColors.mainColor,
-                        size: 16,
+                        size: 18.sp,
                       ),
                       SizedBox(width: 2.w),
                       Text(
@@ -333,8 +364,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
+            SizedBox(height: 3.h),
           ],
         ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
+      ),
+      bottomNavigationBar: SizedBox(
+        height: isTablet ? 14.h : 10.h,
+        child: CustomBar(selected: 5),
       ),
     );
   }

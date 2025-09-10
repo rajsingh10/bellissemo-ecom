@@ -261,12 +261,12 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
             top: 0,
             bottom: 0,
             left: isDrawerOpen ? 0 : -MediaQuery.of(context).size.width * 0.7,
-            child: CustomDrawer(),
+            child: SingleChildScrollView(child: CustomDrawer()),
           ),
         ],
       ),
       bottomNavigationBar: SizedBox(
-        height: isIpad ? 12.h : 10.h,
+        height: isIpad ? 14.h : 10.h,
         child: CustomBar(selected: 3),
       ),
     );

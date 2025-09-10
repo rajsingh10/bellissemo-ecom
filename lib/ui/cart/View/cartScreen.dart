@@ -548,7 +548,7 @@ class _CartScreenState extends State<CartScreen> {
                     padding: EdgeInsets.only(left: 4.w),
                     child: InkWell(
                       onTap: () {
-                        Get.offAll(
+                        Get.to(
                           () => CheckOutScreen(),
                           transition: Transition.fade,
                           duration: const Duration(milliseconds: 450),
@@ -577,7 +577,7 @@ class _CartScreenState extends State<CartScreen> {
               ],
             ),
           ),
-          SizedBox(height: isIpad ? 12.h : 10.h, child: CustomBar(selected: 4)),
+          SizedBox(height: isIpad ? 14.h : 10.h, child: CustomBar(selected: 4)),
         ],
       ),
     );

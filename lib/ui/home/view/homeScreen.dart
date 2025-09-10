@@ -7,6 +7,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../../utils/cachedNetworkImage.dart';
 import '../../../utils/customBottombar.dart';
+import '../../../utils/customMenuDrawer.dart';
 import '../../../utils/fontFamily.dart';
 import '../../../utils/searchFields.dart';
 import '../../category/view/categoryScreen.dart';
@@ -234,6 +235,7 @@ class _HomescreenState extends State<Homescreen> {
     },
   ];
   bool isIpad = 100.w >= 800;
+  bool isDrawerOpen = false;
 
   @override
   void initState() {
@@ -249,6 +251,7 @@ class _HomescreenState extends State<Homescreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKeyHome,
+      drawer: CustomDrawer(),
       backgroundColor: AppColors.containerColor,
       body: SingleChildScrollView(
         physics: ClampingScrollPhysics(),
@@ -273,13 +276,18 @@ class _HomescreenState extends State<Homescreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          CircleAvatar(
-                            radius: 25,
-                            backgroundColor: AppColors.containerColor,
-                            child: Icon(
-                              CupertinoIcons.bars,
-                              color: AppColors.blackColor,
-                              size: 30,
+                          InkWell(
+                            onTap: () {
+                              _scaffoldKeyHome.currentState?.openDrawer();
+                            },
+                            child: CircleAvatar(
+                              radius: 25,
+                              backgroundColor: AppColors.containerColor,
+                              child: Icon(
+                                CupertinoIcons.bars,
+                                color: AppColors.blackColor,
+                                size: 30,
+                              ),
                             ),
                           ),
                           Column(
@@ -464,14 +472,13 @@ class _HomescreenState extends State<Homescreen> {
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(height: 6),
+                                    SizedBox(height: 1.h),
                                     SizedBox(
-                                      width: 10.w,
+                                      width: 15.w,
                                       child: Text(
                                         recentOrders[i]["name"],
                                         textAlign: TextAlign.center,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+
                                         style: TextStyle(
                                           fontSize: 14.sp,
                                           fontFamily: FontFamily.light,
@@ -558,7 +565,7 @@ class _HomescreenState extends State<Homescreen> {
         ),
       ),
       bottomNavigationBar: SizedBox(
-        height: isIpad ? 12.h : 10.h,
+        height: isIpad ? 14.h : 10.h,
         child: CustomBar(selected: 3),
       ),
     );

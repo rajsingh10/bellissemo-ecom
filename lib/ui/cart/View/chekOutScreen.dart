@@ -39,7 +39,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
       body: Column(
         children: [
           TitleBar(
-            title: 'Chekout',
+            title: 'Checkout',
             isDrawerEnabled: false,
             isBackEnabled: true,
           ),

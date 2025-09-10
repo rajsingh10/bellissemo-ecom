@@ -75,8 +75,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   Map<String, int> colorQuantities = {};
   bool isIpad = 100.w >= 800;
 
-
-
   @override
   void initState() {
     // TODO: implement initState
@@ -88,7 +86,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    bool isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
     return Scaffold(
       backgroundColor: AppColors.bgColor,
       body: SingleChildScrollView(
@@ -107,7 +106,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
               ImageSlider(
                 imageUrls: currentImages,
-                height: 25.h,
+                height: isIpad ? 50.h : 25.h,
                 autoScroll: false,
               ),
               SizedBox(height: 2.h),
@@ -466,7 +465,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                           ),
                                         ),
                                         isExpanded: true,
-                                        isDense: (isIpad && isPortrait) ? false : true,
+                                        isDense: !isIpad,
                                         decoration: InputDecoration(
                                           border: OutlineInputBorder(
                                             borderRadius: BorderRadius.circular(
@@ -566,7 +565,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       },
                       color: AppColors.mainColor,
                       fontcolor: AppColors.whiteColor,
-                      radius: 90.0,
+                      radius: isIpad ? 10.0 : 90.0,
                       height: isIpad ? 7.h : 5.h,
                       fontsize: 16.sp,
                       iconData: Icons.shopping_cart_outlined,

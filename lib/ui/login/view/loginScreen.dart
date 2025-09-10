@@ -24,125 +24,150 @@ class _LoginScreenState extends State<LoginScreen> {
     text: "password",
   );
 
-  bool isButtonPressed = false;
+  late bool isIpad;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    isIpad = 100.w >= 800; // Check for iPad or tablet based on screen width
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.mainColor,
-      body: Column(
+      body: Stack(
         children: [
-          // Top Section with Gradient, Logo and Title
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(height: 8.h),
-              Image.asset(
-                Imgs.onlyLogo,
-                height: 40.w,
-                width: 50.w,
-                fit: BoxFit.cover,
-              ),
-              SizedBox(height: 2.h),
-              Text(
-                "Welcome to Bellissemo",
-                style: TextStyle(
-                  fontSize: 22.sp,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.whiteColor,
-                  fontFamily: FontFamily.regular,
-                  letterSpacing: 1.1,
+          // Top Positioned Section
+          Positioned(
+            top: isIpad ? 6.h : 8.h,
+            left: 0,
+            right: 0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Image.asset(
+                  Imgs.onlyLogo,
+                  height: isIpad ? 20.w : 40.w,
+                  width: isIpad ? 25.w : 50.w,
+                  fit: BoxFit.cover,
                 ),
-              ),
-              SizedBox(height: 0.5.h),
-              Text(
-                "Your style, delivered. Log in to explore deals and offers.",
-                style: TextStyle(
-                  fontSize: 15.sp,
-                  color: AppColors.whiteColor.withOpacity(0.9),
+                SizedBox(height: isIpad ? 2.h : 2.h),
+                Text(
+                  "Welcome to Bellissemo",
+                  style: TextStyle(
+                    fontSize: isIpad ? 20.sp : 22.sp,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.whiteColor,
+                    fontFamily: FontFamily.regular,
+                    letterSpacing: 1.1,
+                  ),
                 ),
-                textAlign: TextAlign.center,
-              ).paddingSymmetric(horizontal: 5.w),
-              SizedBox(height: 2.h),
-            ],
+                SizedBox(height: isIpad ? 1.h : 0.5.h),
+                Text(
+                  "Your style, delivered. Log in to explore deals and offers.",
+                  style: TextStyle(
+                    fontSize: isIpad ? 14.sp : 15.sp,
+                    color: AppColors.whiteColor.withOpacity(0.9),
+                  ),
+                  textAlign: TextAlign.center,
+                ).paddingSymmetric(horizontal: isIpad ? 10.w : 5.w),
+              ],
+            ),
           ),
 
-          // Bottom Section with White Card Style Container
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 2.h),
-              decoration: BoxDecoration(
-                color: AppColors.whiteColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(8.w),
-                  topRight: Radius.circular(8.w),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 12,
-                    offset: Offset(0, -4),
+          // Draggable Bottom Sheet
+          DraggableScrollableSheet(
+            initialChildSize: isIpad ? 0.46 : 0.58,
+            minChildSize: isIpad ? 0.46 : 0.58,
+            maxChildSize: 0.9,
+            builder: (context, scrollController) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: AppColors.whiteColor,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(isIpad ? 5.w : 8.w),
+                    topRight: Radius.circular(isIpad ? 5.w : 8.w),
                   ),
-                ],
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Text(
-                      "Sign In",
-                      style: TextStyle(
-                        fontSize: 21.sp,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.blackColor,
-                        fontFamily: FontFamily.regular,
-                      ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 12,
+                      offset: Offset(0, -4),
                     ),
-                    SizedBox(height: 1.h),
-                    Text(
-                      "Discover exclusive products and seamless shopping.",
-                      style: TextStyle(fontSize: 14.sp, color: AppColors.gray),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 3.h),
-                    AppTextField(
-                      controller: emailController,
-                      hintText: "Email Address",
-                      text: "Email Address",
-                      isTextavailable: true,
-                      textInputType: TextInputType.emailAddress,
-                      prefix: Icon(Icons.email_outlined, color: AppColors.gray),
-                    ),
-                    SizedBox(height: 2.h),
-                    AppTextField(
-                      controller: passwordController,
-                      hintText: "Password",
-                      text: "Password",
-                      isTextavailable: true,
-                      obscureText: true,
-                      textInputType: TextInputType.visiblePassword,
-                      prefix: Icon(Icons.lock_outline, color: AppColors.gray),
-                    ),
-                    SizedBox(height: 3.h),
-                    CustomButton(
-                      title: 'Sign In',
-                      route: () {
-                        Get.offAll(
-                          Homescreen(),
-                          transition: Transition.fade,
-                          duration: const Duration(milliseconds: 450),
-                        );
-                      },
-                      color: AppColors.mainColor,
-                      fontcolor: AppColors.whiteColor,
-                      height: 6.h,
-                      fontsize: 17.sp,
-                    ),
-                    SizedBox(height: 2.h),
                   ],
                 ),
-              ),
-            ),
+                padding: EdgeInsets.symmetric(
+                  horizontal: isIpad ? 6.w : 3.w,
+                  vertical: isIpad ? 3.h : 2.h,
+                ),
+                child: SingleChildScrollView(
+                  physics: ClampingScrollPhysics(),
+                  controller: scrollController,
+                  child: Column(
+                    children: [
+                      Text(
+                        "Sign In",
+                        style: TextStyle(
+                          fontSize: isIpad ? 19.sp : 21.sp,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.blackColor,
+                          fontFamily: FontFamily.regular,
+                        ),
+                      ),
+                      SizedBox(height: isIpad ? 1.h : 1.h),
+                      Text(
+                        "Discover exclusive products and seamless shopping.",
+                        style: TextStyle(
+                          fontSize: isIpad ? 12.sp : 14.sp,
+                          color: AppColors.gray,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: isIpad ? 4.h : 3.h),
+                      AppTextField(
+                        controller: emailController,
+                        hintText: "Email Address",
+                        text: "Email Address",
+                        isTextavailable: true,
+                        textInputType: TextInputType.emailAddress,
+                        prefix: Icon(
+                          Icons.email_outlined,
+                          color: AppColors.gray,
+                        ),
+                      ),
+                      SizedBox(height: isIpad ? 2.h : 2.h),
+                      AppTextField(
+                        controller: passwordController,
+                        hintText: "Password",
+                        text: "Password",
+                        isTextavailable: true,
+                        obscureText: true,
+                        textInputType: TextInputType.visiblePassword,
+                        prefix: Icon(Icons.lock_outline, color: AppColors.gray),
+                      ),
+                      SizedBox(height: isIpad ? 4.h : 3.h),
+                      CustomButton(
+                        title: 'Sign In',
+                        route: () {
+                          Get.offAll(
+                            Homescreen(),
+                            transition: Transition.fade,
+                            duration: const Duration(milliseconds: 450),
+                          );
+                        },
+                        color: AppColors.mainColor,
+                        fontcolor: AppColors.whiteColor,
+                        height: isIpad ? 7.h : 6.h,
+                        fontsize: isIpad ? 19.sp : 17.sp,
+                        radius: isIpad ? 1.w : 3.w,
+                      ),
+                      SizedBox(height: isIpad ? 3.h : 2.h),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),

@@ -1,6 +1,7 @@
 import 'package:bellissemo_ecom/ui/cart/View/cartScreen.dart';
 import 'package:bellissemo_ecom/ui/customers/view/customersScreen.dart';
 import 'package:bellissemo_ecom/ui/home/view/homeScreen.dart';
+import 'package:bellissemo_ecom/ui/login/view/loginScreen.dart';
 import 'package:bellissemo_ecom/ui/orderhistory/view/orderHistoryScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,11 +20,14 @@ class CustomDrawer extends StatefulWidget {
   State<CustomDrawer> createState() => _CustomDrawerState();
 }
 
+bool isIpad = 100.w >= 800;
+
 class _CustomDrawerState extends State<CustomDrawer> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.7, // 70% width
+      width: MediaQuery.of(context).size.width * 0.7,
+      height: Device.height,
       decoration: BoxDecoration(
         color: AppColors.bgColor,
         boxShadow: [
@@ -38,7 +42,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
+            padding: EdgeInsets.only(
+              bottom: 2.h,
+              left: 4.w,
+              right: 4.w,
+              top: 8.h,
+            ),
             color: AppColors.mainColor.withOpacity(0.1),
             child: Row(
               children: [
@@ -110,13 +119,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
             // navigate to Settings screen if exists
           }),
 
-          Spacer(),
           Padding(
             padding: EdgeInsets.all(4.w),
             child: CustomButton(
               title: "Log Out",
               route: () {
-                debugPrint("Log Out clicked");
+                Get.offAll(LoginScreen());
               },
               color: AppColors.mainColor,
               fontcolor: AppColors.whiteColor,
@@ -124,7 +132,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               width: double.infinity,
               fontsize: 18.sp,
               fontWeight: FontWeight.w400,
-              radius: 3.w,
+              radius: isIpad ? 1.w : 3.w,
               iconData: Icons.logout,
               iconsize: 20.sp,
               shadow: [
