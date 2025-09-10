@@ -451,7 +451,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         ],
       ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
       bottomNavigationBar: SizedBox(
-        height: isIpad ? 12.h : 10.h,
+        height: isIpad ? 14.h : 10.h,
         child: CustomBar(selected: 2),
       ),
     );

@@ -238,6 +238,7 @@ class AppTextField extends StatefulWidget {
 
 class _AppTextFieldState extends State<AppTextField> {
   late bool isObscured;
+  bool isIpad = 100.w >= 800;
 
   @override
   void initState() {
@@ -314,7 +315,7 @@ class _AppTextFieldState extends State<AppTextField> {
               ),
               fillColor: AppColors.whiteColor,
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(3.w),
+                borderRadius: BorderRadius.circular(isIpad ? 1.w : 3.w),
                 borderSide: const BorderSide(
                   width: 1.5,
                   style: BorderStyle.solid,
@@ -323,7 +324,7 @@ class _AppTextFieldState extends State<AppTextField> {
               ),
               errorStyle: TextStyle(color: AppColors.redColor, fontSize: 15.sp),
               errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(3.w),
+                borderRadius: BorderRadius.circular(isIpad ? 1.w : 3.w),
                 borderSide: const BorderSide(
                   width: 1.5,
                   style: BorderStyle.solid,
@@ -331,7 +332,7 @@ class _AppTextFieldState extends State<AppTextField> {
                 ),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(3.w),
+                borderRadius: BorderRadius.circular(isIpad ? 1.w : 3.w),
                 borderSide: const BorderSide(
                   width: 1.5,
                   style: BorderStyle.solid,
@@ -339,7 +340,7 @@ class _AppTextFieldState extends State<AppTextField> {
                 ),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(3.w),
+                borderRadius: BorderRadius.circular(isIpad ? 1.w : 3.w),
                 borderSide: const BorderSide(
                   width: 1.5,
                   style: BorderStyle.solid,
@@ -349,7 +350,7 @@ class _AppTextFieldState extends State<AppTextField> {
               filled: true,
               hintText: widget.hintText,
               hintStyle: TextStyle(
-                color: AppColors.border,
+                color: AppColors.gray,
                 fontFamily: FontFamily.regular,
                 fontWeight: FontWeight.w500,
                 fontSize: 15.sp,

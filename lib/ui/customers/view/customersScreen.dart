@@ -9,7 +9,6 @@ import '../../../utils/emptyWidget.dart';
 import '../../../utils/fontFamily.dart';
 import '../../../utils/searchFields.dart';
 import '../../../utils/titlebarWidget.dart';
-import '../../products/view/productsScreen.dart';
 
 class CustomersScreen extends StatefulWidget {
   const CustomersScreen({super.key});
@@ -185,6 +184,8 @@ class _CustomersScreenState extends State<CustomersScreen> {
     });
   }
 
+  bool isIpad = 100.w >= 800;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -301,7 +302,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
         ],
       ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
       bottomNavigationBar: SizedBox(
-        height: 10.h,
+        height: isIpad ? 14.h : 10.h,
         child: CustomBar(selected: 8),
       ),
     );
@@ -309,13 +310,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
   Widget _buildGridItem(Customer customer) {
     return InkWell(
-      onTap: () {
-        Get.to(
-          () => ProductsScreen(cate: customer.name),
-          transition: Transition.leftToRightWithFade,
-          duration: const Duration(milliseconds: 450),
-        );
-      },
+      onTap: () {},
       child: Card(
         color: AppColors.cardBgColor2,
         elevation: 3,
@@ -330,8 +325,8 @@ class _CustomersScreenState extends State<CustomersScreen> {
               ),
               child: CustomNetworkImage(
                 imageUrl: customer.imageUrl,
-                height: 20.w,
-                width: 20.w,
+                height: isIpad ? 10.w : 20.w,
+                width: isIpad ? 10.w : 20.w,
                 isFit: true,
                 radius: 20,
               ),

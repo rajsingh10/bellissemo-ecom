@@ -415,6 +415,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                 ),
                               ],
                             ),
+                          SizedBox(height: 2.h),
                         ],
                       ),
                 ],
@@ -424,7 +425,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         ],
       ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
       bottomNavigationBar: SizedBox(
-        height: isIpad ? 12.h : 10.h,
+        height: isIpad ? 14.h : 10.h,
         child: CustomBar(selected: 1),
       ),
     );
@@ -504,12 +505,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       onTap: enabled ? onTap : null,
       borderRadius: BorderRadius.circular(30),
       child: Container(
-        padding: EdgeInsets.all(1.5.w),
+        padding: EdgeInsets.all(isIpad ? 1.2.w : 1.5.w),
         decoration: BoxDecoration(
           color: enabled ? AppColors.mainColor : Colors.grey.shade300,
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, size: 18.sp, color: Colors.white),
+        child: Icon(icon, size: isIpad ? 15.sp : 18.sp, color: Colors.white),
       ),
     );
   }

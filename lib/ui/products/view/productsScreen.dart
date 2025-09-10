@@ -174,6 +174,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   @override
   void initState() {
     super.initState();
+    itemsPerPage = isIpad ? 8 : 4;
     filteredProducts = List.from(products);
 
     searchController.addListener(() {
@@ -434,7 +435,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                             : null,
                                     borderRadius: BorderRadius.circular(30),
                                     child: Container(
-                                      padding: EdgeInsets.all(1.5.w),
+                                      padding: EdgeInsets.all(
+                                        isIpad ? 1.2.w : 1.5.w,
+                                      ),
                                       decoration: BoxDecoration(
                                         color:
                                             currentPage > 0
@@ -444,7 +447,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                       ),
                                       child: Icon(
                                         Icons.arrow_back_ios_new,
-                                        size: 18.sp,
+                                        size: isIpad ? 15.sp : 18.sp,
                                         color: Colors.white,
                                       ),
                                     ),
@@ -491,7 +494,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                             : null,
                                     borderRadius: BorderRadius.circular(30),
                                     child: Container(
-                                      padding: EdgeInsets.all(1.5.w),
+                                      padding: EdgeInsets.all(
+                                        isIpad ? 1.2.w : 1.5.w,
+                                      ),
                                       decoration: BoxDecoration(
                                         color:
                                             endIndex < filteredProducts.length
@@ -501,7 +506,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                       ),
                                       child: Icon(
                                         Icons.arrow_forward_ios,
-                                        size: 18.sp,
+                                        size: isIpad ? 15.sp : 18.sp,
                                         color: Colors.white,
                                       ),
                                     ),
@@ -518,7 +523,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         ],
       ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
       bottomNavigationBar: SizedBox(
-        height: isIpad ? 12.h : 10.h,
+        height: isIpad ? 14.h : 10.h,
         child: CustomBar(selected: 8),
       ),
     );
