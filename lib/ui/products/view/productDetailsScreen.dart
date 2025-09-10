@@ -73,6 +73,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   String? selectedSize;
 
   Map<String, int> colorQuantities = {};
+  bool isIpad = 100.w >= 800;
+
+
 
   @override
   void initState() {
@@ -85,6 +88,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return Scaffold(
       backgroundColor: AppColors.bgColor,
       body: SingleChildScrollView(
@@ -462,6 +466,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                           ),
                                         ),
                                         isExpanded: true,
+                                        isDense: (isIpad && isPortrait) ? false : true,
                                         decoration: InputDecoration(
                                           border: OutlineInputBorder(
                                             borderRadius: BorderRadius.circular(
@@ -469,7 +474,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                             ),
                                           ),
                                           contentPadding: EdgeInsets.symmetric(
-                                            vertical: 12,
+                                            vertical: 10,
                                             horizontal: 10,
                                           ),
                                         ),
@@ -562,7 +567,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       color: AppColors.mainColor,
                       fontcolor: AppColors.whiteColor,
                       radius: 90.0,
-                      height: 5.h,
+                      height: isIpad ? 7.h : 5.h,
                       fontsize: 16.sp,
                       iconData: Icons.shopping_cart_outlined,
                       iconsize: 16.sp,

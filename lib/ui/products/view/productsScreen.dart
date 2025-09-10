@@ -636,7 +636,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         // Modern Quantity Selector
                         Container(
                           padding: EdgeInsets.symmetric(
-                            horizontal: 2.w,
+                            horizontal: isIpad ? 0 : 2.w,
                             vertical: 0.5.h,
                           ),
                           decoration: BoxDecoration(
@@ -659,12 +659,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                   ),
                                   child: Icon(
                                     Icons.remove,
-                                    size: 16.sp,
+                                    size: isIpad ? 12.sp : 16.sp,
                                     color: AppColors.blackColor,
                                   ),
                                 ),
                               ),
-                              SizedBox(width: 2.w),
+                              SizedBox(width: 1.w),
                               Text(
                                 product.quantity.toString(),
                                 style: TextStyle(
@@ -673,7 +673,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                   color: AppColors.blackColor,
                                 ),
                               ),
-                              SizedBox(width: 2.w),
+                              SizedBox(width: 1.w),
                               GestureDetector(
                                 onTap:
                                     product.inStock
@@ -688,7 +688,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                   ),
                                   child: Icon(
                                     Icons.add,
-                                    size: 16.sp,
+                                    size: isIpad ? 12.sp : 16.sp,
                                     color: AppColors.blackColor,
                                   ),
                                 ),
@@ -718,7 +718,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             child: Icon(
                               Icons.shopping_cart_outlined,
                               color: Colors.white,
-                              size: 18.sp,
+                              size: isIpad ? 15.sp : 18.sp,
                             ),
                           ),
                         ),
