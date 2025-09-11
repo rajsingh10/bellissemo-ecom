@@ -7,12 +7,11 @@ import 'package:sizer/sizer.dart';
 import '../../../utils/cachedNetworkImage.dart';
 import '../../../utils/colors.dart';
 import '../../../utils/customBottombar.dart';
+import '../../../utils/customButton.dart';
 import '../../../utils/titlebarWidget.dart';
 
 class CartScreen extends StatefulWidget {
-  final String customerName;
-
-  const CartScreen({super.key, required this.customerName});
+  const CartScreen({super.key});
 
   @override
   State<CartScreen> createState() => _CartScreenState();
@@ -85,26 +84,6 @@ class _CartScreenState extends State<CartScreen> {
                       padding: EdgeInsets.all(8.0),
                       child: Column(
                         children: [
-                          Row(
-                            children: [
-                              Text(
-                                widget.customerName,
-                                style: TextStyle(
-                                  color: AppColors.blackColor,
-                                  fontSize: 18.sp,
-                                  fontFamily: FontFamily.semiBold,
-                                ),
-                              ),
-                              Text(
-                                " (2 items)",
-                                style: TextStyle(
-                                  color: AppColors.mainColor,
-                                  fontSize: 18.sp,
-                                  fontFamily: FontFamily.semiBold,
-                                ),
-                              ),
-                            ],
-                          ),
                           SizedBox(height: 1.h),
                           Column(
                             children: [
@@ -342,15 +321,25 @@ class _CartScreenState extends State<CartScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "Summary Order",
-                          style: TextStyle(
-                            color: AppColors.blackColor,
-                            fontSize: 18.sp,
-                            fontFamily: FontFamily.semiBold,
-                          ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.receipt_long_rounded,
+                              color: AppColors.mainColor,
+                              size: isIpad ? 18.sp : 16.sp,
+                            ),
+                            SizedBox(width: 1.w),
+                            Text(
+                              "Summary Order",
+                              style: TextStyle(
+                                color: AppColors.mainColor,
+                                fontSize: 18.sp,
+                                fontFamily: FontFamily.semiBold,
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 1.h),
+                        SizedBox(height: 1.5.h),
                         Row(
                           children: [
                             Expanded(
@@ -431,7 +420,7 @@ class _CartScreenState extends State<CartScreen> {
                             Text(
                               "Shipping",
                               style: TextStyle(
-                                color: AppColors.blackColor,
+                                color: AppColors.gray,
                                 fontSize: 16.sp,
                                 fontFamily: FontFamily.semiBold,
                               ),
@@ -439,7 +428,7 @@ class _CartScreenState extends State<CartScreen> {
                             Text(
                               "\$ ${shipping.toStringAsFixed(2)}",
                               style: TextStyle(
-                                color: AppColors.blackColor,
+                                color: AppColors.gray,
                                 fontSize: 16.sp,
                                 fontFamily: FontFamily.semiBold,
                               ),
@@ -453,7 +442,7 @@ class _CartScreenState extends State<CartScreen> {
                             Text(
                               "Tax",
                               style: TextStyle(
-                                color: AppColors.blackColor,
+                                color: AppColors.gray,
                                 fontSize: 16.sp,
                                 fontFamily: FontFamily.semiBold,
                               ),
@@ -461,7 +450,7 @@ class _CartScreenState extends State<CartScreen> {
                             Text(
                               "\$ ${tax.toStringAsFixed(2)}",
                               style: TextStyle(
-                                color: AppColors.blackColor,
+                                color: AppColors.gray,
                                 fontSize: 16.sp,
                                 fontFamily: FontFamily.semiBold,
                               ),
@@ -476,7 +465,7 @@ class _CartScreenState extends State<CartScreen> {
                               "Total",
                               style: TextStyle(
                                 color: AppColors.blackColor,
-                                fontSize: 16.sp,
+                                fontSize: 17.sp,
                                 fontFamily: FontFamily.semiBold,
                               ),
                             ),
@@ -484,7 +473,7 @@ class _CartScreenState extends State<CartScreen> {
                               "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
                               style: TextStyle(
                                 color: AppColors.blackColor,
-                                fontSize: 16.sp,
+                                fontSize: 17.sp,
                                 fontFamily: FontFamily.semiBold,
                               ),
                             ),
@@ -541,37 +530,156 @@ class _CartScreenState extends State<CartScreen> {
                     ),
                   ],
                 ),
-
+                SizedBox(width: 2.w),
                 // Checkout Button
                 Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 4.w),
-                    child: InkWell(
-                      onTap: () {
-                        Get.to(
-                          () => CheckOutScreen(),
-                          transition: Transition.fade,
-                          duration: const Duration(milliseconds: 450),
-                        );
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 14),
-                        decoration: BoxDecoration(
-                          color: AppColors.mainColor,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Checkout",
-                            style: TextStyle(
-                              color: AppColors.whiteColor,
-                              fontSize: 18.sp,
-                              fontFamily: FontFamily.semiBold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                  child: CustomButton(
+                    title: 'Checkout',
+                    route: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          String? selectedCustomer;
+                          List<String> customers = [
+                            "Customer 1",
+                            "Customer 2",
+                            "Customer 3",
+                          ];
+                          String? errorText;
+                          return StatefulBuilder(
+                            builder: (context, setState) {
+                              return AlertDialog(
+                                backgroundColor: AppColors.whiteColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                title: Text(
+                                  "Select Customer",
+                                  style: TextStyle(
+                                    fontSize: 18.sp,
+                                    fontFamily: FontFamily.bold,
+                                    color: AppColors.blackColor,
+                                  ),
+                                ),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    DropdownButtonFormField<String>(
+                                      value: selectedCustomer,
+                                      hint: Text(
+                                        "Choose customer",
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                          fontFamily: FontFamily.regular,
+                                          color: AppColors.gray,
+                                        ),
+                                      ),
+                                      isExpanded: true,
+                                      isDense: !isIpad,
+                                      decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        contentPadding: EdgeInsets.symmetric(
+                                          vertical: 10,
+                                          horizontal: 10,
+                                        ),
+                                      ),
+                                      items:
+                                          customers.map((String customer) {
+                                            return DropdownMenuItem<String>(
+                                              value: customer,
+                                              child: Text(
+                                                customer,
+                                                style: TextStyle(
+                                                  fontSize: 16.sp,
+                                                  fontFamily:
+                                                      FontFamily.regular,
+                                                  color: AppColors.gray,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                      onChanged: (newValue) {
+                                        setState(() {
+                                          selectedCustomer = newValue;
+                                          errorText =
+                                              null; // Clear error on selection
+                                        });
+                                      },
+                                    ),
+                                    if (errorText != null) ...[
+                                      SizedBox(height: 8),
+                                      Text(
+                                        errorText!,
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                          fontSize: 14.sp,
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                                actions: [
+                                  CustomButton(
+                                    title: "Cancel",
+                                    route: () {
+                                      Navigator.pop(context);
+                                    },
+                                    color: AppColors.containerColor,
+                                    fontcolor: AppColors.blackColor,
+                                    height: 5.h,
+                                    width: 30.w,
+                                    fontsize: 14.sp,
+                                    radius: 12.0,
+                                  ),
+                                  CustomButton(
+                                    title: "Confirm",
+                                    route: () {
+                                      if (selectedCustomer != null) {
+                                        Get.back();
+                                        Get.to(
+                                          () => CheckOutScreen(
+                                            CustomerName: selectedCustomer,
+                                          ),
+                                          transition: Transition.fade,
+                                          duration: const Duration(
+                                            milliseconds: 450,
+                                          ),
+                                        );
+                                      } else {
+                                        // Use the setState of StatefulBuilder
+                                        setState(() {
+                                          errorText =
+                                              "Please select a customer!";
+                                        });
+                                      }
+                                    },
+                                    color: AppColors.mainColor,
+                                    fontcolor: AppColors.whiteColor,
+                                    height: 5.h,
+                                    width: 30.w,
+                                    fontsize: 14.sp,
+                                    radius: 12.0,
+                                    iconData: Icons.check,
+                                    iconsize: 14.sp,
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      );
+                    },
+                    color: AppColors.mainColor,
+                    fontcolor: AppColors.whiteColor,
+                    height: 5.h,
+                    fontsize: 18.sp,
+                    iconsize: 18.sp,
+                    iconData: Icons.shopping_cart_checkout_outlined,
+                    radius: isIpad ? 1.w : 3.w,
                   ),
                 ),
               ],

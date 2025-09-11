@@ -547,193 +547,186 @@ class _ProductsScreenState extends State<ProductsScreen> {
           );
         }
       },
-      child: Opacity(
-        opacity: product.inStock ? 1.0 : 0.4,
-        child: Card(
-          color: AppColors.cardBgColor2,
-          elevation: 3,
-          shadowColor: Colors.black12,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Product Image
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                  child: Stack(
-                    children: [
-                      CustomNetworkImage(
-                        imageUrl: product.imageUrl,
-                        height: double.infinity,
-                        width: double.infinity,
-                        isFit: true,
-                        radius: 20,
-                      ),
-                      if (!product.inStock)
-                        Positioned.fill(
-                          child: Container(
-                            color: Colors.black.withValues(alpha: 0.4),
-                            child: Center(
-                              child: Text(
-                                "Out of Stock",
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontFamily: FontFamily.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Details
-              Padding(
-                padding: EdgeInsets.all(2.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      child: Card(
+        color: product.inStock ? AppColors.cardBgColor2 : Colors.grey.shade300,
+        elevation: 3,
+        shadowColor: Colors.black45,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: AppColors.border),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Product Image with overlay if out of stock
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                child: Stack(
                   children: [
-                    // Title
-                    Text(
-                      product.name,
-                      style: TextStyle(
-                        fontFamily: FontFamily.bold,
-                        fontSize: 15.sp,
-                        color: AppColors.blackColor,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    CustomNetworkImage(
+                      imageUrl: product.imageUrl,
+                      height: double.infinity,
+                      width: double.infinity,
+                      isFit: true,
+                      radius: 20,
                     ),
-                    SizedBox(height: 0.5.h),
-
-                    // Pack Size
-                    Text(
-                      product.packSize,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontFamily: FontFamily.regular,
-                        color: AppColors.gray,
-                      ),
-                    ),
-                    SizedBox(height: 0.5.h),
-
-                    // Price
-                    Text(
-                      "£${product.pricePerUnit.toStringAsFixed(2)}",
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontFamily: FontFamily.semiBold,
-                        color: AppColors.mainColor,
-                      ),
-                    ),
-                    SizedBox(height: 1.h),
-
-                    // Quantity + Add Button
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Modern Quantity Selector
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: isIpad ? 0 : 2.w,
-                            vertical: 0.5.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.containerColor,
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: Row(
-                            children: [
-                              GestureDetector(
-                                onTap:
-                                    product.inStock && product.quantity > 0
-                                        ? () =>
-                                            setState(() => product.quantity--)
-                                        : null,
-                                child: Container(
-                                  padding: EdgeInsets.all(1.5.w),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.cardBgColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.remove,
-                                    size: isIpad ? 12.sp : 16.sp,
-                                    color: AppColors.blackColor,
-                                  ),
-                                ),
+                    if (!product.inStock)
+                      Positioned.fill(
+                        child: Container(
+                          color: Colors.black.withOpacity(0.4),
+                          child: Center(
+                            child: Text(
+                              "Out of Stock",
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontFamily: FontFamily.bold,
+                                color: Colors.white,
                               ),
-                              SizedBox(width: 1.w),
-                              Text(
-                                product.quantity.toString(),
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontFamily: FontFamily.semiBold,
-                                  color: AppColors.blackColor,
-                                ),
-                              ),
-                              SizedBox(width: 1.w),
-                              GestureDetector(
-                                onTap:
-                                    product.inStock
-                                        ? () =>
-                                            setState(() => product.quantity++)
-                                        : null,
-                                child: Container(
-                                  padding: EdgeInsets.all(1.5.w),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.cardBgColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.add,
-                                    size: isIpad ? 12.sp : 16.sp,
-                                    color: AppColors.blackColor,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Add to Cart Button
-                        InkWell(
-                          onTap:
-                              product.inStock
-                                  ? () {
-                                    // handle add to cart
-                                  }
-                                  : null,
-                          borderRadius: BorderRadius.circular(30),
-                          child: Container(
-                            padding: EdgeInsets.all(1.5.w),
-                            decoration: BoxDecoration(
-                              color:
-                                  product.inStock
-                                      ? AppColors.mainColor
-                                      : Colors.grey,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.shopping_cart_outlined,
-                              color: Colors.white,
-                              size: isIpad ? 15.sp : 18.sp,
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+
+            // Details with text dimmed if out of stock
+            Padding(
+              padding: EdgeInsets.all(2.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product.name,
+                    style: TextStyle(
+                      fontFamily: FontFamily.bold,
+                      fontSize: 15.sp,
+                      color:
+                          product.inStock ? AppColors.blackColor : Colors.grey,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 0.5.h),
+                  Text(
+                    product.packSize,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontFamily: FontFamily.regular,
+                      color: product.inStock ? AppColors.gray : Colors.grey,
+                    ),
+                  ),
+                  SizedBox(height: 0.5.h),
+                  Text(
+                    "£${product.pricePerUnit.toStringAsFixed(2)}",
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontFamily: FontFamily.semiBold,
+                      color:
+                          product.inStock ? AppColors.mainColor : Colors.grey,
+                    ),
+                  ),
+                  SizedBox(height: 1.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Quantity Selector
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isIpad ? 0 : 2.w,
+                          vertical: 0.5.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.containerColor,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Row(
+                          children: [
+                            GestureDetector(
+                              onTap:
+                                  product.inStock && product.quantity > 0
+                                      ? () => setState(() => product.quantity--)
+                                      : null,
+                              child: Container(
+                                padding: EdgeInsets.all(1.5.w),
+                                decoration: BoxDecoration(
+                                  color: AppColors.cardBgColor,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.remove,
+                                  size: isIpad ? 12.sp : 16.sp,
+                                  color: AppColors.blackColor,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 1.w),
+                            Text(
+                              product.quantity.toString(),
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontFamily: FontFamily.semiBold,
+                                color:
+                                    product.inStock
+                                        ? AppColors.blackColor
+                                        : Colors.grey,
+                              ),
+                            ),
+                            SizedBox(width: 1.w),
+                            GestureDetector(
+                              onTap:
+                                  product.inStock
+                                      ? () => setState(() => product.quantity++)
+                                      : null,
+                              child: Container(
+                                padding: EdgeInsets.all(1.5.w),
+                                decoration: BoxDecoration(
+                                  color: AppColors.cardBgColor,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.add,
+                                  size: isIpad ? 12.sp : 16.sp,
+                                  color: AppColors.blackColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Add to Cart Button
+                      InkWell(
+                        onTap:
+                            product.inStock
+                                ? () {
+                                  // handle add to cart
+                                }
+                                : null,
+                        borderRadius: BorderRadius.circular(30),
+                        child: Container(
+                          padding: EdgeInsets.all(1.5.w),
+                          decoration: BoxDecoration(
+                            color:
+                                product.inStock
+                                    ? AppColors.mainColor
+                                    : Colors.grey,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.shopping_cart_outlined,
+                            color: Colors.white,
+                            size: isIpad ? 15.sp : 18.sp,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -110,7 +110,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             Get.to(() => CustomersScreen());
           }),
           _drawerItem(Icons.shopping_cart_outlined, "Cart", () {
-            Get.to(() => CartScreen(customerName: ''));
+            Get.to(() => CartScreen());
           }),
           _drawerItem(Icons.person_outline, "Account", () {
             // navigate to Account screen if exists
@@ -154,11 +154,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 0.h, horizontal: 1.w),
       child: ListTile(
-        leading: Icon(icon, color: AppColors.mainColor),
+        leading: Icon(
+          icon,
+          color: AppColors.mainColor,
+          size: isIpad ? 18.sp : 20.sp,
+        ),
         title: Text(
           title,
           style: TextStyle(
-            fontSize: 18.sp,
+            fontSize: isIpad ? 16.sp : 18.sp,
             fontFamily: FontFamily.bold,
             color: AppColors.blackColor,
           ),

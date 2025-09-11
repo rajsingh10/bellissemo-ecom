@@ -2,13 +2,11 @@ import 'package:bellissemo_ecom/utils/colors.dart';
 import 'package:bellissemo_ecom/utils/customButton.dart';
 import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../utils/multipleImagesSlider.dart';
 import '../../../utils/titlebarWidget.dart';
-import '../../cart/View/cartScreen.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   const ProductDetailsScreen({super.key});
@@ -425,144 +423,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   Expanded(
                     child: CustomButton(
                       title: 'Add to cart',
-                      route: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            String? selectedCustomer;
-                            List<String> customers = [
-                              "Customer 1",
-                              "Customer 2",
-                              "Customer 3",
-                            ];
-                            String? errorText;
-                            return StatefulBuilder(
-                              builder: (context, setState) {
-                                return AlertDialog(
-                                  backgroundColor: AppColors.whiteColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                  title: Text(
-                                    "Select Customer",
-                                    style: TextStyle(
-                                      fontSize: 18.sp,
-                                      fontFamily: FontFamily.bold,
-                                      color: AppColors.blackColor,
-                                    ),
-                                  ),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      DropdownButtonFormField<String>(
-                                        value: selectedCustomer,
-                                        hint: Text(
-                                          "Choose customer",
-                                          style: TextStyle(
-                                            fontSize: 16.sp,
-                                            fontFamily: FontFamily.regular,
-                                            color: AppColors.gray,
-                                          ),
-                                        ),
-                                        isExpanded: true,
-                                        isDense: !isIpad,
-                                        decoration: InputDecoration(
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                          ),
-                                          contentPadding: EdgeInsets.symmetric(
-                                            vertical: 10,
-                                            horizontal: 10,
-                                          ),
-                                        ),
-                                        items:
-                                            customers.map((String customer) {
-                                              return DropdownMenuItem<String>(
-                                                value: customer,
-                                                child: Text(
-                                                  customer,
-                                                  style: TextStyle(
-                                                    fontSize: 16.sp,
-                                                    fontFamily:
-                                                        FontFamily.regular,
-                                                    color: AppColors.gray,
-                                                  ),
-                                                ),
-                                              );
-                                            }).toList(),
-                                        onChanged: (newValue) {
-                                          setState(() {
-                                            selectedCustomer = newValue;
-                                            errorText =
-                                                null; // Clear error on selection
-                                          });
-                                        },
-                                      ),
-                                      if (errorText != null) ...[
-                                        SizedBox(height: 8),
-                                        Text(
-                                          errorText!,
-                                          style: TextStyle(
-                                            color: Colors.red,
-                                            fontSize: 14.sp,
-                                          ),
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                  actions: [
-                                    CustomButton(
-                                      title: "Cancel",
-                                      route: () {
-                                        Navigator.pop(context);
-                                      },
-                                      color: AppColors.containerColor,
-                                      fontcolor: AppColors.blackColor,
-                                      height: 5.h,
-                                      width: 30.w,
-                                      fontsize: 14.sp,
-                                      radius: 12.0,
-                                    ),
-                                    CustomButton(
-                                      title: "Confirm",
-                                      route: () {
-                                        if (selectedCustomer != null) {
-                                          Navigator.pop(context);
-                                          Get.offAll(
-                                            () => CartScreen(
-                                              customerName: selectedCustomer!,
-                                            ),
-                                            transition: Transition.fade,
-                                            duration: const Duration(
-                                              milliseconds: 450,
-                                            ),
-                                          );
-                                        } else {
-                                          // Use the setState of StatefulBuilder
-                                          setState(() {
-                                            errorText =
-                                                "Please select a customer!";
-                                          });
-                                        }
-                                      },
-                                      color: AppColors.mainColor,
-                                      fontcolor: AppColors.whiteColor,
-                                      height: 5.h,
-                                      width: 30.w,
-                                      fontsize: 14.sp,
-                                      radius: 12.0,
-                                      iconData: Icons.check,
-                                      iconsize: 14.sp,
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        );
-                      },
+                      route: () {},
                       color: AppColors.mainColor,
                       fontcolor: AppColors.whiteColor,
                       radius: isIpad ? 10.0 : 90.0,

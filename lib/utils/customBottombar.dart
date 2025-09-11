@@ -39,11 +39,7 @@ class _CustomBarState extends State<CustomBar> {
       "page": () => OrderHistoryScreen(),
     },
     {"title": "Home", "icon": Imgs.thirdImage, "page": () => Homescreen()},
-    {
-      "title": "Cart",
-      "icon": Imgs.fourthImage,
-      "page": () => CartScreen(customerName: ''),
-    },
+    {"title": "Cart", "icon": Imgs.fourthImage, "page": () => CartScreen()},
     {
       "title": "Profile",
       "icon": Imgs.fifthImage,

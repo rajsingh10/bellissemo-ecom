@@ -1,3 +1,4 @@
+import 'package:bellissemo_ecom/utils/customMenuDrawer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -123,7 +124,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     //   productCount: 8,
     // ),
   ];
-
+  final GlobalKey<ScaffoldState> _scaffoldKeyCatalog =
+      GlobalKey<ScaffoldState>();
   bool isSearchEnabled = false;
   TextEditingController searchController = TextEditingController();
 
@@ -186,6 +188,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     final ScrollController scrollController = ScrollController();
 
     return Scaffold(
+      key: _scaffoldKeyCatalog,
+      drawer: CustomDrawer(),
       backgroundColor: AppColors.bgColor,
       body: Column(
         children: [
@@ -193,6 +197,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             title: 'Catalog',
             isDrawerEnabled: true,
             isSearchEnabled: true,
+            drawerCallback: () {
+              _scaffoldKeyCatalog.currentState?.openDrawer();
+            },
             onSearch: () {
               setState(() {
                 isSearchEnabled = !isSearchEnabled;
@@ -445,8 +452,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       child: Card(
         color: AppColors.cardBgColor2,
         elevation: 3,
-        shadowColor: Colors.black12,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shadowColor: Colors.black45,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: AppColors.border),
+          borderRadius: BorderRadius.circular(20),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
