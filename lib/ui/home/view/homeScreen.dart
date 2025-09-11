@@ -37,10 +37,11 @@ class _HomescreenState extends State<Homescreen> {
   }
 
   final List<String> carouselImages = [
-    'https://static.vecteezy.com/system/resources/thumbnails/004/707/493/small_2x/online-shopping-on-phone-buy-sell-business-digital-web-banner-application-money-advertising-payment-ecommerce-illustration-search-vector.jpg',
-    'https://static.vecteezy.com/system/resources/previews/017/764/762/non_2x/banner-for-sale-people-rush-to-shop-with-bags-the-girl-runs-to-the-supermarket-young-people-with-bags-vector.jpg',
-    'https://static.vecteezy.com/system/resources/thumbnails/004/707/493/small_2x/online-shopping-on-phone-buy-sell-business-digital-web-banner-application-money-advertising-payment-ecommerce-illustration-search-vector.jpg',
-    'https://static.vecteezy.com/system/resources/previews/017/764/762/non_2x/banner-for-sale-people-rush-to-shop-with-bags-the-girl-runs-to-the-supermarket-young-people-with-bags-vector.jpg',
+    'https://www.cultbeauty.co.uk/images?url=https://static.thcdn.com/widgets/257-en/22/original-Hair%26ToolsPromo_Desktop-102922.jpg&format=webp&auto=avif&width=1920&fit=cover',
+    'https://www.lookfantastic.com/images?url=https://static.thcdn.com/widgets/95-en/51/original-0805_1361811_LF_GS_Prada_Paradigme_Bottle_1_NI_1920x600-130351.jpg&format=webp&auto=avif&width=1920&fit=cover',
+    'https://www.shutterstock.com/image-vector/makeup-products-realistic-vector-illustration-600nw-2463029283.jpg',
+    'https://www.shutterstock.com/image-vector/makeup-products-realistic-vector-illustration-600nw-2220636093.jpg',
+    'https://t3.ftcdn.net/jpg/08/58/78/66/360_F_858786633_6Uu7lePeLuTG8NYgrCD9dX6A6l5zA1Da.jpg',
   ];
 
   final List<Product> products = [
@@ -277,41 +278,52 @@ class _HomescreenState extends State<Homescreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          InkWell(
-                            onTap: () {
-                              _scaffoldKeyHome.currentState?.openDrawer();
-                            },
-                            child: CircleAvatar(
-                              radius: isIpad ? 40 : 20,
-                              backgroundColor: AppColors.containerColor,
-                              child: Icon(
-                                CupertinoIcons.bars,
-                                color: AppColors.blackColor,
-                                size: isIpad ? 40 : 25,
-                              ),
-                            ),
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                          Row(
                             children: [
-                              Text(
-                                "Delivery address",
-                                style: TextStyle(
-                                  fontSize: 15.sp,
-                                  color: AppColors.gray,
-                                  fontFamily: FontFamily.light,
+                              InkWell(
+                                onTap: () {
+                                  _scaffoldKeyHome.currentState?.openDrawer();
+                                },
+                                child: CircleAvatar(
+                                  radius: isIpad ? 40 : 20,
+                                  backgroundColor: AppColors.containerColor,
+                                  child: Icon(
+                                    CupertinoIcons.bars,
+                                    color: AppColors.blackColor,
+                                    size: isIpad ? 40 : 25,
+                                  ),
                                 ),
                               ),
-                              Text(
-                                "92 High Street, London",
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontFamily: FontFamily.bold,
-                                  color: AppColors.blackColor,
+                              SizedBox(width: 2.w),
+                              SizedBox(
+                                width: 45.w,
+                                child: RichText(
+                                  textAlign: TextAlign.start,
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: "Hy, ",
+                                        style: TextStyle(
+                                          fontSize: 17.sp,
+                                          color: AppColors.gray,
+                                          fontFamily: FontFamily.light,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: "John Doe",
+                                        style: TextStyle(
+                                          fontSize: 17.sp,
+                                          color: AppColors.blackColor,
+                                          fontFamily: FontFamily.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],
                           ),
+
                           Row(
                             children: [
                               GestureDetector(

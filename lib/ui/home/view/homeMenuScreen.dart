@@ -3,6 +3,7 @@ import 'package:bellissemo_ecom/ui/category/view/categoryScreen.dart';
 import 'package:bellissemo_ecom/ui/customers/view/customersScreen.dart';
 import 'package:bellissemo_ecom/ui/orderhistory/view/orderHistoryScreen.dart';
 import 'package:bellissemo_ecom/ui/profile/view/profileScreen.dart';
+import 'package:bellissemo_ecom/utils/customButton.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,6 +13,7 @@ import '../../../utils/colors.dart';
 import '../../../utils/customBottombar.dart';
 import '../../../utils/customMenuDrawer.dart';
 import '../../../utils/fontFamily.dart';
+import '../../../utils/images.dart';
 import '../../../utils/multipleImagesSlider.dart';
 import '../../../utils/searchFields.dart';
 import '../../reports/view/reportsScreen.dart';
@@ -27,10 +29,11 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKeyHome2 = GlobalKey<ScaffoldState>();
   final TextEditingController searchController = TextEditingController();
   final List<String> carouselImages = [
-    'https://static.vecteezy.com/system/resources/thumbnails/004/707/493/small_2x/online-shopping-on-phone-buy-sell-business-digital-web-banner-application-money-advertising-payment-ecommerce-illustration-search-vector.jpg',
-    'https://static.vecteezy.com/system/resources/previews/017/764/762/non_2x/banner-for-sale-people-rush-to-shop-with-bags-the-girl-runs-to-the-supermarket-young-people-with-bags-vector.jpg',
-    'https://static.vecteezy.com/system/resources/thumbnails/004/707/493/small_2x/online-shopping-on-phone-buy-sell-business-digital-web-banner-application-money-advertising-payment-ecommerce-illustration-search-vector.jpg',
-    'https://static.vecteezy.com/system/resources/previews/017/764/762/non_2x/banner-for-sale-people-rush-to-shop-with-bags-the-girl-runs-to-the-supermarket-young-people-with-bags-vector.jpg',
+    'https://www.cultbeauty.co.uk/images?url=https://static.thcdn.com/widgets/257-en/22/original-Hair%26ToolsPromo_Desktop-102922.jpg&format=webp&auto=avif&width=1920&fit=cover',
+    'https://www.lookfantastic.com/images?url=https://static.thcdn.com/widgets/95-en/51/original-0805_1361811_LF_GS_Prada_Paradigme_Bottle_1_NI_1920x600-130351.jpg&format=webp&auto=avif&width=1920&fit=cover',
+    'https://www.shutterstock.com/image-vector/makeup-products-realistic-vector-illustration-600nw-2463029283.jpg',
+    'https://www.shutterstock.com/image-vector/makeup-products-realistic-vector-illustration-600nw-2220636093.jpg',
+    'https://t3.ftcdn.net/jpg/08/58/78/66/360_F_858786633_6Uu7lePeLuTG8NYgrCD9dX6A6l5zA1Da.jpg',
   ];
 
   bool searchBar = false;
@@ -64,41 +67,52 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        InkWell(
-                          onTap: () {
-                            _scaffoldKeyHome2.currentState?.openDrawer();
-                          },
-                          child: CircleAvatar(
-                            radius: isIpad ? 40 : 20,
-                            backgroundColor: AppColors.containerColor,
-                            child: Icon(
-                              CupertinoIcons.bars,
-                              color: AppColors.blackColor,
-                              size: isIpad ? 40 : 25,
-                            ),
-                          ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                        Row(
                           children: [
-                            Text(
-                              "Delivery address",
-                              style: TextStyle(
-                                fontSize: 15.sp,
-                                color: AppColors.gray,
-                                fontFamily: FontFamily.light,
+                            InkWell(
+                              onTap: () {
+                                _scaffoldKeyHome2.currentState?.openDrawer();
+                              },
+                              child: CircleAvatar(
+                                radius: isIpad ? 40 : 20,
+                                backgroundColor: AppColors.containerColor,
+                                child: Icon(
+                                  CupertinoIcons.bars,
+                                  color: AppColors.blackColor,
+                                  size: isIpad ? 40 : 25,
+                                ),
                               ),
                             ),
-                            Text(
-                              "92 High Street, London",
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                fontFamily: FontFamily.bold,
-                                color: AppColors.blackColor,
+                            SizedBox(width: 2.w),
+                            SizedBox(
+                              width: 45.w,
+                              child: RichText(
+                                textAlign: TextAlign.start,
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: "Hy, ",
+                                      style: TextStyle(
+                                        fontSize: 17.sp,
+                                        color: AppColors.gray,
+                                        fontFamily: FontFamily.light,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: "John Doe",
+                                      style: TextStyle(
+                                        fontSize: 17.sp,
+                                        color: AppColors.blackColor,
+                                        fontFamily: FontFamily.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
                         ),
+
                         Row(
                           children: [
                             GestureDetector(
@@ -231,61 +245,84 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                     left: 4.w,
                   ),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Container(
-                        width: Device.width,
-                        padding: EdgeInsets.symmetric(vertical: 3.h),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(40),
-                            topLeft: Radius.circular(40),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            Imgs.onlyLogo,
+                            height: isIpad ? 06.w : 13.w,
+                            width: isIpad ? 08.w : 15.w,
+                            fit: BoxFit.cover,
                           ),
-                          color: AppColors.bgColor,
-                        ),
-                        child: Wrap(
-                          spacing: 0.w,
-                          runSpacing: 3.h,
-                          alignment: WrapAlignment.center,
-                          children: [
-                            _buildMenuItem(
-                              Icons.shopping_bag_outlined,
-                              "Order",
-                              Colors.orange,
-                              Colors.deepOrangeAccent,
+                          Text(
+                            "Bellissemo App",
+                            style: TextStyle(
+                              fontSize: isIpad ? 20.sp : 22.sp,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.blackColor,
+                              fontFamily: FontFamily.regular,
+                              letterSpacing: 1.1,
                             ),
-                            _buildMenuItem(
-                              Icons.menu_book_outlined,
-                              "Catalog",
-                              Colors.blue,
-                              Colors.indigo,
-                            ),
-                            _buildMenuItem(
-                              Icons.people_alt_outlined,
-                              "Customer",
-                              Colors.green,
-                              Colors.teal,
-                            ),
-                            _buildMenuItem(
-                              Icons.shopping_cart_outlined,
-                              "Cart",
-                              Colors.pink,
-                              Colors.purple,
-                            ),
-                            _buildMenuItem(
-                              Icons.area_chart_rounded,
-                              "Report",
-                              Colors.pink,
-                              Colors.purple,
-                            ),
-                            _buildMenuItem(
-                              Icons.person_outline,
-                              "Account",
-                              Colors.amber,
-                              Colors.redAccent,
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
+                      Wrap(
+                        spacing: 0.w,
+                        runSpacing: 3.h,
+                        alignment: WrapAlignment.center,
+                        children: [
+                          _buildMenuItem(
+                            Icons.shopping_bag_outlined,
+                            "Order",
+                            Colors.orange,
+                            Colors.deepOrangeAccent,
+                          ),
+                          _buildMenuItem(
+                            Icons.menu_book_outlined,
+                            "Catalog",
+                            Colors.blue,
+                            Colors.indigo,
+                          ),
+                          _buildMenuItem(
+                            Icons.people_alt_outlined,
+                            "Customer",
+                            Colors.green,
+                            Colors.teal,
+                          ),
+                          _buildMenuItem(
+                            Icons.shopping_cart_outlined,
+                            "Cart",
+                            Colors.pink,
+                            Colors.purple,
+                          ),
+                          _buildMenuItem(
+                            Icons.area_chart_rounded,
+                            "Report",
+                            Colors.pink,
+                            Colors.purple,
+                          ),
+                          _buildMenuItem(
+                            Icons.person_outline,
+                            "Account",
+                            Colors.amber,
+                            Colors.redAccent,
+                          ),
+                        ],
+                      ),
+                      CustomButton(
+                        title: 'Explore More..',
+                        radius: isIpad ? 1.w : 3.w,
+                        route: () {},
+                        iconData: Icons.production_quantity_limits_sharp,
+                        color: AppColors.mainColor,
+                        fontcolor: AppColors.whiteColor,
+                        height: 5.h,
+                        fontsize: 18.sp,
+                      ).paddingOnly(bottom: 1.h),
                     ],
                   ),
                 ),
@@ -340,10 +377,13 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: EdgeInsets.all(15.sp),
+              padding: isIpad ? EdgeInsets.all(12.sp) : EdgeInsets.all(15.sp),
               decoration: BoxDecoration(
                 shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius:
+                    isIpad
+                        ? BorderRadius.circular(15)
+                        : BorderRadius.circular(20),
                 color: Colors.white,
                 border: Border.all(color: AppColors.mainColor, width: 2),
                 boxShadow: [
@@ -354,7 +394,11 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                   ),
                 ],
               ),
-              child: Icon(icon, size: 20.sp, color: AppColors.mainColor),
+              child: Icon(
+                icon,
+                size: isIpad ? 18.sp : 20.sp,
+                color: AppColors.mainColor,
+              ),
             ),
             SizedBox(height: 1.h),
             Text(
