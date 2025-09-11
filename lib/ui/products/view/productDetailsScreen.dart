@@ -426,7 +426,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       route: () {},
                       color: AppColors.mainColor,
                       fontcolor: AppColors.whiteColor,
-                      radius: isIpad ? 10.0 : 90.0,
+                      radius: isIpad ? 1.w : 3.w,
                       height: isIpad ? 7.h : 5.h,
                       fontsize: 16.sp,
                       iconData: Icons.shopping_cart_outlined,

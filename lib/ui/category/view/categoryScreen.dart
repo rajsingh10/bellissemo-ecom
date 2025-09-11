@@ -363,6 +363,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       : Column(
                         children: [
                           GridView.count(
+                            padding: EdgeInsets.zero,
                             shrinkWrap: true,
                             physics: ClampingScrollPhysics(),
                             crossAxisCount: _getCrossAxisCount(context),
