@@ -1,3 +1,4 @@
+import 'package:bellissemo_ecom/ui/cart/View/cartScreen.dart';
 import 'package:bellissemo_ecom/utils/colors.dart';
 import 'package:bellissemo_ecom/utils/multipleImagesSlider.dart';
 import 'package:flutter/cupertino.dart';
@@ -281,12 +282,12 @@ class _HomescreenState extends State<Homescreen> {
                               _scaffoldKeyHome.currentState?.openDrawer();
                             },
                             child: CircleAvatar(
-                              radius: 25,
+                              radius: isIpad ? 40 : 20,
                               backgroundColor: AppColors.containerColor,
                               child: Icon(
                                 CupertinoIcons.bars,
                                 color: AppColors.blackColor,
-                                size: 30,
+                                size: isIpad ? 40 : 25,
                               ),
                             ),
                           ),
@@ -320,32 +321,87 @@ class _HomescreenState extends State<Homescreen> {
                                   });
                                 },
                                 child: CircleAvatar(
-                                  radius: 25,
+                                  radius: isIpad ? 40 : 20,
                                   backgroundColor: AppColors.containerColor,
                                   child: Icon(
                                     Icons.search,
                                     color: AppColors.blackColor,
-                                    size: 30,
+                                    size: isIpad ? 35 : 25,
                                   ),
                                 ),
                               ),
-                              SizedBox(width: 3.5.w),
+                              SizedBox(width: isIpad ? 2.w : 3.5.w),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    Get.offAll(
+                                      CartScreen(),
+                                      transition: Transition.fade,
+                                      duration: const Duration(
+                                        milliseconds: 450,
+                                      ),
+                                    );
+                                  });
+                                },
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: isIpad ? 40 : 20,
+                                      backgroundColor: AppColors.containerColor,
+                                      child: Icon(
+                                        Icons.shopping_cart_outlined,
+                                        color: AppColors.blackColor,
+                                        size: isIpad ? 35 : 25,
+                                      ),
+                                    ),
+                                    // Positioned badge
+                                    Positioned(
+                                      top: -4,
+                                      right: -4,
+                                      child: Container(
+                                        padding: EdgeInsets.all(4.sp),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        constraints: BoxConstraints(
+                                          minWidth: 14.sp,
+                                          minHeight: 14.sp,
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            '2',
+                                            // Replace with your cart count dynamically if needed
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: isIpad ? 2.w : 3.5.w),
                               Stack(
                                 children: [
                                   CircleAvatar(
-                                    radius: 25,
+                                    radius: isIpad ? 40 : 20,
                                     backgroundColor: AppColors.containerColor,
                                     child: Icon(
                                       Icons.notifications_none,
                                       color: AppColors.blackColor,
-                                      size: 30,
+                                      size: isIpad ? 35 : 25,
                                     ),
                                   ),
                                   Positioned(
                                     right: 2,
                                     top: 2,
                                     child: CircleAvatar(
-                                      radius: 6,
+                                      radius: isIpad ? 10 : 6,
                                       backgroundColor: AppColors.counterColor,
                                     ),
                                   ),
@@ -585,8 +641,9 @@ class _HomescreenState extends State<Homescreen> {
         child: Card(
           color: AppColors.cardBgColor2,
           elevation: 3,
-          shadowColor: Colors.black12,
+          shadowColor: Colors.black45,
           shape: RoundedRectangleBorder(
+            side: BorderSide(color: AppColors.border),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Column(

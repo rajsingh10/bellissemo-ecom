@@ -1,3 +1,4 @@
+import 'package:bellissemo_ecom/ui/cart/View/cartScreen.dart';
 import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,10 +16,8 @@ Widget TitleBar({
   bool isDrawerEnabled = true,
   bool isBackEnabled = false,
 }) {
-  /// Determine if device is tablet/iPad based on width
   final bool isTablet = 100.w >= 800;
 
-  /// Helper: Build button
   Widget buildButton(IconData icon, VoidCallback? onTap) {
     return InkWell(
       borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
@@ -38,18 +37,57 @@ Widget TitleBar({
     );
   }
 
-  /// Build right-side buttons dynamically
+  Widget buildCartButton() {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        buildButton(Icons.shopping_cart_rounded, () {
+          Get.offAll(
+            () => CartScreen(),
+            transition: Transition.fade,
+            duration: const Duration(milliseconds: 450),
+          );
+        }),
+        Positioned(
+          right: 0,
+          top: -2.sp,
+          child: Container(
+            padding: EdgeInsets.all(4.sp),
+            decoration: BoxDecoration(
+              color: Colors.red,
+              shape: BoxShape.circle,
+            ),
+            constraints: BoxConstraints(
+              minWidth: isTablet ? 15.sp : 14.sp,
+              minHeight: isTablet ? 15.sp : 14.sp,
+            ),
+            child: Center(
+              child: Text(
+                '2', // Replace with your cart count dynamically if needed
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: isTablet ? 11.sp : 12.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   final List<Widget> rightButtons = [];
+
   if (isSearchEnabled) {
     rightButtons.add(buildButton(Icons.search_rounded, onSearch));
   }
-  if (isDrawerEnabled && isBackEnabled) {
-    rightButtons.add(buildButton(Icons.menu_rounded, drawerCallback));
-  }
 
-  // Total buttons for spacing logic
-  final int totalButtons =
-      (isBackEnabled || isDrawerEnabled ? 1 : 0) + rightButtons.length;
+  // Show cart button only if not in CartScreen or CheckoutScreen
+  if (Get.currentRoute != '/CartScreen' &&
+      Get.currentRoute != '/CheckOutScreen') {
+    rightButtons.add(buildCartButton());
+  }
 
   return Container(
     margin: EdgeInsets.only(
@@ -76,7 +114,7 @@ Widget TitleBar({
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          /// Left Side
+          // Left Side
           if (isBackEnabled)
             buildButton(Icons.arrow_back_rounded, () => Get.back())
           else if (isDrawerEnabled)
@@ -84,7 +122,7 @@ Widget TitleBar({
           else
             SizedBox(width: isTablet ? 60 : 45),
 
-          /// Title
+          // Title
           Expanded(
             child: Center(
               child: Text(
@@ -101,24 +139,19 @@ Widget TitleBar({
             ),
           ),
 
-          /// Right Side
-          if (rightButtons.isNotEmpty)
-            Row(
-              children: List.generate(
-                rightButtons.length,
-                (i) => Row(
-                  children: [
-                    rightButtons[i],
-                    if (i != rightButtons.length - 1)
-                      SizedBox(width: isTablet ? 4.w : 3.w),
-                  ],
-                ),
+          // Right Side
+          Row(
+            children: List.generate(
+              rightButtons.length,
+              (i) => Row(
+                children: [
+                  rightButtons[i],
+                  if (i != rightButtons.length - 1)
+                    SizedBox(width: isTablet ? 2.w : 3.w),
+                ],
               ),
-            )
-          else if (totalButtons == 1)
-            SizedBox(width: isTablet ? 15.w : 12.w)
-          else
-            const SizedBox.shrink(),
+            ),
+          ),
         ],
       ),
     ),

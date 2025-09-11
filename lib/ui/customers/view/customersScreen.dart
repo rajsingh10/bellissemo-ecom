@@ -315,20 +315,23 @@ class _CustomersScreenState extends State<CustomersScreen> {
         color: AppColors.cardBgColor2,
         elevation: 3,
         shadowColor: Colors.black12,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: AppColors.border),
+        ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ClipRRect(
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
+                top: Radius.circular(15),
               ),
               child: CustomNetworkImage(
                 imageUrl: customer.imageUrl,
                 height: isIpad ? 10.w : 20.w,
                 width: isIpad ? 10.w : 20.w,
                 isFit: true,
-                radius: 20,
+                radius: 15,
               ),
             ),
             Padding(
@@ -368,7 +371,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
               ),
             ),
           ],
-        ),
+        ).paddingSymmetric(horizontal: 1.w, vertical: 0.5.h),
       ),
     );
   }
