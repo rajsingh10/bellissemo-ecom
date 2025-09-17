@@ -302,7 +302,10 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                       horizontal: 12,
                                     ),
                                     child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
+                                        // Product Image
                                         ClipRRect(
                                           borderRadius: BorderRadius.circular(
                                             8,
@@ -317,11 +320,14 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                           ),
                                         ),
                                         SizedBox(width: 2.w),
+
+                                        // Product Details + Quantity & Cart Button
                                         Expanded(
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
+                                              // Product Name
                                               Text(
                                                 item.name,
                                                 style: TextStyle(
@@ -332,6 +338,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                 ),
                                               ),
                                               SizedBox(height: 0.5.h),
+
+                                              // Qty + Price
                                               Text(
                                                 "Qty: ${item.qty}  •  \$${item.price.toStringAsFixed(2)}",
                                                 style: TextStyle(
@@ -341,6 +349,100 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                       FontFamily.semiBold,
                                                 ),
                                               ),
+                                              SizedBox(height: 1.h),
+
+                                              // Quantity Selector + Cart Button
+                                              // Row(
+                                              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              //   children: [
+                                              //     // Quantity Selector
+                                              //     Container(
+                                              //       padding: EdgeInsets.symmetric(
+                                              //         horizontal: isIpad ? 0 : 2.w,
+                                              //         vertical: 0.5.h,
+                                              //       ),
+                                              //       decoration: BoxDecoration(
+                                              //         color: AppColors.containerColor,
+                                              //         borderRadius: BorderRadius.circular(30),
+                                              //       ),
+                                              //       child: Row(
+                                              //         children: [
+                                              //           // Decrease Button
+                                              //           GestureDetector(
+                                              //             onTap: product.inStock && product.quantity > 0
+                                              //                 ? () => setState(() => product.quantity--)
+                                              //                 : null,
+                                              //             child: Container(
+                                              //               padding: EdgeInsets.all(1.5.w),
+                                              //               decoration: BoxDecoration(
+                                              //                 color: AppColors.cardBgColor,
+                                              //                 shape: BoxShape.circle,
+                                              //               ),
+                                              //               child: Icon(
+                                              //                 Icons.remove,
+                                              //                 size: isIpad ? 12.sp : 16.sp,
+                                              //                 color: AppColors.blackColor,
+                                              //               ),
+                                              //             ),
+                                              //           ),
+                                              //           SizedBox(width: 1.w),
+                                              //
+                                              //           // Quantity Text
+                                              //           Text(
+                                              //             product.quantity.toString(),
+                                              //             style: TextStyle(
+                                              //               fontSize: 14.sp,
+                                              //               fontFamily: FontFamily.semiBold,
+                                              //               color: AppColors.blackColor,
+                                              //             ),
+                                              //           ),
+                                              //           SizedBox(width: 1.w),
+                                              //
+                                              //           // Increase Button
+                                              //           GestureDetector(
+                                              //             onTap: product.inStock
+                                              //                 ? () => setState(() => product.quantity++)
+                                              //                 : null,
+                                              //             child: Container(
+                                              //               padding: EdgeInsets.all(1.5.w),
+                                              //               decoration: BoxDecoration(
+                                              //                 color: AppColors.cardBgColor,
+                                              //                 shape: BoxShape.circle,
+                                              //               ),
+                                              //               child: Icon(
+                                              //                 Icons.add,
+                                              //                 size: isIpad ? 12.sp : 16.sp,
+                                              //                 color: AppColors.blackColor,
+                                              //               ),
+                                              //             ),
+                                              //           ),
+                                              //         ],
+                                              //       ),
+                                              //     ),
+                                              //
+                                              //     // Add to Cart Button
+                                              //     InkWell(
+                                              //       onTap: product.inStock
+                                              //           ? () {
+                                              //         // handle add to cart
+                                              //       }
+                                              //           : null,
+                                              //       borderRadius: BorderRadius.circular(30),
+                                              //       child: Container(
+                                              //         padding: EdgeInsets.all(1.5.w),
+                                              //         decoration: BoxDecoration(
+                                              //           color: AppColors.mainColor,
+                                              //           shape: BoxShape.circle,
+                                              //         ),
+                                              //         child: Icon(
+                                              //           Icons.shopping_cart_outlined,
+                                              //           color: Colors.white,
+                                              //           size: isIpad ? 15.sp : 18.sp,
+                                              //         ),
+                                              //       ),
+                                              //     ),
+                                              //   ],
+                                              // ),
                                             ],
                                           ),
                                         ),

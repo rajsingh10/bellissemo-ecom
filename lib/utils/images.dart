@@ -9,4 +9,6 @@ class Imgs {
   static const String thirdImage = 'assets/images/bottomBarSvg/3.svg';
   static const String fourthImage = 'assets/images/bottomBarSvg/4.svg';
   static const String fifthImage = 'assets/images/bottomBarSvg/5.svg';
+  static const String customerImage = 'assets/images/bottomBarSvg/custo.svg';
+  static const String reportImage = 'assets/images/bottomBarSvg/report.svg';
 }
