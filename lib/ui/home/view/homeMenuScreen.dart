@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:bellissemo_ecom/ui/cart/View/cartScreen.dart';
 import 'package:bellissemo_ecom/ui/category/view/categoryScreen.dart';
 import 'package:bellissemo_ecom/ui/customers/view/customersScreen.dart';
@@ -6,9 +9,14 @@ import 'package:bellissemo_ecom/ui/profile/view/profileScreen.dart';
 import 'package:bellissemo_ecom/utils/customButton.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../ApiCalling/apiConfigs.dart';
+import '../../../apiCalling/Check Internet Module.dart';
+import '../../../services/hiveServices.dart';
 import '../../../utils/colors.dart';
 import '../../../utils/customBottombar.dart';
 import '../../../utils/customMenuDrawer.dart';
@@ -16,7 +24,14 @@ import '../../../utils/fontFamily.dart';
 import '../../../utils/images.dart';
 import '../../../utils/multipleImagesSlider.dart';
 import '../../../utils/searchFields.dart';
+import '../../../utils/snackBars.dart';
+import '../../customers/modal/fetchCustomersModal.dart';
+import '../../customers/provider/customerProvider.dart';
+import '../../profile/modal/profileModal.dart';
+import '../../profile/provider/profileProvider.dart';
 import '../../reports/view/reportsScreen.dart';
+import '../modal/bannersModal.dart';
+import '../provider/homeProvider.dart';
 
 class HomeMenuScreen extends StatefulWidget {
   const HomeMenuScreen({super.key});
@@ -39,6 +54,67 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
   bool searchBar = false;
   bool isDrawerOpen = false;
   bool isIpad = 100.w >= 800;
+  List<BannersModal> bannersList = [];
+  List<String> bannersImagesList = [];
+  List<FetchCustomersModal> customersList = [];
+  bool isLoading = true;
+
+  Future<void> loadInitialData() async {
+    setState(() => isLoading = true);
+
+    // Load cached data first for immediate display
+    _loadCachedData();
+
+    final stopwatch = Stopwatch()..start();
+
+    try {
+      await Future.wait([
+        _fetchBanner().then((_) => setState(() {})),
+        _fetchProfile().then((_) => setState(() {})),
+        _fetchCustomers().then((_) => setState(() {})),
+      ]);
+    } catch (e) {
+      log("Error loading initial data: $e");
+    } finally {
+      stopwatch.stop();
+      log("All API calls completed in ${stopwatch.elapsed.inMilliseconds} ms");
+      setState(() => isLoading = false);
+    }
+  }
+
+  void _loadCachedData() {
+    var bannerBox = HiveService().getBannerBox();
+    var profileBox = HiveService().getProfileBox();
+    var customerBox = HiveService().getCustomerBox();
+
+    final cachedBanner = bannerBox.get('banner');
+    if (cachedBanner != null) {
+      final List data = json.decode(cachedBanner);
+      bannersList = data.map((e) => BannersModal.fromJson(e)).toList();
+      bannersImagesList =
+          bannersList.map((b) => b.featuredImageUrl ?? '').toList();
+    }
+
+    final cachedCustomers = customerBox.get('customers');
+    if (cachedCustomers != null) {
+      final List data = json.decode(cachedCustomers);
+      customersList = data.map((e) => FetchCustomersModal.fromJson(e)).toList();
+    }
+
+    final cachedProfile = profileBox.get('profile');
+    if (cachedProfile != null) {
+      profile = ProfileModal.fromJson(json.decode(cachedProfile));
+    }
+
+    setState(() {}); // Refresh UI immediately
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    loadInitialData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +161,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                             ),
                             SizedBox(width: 2.w),
                             SizedBox(
-                              width: 45.w,
+                              width: 30.w,
                               child: RichText(
                                 textAlign: TextAlign.start,
                                 text: TextSpan(
@@ -99,7 +175,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                                       ),
                                     ),
                                     TextSpan(
-                                      text: "John Doe",
+                                      text: profile?.name ?? '',
                                       style: TextStyle(
                                         fontSize: 17.sp,
                                         color: AppColors.blackColor,
@@ -115,6 +191,199 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
 
                         Row(
                           children: [
+                            GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    int? selectedCustomerId;
+                                    String? selectedCustomerName;
+
+                                    String? errorText;
+
+                                    return StatefulBuilder(
+                                      builder: (context, setState) {
+                                        return AlertDialog(
+                                          backgroundColor: AppColors.whiteColor,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              15,
+                                            ),
+                                          ),
+                                          title: Text(
+                                            "Select Customer",
+                                            style: TextStyle(
+                                              fontSize: 18.sp,
+                                              fontFamily: FontFamily.bold,
+                                              color: AppColors.blackColor,
+                                            ),
+                                          ),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              // List of customers
+                                              ...customersList.map((customer) {
+                                                bool isSelected =
+                                                    selectedCustomerId ==
+                                                    customer.id;
+                                                return InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      selectedCustomerId =
+                                                          customer.id;
+                                                      selectedCustomerName =
+                                                          "${customer.firstName} ${customer.lastName}";
+                                                      errorText =
+                                                          null; // clear error
+                                                    });
+                                                  },
+                                                  child: Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                          vertical: 12,
+                                                          horizontal: 10,
+                                                        ),
+                                                    margin:
+                                                        EdgeInsets.symmetric(
+                                                          vertical: 5,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          isSelected
+                                                              ? AppColors
+                                                                  .mainColor
+                                                                  .withValues(
+                                                                    alpha: 0.1,
+                                                                  )
+                                                              : AppColors
+                                                                  .whiteColor,
+                                                      border: Border.all(
+                                                        color:
+                                                            isSelected
+                                                                ? AppColors
+                                                                    .mainColor
+                                                                : AppColors
+                                                                    .gray,
+                                                        width: 1,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            10,
+                                                          ),
+                                                    ),
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(
+                                                          isSelected
+                                                              ? Icons
+                                                                  .radio_button_checked
+                                                              : Icons
+                                                                  .radio_button_off,
+                                                          color:
+                                                              isSelected
+                                                                  ? AppColors
+                                                                      .mainColor
+                                                                  : AppColors
+                                                                      .gray,
+                                                        ),
+                                                        SizedBox(width: 10),
+                                                        Text(
+                                                          "${customer.firstName} ${customer.lastName}",
+                                                          style: TextStyle(
+                                                            fontSize: 16.sp,
+                                                            fontFamily:
+                                                                FontFamily
+                                                                    .regular,
+                                                            color:
+                                                                AppColors
+                                                                    .blackColor,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                              }),
+                                              if (errorText != null) ...[
+                                                SizedBox(height: 8),
+                                                Text(
+                                                  errorText!,
+                                                  style: TextStyle(
+                                                    color: Colors.red,
+                                                    fontSize: 14.sp,
+                                                  ),
+                                                ),
+                                              ],
+                                            ],
+                                          ),
+                                          actions: [
+                                            CustomButton(
+                                              title: "Cancel",
+                                              route: () {
+                                                Get.back();
+                                              },
+                                              color: AppColors.containerColor,
+                                              fontcolor: AppColors.blackColor,
+                                              height: 5.h,
+                                              width: 30.w,
+                                              fontsize: 15.sp,
+                                              radius: 12.0,
+                                            ),
+                                            CustomButton(
+                                              title: "Confirm",
+                                              route: () async {
+                                                if (selectedCustomerId !=
+                                                        null &&
+                                                    selectedCustomerName !=
+                                                        null) {
+                                                  // ✅ Save to SharedPreferences
+                                                  final prefs =
+                                                      await SharedPreferences.getInstance();
+                                                  await prefs.setInt(
+                                                    "customerId",
+                                                    selectedCustomerId!,
+                                                  );
+                                                  await prefs.setString(
+                                                    "customerName",
+                                                    selectedCustomerName!,
+                                                  );
+
+                                                  Get.back();
+                                                } else {
+                                                  setState(() {
+                                                    errorText =
+                                                        "Please select a customer!";
+                                                  });
+                                                }
+                                              },
+                                              color: AppColors.mainColor,
+                                              fontcolor: AppColors.whiteColor,
+                                              height: 5.h,
+                                              width: 30.w,
+                                              fontsize: 15.sp,
+                                              radius: 12.0,
+                                              iconData: Icons.check,
+                                              iconsize: 17.sp,
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+
+                              child: CircleAvatar(
+                                radius: isIpad ? 40 : 20,
+                                backgroundColor: AppColors.containerColor,
+                                child: Icon(
+                                  Icons.person_outline_rounded,
+                                  color: AppColors.blackColor,
+                                  size: isIpad ? 35 : 25,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: isIpad ? 2.w : 3.5.w),
                             GestureDetector(
                               onTap: () {
                                 setState(() {
@@ -218,7 +487,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                       ),
                     SizedBox(height: 1.h),
 
-                    ImageSlider(imageUrls: carouselImages, height: 18.h),
+                    ImageSlider(imageUrls: bannersImagesList, height: 18.h),
 
                     SizedBox(height: 2.h),
                   ],
@@ -275,48 +544,20 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                         runSpacing: 3.h,
                         alignment: WrapAlignment.center,
                         children: [
-                          _buildMenuItem(
-                            Icons.shopping_bag_outlined,
-                            "Order",
-                            Colors.orange,
-                            Colors.deepOrangeAccent,
-                          ),
-                          _buildMenuItem(
-                            Icons.menu_book_outlined,
-                            "Catalog",
-                            Colors.blue,
-                            Colors.indigo,
-                          ),
-                          _buildMenuItem(
-                            Icons.people_alt_outlined,
-                            "Customer",
-                            Colors.green,
-                            Colors.teal,
-                          ),
-                          _buildMenuItem(
-                            Icons.shopping_cart_outlined,
-                            "Cart",
-                            Colors.pink,
-                            Colors.purple,
-                          ),
-                          _buildMenuItem(
-                            Icons.area_chart_rounded,
-                            "Report",
-                            Colors.pink,
-                            Colors.purple,
-                          ),
-                          _buildMenuItem(
-                            Icons.person_outline,
-                            "Account",
-                            Colors.amber,
-                            Colors.redAccent,
-                          ),
+                          _buildMenuItem(Imgs.firstImage, "Catalogs"),
+                          _buildMenuItem(Imgs.customerImage, "Customers"),
+                          _buildMenuItem(Imgs.fourthImage, "Cart"),
+                          _buildMenuItem(Imgs.secondImage, "Orders"),
+                          _buildMenuItem(Imgs.reportImage, "Report"),
+                          _buildMenuItem(Imgs.fifthImage, "Account"),
                         ],
                       ),
                       CustomButton(
                         title: 'Explore More..',
                         radius: isIpad ? 1.w : 3.w,
-                        route: () {},
+                        route: () {
+                          Get.to(() => CategoriesScreen());
+                        },
                         iconData: Icons.production_quantity_limits_sharp,
                         color: AppColors.mainColor,
                         fontcolor: AppColors.whiteColor,
@@ -338,14 +579,8 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
     );
   }
 
-  Widget _buildMenuItem(
-    IconData icon,
-    String title,
-    Color startColor,
-    Color endColor,
-  ) {
-    // Calculate total horizontal spacing and divide by 3
-    double totalSpacing = 2 * 4.w; // Two gaps between three items
+  Widget _buildMenuItem(String svgPath, String title) {
+    double totalSpacing = 2 * 4.w;
     double itemWidth = (100.w - totalSpacing) / 3;
 
     return SizedBox(
@@ -353,23 +588,23 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
       child: GestureDetector(
         onTap: () {
           switch (title) {
-            case "Order":
-              Get.to(() => OrderHistoryScreen());
+            case "Orders":
+              Get.offAll(() => OrderHistoryScreen());
               break;
-            case "Catalog":
-              Get.to(() => CategoriesScreen());
+            case "Catalogs":
+              Get.offAll(() => CategoriesScreen());
               break;
-            case "Customer":
+            case "Customers":
               Get.to(() => CustomersScreen());
               break;
             case "Cart":
-              Get.to(() => CartScreen());
+              Get.offAll(() => CartScreen());
               break;
             case "Report":
               Get.to(() => ReportScreen());
               break;
             case "Account":
-              Get.to(() => ProfileScreen());
+              Get.offAll(() => ProfileScreen());
               break;
           }
         },
@@ -388,16 +623,19 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                 border: Border.all(color: AppColors.mainColor, width: 2),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.mainColor.withOpacity(0.15),
+                    color: AppColors.mainColor.withValues(alpha: 0.15),
                     blurRadius: 6,
                     offset: Offset(0, 3),
                   ),
                 ],
               ),
-              child: Icon(
-                icon,
-                size: isIpad ? 18.sp : 20.sp,
+              child: SvgPicture.asset(
+                svgPath,
+                height: isIpad ? 24.sp : 23.sp,
+                width: isIpad ? 24.sp : 23.sp,
                 color: AppColors.mainColor,
+                // 🔹 keep tint (remove if you want original svg color)
+                fit: BoxFit.contain,
               ),
             ),
             SizedBox(height: 1.h),
@@ -414,5 +652,179 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _fetchBanner() async {
+    var box = HiveService().getBannerBox();
+
+    if (!await checkInternet()) {
+      // Load cached banner if offline
+      final cachedData = box.get('banner');
+      if (cachedData != null) {
+        final List data = json.decode(cachedData);
+        bannersList = data.map((e) => BannersModal.fromJson(e)).toList();
+      } else {
+        showCustomErrorSnackbar(
+          title: 'No Internet',
+          message: 'Please check your connection and try again.',
+        );
+      }
+      return;
+    }
+
+    try {
+      final response = await HomeProvider().fetchBanners();
+      if (response.statusCode == 200) {
+        final List data = json.decode(response.body);
+        bannersList = data.map((e) => BannersModal.fromJson(e)).toList();
+        bannersImagesList =
+            bannersList.map((banner) => banner.featuredImageUrl ?? '').toList();
+        // Save banner to Hive
+        await box.put('banner', response.body);
+      } else {
+        // Fallback: load cache if server fails
+        final cachedData = box.get('banner');
+        if (cachedData != null) {
+          final List data = json.decode(cachedData);
+          bannersList = data.map((e) => BannersModal.fromJson(e)).toList();
+          bannersImagesList =
+              bannersList
+                  .map((banner) => banner.featuredImageUrl ?? '')
+                  .toList();
+        }
+        showCustomErrorSnackbar(
+          title: 'Server Error',
+          message: 'Something went wrong. Please try again later.',
+        );
+      }
+    } catch (_) {
+      // Fallback: load cache on network error
+      final cachedData = box.get('banner');
+      if (cachedData != null) {
+        final List data = json.decode(cachedData);
+        bannersList = data.map((e) => BannersModal.fromJson(e)).toList();
+        bannersImagesList =
+            bannersList.map((banner) => banner.featuredImageUrl ?? '').toList();
+      }
+      showCustomErrorSnackbar(
+        title: 'Network Error',
+        message: 'Unable to connect. Please check your internet and try again.',
+      );
+    }
+  }
+
+  Future<void> _fetchProfile() async {
+    var box = HiveService().getProfileBox();
+
+    if (!await checkInternet()) {
+      final cachedData = box.get('profile');
+      if (cachedData != null) {
+        final data = json.decode(cachedData);
+        profile = ProfileModal.fromJson(data);
+      } else {
+        showCustomErrorSnackbar(
+          title: 'No Internet',
+          message: 'Please check your connection and try again.',
+        );
+      }
+      return;
+    }
+
+    try {
+      final response = await ProfileProvider().fetchProfile();
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        profile = ProfileModal.fromJson(data);
+        await box.put('profile', response.body);
+      } else {
+        final cachedData = box.get('profile');
+        if (cachedData != null) {
+          final data = json.decode(cachedData);
+          profile = ProfileModal.fromJson(data);
+        }
+        showCustomErrorSnackbar(
+          title: 'Server Error',
+          message: 'Something went wrong. Please try again later.',
+        );
+      }
+    } catch (_) {
+      final cachedData = box.get('profile');
+      if (cachedData != null) {
+        final data = json.decode(cachedData);
+        profile = ProfileModal.fromJson(data);
+      }
+      showCustomErrorSnackbar(
+        title: 'Network Error',
+        message: 'Unable to connect. Please check your internet and try again.',
+      );
+    }
+  }
+
+  Future<void> _fetchCustomers() async {
+    var box = HiveService().getCustomerBox();
+
+    if (!await checkInternet()) {
+      final cachedData = box.get('customers');
+      if (cachedData != null) {
+        final List data = json.decode(cachedData);
+        customersList =
+            data
+                .map<FetchCustomersModal>(
+                  (e) => FetchCustomersModal.fromJson(e),
+                )
+                .toList();
+      } else {
+        showCustomErrorSnackbar(
+          title: 'No Internet',
+          message: 'Please check your connection and try again.',
+        );
+      }
+      return;
+    }
+
+    try {
+      final response = await CustomerProvider().fetchCustomers();
+      if (response.statusCode == 200) {
+        final List data = json.decode(response.body);
+        customersList =
+            data
+                .map<FetchCustomersModal>(
+                  (e) => FetchCustomersModal.fromJson(e),
+                )
+                .toList();
+
+        await box.put('customers', response.body);
+      } else {
+        final cachedData = box.get('customers');
+        if (cachedData != null) {
+          final List data = json.decode(cachedData);
+          customersList =
+              data
+                  .map<FetchCustomersModal>(
+                    (e) => FetchCustomersModal.fromJson(e),
+                  )
+                  .toList();
+        }
+        showCustomErrorSnackbar(
+          title: 'Server Error',
+          message: 'Something went wrong. Please try again later.',
+        );
+      }
+    } catch (_) {
+      final cachedData = box.get('customers');
+      if (cachedData != null) {
+        final List data = json.decode(cachedData);
+        customersList =
+            data
+                .map<FetchCustomersModal>(
+                  (e) => FetchCustomersModal.fromJson(e),
+                )
+                .toList();
+      }
+      showCustomErrorSnackbar(
+        title: 'Network Error',
+        message: 'Unable to connect. Please check your internet and try again.',
+      );
+    }
   }
 }

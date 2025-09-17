@@ -1,15 +1,15 @@
 import 'dart:math';
 
-import 'package:bellissemo_ecom/ui/login/view/loginScreen.dart';
+import 'package:bellissemo_ecom/services/hiveServices.dart';
+import 'package:bellissemo_ecom/ui/greetingsScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Start the app; orientation will be set after the first frame
+  await HiveService().init();
   runApp(const OrientationHandler());
 }
 
@@ -26,7 +26,7 @@ class _OrientationHandlerState extends State<OrientationHandler> {
   @override
   void initState() {
     super.initState();
-    // Initial default orientation
+    // Set initial orientation to portrait to avoid layout issues
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -47,9 +47,9 @@ class _OrientationHandlerState extends State<OrientationHandler> {
     final size = MediaQuery.of(context).size;
     final diagonal = sqrt(size.width * size.width + size.height * size.height);
 
-    print("Display diagonal is: $diagonal");
+    print("Display diagonal: $diagonal");
 
-    final isTablet = diagonal >= 1100;
+    final isTablet = diagonal >= 1100; // Customize threshold as needed
     print("Is Tablet: $isTablet");
 
     if (isTablet) {
@@ -73,6 +73,7 @@ class _OrientationHandlerState extends State<OrientationHandler> {
   Widget build(BuildContext context) {
     if (!_orientationSet) {
       return const MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: Scaffold(body: Center(child: CircularProgressIndicator())),
       );
     }
@@ -94,7 +95,7 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: Colors.white,
             primarySwatch: Colors.blue,
           ),
-          home: const LoginScreen(),
+          home: const GreetingsScreen(),
         );
       },
     );

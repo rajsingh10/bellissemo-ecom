@@ -2,6 +2,7 @@ import 'package:bellissemo_ecom/utils/customButton.dart';
 import 'package:bellissemo_ecom/utils/customMenuDrawer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../utils/cachedNetworkImage.dart';
@@ -10,9 +11,7 @@ import '../../../utils/fontFamily.dart';
 import '../../../utils/titlebarWidget.dart';
 
 class CheckOutScreen extends StatefulWidget {
-  String? CustomerName;
-
-  CheckOutScreen({super.key, required this.CustomerName});
+  const CheckOutScreen({super.key});
 
   @override
   State<CheckOutScreen> createState() => _CheckOutScreenState();
@@ -35,6 +34,23 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
       price: 79.99,
     ),
   ];
+  String? customerName;
+  int? customerId;
+
+  Future<void> _loadCustomer() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      customerId = prefs.getInt("customerId");
+      customerName = prefs.getString("customerName");
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadCustomer();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +119,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                             ],
                           ),
                           Text(
-                            widget.CustomerName ?? '',
+                            customerName.toString(),
                             style: TextStyle(
                               color: AppColors.blackColor,
                               fontSize: 16.sp,

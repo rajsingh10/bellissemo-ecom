@@ -18,13 +18,13 @@ InkWell CustomButton({
   double? iconsize,
   iconsize1,
   radius,
+  bool isLoading = false, // ✅ added loading state
 }) {
   return InkWell(
-    onTap: route,
+    onTap: isLoading ? null : route, // ✅ disable tap while loading
     child: Material(
       elevation: 2,
       borderRadius: BorderRadius.circular(radius ?? 3.w),
-
       child: Container(
         height: height,
         width: width,
@@ -34,30 +34,40 @@ InkWell CustomButton({
           borderRadius: BorderRadius.circular(radius ?? 3.w),
           boxShadow: shadow,
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Visibility(visible: iconData != null, child: SizedBox(width: 2.w)),
-            if (iconData != null)
-              Icon(iconData, color: fontcolor, size: iconsize),
-            if (iconData != null) SizedBox(width: 2.w),
-            Text(
-              title.toString(),
-              style: TextStyle(
-                fontFamily: FontFamily.regular,
-                color: fontcolor,
-                fontWeight: fontWeight ?? FontWeight.bold,
-                letterSpacing: 1,
-                fontSize: fontsize,
-              ),
-            ),
-            if (iconData1 != null) SizedBox(width: 2.w),
-            if (iconData1 != null)
-              Icon(iconData1, color: fontcolor, size: iconsize1),
-            if (iconData != null) SizedBox(width: 3.w),
-          ],
-        ),
+        child:
+            isLoading
+                ? const SizedBox(
+                  height: 24,
+                  width: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+                : Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (iconData != null) SizedBox(width: 2.w),
+                    if (iconData != null)
+                      Icon(iconData, color: fontcolor, size: iconsize),
+                    if (iconData != null) SizedBox(width: 2.w),
+                    Text(
+                      title.toString(),
+                      style: TextStyle(
+                        fontFamily: FontFamily.regular,
+                        color: fontcolor,
+                        fontWeight: fontWeight ?? FontWeight.bold,
+                        letterSpacing: 1,
+                        fontSize: fontsize,
+                      ),
+                    ),
+                    if (iconData1 != null) SizedBox(width: 2.w),
+                    if (iconData1 != null)
+                      Icon(iconData1, color: fontcolor, size: iconsize1),
+                    if (iconData != null) SizedBox(width: 3.w),
+                  ],
+                ),
       ),
     ),
   );

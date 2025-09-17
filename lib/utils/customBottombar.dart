@@ -3,8 +3,8 @@ import 'dart:ui';
 
 import 'package:bellissemo_ecom/ui/cart/View/cartScreen.dart';
 import 'package:bellissemo_ecom/ui/home/view/homeMenuScreen.dart';
-import 'package:bellissemo_ecom/ui/home/view/homeScreen.dart';
 import 'package:bellissemo_ecom/ui/orderhistory/view/orderHistoryScreen.dart';
+import 'package:bellissemo_ecom/ui/profile/view/profileScreen.dart';
 import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -38,12 +38,12 @@ class _CustomBarState extends State<CustomBar> {
       "icon": Imgs.secondImage,
       "page": () => OrderHistoryScreen(),
     },
-    {"title": "Home", "icon": Imgs.thirdImage, "page": () => Homescreen()},
+    {"title": "Home", "icon": Imgs.thirdImage, "page": () => HomeMenuScreen()},
     {"title": "Cart", "icon": Imgs.fourthImage, "page": () => CartScreen()},
     {
       "title": "Profile",
       "icon": Imgs.fifthImage,
-      "page": () => HomeMenuScreen(),
+      "page": () => ProfileScreen(),
     },
   ];
 

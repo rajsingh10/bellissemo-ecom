@@ -1,15 +1,26 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:bellissemo_ecom/ui/cart/View/cartScreen.dart';
 import 'package:bellissemo_ecom/ui/customers/view/customersScreen.dart';
 import 'package:bellissemo_ecom/ui/home/view/homeScreen.dart';
 import 'package:bellissemo_ecom/ui/login/view/loginScreen.dart';
 import 'package:bellissemo_ecom/ui/orderhistory/view/orderHistoryScreen.dart';
+import 'package:bellissemo_ecom/ui/profile/view/profileScreen.dart';
+import 'package:bellissemo_ecom/utils/snackBars.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../utils/colors.dart';
 import '../../../utils/fontFamily.dart';
+import '../ApiCalling/apiConfigs.dart';
+import '../apiCalling/Check Internet Module.dart';
+import '../services/hiveServices.dart';
 import '../ui/category/view/categoryScreen.dart';
+import '../ui/home/view/homeMenuScreen.dart';
+import '../ui/profile/modal/profileModal.dart';
+import '../ui/profile/provider/profileProvider.dart';
 import 'cachedNetworkImage.dart';
 import 'customButton.dart';
 
@@ -21,8 +32,46 @@ class CustomDrawer extends StatefulWidget {
 }
 
 bool isIpad = 100.w >= 800;
+bool isLoading = true;
 
 class _CustomDrawerState extends State<CustomDrawer> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    loadInitialData();
+  }
+
+  Future<void> loadInitialData() async {
+    setState(() => isLoading = true);
+
+    // Load cached data first for immediate display
+    _loadCachedData();
+
+    final stopwatch = Stopwatch()..start();
+
+    try {
+      await Future.wait([_fetchProfile().then((_) => setState(() {}))]);
+    } catch (e) {
+      log("Error loading initial data: $e");
+    } finally {
+      stopwatch.stop();
+      log("All API calls completed in ${stopwatch.elapsed.inMilliseconds} ms");
+      setState(() => isLoading = false);
+    }
+  }
+
+  void _loadCachedData() {
+    var profileBox = HiveService().getProfileBox();
+
+    final cachedProfile = profileBox.get('profile');
+    if (cachedProfile != null) {
+      profile = ProfileModal.fromJson(json.decode(cachedProfile));
+    }
+
+    setState(() {}); // Refresh UI immediately
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -38,115 +87,122 @@ class _CustomDrawerState extends State<CustomDrawer> {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.only(
-              bottom: 2.h,
-              left: 4.w,
-              right: 4.w,
-              top: 8.h,
-            ),
-            color: AppColors.mainColor.withOpacity(0.1),
-            child: Row(
-              children: [
-                CustomNetworkImage(
-                  imageUrl:
-                      'https://images.unsplash.com/photo-1633332755192-727a05c4013d?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8dXNlcnxlbnwwfHwwfHx8MA%3D%3D',
-                  height: 60,
-                  width: 60,
-                  isCircle: true,
-                  isProfile: true,
+      child:
+          isLoading
+              ? Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  backgroundColor: AppColors.mainColor,
                 ),
-                SizedBox(width: 3.w),
+              )
+              : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(
+                      bottom: 2.h,
+                      left: 4.w,
+                      right: 4.w,
+                      top: 8.h,
+                    ),
+                    color: AppColors.mainColor.withValues(alpha: 0.1),
+                    child: Row(
+                      children: [
+                        CustomNetworkImage(
+                          imageUrl: profile?.avatarUrls?.s96 ?? '',
+                          height: 60,
+                          width: 60,
+                          isCircle: true,
+                          isProfile: true,
+                        ),
+                        SizedBox(width: 3.w),
 
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'John Doe',
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          fontFamily: FontFamily.bold,
-                          color: AppColors.blackColor,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                profile?.name ?? '',
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontFamily: FontFamily.bold,
+                                  color: AppColors.blackColor,
+                                ),
+                              ),
+                              SizedBox(height: 0.5.h),
+                              Text(
+                                profile?.email ?? '',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontFamily: FontFamily.light,
+                                  color: AppColors.gray,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 0.5.h),
-                      Text(
-                        'johndoe@example.com',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          fontFamily: FontFamily.light,
-                          color: AppColors.gray,
-                        ),
-                      ),
-                    ],
+                        // Spacer(),
+                        // // Close button
+                        // IconButton(
+                        //   onPressed: widget.onClose,
+                        //   icon: Icon(Icons.close, size: 28, color: AppColors.blackColor),
+                        // ),
+                      ],
+                    ),
                   ),
-                ),
-                // Spacer(),
-                // // Close button
-                // IconButton(
-                //   onPressed: widget.onClose,
-                //   icon: Icon(Icons.close, size: 28, color: AppColors.blackColor),
-                // ),
-              ],
-            ),
-          ),
-          SizedBox(height: 0.5.h),
-          _drawerItem(Icons.home_outlined, "Home", () {
-            Get.to(() => Homescreen());
-          }),
-          _drawerItem(Icons.shopping_bag_outlined, "Orders", () {
-            Get.to(() => OrderHistoryScreen());
-          }),
-          _drawerItem(Icons.menu_book_outlined, "Catalog", () {
-            Get.to(() => CategoriesScreen());
-          }),
-          _drawerItem(Icons.people_alt_outlined, "Customers", () {
-            Get.to(() => CustomersScreen());
-          }),
-          _drawerItem(Icons.shopping_cart_outlined, "Cart", () {
-            Get.to(() => CartScreen());
-          }),
-          _drawerItem(Icons.person_outline, "Account", () {
-            // navigate to Account screen if exists
-          }),
-          _drawerItem(Icons.settings_outlined, "Settings", () {
-            // navigate to Settings screen if exists
-          }),
+                  SizedBox(height: 0.5.h),
+                  _drawerItem(Icons.home_outlined, "Home", () {
+                    Get.offAll(HomeMenuScreen());
+                  }),
+                  _drawerItem(Icons.home_outlined, "Home 2", () {
+                    Get.offAll(() => Homescreen());
+                  }),
+                  _drawerItem(Icons.shopping_bag_outlined, "Orders", () {
+                    Get.offAll(() => OrderHistoryScreen());
+                  }),
+                  _drawerItem(Icons.menu_book_outlined, "Catalog", () {
+                    Get.offAll(() => CategoriesScreen());
+                  }),
+                  _drawerItem(Icons.people_alt_outlined, "Customers", () {
+                    Get.to(() => CustomersScreen());
+                  }),
+                  _drawerItem(Icons.shopping_cart_outlined, "Cart", () {
+                    Get.offAll(() => CartScreen());
+                  }),
+                  _drawerItem(Icons.person_outline, "Account", () {
+                    Get.offAll(() => ProfileScreen());
+                  }),
 
-          Padding(
-            padding: EdgeInsets.all(4.w),
-            child: CustomButton(
-              title: "Log Out",
-              route: () {
-                Get.offAll(LoginScreen());
-              },
-              color: AppColors.mainColor,
-              fontcolor: AppColors.whiteColor,
-              height: 6.h,
-              width: double.infinity,
-              fontsize: 18.sp,
-              fontWeight: FontWeight.w400,
-              radius: isIpad ? 1.w : 3.w,
-              iconData: Icons.logout,
-              iconsize: 20.sp,
-              shadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 4,
-                  spreadRadius: 1,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+                  Padding(
+                    padding: EdgeInsets.all(4.w),
+                    child: CustomButton(
+                      title: "Log Out",
+                      route: () {
+                        Get.offAll(LoginScreen());
+                      },
+                      color: AppColors.mainColor,
+                      fontcolor: AppColors.whiteColor,
+                      height: 6.h,
+                      width: double.infinity,
+                      fontsize: 18.sp,
+                      fontWeight: FontWeight.w400,
+                      radius: isIpad ? 1.w : 3.w,
+                      iconData: Icons.logout,
+                      iconsize: 20.sp,
+                      shadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 4,
+                          spreadRadius: 1,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
     );
   }
 
@@ -170,5 +226,52 @@ class _CustomDrawerState extends State<CustomDrawer> {
         onTap: onTap,
       ),
     );
+  }
+
+  Future<void> _fetchProfile() async {
+    var box = HiveService().getProfileBox();
+
+    if (!await checkInternet()) {
+      final cachedData = box.get('profile');
+      if (cachedData != null) {
+        final data = json.decode(cachedData);
+        profile = ProfileModal.fromJson(data);
+      } else {
+        showCustomErrorSnackbar(
+          title: 'No Internet',
+          message: 'Please check your connection and try again.',
+        );
+      }
+      return;
+    }
+
+    try {
+      final response = await ProfileProvider().fetchProfile();
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        profile = ProfileModal.fromJson(data);
+        await box.put('profile', response.body);
+      } else {
+        final cachedData = box.get('profile');
+        if (cachedData != null) {
+          final data = json.decode(cachedData);
+          profile = ProfileModal.fromJson(data);
+        }
+        showCustomErrorSnackbar(
+          title: 'Server Error',
+          message: 'Something went wrong. Please try again later.',
+        );
+      }
+    } catch (_) {
+      final cachedData = box.get('profile');
+      if (cachedData != null) {
+        final data = json.decode(cachedData);
+        profile = ProfileModal.fromJson(data);
+      }
+      showCustomErrorSnackbar(
+        title: 'Network Error',
+        message: 'Unable to connect. Please check your internet and try again.',
+      );
+    }
   }
 }
