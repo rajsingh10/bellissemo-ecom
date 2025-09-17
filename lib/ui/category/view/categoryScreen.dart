@@ -106,11 +106,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         categoriesList =
             data.map((e) => FetchCategoriesModal.fromJson(e)).toList();
       }
-
-      showCustomErrorSnackbar(
-        title: 'No Internet',
-        message: 'Loaded cached categories (if available).',
-      );
       return;
     }
 
