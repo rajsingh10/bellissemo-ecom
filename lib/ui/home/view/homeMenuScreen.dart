@@ -507,64 +507,66 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                   ),
                   color: AppColors.bgColor,
                 ),
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    top: isIpad ? 0.h : 2.5.h,
-                    right: 4.w,
-                    left: 4.w,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            Imgs.onlyLogo,
-                            height: isIpad ? 06.w : 13.w,
-                            width: isIpad ? 08.w : 15.w,
-                            fit: BoxFit.cover,
-                          ),
-                          Text(
-                            "Bellissemo App",
-                            style: TextStyle(
-                              fontSize: isIpad ? 20.sp : 22.sp,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.blackColor,
-                              fontFamily: FontFamily.regular,
-                              letterSpacing: 1.1,
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      top: isIpad ? 0.5.h : 2.5.h,
+                      right: 4.w,
+                      left: 4.w,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              Imgs.onlyLogo,
+                              height: isIpad ? 06.w : 13.w,
+                              width: isIpad ? 08.w : 15.w,
+                              fit: BoxFit.cover,
                             ),
-                          ),
-                        ],
-                      ),
-                      Wrap(
-                        spacing: 0.w,
-                        runSpacing: 3.h,
-                        alignment: WrapAlignment.center,
-                        children: [
-                          _buildMenuItem(Imgs.firstImage, "Catalogs"),
-                          _buildMenuItem(Imgs.customerImage, "Customers"),
-                          _buildMenuItem(Imgs.fourthImage, "Cart"),
-                          _buildMenuItem(Imgs.secondImage, "Orders"),
-                          _buildMenuItem(Imgs.reportImage, "Report"),
-                          _buildMenuItem(Imgs.fifthImage, "Account"),
-                        ],
-                      ),
-                      CustomButton(
-                        title: 'Explore More..',
-                        radius: isIpad ? 1.w : 3.w,
-                        route: () {
-                          Get.to(() => CategoriesScreen());
-                        },
-                        iconData: Icons.production_quantity_limits_sharp,
-                        color: AppColors.mainColor,
-                        fontcolor: AppColors.whiteColor,
-                        height: 5.h,
-                        fontsize: 18.sp,
-                      ).paddingOnly(bottom: 1.h),
-                    ],
+                            Text(
+                              "Bellissemo App",
+                              style: TextStyle(
+                                fontSize: isIpad ? 20.sp : 22.sp,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.blackColor,
+                                fontFamily: FontFamily.regular,
+                                letterSpacing: 1.1,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Wrap(
+                          spacing: 0.w,
+                          runSpacing: 3.h,
+                          alignment: WrapAlignment.center,
+                          children: [
+                            _buildMenuItem(Imgs.firstImage, "Catalogs"),
+                            _buildMenuItem(Imgs.customerImage, "Customers"),
+                            _buildMenuItem(Imgs.fourthImage, "Cart"),
+                            _buildMenuItem(Imgs.secondImage, "Orders"),
+                            _buildMenuItem(Imgs.reportImage, "Report"),
+                            _buildMenuItem(Imgs.fifthImage, "Account"),
+                          ],
+                        ),
+                        CustomButton(
+                          title: 'Explore More..',
+                          radius: isIpad ? 1.w : 3.w,
+                          route: () {
+                            Get.to(() => CategoriesScreen());
+                          },
+                          iconData: Icons.production_quantity_limits_sharp,
+                          color: AppColors.mainColor,
+                          fontcolor: AppColors.whiteColor,
+                          height: 5.h,
+                          fontsize: 18.sp,
+                        ).paddingOnly(bottom: 1.h),
+                      ],
+                    ),
                   ),
                 ),
               ),

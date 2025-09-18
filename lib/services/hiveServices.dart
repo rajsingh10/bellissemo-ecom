@@ -14,6 +14,7 @@ class HiveService {
   late Box productsBox;
   late Box variationsBox;
   late Box categoryProductsBox;
+  late Box productDetailsBox;
 
   // Initialize Hive and open all boxes
   Future<void> init() async {
@@ -27,6 +28,7 @@ class HiveService {
     productsBox = await Hive.openBox('productsBox');
     variationsBox = await Hive.openBox('variationsBox');
     categoryProductsBox = await Hive.openBox('categoryProductsBox');
+    productDetailsBox = await Hive.openBox('productDetailsBox');
   }
 
   // Helper getters
@@ -37,4 +39,5 @@ class HiveService {
   Box getProductsBox() => productsBox;
   Box getCategoryProductsBox() => categoryProductsBox;
   Box getVariationsBox() => variationsBox;
+  Box getProductDetailsBox() => productDetailsBox;
 }

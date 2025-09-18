@@ -9,7 +9,6 @@ class ProductDetailsModal {
   String? dateModifiedGmt;
   String? type;
   String? status;
-  bool? featured;
   String? catalogVisibility;
   String? description;
   String? shortDescription;
@@ -18,20 +17,28 @@ class ProductDetailsModal {
   String? regularPrice;
   String? salePrice;
   bool? onSale;
+  bool? purchasable;
+  String? externalUrl;
+  String? buttonText;
   String? taxStatus;
   String? taxClass;
+  bool? manageStock;
+  var stockQuantity;
+  String? backorders;
+  bool? backordersAllowed;
+  bool? backordered;
+  var lowStockAmount;
+  bool? soldIndividually;
   String? weight;
   Dimensions? dimensions;
   String? averageRating;
   int? ratingCount;
-  int? parentId;
-  String? purchaseNote;
   List<Categories>? categories;
   List<Images>? images;
-  List<Attributes>? attributes;
   List<int>? variations;
   String? stockStatus;
-  String? packSize;
+  bool? hasOptions;
+  List<AllVariations>? allVariations;
 
   ProductDetailsModal({
     this.id,
@@ -44,7 +51,6 @@ class ProductDetailsModal {
     this.dateModifiedGmt,
     this.type,
     this.status,
-    this.featured,
     this.catalogVisibility,
     this.description,
     this.shortDescription,
@@ -53,20 +59,28 @@ class ProductDetailsModal {
     this.regularPrice,
     this.salePrice,
     this.onSale,
+    this.purchasable,
+    this.externalUrl,
+    this.buttonText,
     this.taxStatus,
     this.taxClass,
+    this.manageStock,
+    this.stockQuantity,
+    this.backorders,
+    this.backordersAllowed,
+    this.backordered,
+    this.lowStockAmount,
+    this.soldIndividually,
     this.weight,
     this.dimensions,
     this.averageRating,
     this.ratingCount,
-    this.parentId,
-    this.purchaseNote,
     this.categories,
     this.images,
-    this.attributes,
     this.variations,
     this.stockStatus,
-    this.packSize,
+    this.hasOptions,
+    this.allVariations,
   });
 
   ProductDetailsModal.fromJson(Map<String, dynamic> json) {
@@ -80,7 +94,6 @@ class ProductDetailsModal {
     dateModifiedGmt = json['date_modified_gmt'];
     type = json['type'];
     status = json['status'];
-    featured = json['featured'];
     catalogVisibility = json['catalog_visibility'];
     description = json['description'];
     shortDescription = json['short_description'];
@@ -89,8 +102,18 @@ class ProductDetailsModal {
     regularPrice = json['regular_price'];
     salePrice = json['sale_price'];
     onSale = json['on_sale'];
+    purchasable = json['purchasable'];
+    externalUrl = json['external_url'];
+    buttonText = json['button_text'];
     taxStatus = json['tax_status'];
     taxClass = json['tax_class'];
+    manageStock = json['manage_stock'];
+    stockQuantity = json['stock_quantity'];
+    backorders = json['backorders'];
+    backordersAllowed = json['backorders_allowed'];
+    backordered = json['backordered'];
+    lowStockAmount = json['low_stock_amount'];
+    soldIndividually = json['sold_individually'];
     weight = json['weight'];
     dimensions =
         json['dimensions'] != null
@@ -98,8 +121,6 @@ class ProductDetailsModal {
             : null;
     averageRating = json['average_rating'];
     ratingCount = json['rating_count'];
-    parentId = json['parent_id'];
-    purchaseNote = json['purchase_note'];
     if (json['categories'] != null) {
       categories = <Categories>[];
       json['categories'].forEach((v) {
@@ -112,15 +133,15 @@ class ProductDetailsModal {
         images!.add(Images.fromJson(v));
       });
     }
-    if (json['attributes'] != null) {
-      attributes = <Attributes>[];
-      json['attributes'].forEach((v) {
-        attributes!.add(Attributes.fromJson(v));
-      });
-    }
     variations = json['variations'].cast<int>();
     stockStatus = json['stock_status'];
-    packSize = json['pack_size'];
+    hasOptions = json['has_options'];
+    if (json['all_variations'] != null) {
+      allVariations = <AllVariations>[];
+      json['all_variations'].forEach((v) {
+        allVariations!.add(AllVariations.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -135,7 +156,6 @@ class ProductDetailsModal {
     data['date_modified_gmt'] = dateModifiedGmt;
     data['type'] = type;
     data['status'] = status;
-    data['featured'] = featured;
     data['catalog_visibility'] = catalogVisibility;
     data['description'] = description;
     data['short_description'] = shortDescription;
@@ -144,28 +164,36 @@ class ProductDetailsModal {
     data['regular_price'] = regularPrice;
     data['sale_price'] = salePrice;
     data['on_sale'] = onSale;
+    data['purchasable'] = purchasable;
+    data['external_url'] = externalUrl;
+    data['button_text'] = buttonText;
     data['tax_status'] = taxStatus;
     data['tax_class'] = taxClass;
+    data['manage_stock'] = manageStock;
+    data['stock_quantity'] = stockQuantity;
+    data['backorders'] = backorders;
+    data['backorders_allowed'] = backordersAllowed;
+    data['backordered'] = backordered;
+    data['low_stock_amount'] = lowStockAmount;
+    data['sold_individually'] = soldIndividually;
     data['weight'] = weight;
     if (dimensions != null) {
       data['dimensions'] = dimensions!.toJson();
     }
     data['average_rating'] = averageRating;
     data['rating_count'] = ratingCount;
-    data['parent_id'] = parentId;
-    data['purchase_note'] = purchaseNote;
     if (categories != null) {
       data['categories'] = categories!.map((v) => v.toJson()).toList();
     }
     if (images != null) {
       data['images'] = images!.map((v) => v.toJson()).toList();
     }
-    if (attributes != null) {
-      data['attributes'] = attributes!.map((v) => v.toJson()).toList();
-    }
     data['variations'] = variations;
     data['stock_status'] = stockStatus;
-    data['pack_size'] = packSize;
+    data['has_options'] = hasOptions;
+    if (allVariations != null) {
+      data['all_variations'] = allVariations!.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 }
@@ -260,44 +288,125 @@ class Images {
   }
 }
 
-class Attributes {
+class AllVariations {
   int? id;
-  String? name;
-  String? slug;
-  int? position;
-  bool? visible;
-  bool? variation;
-  List<String>? options;
+  String? price;
+  String? regularPrice;
+  String? salePrice;
+  Attributes? attributes;
+  String? stockStatus;
+  String? stockQuantity;
+  String? sku;
+  String? weight;
+  Dimensions? dimensions;
+  String? packSize;
+  List<VariantImages>? images;
 
-  Attributes({
+  AllVariations({
     this.id,
-    this.name,
-    this.slug,
-    this.position,
-    this.visible,
-    this.variation,
-    this.options,
+    this.price,
+    this.regularPrice,
+    this.salePrice,
+    this.attributes,
+    this.stockStatus,
+    this.stockQuantity,
+    this.sku,
+    this.weight,
+    this.dimensions,
+    this.packSize,
+    this.images,
   });
 
-  Attributes.fromJson(Map<String, dynamic> json) {
+  AllVariations.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    name = json['name'];
-    slug = json['slug'];
-    position = json['position'];
-    visible = json['visible'];
-    variation = json['variation'];
-    options = json['options'].cast<String>();
+    price = json['price'];
+    regularPrice = json['regular_price'];
+    salePrice = json['sale_price'];
+    attributes =
+        json['attributes'] != null
+            ? Attributes.fromJson(json['attributes'])
+            : null;
+    stockStatus = json['stock_status'];
+    stockQuantity = json['stock_quantity'];
+    sku = json['sku'];
+    weight = json['weight'];
+    dimensions =
+        json['dimensions'] != null
+            ? Dimensions.fromJson(json['dimensions'])
+            : null;
+    packSize = json['pack_size'];
+    if (json['images'] != null) {
+      images = <VariantImages>[];
+      json['images'].forEach((v) {
+        images!.add(VariantImages.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
+    data['price'] = price;
+    data['regular_price'] = regularPrice;
+    data['sale_price'] = salePrice;
+    if (attributes != null) {
+      data['attributes'] = attributes!.toJson();
+    }
+    data['stock_status'] = stockStatus;
+    data['stock_quantity'] = stockQuantity;
+    data['sku'] = sku;
+    data['weight'] = weight;
+    if (dimensions != null) {
+      data['dimensions'] = dimensions!.toJson();
+    }
+    data['pack_size'] = packSize;
+    if (images != null) {
+      data['images'] = images!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class Attributes {
+  String? paColour;
+
+  Attributes({this.paColour});
+
+  Attributes.fromJson(Map<String, dynamic> json) {
+    paColour = json['pa_colour'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['pa_colour'] = paColour;
+    return data;
+  }
+}
+
+class VariantImages {
+  int? id;
+  String? src;
+  String? name;
+  String? alt;
+  int? position;
+
+  VariantImages({this.id, this.src, this.name, this.alt, this.position});
+
+  VariantImages.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    src = json['src'];
+    name = json['name'];
+    alt = json['alt'];
+    position = json['position'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['src'] = src;
     data['name'] = name;
-    data['slug'] = slug;
+    data['alt'] = alt;
     data['position'] = position;
-    data['visible'] = visible;
-    data['variation'] = variation;
-    data['options'] = options;
     return data;
   }
 }

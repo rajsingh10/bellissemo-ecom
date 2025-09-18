@@ -3,7 +3,7 @@ import 'package:bellissemo_ecom/ui/login/modal/loginModal.dart';
 import '../ui/category/modal/fetchCategoriesModal.dart';
 import '../ui/customers/modal/fetchCustomersModal.dart';
 import '../ui/home/modal/bannersModal.dart';
-import '../ui/products/modal/categoryWiseProducts.dart';
+import '../ui/products/modal/categoryWiseProductsModal.dart';
 import '../ui/products/modal/fetchProductsModal.dart';
 import '../ui/products/modal/productDetailsModal.dart';
 import '../ui/products/modal/productsVariationsModal.dart';

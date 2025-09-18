@@ -38,8 +38,8 @@ class ProductsProvider extends ChangeNotifier {
     return responseJson;
   }
 
-  Future<http.Response> productVariationsApi(id) async {
-    String url = "${apiEndpoints.fetchProducts}/$id/variations";
+  Future<http.Response> productDetailsApi(id) async {
+    String url = "${apiEndpoints.fetchProducts}/$id";
     log('Variation Url :: $url');
     LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
     String token = loginData?.token ?? '';

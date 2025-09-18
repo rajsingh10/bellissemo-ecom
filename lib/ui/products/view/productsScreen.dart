@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:bellissemo_ecom/apiCalling/Loader.dart';
-import 'package:bellissemo_ecom/ui/products/modal/categoryWiseProducts.dart';
+import 'package:bellissemo_ecom/ui/products/modal/categoryWiseProductsModal.dart';
 import 'package:bellissemo_ecom/ui/products/view/productDetailsScreen.dart';
 import 'package:bellissemo_ecom/utils/colors.dart';
 import 'package:bellissemo_ecom/utils/customBottombar.dart';
@@ -121,6 +121,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   Map<int, int> quantities = {};
+
   @override
   Widget build(BuildContext context) {
     int startIndex = currentPage * itemsPerPage;
@@ -679,7 +680,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     return InkWell(
       onTap: () {
         Get.to(
-          () => ProductDetailsScreen(),
+          () => ProductDetailsScreen(productId: product.id.toString()),
           transition: Transition.leftToRightWithFade,
           duration: const Duration(milliseconds: 450),
         );
@@ -712,6 +713,66 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         width: double.infinity,
                         isFit: true,
                         radius: 20,
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              GestureDetector(
+                                onTap:
+                                    (product.stockStatus == 'instock' &&
+                                            quantity > 1)
+                                        ? () => setState(() {
+                                          quantities[product.id ?? 0] =
+                                              quantity - 1;
+                                        })
+                                        : null,
+                                child: Container(
+                                  padding:
+                                      isIpad
+                                          ? EdgeInsets.all(1.w)
+                                          : EdgeInsets.all(1.5.w),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.cardBgColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.remove,
+                                    size: isIpad ? 15.sp : 20.sp,
+                                    color: AppColors.blackColor,
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap:
+                                    (product.stockStatus == 'instock')
+                                        ? () => setState(() {
+                                          quantities[product.id ?? 0] =
+                                              quantity + 1;
+                                        })
+                                        : null,
+                                child: Container(
+                                  padding:
+                                      isIpad
+                                          ? EdgeInsets.all(1.w)
+                                          : EdgeInsets.all(1.5.w),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.cardBgColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.add,
+                                    size: isIpad ? 15.sp : 20.sp,
+                                    color: AppColors.blackColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ).paddingSymmetric(horizontal: 1.w),
+                          SizedBox(height: 0.5.h),
+                        ],
                       ),
                       if (!(product.stockStatus == 'instock'))
                         Positioned.fill(
@@ -800,105 +861,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             ),
                           ],
                         ),
-                    SizedBox(height: 1.h),
-
-                    // Quantity + Add Button
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Modern Quantity Selector
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: isIpad ? 0 : 2.w,
-                            vertical: 0.5.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.containerColor,
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: Row(
-                            children: [
-                              GestureDetector(
-                                onTap:
-                                    (product.stockStatus == 'instock' &&
-                                            quantity > 1)
-                                        ? () => setState(() {
-                                          quantities[product.id ?? 0] =
-                                              quantity - 1;
-                                        })
-                                        : null,
-                                child: Container(
-                                  padding: EdgeInsets.all(1.5.w),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.cardBgColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.remove,
-                                    size: isIpad ? 12.sp : 16.sp,
-                                    color: AppColors.blackColor,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 1.w),
-                              Text(
-                                quantity.toString(),
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontFamily: FontFamily.semiBold,
-                                  color: AppColors.blackColor,
-                                ),
-                              ),
-                              SizedBox(width: 1.w),
-                              GestureDetector(
-                                onTap:
-                                    (product.stockStatus == 'instock')
-                                        ? () => setState(() {
-                                          quantities[product.id ?? 0] =
-                                              quantity + 1;
-                                        })
-                                        : null,
-                                child: Container(
-                                  padding: EdgeInsets.all(1.5.w),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.cardBgColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.add,
-                                    size: isIpad ? 12.sp : 16.sp,
-                                    color: AppColors.blackColor,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Add to Cart Button
-                        InkWell(
-                          onTap:
-                              (product.stockStatus == 'instock')
-                                  ? () {
-                                    // handle add to cart
-                                  }
-                                  : null,
-                          borderRadius: BorderRadius.circular(30),
-                          child: Container(
-                            padding: EdgeInsets.all(1.5.w),
-                            decoration: BoxDecoration(
-                              color: AppColors.mainColor,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.shopping_cart_outlined,
-                              color: Colors.white,
-                              size: isIpad ? 15.sp : 18.sp,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
               ),

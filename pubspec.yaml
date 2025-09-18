@@ -64,6 +64,7 @@ dependencies:
   fl_chart: ^0.69.0
   hive:
   hive_flutter:
+  flutter_html:
 
 dev_dependencies:
   flutter_test:
