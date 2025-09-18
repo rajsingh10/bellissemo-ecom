@@ -3,7 +3,9 @@ import 'package:hive_flutter/hive_flutter.dart';
 class HiveService {
   // Singleton pattern (optional, useful for global access)
   static final HiveService _instance = HiveService._internal();
+
   factory HiveService() => _instance;
+
   HiveService._internal();
 
   // Boxes
@@ -33,11 +35,18 @@ class HiveService {
 
   // Helper getters
   Box getCategoriesBox() => categoriesBox;
+
   Box getBannerBox() => bannerBox;
+
   Box getProfileBox() => profileBox;
+
   Box getCustomerBox() => customerBox;
+
   Box getProductsBox() => productsBox;
+
   Box getCategoryProductsBox() => categoryProductsBox;
+
   Box getVariationsBox() => variationsBox;
+
   Box getProductDetailsBox() => productDetailsBox;
 }
