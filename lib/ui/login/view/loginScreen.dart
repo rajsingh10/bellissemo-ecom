@@ -7,9 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../../apiCalling/Check Internet Module.dart';
 import '../../../apiCalling/apiConfigs.dart';
+import '../../../apiCalling/checkInternetModule.dart';
 import '../../../apiCalling/sharedpreferance.dart';
+import '../../../services/hiveServices.dart';
 import '../../../utils/colors.dart';
 import '../../../utils/customButton.dart';
 import '../../../utils/snackBars.dart';
@@ -83,8 +84,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
           // Draggable Bottom Sheet
           DraggableScrollableSheet(
-            initialChildSize: isIpad ? 0.46 : 0.58,
-            minChildSize: isIpad ? 0.46 : 0.58,
+            initialChildSize: isIpad ? 0.43 : 0.58,
+            minChildSize: isIpad ? 0.43 : 0.58,
             maxChildSize: 0.9,
             builder: (context, scrollController) {
               return Container(
@@ -213,18 +214,121 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  /// only online login
+  // loginap() {
+  //   if (_formKey.currentState!.validate()) {
+  //     setState(() {
+  //       isLogin = true;
+  //     });
+  //     final Map<String, String> data = {
+  //       'username': emailController.text.trim(),
+  //       'password': passwordController.text.trim(),
+  //     };
+  //     print("🔹 Login Data: $data");
+  //
+  //     checkInternet().then((internet) async {
+  //       if (internet) {
+  //         try {
+  //           LoginProvider()
+  //               .loginapi(data)
+  //               .then((response) async {
+  //                 print("✅ API Response Status: ${response.statusCode}");
+  //                 print("📩 API Response Body: ${response.body}");
+  //
+  //                 loginData = LoginModal.fromJson(json.decode(response.body));
+  //
+  //                 if (response.statusCode == 200) {
+  //                   showCustomSuccessSnackbar(
+  //                     title: 'Login Successful',
+  //                     message: 'Welcome to Bellissemo! App',
+  //                   );
+  //                   SaveDataLocal.saveLogInData(loginData!);
+  //
+  //                   Get.offAll(HomeMenuScreen());
+  //
+  //                   setState(() {
+  //                     isLogin = false;
+  //
+  //                     emailController.clear();
+  //                     passwordController.clear();
+  //                   });
+  //                 } else if (response.statusCode == 403) {
+  //                   showCustomErrorSnackbar(
+  //                     title: 'Login Failed',
+  //                     message:
+  //                         'Invalid username or password. Please try again.',
+  //                   );
+  //                   setState(() {
+  //                     isLogin = false;
+  //                   });
+  //                 } else {
+  //                   showCustomErrorSnackbar(
+  //                     title: 'Server Error',
+  //                     message: 'Something went wrong. Please try again later.',
+  //                   );
+  //                   setState(() {
+  //                     isLogin = false;
+  //                   });
+  //                 }
+  //               })
+  //               .catchError((error, stacktrace) {
+  //                 print("❌ API CatchError: $error");
+  //                 print("🛑 Stacktrace: $stacktrace");
+  //
+  //                 showCustomErrorSnackbar(
+  //                   title: 'Network Error',
+  //                   message:
+  //                       'Unable to connect. Please check your internet and try again.',
+  //                 );
+  //                 setState(() {
+  //                   isLogin = false;
+  //                 });
+  //               });
+  //         } catch (e, s) {
+  //           print("🔥 Exception Caught: $e");
+  //           print("📌 Stacktrace: $s");
+  //
+  //           showCustomErrorSnackbar(
+  //             title: 'Unexpected Error',
+  //             message: 'Something went wrong. Please try again.',
+  //           );
+  //           setState(() {
+  //             isLogin = false;
+  //           });
+  //         }
+  //       } else {
+  //         print("⚠️ No Internet Connection");
+  //
+  //         showCustomErrorSnackbar(
+  //           title: 'No Internet',
+  //           message: 'Please check your connection and try again.',
+  //         );
+  //         setState(() {
+  //           isLogin = false;
+  //         });
+  //       }
+  //     });
+  //   }
+  // }
+
   loginap() {
     if (_formKey.currentState!.validate()) {
       setState(() {
         isLogin = true;
       });
+
+      final String username = emailController.text.trim();
+      final String password = passwordController.text.trim();
+
       final Map<String, String> data = {
-        'username': emailController.text.trim(),
-        'password': passwordController.text.trim(),
+        'username': username,
+        'password': password,
       };
       print("🔹 Login Data: $data");
 
       checkInternet().then((internet) async {
+        var loginBox = HiveService().getLoginBox();
+
         if (internet) {
           try {
             LoginProvider()
@@ -236,17 +340,24 @@ class _LoginScreenState extends State<LoginScreen> {
                   loginData = LoginModal.fromJson(json.decode(response.body));
 
                   if (response.statusCode == 200) {
+                    // 🔹 Use username (or userId) as unique key
+                    final userKey = username;
+
+                    // ✅ Save login data in Hive for this user
+                    await loginBox.put('${userKey}_loginData', response.body);
+                    await loginBox.put('${userKey}_username', username);
+                    await loginBox.put('${userKey}_password', password);
+
                     showCustomSuccessSnackbar(
                       title: 'Login Successful',
-                      message: 'Welcome to Bellissemo! App',
+                      message: 'Welcome to Bellissemo!',
                     );
-                    SaveDataLocal.saveLogInData(loginData!);
 
+                    SaveDataLocal.saveLogInData(loginData!);
                     Get.offAll(HomeMenuScreen());
 
                     setState(() {
                       isLogin = false;
-
                       emailController.clear();
                       passwordController.clear();
                     });
@@ -295,12 +406,34 @@ class _LoginScreenState extends State<LoginScreen> {
             });
           }
         } else {
-          print("⚠️ No Internet Connection");
+          // 🔹 Offline Mode
+          print("⚠️ No Internet Connection - Trying Offline Login");
 
-          showCustomErrorSnackbar(
-            title: 'No Internet',
-            message: 'Please check your connection and try again.',
-          );
+          final userKey = username;
+          final cachedData = loginBox.get('${userKey}_loginData');
+          final cachedUsername = loginBox.get('${userKey}_username');
+          final cachedPassword = loginBox.get('${userKey}_password');
+
+          if (cachedData != null &&
+              cachedUsername == username &&
+              cachedPassword == password) {
+            // ✅ Allow offline login for this user
+            loginData = LoginModal.fromJson(json.decode(cachedData));
+
+            showCustomSuccessSnackbar(
+              title: 'Login Successful',
+              message: 'Welcome back to Bellissemo!',
+            );
+
+            Get.offAll(HomeMenuScreen());
+          } else {
+            showCustomErrorSnackbar(
+              title: 'Login Failed',
+              message:
+                  'No saved login found for this account. Please connect to the internet and try again.',
+            );
+          }
+
           setState(() {
             isLogin = false;
           });

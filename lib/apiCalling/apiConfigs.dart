@@ -6,7 +6,6 @@ import '../ui/home/modal/bannersModal.dart';
 import '../ui/products/modal/categoryWiseProductsModal.dart';
 import '../ui/products/modal/fetchProductsModal.dart';
 import '../ui/products/modal/productDetailsModal.dart';
-import '../ui/products/modal/productsVariationsModal.dart';
 import '../ui/profile/modal/profileModal.dart';
 
 class apiConfig {
@@ -20,6 +19,5 @@ ProfileModal? profile;
 BannersModal? banners;
 FetchCustomersModal? customers;
 FetchProductsModal? allProducts;
-ProductVariationsModal? productVariations;
 ProductDetailsModal? productDetails;
 CategoryWiseProductsModal? categoryWiseProducts;

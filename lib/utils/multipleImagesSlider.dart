@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bellissemo_ecom/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -113,7 +114,7 @@ class _ImageSliderState extends State<ImageSlider> {
                   effect: ExpandingDotsEffect(
                     dotHeight: 8,
                     dotWidth: 8,
-                    activeDotColor: Colors.white,
+                    activeDotColor: AppColors.mainColor,
                     dotColor: Colors.black54,
                   ),
                 ),

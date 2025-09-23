@@ -17,6 +17,7 @@ class CategoryWiseProductsModal {
   String? price;
   String? regularPrice;
   String? salePrice;
+  String? currencySymbol;
   bool? onSale;
   bool? purchasable;
   int? totalSales;
@@ -73,6 +74,7 @@ class CategoryWiseProductsModal {
     this.shortDescription,
     this.sku,
     this.price,
+    this.currencySymbol,
     this.regularPrice,
     this.salePrice,
     this.onSale,
@@ -126,6 +128,7 @@ class CategoryWiseProductsModal {
     dateModifiedGmt = json['date_modified_gmt'];
     type = json['type'];
     status = json['status'];
+    currencySymbol = json['currency_symbol'];
     featured = json['featured'];
     catalogVisibility = json['catalog_visibility'];
     description = json['description'];
@@ -220,6 +223,7 @@ class CategoryWiseProductsModal {
     data['description'] = description;
     data['short_description'] = shortDescription;
     data['sku'] = sku;
+    data['currency_symbol'] = currencySymbol;
     data['price'] = price;
     data['regular_price'] = regularPrice;
     data['sale_price'] = salePrice;
@@ -442,6 +446,7 @@ class FirstVariation {
   String? sku;
   String? weight;
   Dimensions? dimensions;
+  VarAttributes? varAttributes;
   String? packSize;
   int? imageId;
   String? imageUrl;
@@ -451,6 +456,7 @@ class FirstVariation {
     this.price,
     this.regularPrice,
     this.salePrice,
+    this.varAttributes,
     this.stockStatus,
     this.sku,
     this.weight,
@@ -468,6 +474,10 @@ class FirstVariation {
     stockStatus = json['stock_status'];
     sku = json['sku'];
     weight = json['weight'];
+    varAttributes =
+        json['attributes'] != null
+            ? VarAttributes.fromJson(json['attributes'])
+            : null;
     dimensions =
         json['dimensions'] != null
             ? Dimensions.fromJson(json['dimensions'])
@@ -488,6 +498,9 @@ class FirstVariation {
     data['weight'] = weight;
     if (dimensions != null) {
       data['dimensions'] = dimensions!.toJson();
+    }
+    if (varAttributes != null) {
+      data['attributes'] = varAttributes!.toJson();
     }
     data['pack_size'] = packSize;
     data['image_id'] = imageId;
@@ -520,6 +533,36 @@ class VariationsSummary {
       data['price_range'] = priceRange!.toJson();
     }
     return data;
+  }
+}
+
+class VarAttributes {
+  Map<String, String>? values;
+
+  VarAttributes({this.values});
+
+  VarAttributes.fromJson(Map<String, dynamic> json) {
+    values = json.map((key, value) => MapEntry(key, value.toString()));
+  }
+
+  Map<String, dynamic> toJson() {
+    return values ?? {};
+  }
+
+  /// Returns the first attribute key dynamically
+  String? getKey() {
+    if (values != null && values!.isNotEmpty) {
+      return values!.keys.first;
+    }
+    return null;
+  }
+
+  /// Returns the first attribute value dynamically
+  String? getValue() {
+    if (values != null && values!.isNotEmpty) {
+      return values!.values.first;
+    }
+    return null;
   }
 }
 

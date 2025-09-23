@@ -59,7 +59,6 @@ class CustomNetworkImage extends StatelessWidget {
           isProfile ? Imgs.defaultProfile : Imgs.defaultImage,
           height: height,
           width: width,
-          fit: BoxFit.cover,
         );
       },
     );

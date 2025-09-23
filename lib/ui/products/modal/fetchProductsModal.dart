@@ -8,6 +8,7 @@ class FetchProductsModal {
   String? dateModified;
   String? dateModifiedGmt;
   String? type;
+  String? currencySymbol;
   String? status;
   String? catalogVisibility;
   String? description;
@@ -70,6 +71,7 @@ class FetchProductsModal {
     this.description,
     this.shortDescription,
     this.sku,
+    this.currencySymbol,
     this.price,
     this.regularPrice,
     this.salePrice,
@@ -123,6 +125,7 @@ class FetchProductsModal {
     dateModified = json['date_modified'];
     dateModifiedGmt = json['date_modified_gmt'];
     type = json['type'];
+    currencySymbol = json['currency_symbol'];
     status = json['status'];
     catalogVisibility = json['catalog_visibility'];
     description = json['description'];
@@ -226,6 +229,7 @@ class FetchProductsModal {
     data['tax_status'] = taxStatus;
     data['tax_class'] = taxClass;
     data['manage_stock'] = manageStock;
+    data['currency_symbol'] = currencySymbol;
     data['stock_quantity'] = stockQuantity;
     data['backorders'] = backorders;
     data['backorders_allowed'] = backordersAllowed;
@@ -438,6 +442,7 @@ class FirstVariation {
   String? sku;
   String? weight;
   Dimensions? dimensions;
+  VarAttributes? varAttributes;
   String? packSize;
   int? imageId;
   String? imageUrl;
@@ -447,6 +452,7 @@ class FirstVariation {
     this.price,
     this.regularPrice,
     this.salePrice,
+    this.varAttributes,
     this.stockStatus,
     this.sku,
     this.weight,
@@ -464,6 +470,10 @@ class FirstVariation {
     stockStatus = json['stock_status'];
     sku = json['sku'];
     weight = json['weight'];
+    varAttributes =
+        json['attributes'] != null
+            ? VarAttributes.fromJson(json['attributes'])
+            : null;
     dimensions =
         json['dimensions'] != null
             ? Dimensions.fromJson(json['dimensions'])
@@ -484,6 +494,9 @@ class FirstVariation {
     data['weight'] = weight;
     if (dimensions != null) {
       data['dimensions'] = dimensions!.toJson();
+    }
+    if (varAttributes != null) {
+      data['attributes'] = varAttributes!.toJson();
     }
     data['pack_size'] = packSize;
     data['image_id'] = imageId;
@@ -516,6 +529,36 @@ class VariationsSummary {
       data['price_range'] = priceRange!.toJson();
     }
     return data;
+  }
+}
+
+class VarAttributes {
+  Map<String, String>? values;
+
+  VarAttributes({this.values});
+
+  VarAttributes.fromJson(Map<String, dynamic> json) {
+    values = json.map((key, value) => MapEntry(key, value.toString()));
+  }
+
+  Map<String, dynamic> toJson() {
+    return values ?? {};
+  }
+
+  /// Returns the first attribute key dynamically
+  String? getKey() {
+    if (values != null && values!.isNotEmpty) {
+      return values!.keys.first;
+    }
+    return null;
+  }
+
+  /// Returns the first attribute value dynamically
+  String? getValue() {
+    if (values != null && values!.isNotEmpty) {
+      return values!.values.first;
+    }
+    return null;
   }
 }
 

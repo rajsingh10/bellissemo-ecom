@@ -1,7 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
 class HiveService {
-  // Singleton pattern (optional, useful for global access)
   static final HiveService _instance = HiveService._internal();
 
   factory HiveService() => _instance;
@@ -17,6 +16,9 @@ class HiveService {
   late Box variationsBox;
   late Box categoryProductsBox;
   late Box productDetailsBox;
+  late Box loginBox;
+  late Box addCartBox;
+  late Box productCartDataBox;
 
   // Initialize Hive and open all boxes
   Future<void> init() async {
@@ -31,6 +33,9 @@ class HiveService {
     variationsBox = await Hive.openBox('variationsBox');
     categoryProductsBox = await Hive.openBox('categoryProductsBox');
     productDetailsBox = await Hive.openBox('productDetailsBox');
+    loginBox = await Hive.openBox('loginBox');
+    addCartBox = await Hive.openBox('addCartBox');
+    productCartDataBox = await Hive.openBox('productCartDataBox');
   }
 
   // Helper getters
@@ -49,4 +54,10 @@ class HiveService {
   Box getVariationsBox() => variationsBox;
 
   Box getProductDetailsBox() => productDetailsBox;
+
+  Box getLoginBox() => loginBox;
+
+  Box getAddCartBox() => addCartBox;
+
+  Box getProductCartDataBox() => productCartDataBox;
 }

@@ -16,8 +16,8 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../../apiCalling/Check Internet Module.dart';
 import '../../../apiCalling/Loader.dart';
+import '../../../apiCalling/checkInternetModule.dart';
 import '../../../services/hiveServices.dart';
 import '../../../utils/cachedNetworkImage.dart';
 import '../../../utils/customBottombar.dart';
@@ -26,10 +26,12 @@ import '../../../utils/customMenuDrawer.dart';
 import '../../../utils/fontFamily.dart';
 import '../../../utils/searchFields.dart';
 import '../../../utils/snackBars.dart';
+import '../../cart/service/cartServices.dart';
 import '../../category/modal/fetchCategoriesModal.dart';
 import '../../category/provider/categoriesProvider.dart';
 import '../../category/view/categoryScreen.dart';
 import '../../products/view/productDetailsScreen.dart';
+import '../../products/view/productsScreen.dart';
 import '../../profile/modal/profileModal.dart';
 import '../../profile/provider/profileProvider.dart';
 import '../modal/bannersModal.dart';
@@ -61,6 +63,7 @@ class _HomescreenState extends State<Homescreen> {
     }
   }
 
+  bool isAddingToCart = false;
   bool isIpad = 100.w >= 800;
   bool isLoading = true;
 
@@ -147,630 +150,698 @@ class _HomescreenState extends State<Homescreen> {
       body:
           isLoading
               ? Loader()
-              : SingleChildScrollView(
-                physics: ClampingScrollPhysics(),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 0.w, vertical: 0.h),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            bottomRight: Radius.circular(40),
-                            bottomLeft: Radius.circular(40),
-                          ),
-                          color: AppColors.bgColor,
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            top: 6.5.h,
-                            right: 3.w,
-                            left: 3.w,
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+              : Stack(
+                children: [
+                  SingleChildScrollView(
+                    physics: ClampingScrollPhysics(),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 0.w,
+                        vertical: 0.h,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                bottomRight: Radius.circular(40),
+                                bottomLeft: Radius.circular(40),
+                              ),
+                              color: AppColors.bgColor,
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                top: 6.5.h,
+                                right: 3.w,
+                                left: 3.w,
+                              ),
+                              child: Column(
                                 children: [
                                   Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      InkWell(
-                                        onTap: () {
-                                          _scaffoldKeyHome.currentState
-                                              ?.openDrawer();
-                                        },
-                                        child: CircleAvatar(
-                                          radius: isIpad ? 40 : 20,
-                                          backgroundColor:
-                                              AppColors.containerColor,
-                                          child: Icon(
-                                            CupertinoIcons.bars,
-                                            color: AppColors.blackColor,
-                                            size: isIpad ? 40 : 25,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: 2.w),
-                                      SizedBox(
-                                        width: 30.w,
-                                        child: RichText(
-                                          textAlign: TextAlign.start,
-                                          text: TextSpan(
-                                            children: [
-                                              TextSpan(
-                                                text: "Hy, ",
-                                                style: TextStyle(
-                                                  fontSize: 17.sp,
-                                                  color: AppColors.gray,
-                                                  fontFamily: FontFamily.light,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text: profile?.name ?? '',
-                                                style: TextStyle(
-                                                  fontSize: 17.sp,
-                                                  color: AppColors.blackColor,
-                                                  fontFamily: FontFamily.bold,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              int? selectedCustomerId;
-                                              String? selectedCustomerName;
-
-                                              String? errorText;
-
-                                              return StatefulBuilder(
-                                                builder: (context, setState) {
-                                                  return AlertDialog(
-                                                    backgroundColor:
-                                                        AppColors.whiteColor,
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            15,
-                                                          ),
-                                                    ),
-                                                    title: Text(
-                                                      "Select Customer",
-                                                      style: TextStyle(
-                                                        fontSize: 18.sp,
-                                                        fontFamily:
-                                                            FontFamily.bold,
-                                                        color:
-                                                            AppColors
-                                                                .blackColor,
-                                                      ),
-                                                    ),
-                                                    content: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        // List of customers
-                                                        ...customersList.map((
-                                                          customer,
-                                                        ) {
-                                                          bool isSelected =
-                                                              selectedCustomerId ==
-                                                              customer.id;
-                                                          return InkWell(
-                                                            onTap: () {
-                                                              setState(() {
-                                                                selectedCustomerId =
-                                                                    customer.id;
-                                                                selectedCustomerName =
-                                                                    "${customer.firstName} ${customer.lastName}";
-                                                                errorText =
-                                                                    null; // clear error
-                                                              });
-                                                            },
-                                                            child: Container(
-                                                              padding:
-                                                                  EdgeInsets.symmetric(
-                                                                    vertical:
-                                                                        12,
-                                                                    horizontal:
-                                                                        10,
-                                                                  ),
-                                                              margin:
-                                                                  EdgeInsets.symmetric(
-                                                                    vertical: 5,
-                                                                  ),
-                                                              decoration: BoxDecoration(
-                                                                color:
-                                                                    isSelected
-                                                                        ? AppColors.mainColor.withValues(
-                                                                          alpha:
-                                                                              0.1,
-                                                                        )
-                                                                        : AppColors
-                                                                            .whiteColor,
-                                                                border: Border.all(
-                                                                  color:
-                                                                      isSelected
-                                                                          ? AppColors
-                                                                              .mainColor
-                                                                          : AppColors
-                                                                              .gray,
-                                                                  width: 1,
-                                                                ),
-                                                                borderRadius:
-                                                                    BorderRadius.circular(
-                                                                      10,
-                                                                    ),
-                                                              ),
-                                                              child: Row(
-                                                                children: [
-                                                                  Icon(
-                                                                    isSelected
-                                                                        ? Icons
-                                                                            .radio_button_checked
-                                                                        : Icons
-                                                                            .radio_button_off,
-                                                                    color:
-                                                                        isSelected
-                                                                            ? AppColors.mainColor
-                                                                            : AppColors.gray,
-                                                                  ),
-                                                                  SizedBox(
-                                                                    width: 10,
-                                                                  ),
-                                                                  Text(
-                                                                    "${customer.firstName} ${customer.lastName}",
-                                                                    style: TextStyle(
-                                                                      fontSize:
-                                                                          16.sp,
-                                                                      fontFamily:
-                                                                          FontFamily
-                                                                              .regular,
-                                                                      color:
-                                                                          AppColors
-                                                                              .blackColor,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          );
-                                                        }),
-                                                        if (errorText !=
-                                                            null) ...[
-                                                          SizedBox(height: 8),
-                                                          Text(
-                                                            errorText!,
-                                                            style: TextStyle(
-                                                              color: Colors.red,
-                                                              fontSize: 14.sp,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ],
-                                                    ),
-                                                    actions: [
-                                                      CustomButton(
-                                                        title: "Cancel",
-                                                        route: () {
-                                                          Get.back();
-                                                        },
-                                                        color:
-                                                            AppColors
-                                                                .containerColor,
-                                                        fontcolor:
-                                                            AppColors
-                                                                .blackColor,
-                                                        height: 5.h,
-                                                        width: 30.w,
-                                                        fontsize: 15.sp,
-                                                        radius: 12.0,
-                                                      ),
-                                                      CustomButton(
-                                                        title: "Confirm",
-                                                        route: () async {
-                                                          if (selectedCustomerId !=
-                                                                  null &&
-                                                              selectedCustomerName !=
-                                                                  null) {
-                                                            // ✅ Save to SharedPreferences
-                                                            final prefs =
-                                                                await SharedPreferences.getInstance();
-                                                            await prefs.setInt(
-                                                              "customerId",
-                                                              selectedCustomerId!,
-                                                            );
-                                                            await prefs.setString(
-                                                              "customerName",
-                                                              selectedCustomerName!,
-                                                            );
-
-                                                            Get.back();
-                                                          } else {
-                                                            setState(() {
-                                                              errorText =
-                                                                  "Please select a customer!";
-                                                            });
-                                                          }
-                                                        },
-                                                        color:
-                                                            AppColors.mainColor,
-                                                        fontcolor:
-                                                            AppColors
-                                                                .whiteColor,
-                                                        height: 5.h,
-                                                        width: 30.w,
-                                                        fontsize: 15.sp,
-                                                        radius: 12.0,
-                                                        iconData: Icons.check,
-                                                        iconsize: 17.sp,
-                                                      ),
-                                                    ],
-                                                  );
-                                                },
-                                              );
+                                      Row(
+                                        children: [
+                                          InkWell(
+                                            onTap: () {
+                                              _scaffoldKeyHome.currentState
+                                                  ?.openDrawer();
                                             },
-                                          );
-                                        },
-
-                                        child: CircleAvatar(
-                                          radius: isIpad ? 40 : 20,
-                                          backgroundColor:
-                                              AppColors.containerColor,
-                                          child: Icon(
-                                            Icons.person_outline_rounded,
-                                            color: AppColors.blackColor,
-                                            size: isIpad ? 35 : 25,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: isIpad ? 2.w : 3.5.w),
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            searchBar =
-                                                !searchBar; // toggle visibility
-                                          });
-                                        },
-                                        child: CircleAvatar(
-                                          radius: isIpad ? 40 : 20,
-                                          backgroundColor:
-                                              AppColors.containerColor,
-                                          child: Icon(
-                                            Icons.search,
-                                            color: AppColors.blackColor,
-                                            size: isIpad ? 35 : 25,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: isIpad ? 2.w : 3.5.w),
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            Get.offAll(
-                                              CartScreen(),
-                                              transition: Transition.fade,
-                                              duration: const Duration(
-                                                milliseconds: 450,
-                                              ),
-                                            );
-                                          });
-                                        },
-                                        child: Stack(
-                                          clipBehavior: Clip.none,
-                                          children: [
-                                            CircleAvatar(
+                                            child: CircleAvatar(
                                               radius: isIpad ? 40 : 20,
                                               backgroundColor:
                                                   AppColors.containerColor,
                                               child: Icon(
-                                                Icons.shopping_cart_outlined,
+                                                CupertinoIcons.bars,
+                                                color: AppColors.blackColor,
+                                                size: isIpad ? 40 : 25,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 2.w),
+                                          SizedBox(
+                                            width: 30.w,
+                                            child: RichText(
+                                              textAlign: TextAlign.start,
+                                              text: TextSpan(
+                                                children: [
+                                                  TextSpan(
+                                                    text: "Hy, ",
+                                                    style: TextStyle(
+                                                      fontSize: 17.sp,
+                                                      color: AppColors.gray,
+                                                      fontFamily:
+                                                          FontFamily.light,
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text: profile?.name ?? '',
+                                                    style: TextStyle(
+                                                      fontSize: 17.sp,
+                                                      color:
+                                                          AppColors.blackColor,
+                                                      fontFamily:
+                                                          FontFamily.bold,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (
+                                                  BuildContext context,
+                                                ) {
+                                                  int? selectedCustomerId;
+                                                  String? selectedCustomerName;
+
+                                                  String? errorText;
+
+                                                  return StatefulBuilder(
+                                                    builder: (
+                                                      context,
+                                                      setState,
+                                                    ) {
+                                                      return AlertDialog(
+                                                        backgroundColor:
+                                                            AppColors
+                                                                .whiteColor,
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                15,
+                                                              ),
+                                                        ),
+                                                        title: Text(
+                                                          "Select Customer",
+                                                          style: TextStyle(
+                                                            fontSize: 18.sp,
+                                                            fontFamily:
+                                                                FontFamily.bold,
+                                                            color:
+                                                                AppColors
+                                                                    .blackColor,
+                                                          ),
+                                                        ),
+                                                        content: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            // List of customers
+                                                            ...customersList.map((
+                                                              customer,
+                                                            ) {
+                                                              bool isSelected =
+                                                                  selectedCustomerId ==
+                                                                  customer.id;
+                                                              return InkWell(
+                                                                onTap: () {
+                                                                  setState(() {
+                                                                    selectedCustomerId =
+                                                                        customer
+                                                                            .id;
+                                                                    selectedCustomerName =
+                                                                        "${customer.firstName} ${customer.lastName}";
+                                                                    errorText =
+                                                                        null; // clear error
+                                                                  });
+                                                                },
+                                                                child: Container(
+                                                                  padding:
+                                                                      EdgeInsets.symmetric(
+                                                                        vertical:
+                                                                            12,
+                                                                        horizontal:
+                                                                            10,
+                                                                      ),
+                                                                  margin:
+                                                                      EdgeInsets.symmetric(
+                                                                        vertical:
+                                                                            5,
+                                                                      ),
+                                                                  decoration: BoxDecoration(
+                                                                    color:
+                                                                        isSelected
+                                                                            ? AppColors.mainColor.withValues(
+                                                                              alpha:
+                                                                                  0.1,
+                                                                            )
+                                                                            : AppColors.whiteColor,
+                                                                    border: Border.all(
+                                                                      color:
+                                                                          isSelected
+                                                                              ? AppColors.mainColor
+                                                                              : AppColors.gray,
+                                                                      width: 1,
+                                                                    ),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                          10,
+                                                                        ),
+                                                                  ),
+                                                                  child: Row(
+                                                                    children: [
+                                                                      Icon(
+                                                                        isSelected
+                                                                            ? Icons.radio_button_checked
+                                                                            : Icons.radio_button_off,
+                                                                        color:
+                                                                            isSelected
+                                                                                ? AppColors.mainColor
+                                                                                : AppColors.gray,
+                                                                      ),
+                                                                      SizedBox(
+                                                                        width:
+                                                                            10,
+                                                                      ),
+                                                                      Text(
+                                                                        "${customer.firstName} ${customer.lastName}",
+                                                                        style: TextStyle(
+                                                                          fontSize:
+                                                                              16.sp,
+                                                                          fontFamily:
+                                                                              FontFamily.regular,
+                                                                          color:
+                                                                              AppColors.blackColor,
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            }),
+                                                            if (errorText !=
+                                                                null) ...[
+                                                              SizedBox(
+                                                                height: 8,
+                                                              ),
+                                                              Text(
+                                                                errorText!,
+                                                                style: TextStyle(
+                                                                  color:
+                                                                      Colors
+                                                                          .red,
+                                                                  fontSize:
+                                                                      14.sp,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ],
+                                                        ),
+                                                        actions: [
+                                                          CustomButton(
+                                                            title: "Cancel",
+                                                            route: () {
+                                                              Get.back();
+                                                            },
+                                                            color:
+                                                                AppColors
+                                                                    .containerColor,
+                                                            fontcolor:
+                                                                AppColors
+                                                                    .blackColor,
+                                                            height: 5.h,
+                                                            width: 30.w,
+                                                            fontsize: 15.sp,
+                                                            radius: 12.0,
+                                                          ),
+                                                          CustomButton(
+                                                            title: "Confirm",
+                                                            route: () async {
+                                                              if (selectedCustomerId !=
+                                                                      null &&
+                                                                  selectedCustomerName !=
+                                                                      null) {
+                                                                // ✅ Save to SharedPreferences
+                                                                final prefs =
+                                                                    await SharedPreferences.getInstance();
+                                                                await prefs.setInt(
+                                                                  "customerId",
+                                                                  selectedCustomerId!,
+                                                                );
+                                                                await prefs.setString(
+                                                                  "customerName",
+                                                                  selectedCustomerName!,
+                                                                );
+
+                                                                Get.back();
+                                                              } else {
+                                                                setState(() {
+                                                                  errorText =
+                                                                      "Please select a customer!";
+                                                                });
+                                                              }
+                                                            },
+                                                            color:
+                                                                AppColors
+                                                                    .mainColor,
+                                                            fontcolor:
+                                                                AppColors
+                                                                    .whiteColor,
+                                                            height: 5.h,
+                                                            width: 30.w,
+                                                            fontsize: 15.sp,
+                                                            radius: 12.0,
+                                                            iconData:
+                                                                Icons.check,
+                                                            iconsize: 17.sp,
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                              );
+                                            },
+
+                                            child: CircleAvatar(
+                                              radius: isIpad ? 40 : 20,
+                                              backgroundColor:
+                                                  AppColors.containerColor,
+                                              child: Icon(
+                                                Icons.person_outline_rounded,
                                                 color: AppColors.blackColor,
                                                 size: isIpad ? 35 : 25,
                                               ),
                                             ),
-                                            // Positioned badge
-                                            Positioned(
-                                              top: -4,
-                                              right: -4,
-                                              child: Container(
-                                                padding: EdgeInsets.all(4.sp),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.red,
-                                                  shape: BoxShape.circle,
+                                          ),
+                                          SizedBox(width: isIpad ? 2.w : 3.5.w),
+                                          GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                searchBar =
+                                                    !searchBar; // toggle visibility
+                                              });
+                                            },
+                                            child: CircleAvatar(
+                                              radius: isIpad ? 40 : 20,
+                                              backgroundColor:
+                                                  AppColors.containerColor,
+                                              child: Icon(
+                                                Icons.search,
+                                                color: AppColors.blackColor,
+                                                size: isIpad ? 35 : 25,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: isIpad ? 2.w : 3.5.w),
+                                          GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                Get.offAll(
+                                                  CartScreen(),
+                                                  transition: Transition.fade,
+                                                  duration: const Duration(
+                                                    milliseconds: 450,
+                                                  ),
+                                                );
+                                              });
+                                            },
+                                            child: Stack(
+                                              clipBehavior: Clip.none,
+                                              children: [
+                                                CircleAvatar(
+                                                  radius: isIpad ? 40 : 20,
+                                                  backgroundColor:
+                                                      AppColors.containerColor,
+                                                  child: Icon(
+                                                    Icons
+                                                        .shopping_cart_outlined,
+                                                    color: AppColors.blackColor,
+                                                    size: isIpad ? 35 : 25,
+                                                  ),
                                                 ),
-                                                constraints: BoxConstraints(
-                                                  minWidth: 14.sp,
-                                                  minHeight: 14.sp,
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    '2',
-                                                    // Replace with your cart count dynamically if needed
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 12.sp,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                // Positioned badge
+                                                Positioned(
+                                                  top: -4,
+                                                  right: -4,
+                                                  child: Container(
+                                                    padding: EdgeInsets.all(
+                                                      4.sp,
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.red,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    constraints: BoxConstraints(
+                                                      minWidth: 14.sp,
+                                                      minHeight: 14.sp,
+                                                    ),
+                                                    child: Center(
+                                                      child: Text(
+                                                        '2',
+                                                        // Replace with your cart count dynamically if needed
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 12.sp,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(width: isIpad ? 2.w : 3.5.w),
-                                      Stack(
-                                        children: [
-                                          CircleAvatar(
-                                            radius: isIpad ? 40 : 20,
-                                            backgroundColor:
-                                                AppColors.containerColor,
-                                            child: Icon(
-                                              Icons.notifications_none,
-                                              color: AppColors.blackColor,
-                                              size: isIpad ? 35 : 25,
+                                              ],
                                             ),
                                           ),
-                                          Positioned(
-                                            right: 2,
-                                            top: 2,
-                                            child: CircleAvatar(
-                                              radius: isIpad ? 10 : 6,
-                                              backgroundColor:
-                                                  AppColors.counterColor,
-                                            ),
+                                          SizedBox(width: isIpad ? 2.w : 3.5.w),
+                                          Stack(
+                                            children: [
+                                              CircleAvatar(
+                                                radius: isIpad ? 40 : 20,
+                                                backgroundColor:
+                                                    AppColors.containerColor,
+                                                child: Icon(
+                                                  Icons.notifications_none,
+                                                  color: AppColors.blackColor,
+                                                  size: isIpad ? 35 : 25,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                right: 2,
+                                                top: 2,
+                                                child: CircleAvatar(
+                                                  radius: isIpad ? 10 : 6,
+                                                  backgroundColor:
+                                                      AppColors.counterColor,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
                                     ],
                                   ),
+                                  SizedBox(height: 1.h),
+                                  if (searchBar)
+                                    SearchField(
+                                      controller: searchController,
+                                      hintText: "Search the entire shop",
+                                    ),
+                                  SizedBox(height: 1.h),
+
+                                  ImageSlider(
+                                    imageUrls: bannersImagesList,
+                                    height: 18.h,
+                                  ),
+
+                                  SizedBox(height: 2.h),
                                 ],
                               ),
-                              SizedBox(height: 1.h),
-                              if (searchBar)
-                                SearchField(
-                                  controller: searchController,
-                                  hintText: "Search the entire shop",
-                                ),
-                              SizedBox(height: 1.h),
+                            ),
+                          ),
 
-                              ImageSlider(
-                                imageUrls: bannersImagesList,
-                                height: 18.h,
+                          SizedBox(height: 2.h),
+
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(40),
+                                topLeft: Radius.circular(40),
                               ),
-
-                              SizedBox(height: 2.h),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 2.h),
-
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(40),
-                            topLeft: Radius.circular(40),
-                          ),
-                          color: AppColors.bgColor,
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            top: 2.5.h,
-                            right: 4.w,
-                            left: 4.w,
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                              color: AppColors.bgColor,
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                top: 2.5.h,
+                                right: 4.w,
+                                left: 4.w,
+                              ),
+                              child: Column(
                                 children: [
-                                  Text(
-                                    "Categories",
-                                    style: TextStyle(
-                                      fontSize: 16.sp,
-                                      fontFamily: FontFamily.bold,
-                                      color: AppColors.blackColor,
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Categories",
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                          fontFamily: FontFamily.bold,
+                                          color: AppColors.blackColor,
+                                        ),
+                                      ),
+                                      InkWell(
+                                        onTap: () {
+                                          Get.offAll(
+                                            () => CategoriesScreen(),
+                                            transition: Transition.fade,
+                                            duration: const Duration(
+                                              milliseconds: 450,
+                                            ),
+                                          );
+                                        },
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              "View All",
+                                              style: TextStyle(
+                                                fontSize:
+                                                    isIpad ? 14.sp : 16.sp,
+                                                fontFamily: FontFamily.bold,
+                                                color: AppColors.gray,
+                                              ),
+                                            ),
+                                            SizedBox(width: 1.w),
+                                            CircleAvatar(
+                                              radius: 15,
+                                              backgroundColor:
+                                                  AppColors.mainColor,
+                                              child: Icon(
+                                                Icons.arrow_forward,
+                                                color: AppColors.whiteColor,
+                                                size: 20,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 2.h),
+
+                                  SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: [
+                                        for (
+                                          int i = 0;
+                                          i < (categoriesList.length);
+                                          i++
+                                        )
+                                          InkWell(
+                                            onTap: () {
+                                              Get.to(
+                                                () => ProductsScreen(
+                                                  cate: categoriesList[i].name,
+                                                  id:
+                                                      categoriesList[i].id
+                                                          .toString(),
+                                                ),
+                                                transition:
+                                                    Transition
+                                                        .leftToRightWithFade,
+                                                duration: const Duration(
+                                                  milliseconds: 450,
+                                                ),
+                                              );
+                                            },
+                                            child: Padding(
+                                              padding: EdgeInsets.only(
+                                                left: i == 0 ? 0 : 10,
+                                                right: 10,
+                                              ),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Material(
+                                                    shape: CircleBorder(),
+                                                    elevation: 2,
+                                                    clipBehavior: Clip.hardEdge,
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        // handle tap
+                                                      },
+                                                      customBorder:
+                                                          CircleBorder(),
+                                                      child: ClipOval(
+                                                        child:
+                                                            isIpad
+                                                                ? CustomNetworkImage(
+                                                                  imageUrl:
+                                                                      categoriesList[i]
+                                                                          .image
+                                                                          ?.src ??
+                                                                      '',
+                                                                  width: 10.w,
+                                                                  height: 10.w,
+                                                                  isProfile:
+                                                                      false,
+                                                                )
+                                                                : CustomNetworkImage(
+                                                                  imageUrl:
+                                                                      categoriesList[i]
+                                                                          .image
+                                                                          ?.src ??
+                                                                      '',
+                                                                  width: 15.w,
+                                                                  height: 15.w,
+                                                                  isProfile:
+                                                                      false,
+                                                                ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 1.h),
+                                                  SizedBox(
+                                                    width: 15.w,
+                                                    child: Text(
+                                                      categoriesList[i].name
+                                                          .toString(),
+                                                      textAlign:
+                                                          TextAlign.center,
+
+                                                      style: TextStyle(
+                                                        fontSize: 14.sp,
+                                                        fontFamily:
+                                                            FontFamily.light,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color:
+                                                            AppColors
+                                                                .blackColor,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                      ],
                                     ),
                                   ),
+                                  SizedBox(height: isIpad ? 4.h : 2.h),
                                   InkWell(
                                     onTap: () {
-                                      Get.offAll(
+                                      Get.to(
                                         () => CategoriesScreen(),
-                                        transition: Transition.fade,
+                                        transition:
+                                            Transition.leftToRightWithFade,
                                         duration: const Duration(
                                           milliseconds: 450,
                                         ),
                                       );
                                     },
                                     child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          "View All",
+                                          "Products",
                                           style: TextStyle(
-                                            fontSize: isIpad ? 14.sp : 16.sp,
+                                            fontSize: 16.sp,
                                             fontFamily: FontFamily.bold,
-                                            color: AppColors.gray,
+                                            color: AppColors.blackColor,
                                           ),
                                         ),
-                                        SizedBox(width: 1.w),
-                                        CircleAvatar(
-                                          radius: 15,
-                                          backgroundColor: AppColors.mainColor,
-                                          child: Icon(
-                                            Icons.arrow_forward,
-                                            color: AppColors.whiteColor,
-                                            size: 20,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 2.h),
-
-                              SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children: [
-                                    for (
-                                      int i = 0;
-                                      i < (categoriesList.length);
-                                      i++
-                                    )
-                                      Padding(
-                                        padding: EdgeInsets.only(
-                                          left: i == 0 ? 0 : 10,
-                                          right: 10,
-                                        ),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
+                                        Row(
                                           children: [
-                                            Material(
-                                              shape: CircleBorder(),
-                                              elevation: 2,
-                                              clipBehavior: Clip.hardEdge,
-                                              child: InkWell(
-                                                onTap: () {
-                                                  // handle tap
-                                                },
-                                                customBorder: CircleBorder(),
-                                                child: ClipOval(
-                                                  child:
-                                                      isIpad
-                                                          ? CustomNetworkImage(
-                                                            imageUrl:
-                                                                categoriesList[i]
-                                                                    .image
-                                                                    ?.src ??
-                                                                '',
-                                                            width: 10.w,
-                                                            height: 10.w,
-                                                            isProfile: false,
-                                                          )
-                                                          : CustomNetworkImage(
-                                                            imageUrl:
-                                                                categoriesList[i]
-                                                                    .image
-                                                                    ?.src ??
-                                                                '',
-                                                            width: 15.w,
-                                                            height: 15.w,
-                                                            isProfile: false,
-                                                          ),
-                                                ),
+                                            Text(
+                                              "View All",
+                                              style: TextStyle(
+                                                fontSize:
+                                                    isIpad ? 14.sp : 16.sp,
+                                                fontFamily: FontFamily.bold,
+                                                color: AppColors.gray,
                                               ),
                                             ),
-                                            SizedBox(height: 1.h),
-                                            SizedBox(
-                                              width: 15.w,
-                                              child: Text(
-                                                categoriesList[i].name
-                                                    .toString(),
-                                                textAlign: TextAlign.center,
-
-                                                style: TextStyle(
-                                                  fontSize: 14.sp,
-                                                  fontFamily: FontFamily.light,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: AppColors.blackColor,
-                                                ),
+                                            SizedBox(width: 1.w),
+                                            CircleAvatar(
+                                              radius: 15,
+                                              backgroundColor:
+                                                  AppColors.mainColor,
+                                              child: Icon(
+                                                Icons.arrow_forward,
+                                                color: AppColors.whiteColor,
+                                                size: 20,
                                               ),
                                             ),
                                           ],
                                         ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: isIpad ? 4.h : 2.h),
-                              InkWell(
-                                onTap: () {
-                                  Get.to(
-                                    () => CategoriesScreen(),
-                                    transition: Transition.leftToRightWithFade,
-                                    duration: const Duration(milliseconds: 450),
-                                  );
-                                },
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "Products",
-                                      style: TextStyle(
-                                        fontSize: 16.sp,
-                                        fontFamily: FontFamily.bold,
-                                        color: AppColors.blackColor,
-                                      ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "View All",
-                                          style: TextStyle(
-                                            fontSize: isIpad ? 14.sp : 16.sp,
-                                            fontFamily: FontFamily.bold,
-                                            color: AppColors.gray,
-                                          ),
-                                        ),
-                                        SizedBox(width: 1.w),
-                                        CircleAvatar(
-                                          radius: 15,
-                                          backgroundColor: AppColors.mainColor,
-                                          child: Icon(
-                                            Icons.arrow_forward,
-                                            color: AppColors.whiteColor,
-                                            size: 20,
-                                          ),
-                                        ),
                                       ],
                                     ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: 1.h),
-                              GridView.count(
-                                shrinkWrap: true,
-                                padding: EdgeInsets.zero,
-                                physics: ClampingScrollPhysics(),
-                                crossAxisCount: _getCrossAxisCount(context),
-                                childAspectRatio: 0.75,
-                                mainAxisSpacing: 1.h,
-                                crossAxisSpacing: 2.w,
-                                children:
-                                    productsList
-                                        .take(6)
-                                        .map((p) => _buildGridItem(p))
-                                        .toList(),
-                              ),
+                                  ),
+                                  SizedBox(height: 1.h),
+                                  GridView.count(
+                                    shrinkWrap: true,
+                                    padding: EdgeInsets.zero,
+                                    physics: ClampingScrollPhysics(),
+                                    crossAxisCount: _getCrossAxisCount(context),
+                                    childAspectRatio: 0.75,
+                                    mainAxisSpacing: 1.h,
+                                    crossAxisSpacing: 2.w,
+                                    children:
+                                        productsList
+                                            .where(
+                                              (p) => p.stockStatus == 'instock',
+                                            )
+                                            .take(isIpad ? 8 : 6)
+                                            .map((p) => _buildGridItem(p))
+                                            .toList(),
+                                  ),
 
-                              SizedBox(height: 1.h),
-                            ],
+                                  SizedBox(height: 1.h),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                  if (isAddingToCart)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.3),
+                      ),
+                      child: Loader(),
+                    ),
+                ],
               ),
       bottomNavigationBar: SizedBox(
         height: isIpad ? 14.h : 10.h,
@@ -780,15 +851,22 @@ class _HomescreenState extends State<Homescreen> {
   }
 
   Widget _buildGridItem(FetchProductsModal product) {
-    int quantity = quantities[product.id ?? 0] ?? 1;
     return InkWell(
-      onTap: () {
-        Get.to(
-          () => ProductDetailsScreen(productId: product.id.toString()),
-          transition: Transition.leftToRightWithFade,
-          duration: const Duration(milliseconds: 450),
-        );
-      },
+      onTap:
+          product.stockStatus == 'instock'
+              ? () {
+                Get.to(
+                  () => ProductDetailsScreen(productId: product.id.toString()),
+                  transition: Transition.leftToRightWithFade,
+                  duration: const Duration(milliseconds: 450),
+                );
+              }
+              : () {
+                showCustomErrorSnackbar(
+                  title: "Out of Stock",
+                  message: "${product.name} is not available right now!",
+                );
+              },
       child: Opacity(
         opacity: product.stockStatus == 'instock' ? 1.0 : 0.4,
         child: Card(
@@ -826,12 +904,12 @@ class _HomescreenState extends State<Homescreen> {
                             children: [
                               GestureDetector(
                                 onTap:
-                                    (product.stockStatus == 'instock' &&
-                                            quantity > 1)
-                                        ? () => setState(() {
-                                          quantities[product.id ?? 0] =
-                                              quantity - 1;
-                                        })
+                                    (product.stockStatus == 'instock')
+                                        ? () {
+                                          _removeProductFromCart(
+                                            product.id ?? 0,
+                                          );
+                                        }
                                         : null,
                                 child: Container(
                                   padding:
@@ -852,11 +930,28 @@ class _HomescreenState extends State<Homescreen> {
                               GestureDetector(
                                 onTap:
                                     (product.stockStatus == 'instock')
-                                        ? () => setState(() {
-                                          quantities[product.id ?? 0] =
-                                              quantity + 1;
-                                        })
-                                        : null,
+                                        ? () {
+                                          log('hello');
+                                          product.variations?.length == 0
+                                              ? _addSimpleProductsToCart(
+                                                product.id,
+                                              )
+                                              : _addVariationProductsToCart(
+                                                product.id,
+                                                product.firstVariation?.id,
+                                                product
+                                                    .firstVariation
+                                                    ?.varAttributes
+                                                    ?.getKey(),
+                                                product
+                                                    .firstVariation
+                                                    ?.varAttributes
+                                                    ?.getValue(),
+                                              );
+                                        }
+                                        : () {
+                                          log('Kaaaa');
+                                        },
                                 child: Container(
                                   padding:
                                       isIpad
@@ -924,18 +1019,29 @@ class _HomescreenState extends State<Homescreen> {
                         ? Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            isIpad
+                                ? Text(
+                                  product.packSize == ""
+                                      ? 'Pack : 1 Item'
+                                      : 'Pack : ${product.packSize} Items',
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontFamily: FontFamily.regular,
+                                    color: AppColors.gray,
+                                  ),
+                                )
+                                : Text(
+                                  product.packSize == ""
+                                      ? 'Pack size : 1 Item'
+                                      : 'Pack size : ${product.packSize} Items',
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontFamily: FontFamily.regular,
+                                    color: AppColors.gray,
+                                  ),
+                                ),
                             Text(
-                              product.packSize == ""
-                                  ? 'Pack : 1 Item'
-                                  : 'Pack : ${product.packSize} Items',
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                fontFamily: FontFamily.regular,
-                                color: AppColors.gray,
-                              ),
-                            ),
-                            Text(
-                              "£${product.price}",
+                              "${product.currencySymbol} ${product.price}",
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontFamily: FontFamily.semiBold,
@@ -948,7 +1054,7 @@ class _HomescreenState extends State<Homescreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Pack : ${product.firstVariation?.packSize} Items',
+                              'Pack size : ${product.firstVariation?.packSize} Items',
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontFamily: FontFamily.regular,
@@ -965,104 +1071,6 @@ class _HomescreenState extends State<Homescreen> {
                             ),
                           ],
                         ),
-                    // SizedBox(height: 1.h),
-                    // Quantity + Add Button
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //   children: [
-                    //     // Modern Quantity Selector
-                    //     Container(
-                    //       padding: EdgeInsets.symmetric(
-                    //         horizontal: isIpad ? 0 : 2.w,
-                    //         vertical: 0.5.h,
-                    //       ),
-                    //       decoration: BoxDecoration(
-                    //         color: AppColors.containerColor,
-                    //         borderRadius: BorderRadius.circular(30),
-                    //       ),
-                    //       child: Row(
-                    //         children: [
-                    //           GestureDetector(
-                    //             onTap:
-                    //                 (product.stockStatus == 'instock' &&
-                    //                         quantity > 1)
-                    //                     ? () => setState(() {
-                    //                       quantities[product.id ?? 0] =
-                    //                           quantity - 1;
-                    //                     })
-                    //                     : null,
-                    //             child: Container(
-                    //               padding: EdgeInsets.all(1.5.w),
-                    //               decoration: BoxDecoration(
-                    //                 color: AppColors.cardBgColor,
-                    //                 shape: BoxShape.circle,
-                    //               ),
-                    //               child: Icon(
-                    //                 Icons.remove,
-                    //                 size: isIpad ? 12.sp : 16.sp,
-                    //                 color: AppColors.blackColor,
-                    //               ),
-                    //             ),
-                    //           ),
-                    //           SizedBox(width: 1.w),
-                    //           Text(
-                    //             quantity.toString(),
-                    //             style: TextStyle(
-                    //               fontSize: 14.sp,
-                    //               fontFamily: FontFamily.semiBold,
-                    //               color: AppColors.blackColor,
-                    //             ),
-                    //           ),
-                    //           SizedBox(width: 1.w),
-                    //           GestureDetector(
-                    //             onTap:
-                    //                 (product.stockStatus == 'instock')
-                    //                     ? () => setState(() {
-                    //                       quantities[product.id ?? 0] =
-                    //                           quantity + 1;
-                    //                     })
-                    //                     : null,
-                    //             child: Container(
-                    //               padding: EdgeInsets.all(1.5.w),
-                    //               decoration: BoxDecoration(
-                    //                 color: AppColors.cardBgColor,
-                    //                 shape: BoxShape.circle,
-                    //               ),
-                    //               child: Icon(
-                    //                 Icons.add,
-                    //                 size: isIpad ? 12.sp : 16.sp,
-                    //                 color: AppColors.blackColor,
-                    //               ),
-                    //             ),
-                    //           ),
-                    //         ],
-                    //       ),
-                    //     ),
-                    //
-                    //     // Add to Cart Button
-                    //     InkWell(
-                    //       onTap:
-                    //           (product.stockStatus == 'instock')
-                    //               ? () {
-                    //                 // handle add to cart
-                    //               }
-                    //               : null,
-                    //       borderRadius: BorderRadius.circular(30),
-                    //       child: Container(
-                    //         padding: EdgeInsets.all(1.5.w),
-                    //         decoration: BoxDecoration(
-                    //           color: AppColors.mainColor,
-                    //           shape: BoxShape.circle,
-                    //         ),
-                    //         child: Icon(
-                    //           Icons.shopping_cart_outlined,
-                    //           color: Colors.white,
-                    //           size: isIpad ? 15.sp : 18.sp,
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
                   ],
                 ),
               ),
@@ -1374,6 +1382,131 @@ class _HomescreenState extends State<Homescreen> {
         title: 'Network Error',
         message: 'Unable to connect. Please check your internet and try again.',
       );
+    }
+  }
+
+  Future<void> _addVariationProductsToCart(
+    id,
+    variationId,
+    variationKey,
+    variationValue,
+  ) async {
+    setState(() {
+      isAddingToCart = true;
+    });
+    final cartService = CartService();
+
+    try {
+      final response = await cartService.addToCart(
+        productId: int.parse(id.toString()),
+        variationId: variationId,
+        variation: {"attribute_${variationKey ?? ''}": variationValue ?? ''},
+        quantity: 1,
+        itemNote: '',
+      );
+
+      if (response != null && response.statusCode == 200) {
+        showCustomSuccessSnackbar(
+          title: "Added to Cart",
+          message: "This product has been successfully added to your cart.",
+        );
+        setState(() {
+          isAddingToCart = false;
+        });
+      } else {
+        showCustomSuccessSnackbar(
+          title: "Offline Mode",
+          message: "Product added offline. It will sync once internet is back.",
+        );
+        setState(() {
+          isAddingToCart = false;
+        });
+      }
+    } catch (e) {
+      showCustomErrorSnackbar(
+        title: "Error",
+        message: "Something went wrong while adding product.\n$e",
+      );
+      setState(() {
+        isAddingToCart = false;
+      });
+    }
+  }
+
+  Future<void> _addSimpleProductsToCart(id) async {
+    setState(() {
+      isAddingToCart = true;
+    });
+    final cartService = CartService();
+
+    try {
+      final response = await cartService.addToCart(
+        productId: int.parse(id.toString()),
+        quantity: 1,
+        itemNote: '',
+      );
+
+      if (response != null && response.statusCode == 200) {
+        showCustomSuccessSnackbar(
+          title: "Added to Cart",
+          message: "This product has been successfully added to your cart.",
+        );
+        setState(() {
+          isAddingToCart = false;
+        });
+      } else {
+        showCustomSuccessSnackbar(
+          title: "Offline Mode",
+          message: "Product added offline. It will sync once internet is back.",
+        );
+        setState(() {
+          isAddingToCart = false;
+        });
+      }
+    } catch (e) {
+      showCustomErrorSnackbar(
+        title: "Error",
+        message: "Something went wrong while adding product.\n$e",
+      );
+      log('Error : $e');
+      setState(() {
+        isAddingToCart = false;
+      });
+    }
+  }
+
+  Future<void> _removeProductFromCart(int productId) async {
+    setState(() => isAddingToCart = true);
+
+    final cartService = CartService();
+
+    try {
+      final response = await cartService.decreaseCartItem(productId: productId);
+
+      if (response != null && response.statusCode == 200) {
+        final data = response.data;
+        final message = data["message"] ?? "Product quantity removed.";
+        showCustomSuccessSnackbar(title: "Cart", message: "$message");
+      } else if (response != null && response.statusCode == 204) {
+        showCustomErrorSnackbar(
+          title: "Cart Empty",
+          message: "No items in cart to remove.",
+        );
+      } else {
+        showCustomSuccessSnackbar(
+          title: "Offline Mode",
+          message:
+              "Cart update saved offline. It will sync once internet is back.",
+        );
+      }
+    } catch (e, stackTrace) {
+      showCustomErrorSnackbar(
+        title: "Error",
+        message: "Something went wrong while updating cart.\n$e",
+      );
+      log('Error : $stackTrace');
+    } finally {
+      setState(() => isAddingToCart = false);
     }
   }
 }
