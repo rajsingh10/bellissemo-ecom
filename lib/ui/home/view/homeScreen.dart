@@ -239,205 +239,242 @@ class _HomescreenState extends State<Homescreen> {
                                           GestureDetector(
                                             onTap: () {
                                               showDialog(
+                                                barrierDismissible: false,
+
                                                 context: context,
                                                 builder: (
                                                   BuildContext context,
                                                 ) {
                                                   int? selectedCustomerId;
                                                   String? selectedCustomerName;
-
                                                   String? errorText;
 
-                                                  return StatefulBuilder(
+                                                  return FutureBuilder(
+                                                    future:
+                                                        SharedPreferences.getInstance(),
                                                     builder: (
                                                       context,
-                                                      setState,
+                                                      snapshot,
                                                     ) {
-                                                      return AlertDialog(
-                                                        backgroundColor:
-                                                            AppColors
-                                                                .whiteColor,
-                                                        shape: RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                15,
-                                                              ),
-                                                        ),
-                                                        title: Text(
-                                                          "Select Customer",
-                                                          style: TextStyle(
-                                                            fontSize: 18.sp,
-                                                            fontFamily:
-                                                                FontFamily.bold,
-                                                            color:
+                                                      if (!snapshot.hasData) {
+                                                        return Center(
+                                                          child:
+                                                              CircularProgressIndicator(),
+                                                        );
+                                                      }
+
+                                                      final prefs =
+                                                          snapshot.data!;
+                                                      selectedCustomerId = prefs
+                                                          .getInt("customerId");
+                                                      selectedCustomerName =
+                                                          prefs.getString(
+                                                            "customerName",
+                                                          );
+
+                                                      return StatefulBuilder(
+                                                        builder: (
+                                                          context,
+                                                          setState,
+                                                        ) {
+                                                          return AlertDialog(
+                                                            backgroundColor:
                                                                 AppColors
-                                                                    .blackColor,
-                                                          ),
-                                                        ),
-                                                        content: Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
-                                                          children: [
-                                                            // List of customers
-                                                            ...customersList.map((
-                                                              customer,
-                                                            ) {
-                                                              bool isSelected =
-                                                                  selectedCustomerId ==
-                                                                  customer.id;
-                                                              return InkWell(
-                                                                onTap: () {
-                                                                  setState(() {
-                                                                    selectedCustomerId =
-                                                                        customer
-                                                                            .id;
-                                                                    selectedCustomerName =
-                                                                        "${customer.firstName} ${customer.lastName}";
-                                                                    errorText =
-                                                                        null; // clear error
-                                                                  });
-                                                                },
-                                                                child: Container(
-                                                                  padding:
-                                                                      EdgeInsets.symmetric(
+                                                                    .whiteColor,
+                                                            shape: RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    15,
+                                                                  ),
+                                                            ),
+                                                            title: Text(
+                                                              "Select Customer",
+                                                              style: TextStyle(
+                                                                fontSize: 18.sp,
+                                                                fontFamily:
+                                                                    FontFamily
+                                                                        .bold,
+                                                                color:
+                                                                    AppColors
+                                                                        .blackColor,
+                                                              ),
+                                                            ),
+                                                            content: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              children: [
+                                                                // List of customers
+                                                                ...customersList.map((
+                                                                  customer,
+                                                                ) {
+                                                                  bool
+                                                                  isSelected =
+                                                                      selectedCustomerId ==
+                                                                      customer
+                                                                          .id;
+                                                                  return InkWell(
+                                                                    onTap: () {
+                                                                      setState(() {
+                                                                        selectedCustomerId =
+                                                                            customer.id;
+                                                                        selectedCustomerName =
+                                                                            "${customer.firstName} ${customer.lastName}";
+                                                                        errorText =
+                                                                            null; // clear error
+                                                                      });
+                                                                    },
+                                                                    child: Container(
+                                                                      padding: EdgeInsets.symmetric(
                                                                         vertical:
                                                                             12,
                                                                         horizontal:
                                                                             10,
                                                                       ),
-                                                                  margin:
-                                                                      EdgeInsets.symmetric(
+                                                                      margin: EdgeInsets.symmetric(
                                                                         vertical:
                                                                             5,
                                                                       ),
-                                                                  decoration: BoxDecoration(
-                                                                    color:
-                                                                        isSelected
-                                                                            ? AppColors.mainColor.withValues(
-                                                                              alpha:
-                                                                                  0.1,
-                                                                            )
-                                                                            : AppColors.whiteColor,
-                                                                    border: Border.all(
-                                                                      color:
-                                                                          isSelected
-                                                                              ? AppColors.mainColor
-                                                                              : AppColors.gray,
-                                                                      width: 1,
-                                                                    ),
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                          10,
-                                                                        ),
-                                                                  ),
-                                                                  child: Row(
-                                                                    children: [
-                                                                      Icon(
-                                                                        isSelected
-                                                                            ? Icons.radio_button_checked
-                                                                            : Icons.radio_button_off,
+                                                                      decoration: BoxDecoration(
                                                                         color:
                                                                             isSelected
-                                                                                ? AppColors.mainColor
-                                                                                : AppColors.gray,
-                                                                      ),
-                                                                      SizedBox(
-                                                                        width:
-                                                                            10,
-                                                                      ),
-                                                                      Text(
-                                                                        "${customer.firstName} ${customer.lastName}",
-                                                                        style: TextStyle(
-                                                                          fontSize:
-                                                                              16.sp,
-                                                                          fontFamily:
-                                                                              FontFamily.regular,
+                                                                                ? AppColors.mainColor.withValues(
+                                                                                  alpha:
+                                                                                      0.1,
+                                                                                )
+                                                                                : AppColors.whiteColor,
+                                                                        border: Border.all(
                                                                           color:
-                                                                              AppColors.blackColor,
+                                                                              isSelected
+                                                                                  ? AppColors.mainColor
+                                                                                  : AppColors.gray,
+                                                                          width:
+                                                                              1,
                                                                         ),
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                              10,
+                                                                            ),
                                                                       ),
-                                                                    ],
+                                                                      child: Row(
+                                                                        children: [
+                                                                          Icon(
+                                                                            isSelected
+                                                                                ? Icons.radio_button_checked
+                                                                                : Icons.radio_button_off,
+                                                                            color:
+                                                                                isSelected
+                                                                                    ? AppColors.mainColor
+                                                                                    : AppColors.gray,
+                                                                          ),
+                                                                          SizedBox(
+                                                                            width:
+                                                                                10,
+                                                                          ),
+                                                                          Text(
+                                                                            "${customer.firstName} ${customer.lastName}",
+                                                                            style: TextStyle(
+                                                                              fontSize:
+                                                                                  16.sp,
+                                                                              fontFamily:
+                                                                                  FontFamily.regular,
+                                                                              color:
+                                                                                  AppColors.blackColor,
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  );
+                                                                }),
+                                                                if (errorText !=
+                                                                    null) ...[
+                                                                  SizedBox(
+                                                                    height: 8,
                                                                   ),
-                                                                ),
-                                                              );
-                                                            }),
-                                                            if (errorText !=
-                                                                null) ...[
-                                                              SizedBox(
-                                                                height: 8,
+                                                                  Text(
+                                                                    errorText!,
+                                                                    style: TextStyle(
+                                                                      color:
+                                                                          Colors
+                                                                              .red,
+                                                                      fontSize:
+                                                                          14.sp,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ],
+                                                            ),
+                                                            actions: [
+                                                              CustomButton(
+                                                                title: "Cancel",
+                                                                route: () {
+                                                                  Get.back();
+                                                                },
+                                                                color:
+                                                                    AppColors
+                                                                        .containerColor,
+                                                                fontcolor:
+                                                                    AppColors
+                                                                        .blackColor,
+                                                                height: 5.h,
+                                                                width: 30.w,
+                                                                fontsize: 15.sp,
+                                                                radius: 12.0,
                                                               ),
-                                                              Text(
-                                                                errorText!,
-                                                                style: TextStyle(
-                                                                  color:
-                                                                      Colors
-                                                                          .red,
-                                                                  fontSize:
-                                                                      14.sp,
-                                                                ),
+                                                              CustomButton(
+                                                                title:
+                                                                    "Confirm",
+                                                                route: () async {
+                                                                  if (selectedCustomerId !=
+                                                                          null &&
+                                                                      selectedCustomerName !=
+                                                                          null) {
+                                                                    final prevCustomerId =
+                                                                        prefs.getInt(
+                                                                          "customerId",
+                                                                        );
+
+                                                                    if (prevCustomerId !=
+                                                                        selectedCustomerId) {
+                                                                      // Customer changed -> save new values and clear cart
+                                                                      await prefs.setInt(
+                                                                        "customerId",
+                                                                        selectedCustomerId!,
+                                                                      );
+                                                                      await prefs.setString(
+                                                                        "customerName",
+                                                                        selectedCustomerName!,
+                                                                      );
+                                                                      _clearCart();
+                                                                    } else {
+                                                                      // Customer did not change -> just close dialog
+                                                                      Get.back();
+                                                                    }
+                                                                  } else {
+                                                                    setState(() {
+                                                                      errorText =
+                                                                          "Please select a customer!";
+                                                                    });
+                                                                  }
+                                                                },
+                                                                color:
+                                                                    AppColors
+                                                                        .mainColor,
+                                                                fontcolor:
+                                                                    AppColors
+                                                                        .whiteColor,
+                                                                height: 5.h,
+                                                                width: 30.w,
+                                                                fontsize: 15.sp,
+                                                                radius: 12.0,
+                                                                iconData:
+                                                                    Icons.check,
+                                                                iconsize: 17.sp,
                                                               ),
                                                             ],
-                                                          ],
-                                                        ),
-                                                        actions: [
-                                                          CustomButton(
-                                                            title: "Cancel",
-                                                            route: () {
-                                                              Get.back();
-                                                            },
-                                                            color:
-                                                                AppColors
-                                                                    .containerColor,
-                                                            fontcolor:
-                                                                AppColors
-                                                                    .blackColor,
-                                                            height: 5.h,
-                                                            width: 30.w,
-                                                            fontsize: 15.sp,
-                                                            radius: 12.0,
-                                                          ),
-                                                          CustomButton(
-                                                            title: "Confirm",
-                                                            route: () async {
-                                                              if (selectedCustomerId !=
-                                                                      null &&
-                                                                  selectedCustomerName !=
-                                                                      null) {
-                                                                // ✅ Save to SharedPreferences
-                                                                final prefs =
-                                                                    await SharedPreferences.getInstance();
-                                                                await prefs.setInt(
-                                                                  "customerId",
-                                                                  selectedCustomerId!,
-                                                                );
-                                                                await prefs.setString(
-                                                                  "customerName",
-                                                                  selectedCustomerName!,
-                                                                );
-
-                                                                Get.back();
-                                                              } else {
-                                                                setState(() {
-                                                                  errorText =
-                                                                      "Please select a customer!";
-                                                                });
-                                                              }
-                                                            },
-                                                            color:
-                                                                AppColors
-                                                                    .mainColor,
-                                                            fontcolor:
-                                                                AppColors
-                                                                    .whiteColor,
-                                                            height: 5.h,
-                                                            width: 30.w,
-                                                            fontsize: 15.sp,
-                                                            radius: 12.0,
-                                                            iconData:
-                                                                Icons.check,
-                                                            iconsize: 17.sp,
-                                                          ),
-                                                        ],
+                                                          );
+                                                        },
                                                       );
                                                     },
                                                   );
@@ -906,9 +943,7 @@ class _HomescreenState extends State<Homescreen> {
                                 onTap:
                                     (product.stockStatus == 'instock')
                                         ? () {
-                                          _removeProductFromCart(
-                                            product.id ?? 0,
-                                          );
+                                          _removeProductFromCart(product);
                                         }
                                         : null,
                                 child: Container(
@@ -934,10 +969,10 @@ class _HomescreenState extends State<Homescreen> {
                                           log('hello');
                                           product.variations?.length == 0
                                               ? _addSimpleProductsToCart(
-                                                product.id,
+                                                product,
                                               )
                                               : _addVariationProductsToCart(
-                                                product.id,
+                                                product,
                                                 product.firstVariation?.id,
                                                 product
                                                     .firstVariation
@@ -1041,7 +1076,7 @@ class _HomescreenState extends State<Homescreen> {
                                   ),
                                 ),
                             Text(
-                              "${product.currencySymbol} ${product.price}",
+                              "${product.cartQuantity} Qty",
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontFamily: FontFamily.semiBold,
@@ -1062,7 +1097,7 @@ class _HomescreenState extends State<Homescreen> {
                               ),
                             ),
                             Text(
-                              "£${product.firstVariation?.price}",
+                              "${product.cartQuantity} Qty",
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontFamily: FontFamily.semiBold,
@@ -1385,114 +1420,136 @@ class _HomescreenState extends State<Homescreen> {
     }
   }
 
-  Future<void> _addVariationProductsToCart(
-    id,
-    variationId,
-    variationKey,
-    variationValue,
-  ) async {
+  Future<void> _addSimpleProductsToCart(FetchProductsModal product) async {
     setState(() {
       isAddingToCart = true;
+      // 🔹 update UI immediately
+      product.cartQuantity = (product.cartQuantity ?? 0) + 1;
     });
+
     final cartService = CartService();
 
     try {
-      final response = await cartService.addToCart(
-        productId: int.parse(id.toString()),
-        variationId: variationId,
-        variation: {"attribute_${variationKey ?? ''}": variationValue ?? ''},
-        quantity: 1,
+      final response = await cartService.increaseCartItem(
+        productId: int.parse(product.id.toString()),
         itemNote: '',
       );
 
+      String message = "Added to Cart";
       if (response != null && response.statusCode == 200) {
-        showCustomSuccessSnackbar(
-          title: "Added to Cart",
-          message: "This product has been successfully added to your cart.",
-        );
-        setState(() {
-          isAddingToCart = false;
-        });
+        final serverMessage = response.data["message"];
+        if (serverMessage != null && serverMessage.toString().isNotEmpty) {
+          message = serverMessage.toString();
+        }
       } else {
-        showCustomSuccessSnackbar(
-          title: "Offline Mode",
-          message: "Product added offline. It will sync once internet is back.",
-        );
-        setState(() {
-          isAddingToCart = false;
-        });
+        message = "Product added offline. It will sync once internet is back.";
       }
-    } catch (e) {
-      showCustomErrorSnackbar(
-        title: "Error",
-        message: "Something went wrong while adding product.\n$e",
+
+      showCustomSuccessSnackbar(
+        title:
+            message.contains("update") ? "Quantity Updated" : "Added to Cart",
+        message: message,
       );
-      setState(() {
-        isAddingToCart = false;
-      });
-    }
-  }
-
-  Future<void> _addSimpleProductsToCart(id) async {
-    setState(() {
-      isAddingToCart = true;
-    });
-    final cartService = CartService();
-
-    try {
-      final response = await cartService.addToCart(
-        productId: int.parse(id.toString()),
-        quantity: 1,
-        itemNote: '',
-      );
-
-      if (response != null && response.statusCode == 200) {
-        showCustomSuccessSnackbar(
-          title: "Added to Cart",
-          message: "This product has been successfully added to your cart.",
-        );
-        setState(() {
-          isAddingToCart = false;
-        });
-      } else {
-        showCustomSuccessSnackbar(
-          title: "Offline Mode",
-          message: "Product added offline. It will sync once internet is back.",
-        );
-        setState(() {
-          isAddingToCart = false;
-        });
-      }
     } catch (e) {
       showCustomErrorSnackbar(
         title: "Error",
         message: "Something went wrong while adding product.\n$e",
       );
       log('Error : $e');
-      setState(() {
-        isAddingToCart = false;
-      });
+    } finally {
+      setState(() => isAddingToCart = false);
     }
   }
 
-  Future<void> _removeProductFromCart(int productId) async {
+  Future<void> _addVariationProductsToCart(
+    FetchProductsModal product,
+    variationId,
+    variationKey,
+    variationValue,
+  ) async {
+    setState(() {
+      isAddingToCart = true;
+      product.cartQuantity = (product.cartQuantity ?? 0) + 1;
+    });
+
+    final cartService = CartService();
+
+    try {
+      final response = await cartService.increaseCartItem(
+        productId: int.parse(product.id.toString()),
+        variationId: variationId,
+        variation: {"attribute_${variationKey ?? ''}": variationValue ?? ''},
+        itemNote: '',
+      );
+
+      String message = "Added to Cart";
+      if (response != null && response.statusCode == 200) {
+        final serverMessage = response.data["message"];
+        if (serverMessage != null && serverMessage.toString().isNotEmpty) {
+          message = serverMessage.toString();
+        }
+      } else {
+        message = "Product added offline. It will sync once internet is back.";
+      }
+
+      showCustomSuccessSnackbar(
+        title:
+            message.contains("update") ? "Quantity Updated" : "Added to Cart",
+        message: message,
+      );
+    } catch (e) {
+      showCustomErrorSnackbar(
+        title: "Error",
+        message: "Something went wrong while adding product.\n$e",
+      );
+    } finally {
+      setState(() => isAddingToCart = false);
+    }
+  }
+
+  Future<void> _removeProductFromCart(FetchProductsModal product) async {
     setState(() => isAddingToCart = true);
 
     final cartService = CartService();
 
     try {
-      final response = await cartService.decreaseCartItem(productId: productId);
+      // Get cached quantity to sync UI with local cache
+      final cachedData = cartService.getCachedProductCartData(product.id ?? 0);
+      int currentQty =
+          cachedData?["totalQuantity"] ?? (product.cartQuantity ?? 0);
 
-      if (response != null && response.statusCode == 200) {
-        final data = response.data;
-        final message = data["message"] ?? "Product quantity removed.";
-        showCustomSuccessSnackbar(title: "Cart", message: "$message");
-      } else if (response != null && response.statusCode == 204) {
+      if (currentQty <= 0) {
         showCustomErrorSnackbar(
           title: "Cart Empty",
           message: "No items in cart to remove.",
         );
+        return;
+      }
+
+      // Decrease local UI quantity immediately
+      product.cartQuantity = currentQty - 1;
+
+      // Call CartService to handle offline or online decrease
+      final response = await cartService.decreaseCartItem(
+        productId: product.id ?? 0,
+      );
+
+      if (response != null) {
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final message =
+              response.data?["message"] ?? "Product quantity removed.";
+          showCustomSuccessSnackbar(
+            title: "Quantity Updated",
+            message: message,
+          );
+        } else if (response.statusCode == 204) {
+          showCustomErrorSnackbar(
+            title: "Cart Empty",
+            message: "No items in cart to remove.",
+          );
+        }
       } else {
+        // Offline fallback
         showCustomSuccessSnackbar(
           title: "Offline Mode",
           message:
@@ -1505,6 +1562,176 @@ class _HomescreenState extends State<Homescreen> {
         message: "Something went wrong while updating cart.\n$e",
       );
       log('Error : $stackTrace');
+    } finally {
+      setState(() => isAddingToCart = false);
+    }
+  }
+
+  // Future<void> _addVariationProductsToCart(
+  //   id,
+  //   variationId,
+  //   variationKey,
+  //   variationValue,
+  // ) async {
+  //   setState(() {
+  //     isAddingToCart = true;
+  //   });
+  //
+  //   final cartService = CartService();
+  //
+  //   try {
+  //     final response = await cartService.increaseCartItem(
+  //       productId: int.parse(id.toString()),
+  //       variationId: variationId,
+  //       variation: {"attribute_${variationKey ?? ''}": variationValue ?? ''},
+  //       itemNote: '',
+  //     );
+  //
+  //     // Determine message
+  //     String message = "Added to Cart"; // default
+  //     if (response != null && response.statusCode == 200) {
+  //       final serverMessage = response.data["message"];
+  //       if (serverMessage != null && serverMessage.toString().isNotEmpty) {
+  //         message = serverMessage.toString();
+  //       }
+  //     } else {
+  //       message = "Product added offline. It will sync once internet is back.";
+  //     }
+  //
+  //     showCustomSuccessSnackbar(
+  //       title:
+  //           message.contains("update") ? "Quantity Updated" : "Added to Cart",
+  //       message: message,
+  //     );
+  //
+  //     // Refresh products list and rebuild UI
+  //     await _fetchProducts(); // make sure this updates the state variable your UI depends on
+  //     setState(() {}); // forces the widget to rebuild
+  //   } catch (e) {
+  //     showCustomErrorSnackbar(
+  //       title: "Error",
+  //       message: "Something went wrong while adding product.\n$e",
+  //     );
+  //   } finally {
+  //     setState(() {
+  //       isAddingToCart = false; // always reset the loading state
+  //     });
+  //   }
+  // }
+  //
+  // Future<void> _addSimpleProductsToCart(id) async {
+  //   setState(() {
+  //     isAddingToCart = true;
+  //   });
+  //
+  //   final cartService = CartService();
+  //
+  //   try {
+  //     final response = await cartService.increaseCartItem(
+  //       productId: int.parse(id.toString()),
+  //       itemNote: '',
+  //     );
+  //
+  //     // Determine message
+  //     String message = "Added to Cart"; // default
+  //     if (response != null && response.statusCode == 200) {
+  //       final serverMessage = response.data["message"];
+  //       if (serverMessage != null && serverMessage.toString().isNotEmpty) {
+  //         message = serverMessage.toString();
+  //       }
+  //     } else {
+  //       message = "Product added offline. It will sync once internet is back.";
+  //     }
+  //
+  //     showCustomSuccessSnackbar(
+  //       title:
+  //           message.contains("update") ? "Quantity Updated" : "Added to Cart",
+  //       message: message,
+  //     );
+  //
+  //     // Refresh products list and rebuild UI
+  //     await _fetchProducts(); // make sure this updates your state variable
+  //     setState(() {}); // force rebuild in case UI doesn’t auto-update
+  //   } catch (e) {
+  //     showCustomErrorSnackbar(
+  //       title: "Error",
+  //       message: "Something went wrong while adding product.\n$e",
+  //     );
+  //     log('Error : $e');
+  //   } finally {
+  //     setState(() {
+  //       isAddingToCart = false; // reset loading state always
+  //     });
+  //   }
+  // }
+  //
+  // Future<void> _removeProductFromCart(int productId, int quantity) async {
+  //   setState(() => isAddingToCart = true);
+  //
+  //   final cartService = CartService();
+  //
+  //   try {
+  //     final response = await cartService.decreaseCartItem(
+  //       productId: productId,
+  //
+  //     );
+  //
+  //     if (response != null && response.statusCode == 200) {
+  //       final data = response.data;
+  //       final message = data["message"] ?? "Product quantity removed.";
+  //       showCustomSuccessSnackbar(
+  //         title: "Quantity Updated",
+  //         message: "$message",
+  //       );
+  //
+  //       // Refresh products after removal
+  //       await _fetchProducts();
+  //       setState(() {});
+  //     } else if (response != null && response.statusCode == 204) {
+  //       showCustomErrorSnackbar(
+  //         title: "Cart Empty",
+  //         message: "No items in cart to remove.",
+  //       );
+  //
+  //       await _fetchProducts();
+  //       setState(() {});
+  //     } else {
+  //       showCustomSuccessSnackbar(
+  //         title: "Offline Mode",
+  //         message:
+  //             "Cart update saved offline. It will sync once internet is back.",
+  //       );
+  //
+  //       await _fetchProducts();
+  //       setState(() {});
+  //     }
+  //   } catch (e, stackTrace) {
+  //     showCustomErrorSnackbar(
+  //       title: "Error",
+  //       message: "Something went wrong while updating cart.\n$e",
+  //     );
+  //     log('Error : $stackTrace');
+  //   } finally {
+  //     setState(() => isAddingToCart = false);
+  //   }
+  // }
+
+  Future<void> _clearCart() async {
+    Get.back();
+    setState(() => isAddingToCart = true);
+    try {
+      final response = await CartService().clearCart();
+      if (response != null &&
+          (response.statusCode == 200 || response.statusCode == 204)) {
+        Get.back();
+      }
+      setState(() => isAddingToCart = false);
+    } catch (e) {
+      setState(() => isAddingToCart = false);
+      showCustomErrorSnackbar(
+        title: "Error",
+        message: "Failed to clear cart.\n$e",
+      );
     } finally {
       setState(() => isAddingToCart = false);
     }

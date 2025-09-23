@@ -1,4 +1,3 @@
-import 'package:bellissemo_ecom/ui/cart/View/cartScreen.dart';
 import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,10 +10,12 @@ Widget TitleBar({
   required String? title,
   Callback? drawerCallback,
   Callback? onSearch,
+  Callback? onDownload,
   Color? clr,
   bool isSearchEnabled = false,
   bool isDrawerEnabled = true,
   bool isBackEnabled = false,
+  bool showDownloadButton = false, // Add a flag to control the download button
 }) {
   final bool isTablet = 100.w >= 800;
 
@@ -37,44 +38,8 @@ Widget TitleBar({
     );
   }
 
-  Widget buildCartButton() {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        buildButton(Icons.shopping_cart_rounded, () {
-          Get.offAll(
-            () => CartScreen(),
-            transition: Transition.fade,
-            duration: const Duration(milliseconds: 450),
-          );
-        }),
-        Positioned(
-          right: 0,
-          top: -2.sp,
-          child: Container(
-            padding: EdgeInsets.all(4.sp),
-            decoration: BoxDecoration(
-              color: Colors.red,
-              shape: BoxShape.circle,
-            ),
-            constraints: BoxConstraints(
-              minWidth: isTablet ? 15.sp : 14.sp,
-              minHeight: isTablet ? 15.sp : 14.sp,
-            ),
-            child: Center(
-              child: Text(
-                '2', // Replace with your cart count dynamically if needed
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: isTablet ? 11.sp : 12.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+  Widget buildDownloadButton() {
+    return buildButton(Icons.download_rounded, onDownload);
   }
 
   final List<Widget> rightButtons = [];
@@ -83,10 +48,9 @@ Widget TitleBar({
     rightButtons.add(buildButton(Icons.search_rounded, onSearch));
   }
 
-  // Show cart button only if not in CartScreen or CheckoutScreen
-  if (Get.currentRoute != '/CartScreen' &&
-      Get.currentRoute != '/CheckOutScreen') {
-    rightButtons.add(buildCartButton());
+  // Show download button conditionally
+  if (showDownloadButton) {
+    rightButtons.add(buildDownloadButton());
   }
 
   return Container(
