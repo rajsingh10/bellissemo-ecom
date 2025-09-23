@@ -18,6 +18,7 @@ class CategoryWiseProductsModal {
   String? regularPrice;
   String? salePrice;
   String? currencySymbol;
+  var cartQuantity;
   bool? onSale;
   bool? purchasable;
   int? totalSales;
@@ -67,6 +68,7 @@ class CategoryWiseProductsModal {
     this.dateModified,
     this.dateModifiedGmt,
     this.type,
+    this.cartQuantity,
     this.status,
     this.featured,
     this.catalogVisibility,
@@ -137,6 +139,7 @@ class CategoryWiseProductsModal {
     price = json['price'];
     regularPrice = json['regular_price'];
     salePrice = json['sale_price'];
+    cartQuantity = json['cart_quantity'];
     onSale = json['on_sale'];
     purchasable = json['purchasable'];
     totalSales = json['total_sales'];
@@ -222,6 +225,7 @@ class CategoryWiseProductsModal {
     data['catalog_visibility'] = catalogVisibility;
     data['description'] = description;
     data['short_description'] = shortDescription;
+    data['cart_quantity'] = cartQuantity;
     data['sku'] = sku;
     data['currency_symbol'] = currencySymbol;
     data['price'] = price;

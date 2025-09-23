@@ -17,6 +17,7 @@ void main() async {
   ConnectivityManager().startListening();
   if (await checkInternet()) {
     await CartService().syncOfflineCart();
+    await CartService().syncOfflineActions();
   }
   runApp(const OrientationHandler());
 }

@@ -54,7 +54,6 @@ class CustomNetworkImage extends StatelessWidget {
             ),
           ),
       errorWidget: (context, url, error) {
-        debugPrint("❌ Image load failed: $url, error: $error");
         return Image.asset(
           isProfile ? Imgs.defaultProfile : Imgs.defaultImage,
           height: height,

@@ -18,6 +18,7 @@ import 'package:sizer/sizer.dart';
 import '../../../apiCalling/checkInternetModule.dart';
 import '../../../services/hiveServices.dart';
 import '../../../utils/cachedNetworkImage.dart';
+import '../../../utils/customButton.dart';
 import '../../cart/service/cartServices.dart';
 import '../provider/productsProvider.dart';
 
@@ -34,6 +35,7 @@ class ProductsScreen extends StatefulWidget {
 class _ProductsScreenState extends State<ProductsScreen> {
   int itemsPerPage = 4;
   int currentPage = 0;
+  bool isFilter = false;
 
   int _getCrossAxisCount(BuildContext context) {
     if (100.w >= 800) {
@@ -49,7 +51,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   String selectedSort = "Low to High";
   final List<String> sortOptions = ["Low to High", "High to Low", "Latest"];
-
+  List<String> selectedFilters = []; // for multi-selection
   bool isSearchEnabled = false;
   TextEditingController searchController = TextEditingController();
   bool isAddingToCart = false;
@@ -152,6 +154,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         isDrawerEnabled: true,
                         isSearchEnabled: true,
                         isBackEnabled: true,
+                        showDownloadButton: true,
+                        onDownload: () {},
                         onSearch: () {
                           setState(() {
                             isSearchEnabled = !isSearchEnabled;
@@ -173,71 +177,67 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 3.w,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(30),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black12,
-                                            blurRadius: 6,
-                                            offset: Offset(0, 3),
+                                    InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          isFilter = !isFilter;
+                                        });
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 3.w,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            30,
                                           ),
-                                        ],
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Text(
-                                            "Sort by",
-                                            style: TextStyle(
-                                              fontSize: 15.sp,
-                                              fontFamily: FontFamily.semiBold,
-                                              color: AppColors.blackColor,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black12,
+                                              blurRadius: 6,
+                                              offset: Offset(0, 3),
                                             ),
-                                          ),
-                                          SizedBox(width: 3.w),
-                                          DropdownButtonHideUnderline(
-                                            child: DropdownButton<String>(
-                                              value: selectedSort,
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              dropdownColor: Colors.white,
-                                              icon: Icon(
-                                                Icons.sort,
-                                                color: AppColors.mainColor,
-                                              ),
-                                              items:
-                                                  sortOptions.map((e) {
-                                                    return DropdownMenuItem(
-                                                      value: e,
-                                                      child: Text(
-                                                        e,
-                                                        style: TextStyle(
-                                                          fontSize: 15.sp,
-                                                          fontFamily:
-                                                              FontFamily
-                                                                  .semiBold,
-                                                          color:
-                                                              AppColors
-                                                                  .mainColor,
-                                                        ),
+                                          ],
+                                        ),
+                                        child: DropdownButtonHideUnderline(
+                                          child: DropdownButton<String>(
+                                            value: selectedSort,
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            dropdownColor: Colors.white,
+                                            icon: Icon(
+                                              Icons.filter_tilt_shift,
+                                              color: AppColors.mainColor,
+                                            ),
+                                            items:
+                                                sortOptions.map((e) {
+                                                  return DropdownMenuItem(
+                                                    value: e,
+                                                    child: Text(
+                                                      'Filter Data   ',
+                                                      style: TextStyle(
+                                                        fontSize: 15.sp,
+                                                        fontFamily:
+                                                            FontFamily.semiBold,
+                                                        color:
+                                                            AppColors
+                                                                .blackColor,
                                                       ),
-                                                    );
-                                                  }).toList(),
-                                              onChanged: (value) {
-                                                if (value != null) {
-                                                  setState(() {
-                                                    selectedSort = value;
-                                                    _filterProducts();
-                                                  });
-                                                }
-                                              },
-                                            ),
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                            onTap: () {
+                                              setState(() {
+                                                isFilter = !isFilter;
+                                                log("isFilter : $isFilter");
+                                              });
+                                            },
+                                            onChanged:
+                                                null, // <-- disables selection
                                           ),
-                                        ],
+                                        ),
                                       ),
                                     ),
 
@@ -318,7 +318,322 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                     ),
                                   ],
                                 ),
-                              SizedBox(height: 1.h),
+                              if (filteredProducts.isNotEmpty)
+                                SizedBox(height: 1.h),
+                              if (filteredProducts.isNotEmpty)
+                                if (isFilter)
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 3.w,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            30,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black12,
+                                              blurRadius: 6,
+                                              offset: Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              "Sort by",
+                                              style: TextStyle(
+                                                fontSize: 15.sp,
+                                                fontFamily: FontFamily.semiBold,
+                                                color: AppColors.blackColor,
+                                              ),
+                                            ),
+                                            SizedBox(width: 3.w),
+                                            DropdownButtonHideUnderline(
+                                              child: DropdownButton<String>(
+                                                value: selectedSort,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                dropdownColor: Colors.white,
+                                                icon: Icon(
+                                                  Icons.sort,
+                                                  color: AppColors.mainColor,
+                                                ),
+                                                items:
+                                                    sortOptions.map((e) {
+                                                      return DropdownMenuItem(
+                                                        value: e,
+                                                        child: Text(
+                                                          e,
+                                                          style: TextStyle(
+                                                            fontSize: 15.sp,
+                                                            fontFamily:
+                                                                FontFamily
+                                                                    .semiBold,
+                                                            color:
+                                                                AppColors
+                                                                    .mainColor,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }).toList(),
+                                                onChanged: (value) {
+                                                  if (value != null) {
+                                                    setState(() {
+                                                      selectedSort = value;
+                                                      _filterProducts();
+                                                    });
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      InkWell(
+                                        onTap: () {
+                                          List<String> tempSelectedFilters =
+                                              List.from(selectedFilters);
+                                          String? errorText;
+
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return StatefulBuilder(
+                                                builder: (context, setState) {
+                                                  return AlertDialog(
+                                                    backgroundColor:
+                                                        AppColors.whiteColor,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            15,
+                                                          ),
+                                                    ),
+                                                    title: Text(
+                                                      "Select Filters",
+                                                      style: TextStyle(
+                                                        fontSize: 18.sp,
+                                                        fontFamily:
+                                                            FontFamily.bold,
+                                                        color:
+                                                            AppColors
+                                                                .blackColor,
+                                                      ),
+                                                    ),
+                                                    content: SingleChildScrollView(
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children:
+                                                            sortOptions.map((
+                                                              filter,
+                                                            ) {
+                                                              bool isSelected =
+                                                                  tempSelectedFilters
+                                                                      .contains(
+                                                                        filter,
+                                                                      );
+                                                              return InkWell(
+                                                                onTap: () {
+                                                                  setState(() {
+                                                                    if (isSelected) {
+                                                                      tempSelectedFilters
+                                                                          .remove(
+                                                                            filter,
+                                                                          );
+                                                                    } else {
+                                                                      tempSelectedFilters
+                                                                          .add(
+                                                                            filter,
+                                                                          );
+                                                                    }
+                                                                  });
+                                                                },
+                                                                child: Container(
+                                                                  padding:
+                                                                      EdgeInsets.symmetric(
+                                                                        vertical:
+                                                                            12,
+                                                                        horizontal:
+                                                                            10,
+                                                                      ),
+                                                                  margin:
+                                                                      EdgeInsets.symmetric(
+                                                                        vertical:
+                                                                            5,
+                                                                      ),
+                                                                  child: Row(
+                                                                    children: [
+                                                                      Container(
+                                                                        width:
+                                                                            19.sp,
+                                                                        height:
+                                                                            19.sp,
+                                                                        decoration: BoxDecoration(
+                                                                          shape:
+                                                                              BoxShape.circle,
+                                                                          border: Border.all(
+                                                                            color:
+                                                                                isSelected
+                                                                                    ? AppColors.mainColor
+                                                                                    : AppColors.gray,
+                                                                            width:
+                                                                                2,
+                                                                          ),
+                                                                        ),
+                                                                        child:
+                                                                            isSelected
+                                                                                ? Center(
+                                                                                  child: Container(
+                                                                                    width:
+                                                                                        13.sp,
+                                                                                    height:
+                                                                                        13.sp,
+                                                                                    decoration: BoxDecoration(
+                                                                                      color:
+                                                                                          AppColors.mainColor,
+                                                                                      shape:
+                                                                                          BoxShape.circle,
+                                                                                    ),
+                                                                                  ),
+                                                                                )
+                                                                                : SizedBox.shrink(),
+                                                                      ),
+                                                                      SizedBox(
+                                                                        width:
+                                                                            10,
+                                                                      ),
+                                                                      Text(
+                                                                        filter,
+                                                                        style: TextStyle(
+                                                                          fontSize:
+                                                                              16.sp,
+                                                                          fontFamily:
+                                                                              FontFamily.regular,
+                                                                          color:
+                                                                              AppColors.blackColor,
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            }).toList(),
+                                                      ),
+                                                    ),
+                                                    actions: [
+                                                      CustomButton(
+                                                        title: "Cancel",
+                                                        route: () => Get.back(),
+                                                        color:
+                                                            AppColors
+                                                                .containerColor,
+                                                        fontcolor:
+                                                            AppColors
+                                                                .blackColor,
+                                                        height: 5.h,
+                                                        width: 30.w,
+                                                        fontsize: 15.sp,
+                                                        radius: 12.0,
+                                                      ),
+                                                      CustomButton(
+                                                        title: "Confirm",
+                                                        route: () {
+                                                          if (tempSelectedFilters
+                                                              .isEmpty) {
+                                                            setState(() {
+                                                              errorText =
+                                                                  "Please select at least one filter!";
+                                                            });
+                                                          } else {
+                                                            setState(() {
+                                                              selectedFilters =
+                                                                  tempSelectedFilters;
+                                                              _filterProducts(); // apply your filter logic
+                                                            });
+                                                            Get.back();
+                                                          }
+                                                        },
+                                                        color:
+                                                            AppColors.mainColor,
+                                                        fontcolor:
+                                                            AppColors
+                                                                .whiteColor,
+                                                        height: 5.h,
+                                                        width: 30.w,
+                                                        fontsize: 15.sp,
+                                                        radius: 12.0,
+                                                        iconData: Icons.check,
+                                                        iconsize: 17.sp,
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          );
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 3.w,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(
+                                              30,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black12,
+                                                blurRadius: 6,
+                                                offset: Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: DropdownButtonHideUnderline(
+                                            child: DropdownButton<String>(
+                                              value: selectedSort,
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              dropdownColor: Colors.white,
+                                              icon: Icon(
+                                                Icons.filter_vintage_outlined,
+                                                color: AppColors.mainColor,
+                                              ),
+                                              items:
+                                                  sortOptions.map((e) {
+                                                    return DropdownMenuItem(
+                                                      value: e,
+                                                      child: Text(
+                                                        'Filter Data Using  ',
+                                                        style: TextStyle(
+                                                          fontSize: 15.sp,
+                                                          fontFamily:
+                                                              FontFamily
+                                                                  .semiBold,
+                                                          color:
+                                                              AppColors
+                                                                  .blackColor,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }).toList(),
+                                              onChanged:
+                                                  null, // <-- disables selection
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                              if (filteredProducts.isNotEmpty)
+                                SizedBox(height: 1.h),
                               filteredProducts.isEmpty
                                   ? Padding(
                                     padding: EdgeInsets.symmetric(
@@ -562,9 +877,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                 onTap:
                                     (product.stockStatus == 'instock')
                                         ? () {
-                                          _removeProductFromCart(
-                                            product.id ?? 0,
-                                          );
+                                          _removeProductFromCart(product);
                                         }
                                         : null,
                                 child: Container(
@@ -589,10 +902,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                         ? () {
                                           product.variations?.length == 0
                                               ? _addSimpleProductsToCart(
-                                                product.id,
+                                                product,
                                               )
                                               : _addVariationProductsToCart(
-                                                product.id,
+                                                product,
                                                 product.firstVariation?.id,
                                                 product
                                                     .firstVariation
@@ -694,7 +1007,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                   ),
                                 ),
                             Text(
-                              "${product.currencySymbol} ${product.price}",
+                              "${product.cartQuantity} Qty",
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontFamily: FontFamily.semiBold,
@@ -715,7 +1028,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               ),
                             ),
                             Text(
-                              "£${product.firstVariation?.price}",
+                              "${product.cartQuantity} Qty",
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontFamily: FontFamily.semiBold,
@@ -810,128 +1123,299 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
   }
 
-  Future<void> _addVariationProductsToCart(
-    id,
-    variationId,
-    variationKey,
-    variationValue,
+  Future<void> _addSimpleProductsToCart(
+    CategoryWiseProductsModal product,
   ) async {
     setState(() {
       isAddingToCart = true;
+      // 🔹 update UI immediately
+      product.cartQuantity = (product.cartQuantity ?? 0) + 1;
     });
+
     final cartService = CartService();
 
     try {
-      final response = await cartService.addToCart(
-        productId: int.parse(id.toString()),
-        variationId: variationId,
-        variation: {"attribute_${variationKey ?? ''}": variationValue ?? ''},
-        quantity: 1,
+      final response = await cartService.increaseCartItem(
+        productId: int.parse(product.id.toString()),
         itemNote: '',
       );
 
+      String message = "Added to Cart";
       if (response != null && response.statusCode == 200) {
-        showCustomSuccessSnackbar(
-          title: "Added to Cart",
-          message: "This product has been successfully added to your cart.",
-        );
-        setState(() {
-          isAddingToCart = false;
-        });
+        final serverMessage = response.data["message"];
+        if (serverMessage != null && serverMessage.toString().isNotEmpty) {
+          message = serverMessage.toString();
+        }
       } else {
-        showCustomSuccessSnackbar(
-          title: "Offline Mode",
-          message: "Product added offline. It will sync once internet is back.",
-        );
-        setState(() {
-          isAddingToCart = false;
-        });
+        message = "Product added offline. It will sync once internet is back.";
       }
+
+      showCustomSuccessSnackbar(
+        title:
+            message.contains("update") ? "Quantity Updated" : "Added to Cart",
+        message: message,
+      );
     } catch (e) {
       showCustomErrorSnackbar(
         title: "Error",
         message: "Something went wrong while adding product.\n$e",
-      );
-      setState(() {
-        isAddingToCart = false;
-      });
-    }
-  }
-
-  Future<void> _addSimpleProductsToCart(id) async {
-    setState(() {
-      isAddingToCart = true;
-    });
-    final cartService = CartService();
-
-    try {
-      final response = await cartService.addToCart(
-        productId: int.parse(id.toString()),
-        quantity: 1,
-        itemNote: '',
-      );
-
-      if (response != null && response.statusCode == 200) {
-        showCustomSuccessSnackbar(
-          title: "Added to Cart",
-          message: "This product has been successfully added to your cart.",
-        );
-        setState(() {
-          isAddingToCart = false;
-        });
-      } else {
-        showCustomSuccessSnackbar(
-          title: "Offline Mode",
-          message: "Product added offline. It will sync once internet is back.",
-        );
-        setState(() {
-          isAddingToCart = false;
-        });
-      }
-    } catch (e) {
-      showCustomErrorSnackbar(
-        title: "Error",
-        message: "Something went wrong while adding product.\n$e",
-      );
-      log('Error : $e');
-      setState(() {
-        isAddingToCart = false;
-      });
-    }
-  }
-
-  Future<void> _removeProductFromCart(int productId) async {
-    setState(() => isAddingToCart = true);
-
-    final cartService = CartService();
-
-    try {
-      final response = await cartService.decreaseCartItem(productId: productId);
-
-      if (response != null && response.statusCode == 200) {
-        final data = response.data;
-        final message = data["message"] ?? "Product quantity removed.";
-        showCustomSuccessSnackbar(title: "Cart", message: "$message");
-      } else if (response != null && response.statusCode == 204) {
-        showCustomErrorSnackbar(
-          title: "Cart Empty",
-          message: "No items in cart to remove.",
-        );
-      } else {
-        showCustomSuccessSnackbar(
-          title: "Offline Mode",
-          message:
-              "Cart update saved offline. It will sync once internet is back.",
-        );
-      }
-    } catch (e) {
-      showCustomErrorSnackbar(
-        title: "Error",
-        message: "Something went wrong while updating cart.\n$e",
       );
       log('Error : $e');
     } finally {
       setState(() => isAddingToCart = false);
     }
   }
+
+  Future<void> _addVariationProductsToCart(
+    CategoryWiseProductsModal product,
+    variationId,
+    variationKey,
+    variationValue,
+  ) async {
+    setState(() {
+      isAddingToCart = true;
+      product.cartQuantity = (product.cartQuantity ?? 0) + 1;
+    });
+
+    final cartService = CartService();
+
+    try {
+      final response = await cartService.increaseCartItem(
+        productId: int.parse(product.id.toString()),
+        variationId: variationId,
+        variation: {"attribute_${variationKey ?? ''}": variationValue ?? ''},
+        itemNote: '',
+      );
+
+      String message = "Added to Cart";
+      if (response != null && response.statusCode == 200) {
+        final serverMessage = response.data["message"];
+        if (serverMessage != null && serverMessage.toString().isNotEmpty) {
+          message = serverMessage.toString();
+        }
+      } else {
+        message = "Product added offline. It will sync once internet is back.";
+      }
+
+      showCustomSuccessSnackbar(
+        title:
+            message.contains("update") ? "Quantity Updated" : "Added to Cart",
+        message: message,
+      );
+    } catch (e) {
+      showCustomErrorSnackbar(
+        title: "Error",
+        message: "Something went wrong while adding product.\n$e",
+      );
+    } finally {
+      setState(() => isAddingToCart = false);
+    }
+  }
+
+  Future<void> _removeProductFromCart(CategoryWiseProductsModal product) async {
+    setState(() => isAddingToCart = true);
+
+    final cartService = CartService();
+
+    try {
+      // Get cached quantity to sync UI with local cache
+      final cachedData = cartService.getCachedProductCartData(product.id ?? 0);
+      int currentQty =
+          cachedData?["totalQuantity"] ?? (product.cartQuantity ?? 0);
+
+      if (currentQty <= 0) {
+        showCustomErrorSnackbar(
+          title: "Cart Empty",
+          message: "No items in cart to remove.",
+        );
+        return;
+      }
+
+      // Decrease local UI quantity immediately
+      product.cartQuantity = currentQty - 1;
+
+      // Call CartService to handle offline or online decrease
+      final response = await cartService.decreaseCartItem(
+        productId: product.id ?? 0,
+      );
+
+      if (response != null) {
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final message =
+              response.data?["message"] ?? "Product quantity removed.";
+          showCustomSuccessSnackbar(
+            title: "Quantity Updated",
+            message: message,
+          );
+        } else if (response.statusCode == 204) {
+          showCustomErrorSnackbar(
+            title: "Cart Empty",
+            message: "No items in cart to remove.",
+          );
+        }
+      } else {
+        // Offline fallback
+        showCustomSuccessSnackbar(
+          title: "Offline Mode",
+          message:
+              "Cart update saved offline. It will sync once internet is back.",
+        );
+      }
+    } catch (e, stackTrace) {
+      showCustomErrorSnackbar(
+        title: "Error",
+        message: "Something went wrong while updating cart.\n$e",
+      );
+      log('Error : $stackTrace');
+    } finally {
+      setState(() => isAddingToCart = false);
+    }
+  }
+
+  // Future<void> _addVariationProductsToCart(
+  //   id,
+  //   variationId,
+  //   variationKey,
+  //   variationValue,
+  // ) async
+  // {
+  //   setState(() {
+  //     isAddingToCart = true;
+  //   });
+  //
+  //   final cartService = CartService();
+  //
+  //   try {
+  //     final response = await cartService.increaseCartItem(
+  //       productId: int.parse(id.toString()),
+  //       variationId: variationId,
+  //       variation: {"attribute_${variationKey ?? ''}": variationValue ?? ''},
+  //       itemNote: '',
+  //     );
+  //
+  //     // Determine message
+  //     String message = "Added to Cart"; // default
+  //     if (response != null && response.statusCode == 200) {
+  //       final serverMessage = response.data["message"];
+  //       if (serverMessage != null && serverMessage.toString().isNotEmpty) {
+  //         message = serverMessage.toString();
+  //       }
+  //     } else {
+  //       message = "Product added offline. It will sync once internet is back.";
+  //     }
+  //
+  //     showCustomSuccessSnackbar(
+  //       title:
+  //           message.contains("update") ? "Quantity Updated" : "Added to Cart",
+  //       message: message,
+  //     );
+  //
+  //     // Refresh products list and rebuild UI
+  //     await _fetchProducts(); // make sure this updates the state variable your UI depends on
+  //     setState(() {}); // forces the widget to rebuild
+  //   } catch (e) {
+  //     showCustomErrorSnackbar(
+  //       title: "Error",
+  //       message: "Something went wrong while adding product.\n$e",
+  //     );
+  //   } finally {
+  //     setState(() {
+  //       isAddingToCart = false; // always reset the loading state
+  //     });
+  //   }
+  // }
+  //
+  // Future<void> _addSimpleProductsToCart(id) async {
+  //   setState(() {
+  //     isAddingToCart = true;
+  //   });
+  //
+  //   final cartService = CartService();
+  //
+  //   try {
+  //     final response = await cartService.increaseCartItem(
+  //       productId: int.parse(id.toString()),
+  //       itemNote: '',
+  //     );
+  //
+  //     // Determine message
+  //     String message = "Added to Cart"; // default
+  //     if (response != null && response.statusCode == 200) {
+  //       final serverMessage = response.data["message"];
+  //       if (serverMessage != null && serverMessage.toString().isNotEmpty) {
+  //         message = serverMessage.toString();
+  //       }
+  //     } else {
+  //       message = "Product added offline. It will sync once internet is back.";
+  //     }
+  //
+  //     showCustomSuccessSnackbar(
+  //       title:
+  //           message.contains("update") ? "Quantity Updated" : "Added to Cart",
+  //       message: message,
+  //     );
+  //
+  //     // Refresh products list and rebuild UI
+  //     await _fetchProducts(); // make sure this updates your state variable
+  //     setState(() {}); // force rebuild in case UI doesn’t auto-update
+  //   } catch (e) {
+  //     showCustomErrorSnackbar(
+  //       title: "Error",
+  //       message: "Something went wrong while adding product.\n$e",
+  //     );
+  //     log('Error : $e');
+  //   } finally {
+  //     setState(() {
+  //       isAddingToCart = false; // reset loading state always
+  //     });
+  //   }
+  // }
+  //
+  // Future<void> _removeProductFromCart(int productId) async {
+  //   setState(() => isAddingToCart = true);
+  //
+  //   final cartService = CartService();
+  //
+  //   try {
+  //     final response = await cartService.decreaseCartItem(productId: productId);
+  //
+  //     if (response != null && response.statusCode == 200) {
+  //       final data = response.data;
+  //       final message = data["message"] ?? "Product quantity removed.";
+  //       showCustomSuccessSnackbar(
+  //         title: "Quantity Updated",
+  //         message: "$message",
+  //       );
+  //
+  //       // Refresh products after removal
+  //       await _fetchProducts();
+  //       setState(() {});
+  //     } else if (response != null && response.statusCode == 204) {
+  //       showCustomErrorSnackbar(
+  //         title: "Cart Empty",
+  //         message: "No items in cart to remove.",
+  //       );
+  //
+  //       await _fetchProducts();
+  //       setState(() {});
+  //     } else {
+  //       showCustomSuccessSnackbar(
+  //         title: "Offline Mode",
+  //         message:
+  //             "Cart update saved offline. It will sync once internet is back.",
+  //       );
+  //
+  //       await _fetchProducts();
+  //       setState(() {});
+  //     }
+  //   } catch (e, stackTrace) {
+  //     showCustomErrorSnackbar(
+  //       title: "Error",
+  //       message: "Something went wrong while updating cart.\n$e",
+  //     );
+  //     log('Error : $stackTrace');
+  //   } finally {
+  //     setState(() => isAddingToCart = false);
+  //   }
+  // }
 }

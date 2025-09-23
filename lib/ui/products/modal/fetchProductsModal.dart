@@ -9,6 +9,7 @@ class FetchProductsModal {
   String? dateModifiedGmt;
   String? type;
   String? currencySymbol;
+  var cartQuantity;
   String? status;
   String? catalogVisibility;
   String? description;
@@ -72,6 +73,7 @@ class FetchProductsModal {
     this.shortDescription,
     this.sku,
     this.currencySymbol,
+    this.cartQuantity,
     this.price,
     this.regularPrice,
     this.salePrice,
@@ -126,6 +128,7 @@ class FetchProductsModal {
     dateModifiedGmt = json['date_modified_gmt'];
     type = json['type'];
     currencySymbol = json['currency_symbol'];
+    cartQuantity = json['cart_quantity'];
     status = json['status'];
     catalogVisibility = json['catalog_visibility'];
     description = json['description'];
@@ -209,6 +212,7 @@ class FetchProductsModal {
     data['name'] = name;
     data['slug'] = slug;
     data['permalink'] = permalink;
+    data['cart_quantity'] = cartQuantity;
     data['date_created'] = dateCreated;
     data['date_created_gmt'] = dateCreatedGmt;
     data['date_modified'] = dateModified;
