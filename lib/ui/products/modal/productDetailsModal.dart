@@ -22,6 +22,7 @@ class ProductDetailsModal {
   String? buttonText;
   String? taxStatus;
   String? taxClass;
+  String? currencySymbol;
   bool? manageStock;
   var stockQuantity;
   String? backorders;
@@ -64,6 +65,7 @@ class ProductDetailsModal {
     this.buttonText,
     this.taxStatus,
     this.taxClass,
+    this.currencySymbol,
     this.manageStock,
     this.stockQuantity,
     this.backorders,
@@ -94,6 +96,7 @@ class ProductDetailsModal {
     dateModifiedGmt = json['date_modified_gmt'];
     type = json['type'];
     status = json['status'];
+    currencySymbol = json['currency_symbol'];
     catalogVisibility = json['catalog_visibility'];
     description = json['description'];
     shortDescription = json['short_description'];
@@ -164,6 +167,7 @@ class ProductDetailsModal {
     data['regular_price'] = regularPrice;
     data['sale_price'] = salePrice;
     data['on_sale'] = onSale;
+    data['currency_symbol'] = currencySymbol;
     data['purchasable'] = purchasable;
     data['external_url'] = externalUrl;
     data['button_text'] = buttonText;
@@ -368,18 +372,32 @@ class AllVariations {
 }
 
 class Attributes {
-  String? paColour;
+  Map<String, String>? values;
 
-  Attributes({this.paColour});
+  Attributes({this.values});
 
   Attributes.fromJson(Map<String, dynamic> json) {
-    paColour = json['pa_colour'];
+    values = json.map((key, value) => MapEntry(key, value.toString()));
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['pa_colour'] = paColour;
-    return data;
+    return values ?? {};
+  }
+
+  /// Returns the first attribute key dynamically
+  String? getKey() {
+    if (values != null && values!.isNotEmpty) {
+      return values!.keys.first;
+    }
+    return null;
+  }
+
+  /// Returns the first attribute value dynamically
+  String? getValue() {
+    if (values != null && values!.isNotEmpty) {
+      return values!.values.first;
+    }
+    return null;
   }
 }
 

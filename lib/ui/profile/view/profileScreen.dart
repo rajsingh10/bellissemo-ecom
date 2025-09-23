@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../ApiCalling/apiConfigs.dart';
-import '../../../apiCalling/Check Internet Module.dart';
+import '../../../apiCalling/checkInternetModule.dart';
 import '../../../services/hiveServices.dart';
 import '../../../utils/cachedNetworkImage.dart';
 import '../../../utils/customBottombar.dart';

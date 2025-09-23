@@ -15,7 +15,7 @@ import 'package:sizer/sizer.dart';
 import '../../../utils/colors.dart';
 import '../../../utils/fontFamily.dart';
 import '../ApiCalling/apiConfigs.dart';
-import '../apiCalling/Check Internet Module.dart';
+import '../apiCalling/checkInternetModule.dart';
 import '../services/hiveServices.dart';
 import '../ui/category/view/categoryScreen.dart';
 import '../ui/home/view/homeMenuScreen.dart';
