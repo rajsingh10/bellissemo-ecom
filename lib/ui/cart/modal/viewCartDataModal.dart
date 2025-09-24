@@ -7,8 +7,6 @@ class ViewCartDataModal {
   bool? needsShipping;
   List<String>? paymentRequirements;
   bool? hasCalculatedShipping;
-  int? itemsCount;
-  int? itemsWeight;
 
   ViewCartDataModal({
     this.items,
@@ -19,8 +17,6 @@ class ViewCartDataModal {
     this.needsShipping,
     this.paymentRequirements,
     this.hasCalculatedShipping,
-    this.itemsCount,
-    this.itemsWeight,
   });
 
   ViewCartDataModal.fromJson(Map<String, dynamic> json) {
@@ -43,8 +39,6 @@ class ViewCartDataModal {
     needsShipping = json['needs_shipping'];
     paymentRequirements = json['payment_requirements'].cast<String>();
     hasCalculatedShipping = json['has_calculated_shipping'];
-    itemsCount = json['items_count'];
-    itemsWeight = json['items_weight'];
   }
 
   Map<String, dynamic> toJson() {
@@ -65,8 +59,6 @@ class ViewCartDataModal {
     data['needs_shipping'] = needsShipping;
     data['payment_requirements'] = paymentRequirements;
     data['has_calculated_shipping'] = hasCalculatedShipping;
-    data['items_count'] = itemsCount;
-    data['items_weight'] = itemsWeight;
     return data;
   }
 }
@@ -87,10 +79,7 @@ class Items {
   bool? soldIndividually;
   String? permalink;
   List<Images>? images;
-  List<Variation>? variation;
-  List<ItemData>? itemData;
   Prices? prices;
-  ItemTotals? totals;
   String? catalogVisibility;
 
   Items({
@@ -109,10 +98,7 @@ class Items {
     this.soldIndividually,
     this.permalink,
     this.images,
-    this.variation,
-    this.itemData,
     this.prices,
-    this.totals,
     this.catalogVisibility,
   });
 
@@ -140,21 +126,7 @@ class Items {
         images!.add(Images.fromJson(v));
       });
     }
-    if (json['variation'] != null) {
-      variation = <Variation>[];
-      json['variation'].forEach((v) {
-        variation!.add(Variation.fromJson(v));
-      });
-    }
-    if (json['item_data'] != null) {
-      itemData = <ItemData>[];
-      json['item_data'].forEach((v) {
-        itemData!.add(ItemData.fromJson(v));
-      });
-    }
     prices = json['prices'] != null ? Prices.fromJson(json['prices']) : null;
-    totals =
-        json['totals'] != null ? ItemTotals.fromJson(json['totals']) : null;
     catalogVisibility = json['catalog_visibility'];
   }
 
@@ -179,17 +151,8 @@ class Items {
     if (images != null) {
       data['images'] = images!.map((v) => v.toJson()).toList();
     }
-    if (variation != null) {
-      data['variation'] = variation!.map((v) => v.toJson()).toList();
-    }
-    if (itemData != null) {
-      data['item_data'] = itemData!.map((v) => v.toJson()).toList();
-    }
     if (prices != null) {
       data['prices'] = prices!.toJson();
-    }
-    if (totals != null) {
-      data['totals'] = totals!.toJson();
     }
     data['catalog_visibility'] = catalogVisibility;
     return data;
@@ -263,55 +226,11 @@ class Images {
   }
 }
 
-class Variation {
-  String? rawAttribute;
-  String? attribute;
-  String? value;
-
-  Variation({this.rawAttribute, this.attribute, this.value});
-
-  Variation.fromJson(Map<String, dynamic> json) {
-    rawAttribute = json['raw_attribute'];
-    attribute = json['attribute'];
-    value = json['value'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['raw_attribute'] = rawAttribute;
-    data['attribute'] = attribute;
-    data['value'] = value;
-    return data;
-  }
-}
-
-class ItemData {
-  String? key;
-  String? value;
-  String? display;
-
-  ItemData({this.key, this.value, this.display});
-
-  ItemData.fromJson(Map<String, dynamic> json) {
-    key = json['key'];
-    value = json['value'];
-    display = json['display'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['key'] = key;
-    data['value'] = value;
-    data['display'] = display;
-    return data;
-  }
-}
-
 class Prices {
   String? price;
   String? regularPrice;
   String? salePrice;
-  Null priceRange;
+  var priceRange;
   String? currencyCode;
   String? currencySymbol;
   int? currencyMinorUnit;
@@ -399,64 +318,6 @@ class RawPrices {
   }
 }
 
-class ItemTotals {
-  String? lineSubtotal;
-  String? lineSubtotalTax;
-  String? lineTotal;
-  String? lineTotalTax;
-  String? currencyCode;
-  String? currencySymbol;
-  int? currencyMinorUnit;
-  String? currencyDecimalSeparator;
-  String? currencyThousandSeparator;
-  String? currencyPrefix;
-  String? currencySuffix;
-
-  ItemTotals({
-    this.lineSubtotal,
-    this.lineSubtotalTax,
-    this.lineTotal,
-    this.lineTotalTax,
-    this.currencyCode,
-    this.currencySymbol,
-    this.currencyMinorUnit,
-    this.currencyDecimalSeparator,
-    this.currencyThousandSeparator,
-    this.currencyPrefix,
-    this.currencySuffix,
-  });
-
-  ItemTotals.fromJson(Map<String, dynamic> json) {
-    lineSubtotal = json['line_subtotal'];
-    lineSubtotalTax = json['line_subtotal_tax'];
-    lineTotal = json['line_total'];
-    lineTotalTax = json['line_total_tax'];
-    currencyCode = json['currency_code'];
-    currencySymbol = json['currency_symbol'];
-    currencyMinorUnit = json['currency_minor_unit'];
-    currencyDecimalSeparator = json['currency_decimal_separator'];
-    currencyThousandSeparator = json['currency_thousand_separator'];
-    currencyPrefix = json['currency_prefix'];
-    currencySuffix = json['currency_suffix'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['line_subtotal'] = lineSubtotal;
-    data['line_subtotal_tax'] = lineSubtotalTax;
-    data['line_total'] = lineTotal;
-    data['line_total_tax'] = lineTotalTax;
-    data['currency_code'] = currencyCode;
-    data['currency_symbol'] = currencySymbol;
-    data['currency_minor_unit'] = currencyMinorUnit;
-    data['currency_decimal_separator'] = currencyDecimalSeparator;
-    data['currency_thousand_separator'] = currencyThousandSeparator;
-    data['currency_prefix'] = currencyPrefix;
-    data['currency_suffix'] = currencySuffix;
-    return data;
-  }
-}
-
 class Totals {
   String? totalItems;
   String? totalItemsTax;
@@ -464,8 +325,8 @@ class Totals {
   String? totalFeesTax;
   String? totalDiscount;
   String? totalDiscountTax;
-  Null totalShipping;
-  Null totalShippingTax;
+  var totalShipping;
+  var totalShippingTax;
   String? totalPrice;
   String? totalTax;
   String? currencyCode;

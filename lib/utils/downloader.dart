@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
@@ -10,7 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'fontFamily.dart';
+import 'colors.dart';
 
 Future<bool> requestStoragePermission() async {
   if (Platform.isAndroid) {
@@ -58,196 +58,19 @@ Future<Directory?> getDownloadDirectory() async {
 }
 
 Future<void> downloadFile(
-  String url,
+  String? url,
   BuildContext context,
   String filename,
-  String extension,
-) async {
+  String extension, {
+  Uint8List? fileBytes, // optional offline bytes
+}) async {
+  ValueNotifier<double> downloadProgress = ValueNotifier(0.0);
+
   try {
-    print('Download requested. URL: $url');
-    print('File: $filename.$extension');
-
-    bool permissionGranted = await requestStoragePermission();
-
-    if (!permissionGranted && !Platform.isIOS) {
-      Fluttertoast.showToast(
-        msg: "Storage permission denied",
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
-      log('Storage permission not granted');
-      return;
-    }
-
-    Dio dio = Dio(
-      BaseOptions(headers: {"User-Agent": "Mozilla/5.0", "Accept": "*/*"}),
-    );
-    Directory? downloadDir = await getDownloadDirectory();
-
-    if (downloadDir == null) {
-      throw Exception("Download directory is null");
-    }
-
-    Directory appDir = Directory('${downloadDir.path}/Advice Center');
-    if (!appDir.existsSync()) {
-      appDir.createSync(recursive: true);
-      log('Created directory: ${appDir.path}');
-    }
-
-    String formattedTime = DateFormat(
-      'yyyy-MM-dd-hh-mm-ss-a',
-    ).format(DateTime.now());
-    String filePath = '${appDir.path}/$filename-$formattedTime.$extension';
-
-    ValueNotifier<double> downloadProgress = ValueNotifier(0.0);
-
-    bool dialogOpen = true;
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) {
-        return ValueListenableBuilder<double>(
-          valueListenable: downloadProgress,
-          builder: (context, value, child) {
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              backgroundColor: const Color(0xff232323),
-              child: Container(
-                width: 300,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xff232323),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Downloading File",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontFamily: FontFamily.regular,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        SizedBox(
-                          width: 60,
-                          height: 60,
-                          child: CircularProgressIndicator(
-                            value: 1.0,
-                            color: Colors.grey.shade200,
-                            strokeWidth: 6.0,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 60,
-                          height: 60,
-                          child: CircularProgressIndicator(
-                            value: value,
-                            color: Colors.green,
-                            strokeWidth: 6.0,
-                          ),
-                        ),
-                        Text(
-                          "${(value * 100).toStringAsFixed(0)}%",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-
-    String cleanedUrl = url.trim().replaceAll('%20', '');
-
-    final encodedUrl = Uri.parse(cleanedUrl).toString();
-    log("encodedUrl = $encodedUrl");
-    await dio.download(
-      encodedUrl,
-      filePath,
-      onReceiveProgress: (received, total) {
-        if (total != -1) {
-          downloadProgress.value = received / total;
-          log(
-            'Download progress: ${(received / total * 100).toStringAsFixed(2)}%',
-          );
-        }
-      },
-    );
-    if (dialogOpen) Navigator.of(context).pop();
-
-    Fluttertoast.showToast(
-      msg: "File downloaded successfully: $filePath",
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
-    log("✅ File successfully downloaded at: $filePath");
-  } catch (e, stackTrace) {
-    if (Navigator.canPop(context)) {
-      Navigator.of(context).pop(); // Only pop if dialog is shown
-    }
-
-    Fluttertoast.showToast(
-      msg: "Error occurred: $e",
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.red,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
-
-    log("❌ Download error: $e", stackTrace: stackTrace);
-  }
-}
-
-Future<void> downloadFileWithCookies(
-  String url,
-  BuildContext context,
-  String filename,
-  String extension,
-  String? cookies,
-) async {
-  try {
-    bool permissionGranted = await requestStoragePermission();
-    if (!permissionGranted && !Platform.isIOS) return;
-
-    Dio dio = Dio(
-      BaseOptions(
-        headers: {
-          "User-Agent": "Mozilla/5.0",
-          "Accept": "*/*",
-          if (cookies != null) "Cookie": cookies,
-        },
-      ),
-    );
-
     Directory? downloadDir = await getDownloadDirectory();
     if (downloadDir == null) throw Exception("Download directory is null");
 
-    Directory appDir = Directory('${downloadDir.path}/Advice Center');
+    Directory appDir = Directory('${downloadDir.path}/Bellissemo App');
     if (!appDir.existsSync()) appDir.createSync(recursive: true);
 
     String formattedTime = DateFormat(
@@ -255,68 +78,50 @@ Future<void> downloadFileWithCookies(
     ).format(DateTime.now());
     String filePath = '${appDir.path}/$filename-$formattedTime.$extension';
 
-    ValueNotifier<double> downloadProgress = ValueNotifier(0.0);
-
-    // Show Progress Dialog
     showDialog(
-      context: context,
       barrierDismissible: false,
-      builder: (_) {
+      context: context,
+      builder: (context) {
         return ValueListenableBuilder<double>(
           valueListenable: downloadProgress,
-          builder: (context, value, _) {
-            return Dialog(
+          builder: (context, value, child) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(20),
               ),
-              backgroundColor: const Color(0xff232323),
-              child: Container(
-                width: 300,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xff232323),
-                  borderRadius: BorderRadius.circular(16),
-                ),
+              title: Text("Downloading File"),
+              content: SizedBox(
+                height: 160,
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      "Downloading File",
-                      style: TextStyle(fontSize: 18, color: Colors.white),
-                    ),
-                    const SizedBox(height: 20),
                     Stack(
                       alignment: Alignment.center,
                       children: [
-                        // Optional light background circle
                         SizedBox(
-                          width: 60,
-                          height: 60,
+                          width: 80,
+                          height: 80,
                           child: CircularProgressIndicator(
                             value: 1.0,
-                            color: Colors.grey.withOpacity(0.3),
-                            strokeWidth: 6.0,
+                            color: Colors.grey.shade300,
+                            strokeWidth: 10.0,
                           ),
                         ),
                         SizedBox(
-                          width: 60,
-                          height: 60,
+                          width: 80,
+                          height: 80,
                           child: CircularProgressIndicator(
                             value: value,
-                            color: Colors.green,
-                            strokeWidth: 6.0,
+                            color: AppColors.mainColor,
+                            strokeWidth: 10.0,
                           ),
                         ),
-                        Text(
-                          "${(value * 100).toStringAsFixed(0)}%",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        Text("${(value * 100).toStringAsFixed(0)}%"),
                       ],
                     ),
+                    SizedBox(height: 20),
+                    Text(filename, textAlign: TextAlign.center),
                   ],
                 ),
               ),
@@ -326,173 +131,49 @@ Future<void> downloadFileWithCookies(
       },
     );
 
-    await dio.download(
-      url,
-      filePath,
-      onReceiveProgress: (received, total) {
-        if (total != -1) {
-          downloadProgress.value = received / total;
-        }
-      },
-    );
+    if (fileBytes != null) {
+      // ✅ Offline: write bytes directly
+      await File(filePath).writeAsBytes(fileBytes);
+      downloadProgress.value = 1.0;
+    } else {
+      // ✅ Online: use Dio to download
+      Dio dio = Dio(
+        BaseOptions(headers: {"User-Agent": "Mozilla/5.0", "Accept": "*/*"}),
+      );
 
-    if (Navigator.canPop(context)) Navigator.pop(context);
+      final cleanedUrl = url!.trim().replaceAll('%20', '');
+      await dio.download(
+        Uri.parse(cleanedUrl).toString(),
+        filePath,
+        onReceiveProgress: (received, total) {
+          if (total != -1) downloadProgress.value = received / total;
+        },
+      );
+    }
 
-    Fluttertoast.showToast(
-      msg: "File Downloaded to: $filePath",
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-    );
-    log("✅ File downloaded to: $filePath");
-  } catch (e, s) {
-    if (Navigator.canPop(context)) Navigator.pop(context);
-    Fluttertoast.showToast(
-      msg: "Download failed: $e",
-      backgroundColor: Colors.red,
-      textColor: Colors.white,
-    );
-    log("❌ Download error: $e", stackTrace: s);
+    if (Navigator.canPop(context)) Navigator.of(context).pop();
+
+    Fluttertoast.showToast(msg: "File downloaded: $filePath");
+  } catch (e) {
+    if (Navigator.canPop(context)) Navigator.of(context).pop();
+    Fluttertoast.showToast(msg: "Error occurred: $e");
   }
 }
 
-// // Download file with progress dialog
 // Future<void> downloadFile(
-//   String url,
-//   BuildContext context,
-//   String filename,
-//   String extension,
-// ) async
+//     String url,
+//     BuildContext context,
+//     String filename,
+//     String extension,
+//     ) async
 // {
-//   try {
-//     print('Url is : $url');
-//     print('File is : $filename.$extension');
+//   ValueNotifier<double> downloadProgress = ValueNotifier(0.0);
 //
+//   try
+//   {
+//     // Request storage permissions
 //     bool permissionGranted = await requestStoragePermission();
-//
-//     if (permissionGranted || Platform.isIOS) {
-//       Dio dio = Dio();
-//       Directory? downloadDir = await getDownloadDirectory();
-//
-//       if (downloadDir == null) {
-//         throw Exception("Downloads directory not found");
-//       }
-//
-//       // Create a specific folder for your app inside the Downloads directory
-//       Directory appDir = Directory('${downloadDir.path}/Advice Center');
-//       if (!appDir.existsSync()) {
-//         appDir.createSync(recursive: true);
-//       }
-//
-//       // Generate a unique filename with timestamp
-//       String formattedTime = DateFormat(
-//         'yyyy-MM-dd-hh-mm-ss-a',
-//       ).format(DateTime.now());
-//       String filePath = '${appDir.path}/$filename-$formattedTime.$extension';
-//
-//       // Create a ValueNotifier to track download progress
-//       ValueNotifier<double> downloadProgress = ValueNotifier(0.0);
-//
-//       // Show the progress dialog with current file name and progress
-//       showDialog(
-//         context: context,
-//         barrierDismissible: false,
-//         builder: (BuildContext context) {
-//           return ValueListenableBuilder<double>(
-//             valueListenable: downloadProgress,
-//             builder: (context, value, child) {
-//               return Dialog(
-//                 shape: RoundedRectangleBorder(
-//                   borderRadius: BorderRadius.circular(16),
-//                 ),
-//                 backgroundColor: Color(0xff232323),
-//                 child: Container(
-//                   width: 300,
-//                   padding: EdgeInsets.all(16),
-//                   decoration: BoxDecoration(
-//                     color: Color(0xff232323),
-//                     borderRadius: BorderRadius.circular(16),
-//                   ),
-//                   child: Column(
-//                     mainAxisSize: MainAxisSize.min,
-//                     crossAxisAlignment: CrossAxisAlignment.center,
-//                     mainAxisAlignment: MainAxisAlignment.center,
-//                     children: [
-//                       Text(
-//                         "Downloading File",
-//                         style: TextStyle(
-//                           fontSize: 18,
-//                           color: Colors.white,
-//                           fontFamily: FontFamily.regular,
-//                         ),
-//                       ),
-//                       SizedBox(height: 20),
-//                       Stack(
-//                         alignment: Alignment.center,
-//                         children: [
-//                           SizedBox(
-//                             width: 60,
-//                             height: 60,
-//                             child: CircularProgressIndicator(
-//                               value: 1.0,
-//                               // Full circle for background
-//                               color: Colors.grey.shade200,
-//                               strokeWidth: 6.0,
-//                             ),
-//                           ),
-//                           SizedBox(
-//                             width: 60,
-//                             height: 60,
-//                             child: CircularProgressIndicator(
-//                               value: value,
-//                               color: Colors.green,
-//                               strokeWidth: 6.0,
-//                             ),
-//                           ),
-//                           Text(
-//                             "${(value * 100).toStringAsFixed(0)}%",
-//                             style: TextStyle(
-//                               fontSize: 16,
-//                               color: Colors.white,
-//                               fontWeight: FontWeight.bold,
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               );
-//             },
-//           );
-//         },
-//       );
-//
-//       // Download the file and track progress
-//       await dio.download(
-//         url,
-//         filePath,
-//         onReceiveProgress: (received, total) {
-//           if (total != -1) {
-//             downloadProgress.value = received / total;
-//           }
-//         },
-//       );
-//
-//       // Close the progress dialog once download completes
-//       Navigator.of(context).pop();
-//
-//       // Show success toast message
-//       Fluttertoast.showToast(
-//         msg: "File downloaded successfully: $filePath",
-//         toastLength: Toast.LENGTH_LONG,
-//         gravity: ToastGravity.BOTTOM,
-//         backgroundColor: Colors.green,
-//         textColor: Colors.white,
-//         fontSize: 16.0,
-//       );
-//       log("File downloaded at : $filePath");
-//     } else {
-//       // Handle permission denial
+//     if (!permissionGranted && !Platform.isIOS) {
 //       Fluttertoast.showToast(
 //         msg: "Storage permission denied",
 //         toastLength: Toast.LENGTH_LONG,
@@ -501,19 +182,135 @@ Future<void> downloadFileWithCookies(
 //         textColor: Colors.white,
 //         fontSize: 16.0,
 //       );
+//       log('Storage permission not granted');
+//       return;
 //     }
-//   } catch (e) {
-//     // Close the progress dialog if an error occurs
-//     Navigator.of(context).pop();
 //
-//     // Show error toast message
+//     Dio dio = Dio(
+//       BaseOptions(headers: {"User-Agent": "Mozilla/5.0", "Accept": "*/*"}),
+//     );
+//
+//     Directory? downloadDir = await getDownloadDirectory();
+//     if (downloadDir == null) throw Exception("Download directory is null");
+//
+//     Directory appDir = Directory('${downloadDir.path}/Bellissemo App');
+//     if (!appDir.existsSync()) appDir.createSync(recursive: true);
+//
+//     String formattedTime = DateFormat('yyyy-MM-dd-hh-mm-ss-a').format(DateTime.now());
+//     String filePath = '${appDir.path}/$filename-$formattedTime.$extension';
+//
+//     // Show polished circular progress dialog
+//     showDialog(
+//       barrierDismissible: false,
+//       context: context,
+//       builder: (context) {
+//         return ValueListenableBuilder<double>(
+//           valueListenable: downloadProgress,
+//           builder: (context, value, child) {
+//             return AlertDialog(
+//               backgroundColor: Colors.white,
+//               shape: RoundedRectangleBorder(
+//                 borderRadius: BorderRadius.circular(20),
+//               ),
+//               title: Text(
+//                 "Downloading File",
+//                 style: TextStyle(
+//                   fontSize: 20,
+//                   fontFamily: FontFamily.bold,
+//                   color: Colors.black,
+//                 ),
+//               ),
+//               content: SizedBox(
+//                 height: 160,
+//                 child: Column(
+//                   mainAxisAlignment: MainAxisAlignment.center,
+//                   children: [
+//                     Stack(
+//                       alignment: Alignment.center,
+//                       children: [
+//                         SizedBox(
+//                           width: 80,
+//                           height: 80,
+//                           child: CircularProgressIndicator(
+//                             value: 1.0,
+//                             color: Colors.grey.shade300,
+//                             strokeWidth: 10.0,
+//                           ),
+//                         ),
+//                         SizedBox(
+//                           width: 80,
+//                           height: 80,
+//                           child: CircularProgressIndicator(
+//                             value: value,
+//                             color: AppColors.mainColor,
+//                             strokeWidth: 10.0,
+//                           ),
+//                         ),
+//                         Text(
+//                           "${(value * 100).toStringAsFixed(0)}%",
+//                           style: TextStyle(
+//                             fontSize: 20,
+//                             fontWeight: FontWeight.bold,
+//                             color: Colors.black,
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                     SizedBox(height: 20),
+//                     Text(
+//                       filename,
+//                       textAlign: TextAlign.center,
+//                       style: TextStyle(
+//                         fontSize: 16,
+//                         color: Colors.black87,
+//                         fontFamily: FontFamily.regular,
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             );
+//           },
+//         );
+//       },
+//     );
+//
+//     // Clean and encode URL
+//     String cleanedUrl = url.trim().replaceAll('%20', '');
+//     final encodedUrl = Uri.parse(cleanedUrl).toString();
+//
+//     await dio.download(
+//       encodedUrl,
+//       filePath,
+//       onReceiveProgress: (received, total) {
+//         if (total != -1) {
+//           downloadProgress.value = received / total;
+//         }
+//       },
+//     );
+//
+//     if (Navigator.canPop(context)) Navigator.of(context).pop(); // Close dialog
+//
 //     Fluttertoast.showToast(
-//       msg: "Error: $e",
+//       msg: "File downloaded successfully: $filePath",
+//       toastLength: Toast.LENGTH_LONG,
+//       gravity: ToastGravity.BOTTOM,
+//       backgroundColor: Colors.green,
+//       textColor: Colors.white,
+//       fontSize: 16.0,
+//     );
+//     log("✅ File successfully downloaded at: $filePath");
+//   } catch (e, stackTrace) {
+//     if (Navigator.canPop(context)) Navigator.of(context).pop(); // Close dialog
+//
+//     Fluttertoast.showToast(
+//       msg: "Error occurred: $e",
 //       toastLength: Toast.LENGTH_LONG,
 //       gravity: ToastGravity.BOTTOM,
 //       backgroundColor: Colors.red,
 //       textColor: Colors.white,
 //       fontSize: 16.0,
 //     );
+//     log("❌ Download error: $e", stackTrace: stackTrace);
 //   }
 // }

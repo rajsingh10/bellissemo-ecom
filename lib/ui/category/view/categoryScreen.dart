@@ -402,6 +402,16 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       filteredCategories.length,
     );
 
+    void scrollToTop() {
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
+          0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -411,11 +421,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           onTap: () {
             if (currentPage > 0) {
               setState(() => currentPage--);
-              scrollController.animateTo(
-                0,
-                duration: Duration(milliseconds: 300),
-                curve: Curves.easeOut,
-              );
+              scrollToTop();
             }
           },
         ),
@@ -435,17 +441,65 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           onTap: () {
             if (endIndex < filteredCategories.length) {
               setState(() => currentPage++);
-              scrollController.animateTo(
-                0,
-                duration: Duration(milliseconds: 300),
-                curve: Curves.easeOut,
-              );
+              scrollToTop();
             }
           },
         ),
       ],
     );
   }
+
+  // Widget _buildPagination(ScrollController scrollController) {
+  //   int startIndex = currentPage * itemsPerPage;
+  //   int endIndex = (startIndex + itemsPerPage).clamp(
+  //     0,
+  //     filteredCategories.length,
+  //   );
+  //
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.center,
+  //     children: [
+  //       _pageButton(
+  //         icon: Icons.arrow_back_ios_new,
+  //         enabled: currentPage > 0,
+  //         onTap: () {
+  //           if (currentPage > 0) {
+  //             setState(() => currentPage--);
+  //             scrollController.animateTo(
+  //               0,
+  //               duration: Duration(milliseconds: 300),
+  //               curve: Curves.easeOut,
+  //             );
+  //           }
+  //         },
+  //       ),
+  //       SizedBox(width: 4.w),
+  //       Text(
+  //         "Page ${currentPage + 1}",
+  //         style: TextStyle(
+  //           fontSize: 15.sp,
+  //           fontFamily: FontFamily.semiBold,
+  //           color: AppColors.blackColor,
+  //         ),
+  //       ),
+  //       SizedBox(width: 4.w),
+  //       _pageButton(
+  //         icon: Icons.arrow_forward_ios,
+  //         enabled: endIndex < filteredCategories.length,
+  //         onTap: () {
+  //           if (endIndex < filteredCategories.length) {
+  //             setState(() => currentPage++);
+  //             scrollController.animateTo(
+  //               0,
+  //               duration: Duration(milliseconds: 300),
+  //               curve: Curves.easeOut,
+  //             );
+  //           }
+  //         },
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _pageButton({
     required IconData icon,
@@ -470,7 +524,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     return InkWell(
       onTap: () {
         Get.to(
-          () => ProductsScreen(cate: category.name, id: category.id.toString()),
+          () => ProductsScreen(
+            cate: category.name,
+            slug: category.slug,
+            id: category.id.toString(),
+          ),
           transition: Transition.leftToRightWithFade,
           duration: const Duration(milliseconds: 450),
         );

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:bellissemo_ecom/Apicalling/sharedpreferance.dart';
 import 'package:bellissemo_ecom/ui/cart/View/cartScreen.dart';
 import 'package:bellissemo_ecom/ui/customers/view/customersScreen.dart';
 import 'package:bellissemo_ecom/ui/home/view/homeScreen.dart';
@@ -10,6 +11,7 @@ import 'package:bellissemo_ecom/ui/profile/view/profileScreen.dart';
 import 'package:bellissemo_ecom/utils/snackBars.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../utils/colors.dart';
@@ -180,7 +182,68 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     child: CustomButton(
                       title: "Log Out",
                       route: () {
-                        Get.offAll(LoginScreen());
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              backgroundColor: AppColors.whiteColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              title: Text(
+                                "Logout",
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontFamily: FontFamily.bold,
+                                  color: AppColors.blackColor,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              content: Text(
+                                "Are you sure you wish to log out of your account?",
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontFamily: FontFamily.regular,
+                                  color: AppColors.blackColor,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              actionsAlignment: MainAxisAlignment.spaceEvenly,
+                              actions: [
+                                CustomButton(
+                                  title: "Cancel",
+                                  route: () {
+                                    Get.back(); // Close dialog
+                                  },
+                                  color: AppColors.containerColor,
+                                  fontcolor: AppColors.blackColor,
+                                  height: 5.h,
+                                  width: 30.w,
+                                  fontsize: 15.sp,
+                                  radius: 12.0,
+                                ),
+                                CustomButton(
+                                  title: "Confirm",
+                                  route: () async {
+                                    final prefs =
+                                        await SharedPreferences.getInstance();
+                                    SaveDataLocal.clearUserData();
+                                    await prefs.clear();
+                                    Get.offAll(LoginScreen());
+                                  },
+                                  color: AppColors.mainColor,
+                                  fontcolor: AppColors.whiteColor,
+                                  height: 5.h,
+                                  width: 30.w,
+                                  fontsize: 15.sp,
+                                  radius: 12.0,
+                                  iconData: Icons.check,
+                                  iconsize: 17.sp,
+                                ),
+                              ],
+                            );
+                          },
+                        );
                       },
                       color: AppColors.mainColor,
                       fontcolor: AppColors.whiteColor,

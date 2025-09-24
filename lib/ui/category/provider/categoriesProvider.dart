@@ -36,4 +36,60 @@ class CategoriesProvider extends ChangeNotifier {
 
     return responseJson;
   }
+
+  Future<http.Response> fetchSubCategoriesApi(id) async {
+    String url = "${apiEndpoints.fetchSubCategories}$id&per_page=100";
+    LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
+    String token = loginData?.token ?? '';
+    print("my token :: $token");
+    if (token.isEmpty) {
+      throw Exception('Token not found');
+    }
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $token',
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    };
+    print(url);
+    var responseJson;
+    final response = await http
+        .get(Uri.parse(url), headers: headers)
+        .timeout(
+          const Duration(seconds: 60),
+          onTimeout: () {
+            throw const SocketException('Something went wrong');
+          },
+        );
+    responseJson = responses(response);
+
+    return responseJson;
+  }
+
+  Future<http.Response> fetchPdfFileApi(slug) async {
+    String url = "${apiEndpoints.fetchPdfFile}$slug";
+    LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
+    String token = loginData?.token ?? '';
+    print("my token :: $token");
+    if (token.isEmpty) {
+      throw Exception('Token not found');
+    }
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $token',
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    };
+    print(url);
+    var responseJson;
+    final response = await http
+        .get(Uri.parse(url), headers: headers)
+        .timeout(
+          const Duration(seconds: 60),
+          onTimeout: () {
+            throw const SocketException('Something went wrong');
+          },
+        );
+    responseJson = responses(response);
+
+    return responseJson;
+  }
 }
