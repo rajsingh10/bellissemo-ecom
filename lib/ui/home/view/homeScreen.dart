@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:bellissemo_ecom/apiCalling/apiConfigs.dart';
-import 'package:bellissemo_ecom/ui/cart/View/cartScreen.dart';
 import 'package:bellissemo_ecom/ui/customers/modal/fetchCustomersModal.dart';
 import 'package:bellissemo_ecom/ui/customers/provider/customerProvider.dart';
 import 'package:bellissemo_ecom/ui/home/provider/homeProvider.dart';
@@ -73,6 +72,18 @@ class _HomescreenState extends State<Homescreen> {
     loadInitialData();
   }
 
+  Future<void> checkCustomer() async {
+    final prefs = await SharedPreferences.getInstance();
+    final customerId = prefs.getInt("customerId");
+
+    // If no customer selected, show the popup
+    if (customerId == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showSelectCustomerDialog();
+      });
+    }
+  }
+
   Future<void> loadInitialData() async {
     setState(() => isLoading = true);
 
@@ -84,7 +95,11 @@ class _HomescreenState extends State<Homescreen> {
     try {
       await Future.wait([
         _fetchCategories().then((_) => setState(() {})),
-        _fetchCustomers().then((_) => setState(() {})),
+        _fetchCustomers().then(
+          (_) => setState(() {
+            checkCustomer();
+          }),
+        ),
         _fetchProducts().then((_) => setState(() {})),
         _fetchBanner().then((_) => setState(() {})),
         _fetchProfile().then((_) => setState(() {})),
@@ -135,7 +150,6 @@ class _HomescreenState extends State<Homescreen> {
     if (cachedProfile != null) {
       profile = ProfileModal.fromJson(json.decode(cachedProfile));
     }
-
     setState(() {});
   }
 
@@ -204,7 +218,7 @@ class _HomescreenState extends State<Homescreen> {
                                           ),
                                           SizedBox(width: 2.w),
                                           SizedBox(
-                                            width: 30.w,
+                                            width: 40.w,
                                             child: RichText(
                                               textAlign: TextAlign.start,
                                               text: TextSpan(
@@ -454,7 +468,7 @@ class _HomescreenState extends State<Homescreen> {
                                                                   } else {
                                                                     setState(() {
                                                                       errorText =
-                                                                          "Please select a customer!";
+                                                                          " Please select a customer before proceeding.";
                                                                     });
                                                                   }
                                                                 },
@@ -510,66 +524,6 @@ class _HomescreenState extends State<Homescreen> {
                                                 color: AppColors.blackColor,
                                                 size: isIpad ? 35 : 25,
                                               ),
-                                            ),
-                                          ),
-                                          SizedBox(width: isIpad ? 2.w : 3.5.w),
-                                          GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-                                                Get.offAll(
-                                                  CartScreen(),
-                                                  transition: Transition.fade,
-                                                  duration: const Duration(
-                                                    milliseconds: 450,
-                                                  ),
-                                                );
-                                              });
-                                            },
-                                            child: Stack(
-                                              clipBehavior: Clip.none,
-                                              children: [
-                                                CircleAvatar(
-                                                  radius: isIpad ? 40 : 20,
-                                                  backgroundColor:
-                                                      AppColors.containerColor,
-                                                  child: Icon(
-                                                    Icons
-                                                        .shopping_cart_outlined,
-                                                    color: AppColors.blackColor,
-                                                    size: isIpad ? 35 : 25,
-                                                  ),
-                                                ),
-                                                // Positioned badge
-                                                Positioned(
-                                                  top: -4,
-                                                  right: -4,
-                                                  child: Container(
-                                                    padding: EdgeInsets.all(
-                                                      4.sp,
-                                                    ),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.red,
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    constraints: BoxConstraints(
-                                                      minWidth: 14.sp,
-                                                      minHeight: 14.sp,
-                                                    ),
-                                                    child: Center(
-                                                      child: Text(
-                                                        '2',
-                                                        // Replace with your cart count dynamically if needed
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 12.sp,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
                                             ),
                                           ),
                                           SizedBox(width: isIpad ? 2.w : 3.5.w),
@@ -704,6 +658,7 @@ class _HomescreenState extends State<Homescreen> {
                                               Get.to(
                                                 () => ProductsScreen(
                                                   cate: categoriesList[i].name,
+                                                  slug: categoriesList[i].slug,
                                                   id:
                                                       categoriesList[i].id
                                                           .toString(),
@@ -1508,15 +1463,18 @@ class _HomescreenState extends State<Homescreen> {
   }
 
   Future<void> _removeProductFromCart(FetchProductsModal product) async {
-    setState(() => isAddingToCart = true);
+    if (product.id == null) return;
 
+    setState(() => isAddingToCart = true);
     final cartService = CartService();
 
     try {
-      // Get cached quantity to sync UI with local cache
-      final cachedData = cartService.getCachedProductCartData(product.id ?? 0);
+      // ----------------- Get cached quantity safely -----------------
+      final cachedData = await cartService.getCachedProductCartDataSafe(
+        product.id!,
+      );
       int currentQty =
-          cachedData?["totalQuantity"] ?? (product.cartQuantity ?? 0);
+          cachedData["totalQuantity"]?.toInt() ?? (product.cartQuantity ?? 0);
 
       if (currentQty <= 0) {
         showCustomErrorSnackbar(
@@ -1526,14 +1484,20 @@ class _HomescreenState extends State<Homescreen> {
         return;
       }
 
-      // Decrease local UI quantity immediately
-      product.cartQuantity = currentQty - 1;
-
-      // Call CartService to handle offline or online decrease
+      // ----------------- Call CartService to decrease item -----------------
       final response = await cartService.decreaseCartItem(
-        productId: product.id ?? 0,
+        productId: product.id!,
       );
 
+      // ----------------- Get updated quantity from cache -----------------
+      final updatedData = await cartService.getCachedProductCartDataSafe(
+        product.id!,
+      );
+      setState(() {
+        product.cartQuantity = updatedData["totalQuantity"]?.toInt() ?? 0;
+      });
+
+      // ----------------- Show appropriate message -----------------
       if (response != null) {
         if (response.statusCode == 200 || response.statusCode == 201) {
           final message =
@@ -1549,11 +1513,10 @@ class _HomescreenState extends State<Homescreen> {
           );
         }
       } else {
-        // Offline fallback
+        // Offline mode
         showCustomSuccessSnackbar(
           title: "Offline Mode",
-          message:
-              "Cart update saved offline. It will sync once internet is back.",
+          message: "Cart updated offline. It will sync when internet is back.",
         );
       }
     } catch (e, stackTrace) {
@@ -1566,155 +1529,6 @@ class _HomescreenState extends State<Homescreen> {
       setState(() => isAddingToCart = false);
     }
   }
-
-  // Future<void> _addVariationProductsToCart(
-  //   id,
-  //   variationId,
-  //   variationKey,
-  //   variationValue,
-  // ) async {
-  //   setState(() {
-  //     isAddingToCart = true;
-  //   });
-  //
-  //   final cartService = CartService();
-  //
-  //   try {
-  //     final response = await cartService.increaseCartItem(
-  //       productId: int.parse(id.toString()),
-  //       variationId: variationId,
-  //       variation: {"attribute_${variationKey ?? ''}": variationValue ?? ''},
-  //       itemNote: '',
-  //     );
-  //
-  //     // Determine message
-  //     String message = "Added to Cart"; // default
-  //     if (response != null && response.statusCode == 200) {
-  //       final serverMessage = response.data["message"];
-  //       if (serverMessage != null && serverMessage.toString().isNotEmpty) {
-  //         message = serverMessage.toString();
-  //       }
-  //     } else {
-  //       message = "Product added offline. It will sync once internet is back.";
-  //     }
-  //
-  //     showCustomSuccessSnackbar(
-  //       title:
-  //           message.contains("update") ? "Quantity Updated" : "Added to Cart",
-  //       message: message,
-  //     );
-  //
-  //     // Refresh products list and rebuild UI
-  //     await _fetchProducts(); // make sure this updates the state variable your UI depends on
-  //     setState(() {}); // forces the widget to rebuild
-  //   } catch (e) {
-  //     showCustomErrorSnackbar(
-  //       title: "Error",
-  //       message: "Something went wrong while adding product.\n$e",
-  //     );
-  //   } finally {
-  //     setState(() {
-  //       isAddingToCart = false; // always reset the loading state
-  //     });
-  //   }
-  // }
-  //
-  // Future<void> _addSimpleProductsToCart(id) async {
-  //   setState(() {
-  //     isAddingToCart = true;
-  //   });
-  //
-  //   final cartService = CartService();
-  //
-  //   try {
-  //     final response = await cartService.increaseCartItem(
-  //       productId: int.parse(id.toString()),
-  //       itemNote: '',
-  //     );
-  //
-  //     // Determine message
-  //     String message = "Added to Cart"; // default
-  //     if (response != null && response.statusCode == 200) {
-  //       final serverMessage = response.data["message"];
-  //       if (serverMessage != null && serverMessage.toString().isNotEmpty) {
-  //         message = serverMessage.toString();
-  //       }
-  //     } else {
-  //       message = "Product added offline. It will sync once internet is back.";
-  //     }
-  //
-  //     showCustomSuccessSnackbar(
-  //       title:
-  //           message.contains("update") ? "Quantity Updated" : "Added to Cart",
-  //       message: message,
-  //     );
-  //
-  //     // Refresh products list and rebuild UI
-  //     await _fetchProducts(); // make sure this updates your state variable
-  //     setState(() {}); // force rebuild in case UI doesn’t auto-update
-  //   } catch (e) {
-  //     showCustomErrorSnackbar(
-  //       title: "Error",
-  //       message: "Something went wrong while adding product.\n$e",
-  //     );
-  //     log('Error : $e');
-  //   } finally {
-  //     setState(() {
-  //       isAddingToCart = false; // reset loading state always
-  //     });
-  //   }
-  // }
-  //
-  // Future<void> _removeProductFromCart(int productId, int quantity) async {
-  //   setState(() => isAddingToCart = true);
-  //
-  //   final cartService = CartService();
-  //
-  //   try {
-  //     final response = await cartService.decreaseCartItem(
-  //       productId: productId,
-  //
-  //     );
-  //
-  //     if (response != null && response.statusCode == 200) {
-  //       final data = response.data;
-  //       final message = data["message"] ?? "Product quantity removed.";
-  //       showCustomSuccessSnackbar(
-  //         title: "Quantity Updated",
-  //         message: "$message",
-  //       );
-  //
-  //       // Refresh products after removal
-  //       await _fetchProducts();
-  //       setState(() {});
-  //     } else if (response != null && response.statusCode == 204) {
-  //       showCustomErrorSnackbar(
-  //         title: "Cart Empty",
-  //         message: "No items in cart to remove.",
-  //       );
-  //
-  //       await _fetchProducts();
-  //       setState(() {});
-  //     } else {
-  //       showCustomSuccessSnackbar(
-  //         title: "Offline Mode",
-  //         message:
-  //             "Cart update saved offline. It will sync once internet is back.",
-  //       );
-  //
-  //       await _fetchProducts();
-  //       setState(() {});
-  //     }
-  //   } catch (e, stackTrace) {
-  //     showCustomErrorSnackbar(
-  //       title: "Error",
-  //       message: "Something went wrong while updating cart.\n$e",
-  //     );
-  //     log('Error : $stackTrace');
-  //   } finally {
-  //     setState(() => isAddingToCart = false);
-  //   }
-  // }
 
   Future<void> _clearCart() async {
     Get.back();
@@ -1735,5 +1549,187 @@ class _HomescreenState extends State<Homescreen> {
     } finally {
       setState(() => isAddingToCart = false);
     }
+  }
+
+  /// Customer Dialogue
+  void _showSelectCustomerDialog() {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        int? selectedCustomerId;
+        String? selectedCustomerName;
+        String? errorText;
+
+        return FutureBuilder(
+          future: SharedPreferences.getInstance(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Center(child: CircularProgressIndicator());
+            }
+
+            final prefs = snapshot.data!;
+            selectedCustomerId = prefs.getInt("customerId");
+            selectedCustomerName = prefs.getString("customerName");
+
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return WillPopScope(
+                  onWillPop: () async {
+                    setState(() {
+                      errorText =
+                          " Please select a customer before proceeding.";
+                    });
+                    return false;
+                  }, // Prevent back button
+                  child: AlertDialog(
+                    backgroundColor: AppColors.whiteColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    title: Text(
+                      "Select Customer",
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontFamily: FontFamily.bold,
+                        color: AppColors.blackColor,
+                      ),
+                    ),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // List of customers
+                        ...customersList.map((customer) {
+                          bool isSelected = selectedCustomerId == customer.id;
+                          return InkWell(
+                            onTap: () {
+                              setState(() {
+                                selectedCustomerId = customer.id;
+                                selectedCustomerName =
+                                    "${customer.firstName} ${customer.lastName}";
+                                errorText = null; // clear error
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 10,
+                              ),
+                              margin: EdgeInsets.symmetric(vertical: 5),
+                              decoration: BoxDecoration(
+                                color:
+                                    isSelected
+                                        ? AppColors.mainColor.withAlpha(25)
+                                        : AppColors.whiteColor,
+                                border: Border.all(
+                                  color:
+                                      isSelected
+                                          ? AppColors.mainColor
+                                          : AppColors.gray,
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    isSelected
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_off,
+                                    color:
+                                        isSelected
+                                            ? AppColors.mainColor
+                                            : AppColors.gray,
+                                  ),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    "${customer.firstName} ${customer.lastName}",
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontFamily: FontFamily.regular,
+                                      color: AppColors.blackColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }),
+                        if (errorText != null) ...[
+                          SizedBox(height: 0.5.h),
+                          Text(
+                            errorText!,
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 14.sp,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    actions: [
+                      // Disable Cancel button or just show error
+                      CustomButton(
+                        title: "Cancel",
+                        route: () {
+                          setState(() {
+                            errorText =
+                                " Please select a customer before proceeding.";
+                          });
+                        },
+                        color: AppColors.containerColor,
+                        fontcolor: AppColors.blackColor,
+                        height: 5.h,
+                        width: 30.w,
+                        fontsize: 15.sp,
+                        radius: 12.0,
+                      ),
+                      CustomButton(
+                        title: "Confirm",
+                        route: () async {
+                          if (selectedCustomerId != null &&
+                              selectedCustomerName != null) {
+                            final prevCustomerId = prefs.getInt("customerId");
+
+                            if (prevCustomerId != selectedCustomerId) {
+                              // Customer changed -> save new values and clear cart
+                              await prefs.setInt(
+                                "customerId",
+                                selectedCustomerId!,
+                              );
+                              await prefs.setString(
+                                "customerName",
+                                selectedCustomerName!,
+                              );
+                              _clearCart();
+                            }
+
+                            // Close dialog only after saving
+                            Get.back();
+                          } else {
+                            setState(() {
+                              errorText =
+                                  " Please select a customer before proceeding.";
+                            });
+                          }
+                        },
+                        color: AppColors.mainColor,
+                        fontcolor: AppColors.whiteColor,
+                        height: 5.h,
+                        width: 30.w,
+                        fontsize: 15.sp,
+                        radius: 12.0,
+                        iconData: Icons.check,
+                        iconsize: 17.sp,
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
   }
 }

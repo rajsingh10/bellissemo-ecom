@@ -19,6 +19,10 @@ class HiveService {
   late Box loginBox;
   late Box addCartBox;
   late Box productCartDataBox;
+  late Box subCategoriesBox;
+  late Box ordersBox;
+  late Box viewCartBox;
+  late Box pdfFileBox;
 
   // Initialize Hive and open all boxes
   Future<void> init() async {
@@ -36,10 +40,16 @@ class HiveService {
     loginBox = await Hive.openBox('loginBox');
     addCartBox = await Hive.openBox('addCartBox');
     productCartDataBox = await Hive.openBox('productCartDataBox');
+    subCategoriesBox = await Hive.openBox('subCategoriesBox');
+    ordersBox = await Hive.openBox('ordersBox');
+    viewCartBox = await Hive.openBox('viewCartBox');
+    pdfFileBox = await Hive.openBox('pdfFileBox');
   }
 
   // Helper getters
   Box getCategoriesBox() => categoriesBox;
+
+  Box getSubCategoriesBox() => subCategoriesBox;
 
   Box getBannerBox() => bannerBox;
 
@@ -60,4 +70,10 @@ class HiveService {
   Box getAddCartBox() => addCartBox;
 
   Box getProductCartDataBox() => productCartDataBox;
+
+  Box getOrdersBox() => ordersBox;
+
+  Box getViewCartBox() => viewCartBox;
+
+  Box getPdfFileBox() => viewCartBox;
 }

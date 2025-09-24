@@ -1,12 +1,16 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:http/http.dart' as http;
 
+import '../../../ApiCalling/response.dart';
 import '../../../Apicalling/sharedpreferance.dart';
 import '../../../apiCalling/apiEndpoints.dart';
 import '../../../apiCalling/checkInternetModule.dart';
 import '../../../services/hiveServices.dart';
+import '../../login/modal/loginModal.dart';
 import '../modal/checkCartDataModal.dart';
 
 // Pretty print JSON helper
@@ -320,53 +324,64 @@ class CartService {
   }
 
   // ----------------- Get Cached Cart Data -----------------
-  Map<String, dynamic>? getCachedProductCartData(int productId) {
+  Future<Map<String, dynamic>> getCachedProductCartDataSafe(
+    int productId,
+  ) async {
     var cacheBox = HiveService().getProductCartDataBox();
-    if (!cacheBox.isOpen) return null; // <-- this is safe
-    return cacheBox.get("cartData_$productId"); // <-- may return null
+
+    if (!cacheBox.isOpen) {
+      // Open the box properly if not open
+      await HiveService().init();
+      cacheBox = HiveService().getProductCartDataBox();
+    }
+
+    final data = cacheBox.get("cartData_$productId");
+
+    if (data == null) return {}; // empty map if nothing
+
+    // Convert any dynamic map to Map<String, dynamic>
+    return Map<String, dynamic>.from(data);
   }
 
   // ----------------- Decrease / Remove from Cart -----------------
-  Future<Response?> decreaseCartItem({required int productId}) async {
+  Future<Response?> decreaseCartItem({
+    required int productId,
+    int decreaseBy = 1,
+  }) async {
     final box = HiveService().getAddCartBox();
     final cacheBox = HiveService().getProductCartDataBox();
     if (!cacheBox.isOpen) await HiveService().init();
 
-    // Get cached total quantity (UI + offline queued)
+    // Get cached quantity safely
     final cachedData = cacheBox.get("cartData_$productId");
     int totalQuantity = (cachedData?["totalQuantity"] ?? 0).toInt();
 
+    // Fallback if cache is empty
     if (totalQuantity <= 0) {
-      final hasInternet = await checkInternet();
-      if (hasInternet) {
-        print("⚠️ No items in cart to remove.");
-      } else {
-        print("🗑️ Offline cart removal skipped, quantity already 0.");
-      }
-      return Response(
-        requestOptions: RequestOptions(path: ''),
-        statusCode: 204,
-        data: null,
-      );
+      totalQuantity = 0; // assume at least 1 to allow offline decrease
     }
 
-    int newQuantity = totalQuantity - 1;
+    int newQuantity = (totalQuantity - decreaseBy).clamp(0, totalQuantity);
 
     final hasInternet = await checkInternet();
 
     // ---------------- OFFLINE ----------------
     if (!hasInternet) {
+      // Queue offline decrease
       await box
           .put("offline_remove_cart_${DateTime.now().millisecondsSinceEpoch}", {
             "action": "decrease",
             "product_id": productId,
-            "quantity": 1,
+            "quantity": decreaseBy,
             "timestamp": DateTime.now().toIso8601String(),
           });
 
+      // Update cache
       await cacheBox.put("cartData_$productId", {"totalQuantity": newQuantity});
 
-      print("🗑️ Offline cart decreased by 1. New quantity: $newQuantity");
+      print(
+        "🗑️ Offline cart decreased by $decreaseBy. New quantity: $newQuantity",
+      );
       return null;
     }
 
@@ -382,19 +397,19 @@ class CartService {
         "Accept": "application/json",
       };
 
-      // Get **only online quantity** to avoid double-counting offline decreases
+      // Get online cart data
       final cartData = await getProductCartData(productId: productId);
       final cartItemKey = cartData["cartItemKey"];
       int onlineQuantity = cartData["totalQuantity"] ?? totalQuantity;
 
       if (cartItemKey == null) {
-        // Queue offline decrease if key not found
+        // Queue offline if no key
         await box.put(
           "offline_remove_cart_${DateTime.now().millisecondsSinceEpoch}",
           {
             "action": "decrease",
             "product_id": productId,
-            "quantity": 1,
+            "quantity": decreaseBy,
             "timestamp": DateTime.now().toIso8601String(),
           },
         );
@@ -404,7 +419,7 @@ class CartService {
 
       final body = {
         "cart_item_key": cartItemKey,
-        "quantity": onlineQuantity - 1, // only decrease 1 online
+        "quantity": (onlineQuantity - decreaseBy).clamp(0, onlineQuantity),
       };
 
       final response = await _dio.post(
@@ -414,9 +429,8 @@ class CartService {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // Update cache: combine new online quantity with queued offline decreases
+        // Count offline queued decreases
         int offlineQueuedQty = 0;
-
         final offlineKeys =
             box.keys
                 .where(
@@ -432,23 +446,23 @@ class CartService {
         }
 
         await cacheBox.put("cartData_$productId", {
-          "totalQuantity": (onlineQuantity - 1) + offlineQueuedQty,
+          "totalQuantity": (onlineQuantity - decreaseBy) + offlineQueuedQty,
           "cartItemKey": cartItemKey,
         });
 
         print(
-          "✅ Cart item decreased online. Online: ${onlineQuantity - 1}, Total with offline queued: ${(onlineQuantity - 1) + offlineQueuedQty}",
+          "✅ Cart item decreased online. Online: ${onlineQuantity - decreaseBy}, Total with offline queued: ${(onlineQuantity - decreaseBy) + offlineQueuedQty}",
         );
       }
 
       return response;
     } catch (e) {
-      // Queue offline decrease if online fails
+      // Queue offline if online fails
       await box
           .put("offline_remove_cart_${DateTime.now().millisecondsSinceEpoch}", {
             "action": "decrease",
             "product_id": productId,
-            "quantity": 1,
+            "quantity": decreaseBy,
             "timestamp": DateTime.now().toIso8601String(),
           });
 
@@ -630,5 +644,34 @@ class CartService {
       print("⚠️ Failed online, cart cleared offline & queued: $e");
       return null;
     }
+  }
+
+  // ----------------- Fetch Cart -----------------
+  Future<http.Response> fetchCart(id) async {
+    String url = "${apiEndpoints.viewCart}$id";
+    LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
+    String token = loginData?.token ?? '';
+    print("my token :: $token");
+    if (token.isEmpty) {
+      throw Exception('Token not found');
+    }
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $token',
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    };
+    print(url);
+    var responseJson;
+    final response = await http
+        .get(Uri.parse(url), headers: headers)
+        .timeout(
+          const Duration(seconds: 60),
+          onTimeout: () {
+            throw const SocketException('Something went wrong');
+          },
+        );
+    responseJson = responses(response);
+
+    return responseJson;
   }
 }

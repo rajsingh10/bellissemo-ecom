@@ -137,8 +137,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         // 🔹 Email Field with Validator
                         AppTextField(
                           controller: emailController,
-                          hintText: "User Name",
-                          text: "User Name",
+                          hintText: "User Name / Email Address",
+                          text: "User Name / Email Address",
                           isTextavailable: true,
                           textInputType: TextInputType.emailAddress,
                           prefix: Icon(
@@ -147,13 +147,22 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return "Please enter your user name";
+                              return "Please enter your user name or email address";
+                            }
+
+                            // Check if input contains '@', treat it as email
+                            if (value.contains('@')) {
+                              final emailRegex = RegExp(
+                                r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                              );
+                              if (!emailRegex.hasMatch(value)) {
+                                return "Please enter a valid email address";
+                              }
                             }
                             return null;
                           },
                         ),
                         SizedBox(height: isIpad ? 2.h : 2.h),
-
                         // 🔹 Password Field with Validator
                         AppTextField(
                           controller: passwordController,
@@ -312,133 +321,117 @@ class _LoginScreenState extends State<LoginScreen> {
   // }
 
   loginap() {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        isLogin = true;
-      });
+    if (!_formKey.currentState!.validate()) return;
 
-      final String username = emailController.text.trim();
-      final String password = passwordController.text.trim();
+    setState(() => isLogin = true);
 
-      final Map<String, String> data = {
-        'username': username,
-        'password': password,
-      };
-      print("🔹 Login Data: $data");
+    final String username = emailController.text.trim();
+    final String password = passwordController.text.trim();
 
-      checkInternet().then((internet) async {
-        var loginBox = HiveService().getLoginBox();
+    final Map<String, String> data = {
+      'username': username,
+      'password': password,
+    };
+    print("🔹 Login Data: $data");
 
+    checkInternet().then((internet) async {
+      var loginBox = HiveService().getLoginBox();
+
+      Future<void> handleSuccessfulLogin(String responseBody) async {
+        loginData = LoginModal.fromJson(json.decode(responseBody));
+
+        final userKey = username;
+        // Save in Hive
+        await loginBox.put('${userKey}_loginData', responseBody);
+        await loginBox.put('${userKey}_username', username);
+        await loginBox.put('${userKey}_password', password);
+
+        // Save in SharedPreferences
+        SaveDataLocal.saveLogInData(loginData!);
+
+        showCustomSuccessSnackbar(
+          title: 'Login Successful',
+          message:
+              internet
+                  ? 'Welcome to Bellissemo!'
+                  : 'Welcome back to Bellissemo!',
+        );
+
+        Get.offAll(HomeMenuScreen());
+
+        setState(() {
+          isLogin = false;
+          emailController.clear();
+          passwordController.clear();
+        });
+      }
+
+      try {
         if (internet) {
-          try {
-            LoginProvider()
-                .loginapi(data)
-                .then((response) async {
-                  print("✅ API Response Status: ${response.statusCode}");
-                  print("📩 API Response Body: ${response.body}");
+          // 🌐 Online Login
+          LoginProvider()
+              .loginapi(data)
+              .then((response) async {
+                print("✅ API Status: ${response.statusCode}");
+                print("📩 API Body: ${response.body}");
 
-                  loginData = LoginModal.fromJson(json.decode(response.body));
-
-                  if (response.statusCode == 200) {
-                    // 🔹 Use username (or userId) as unique key
-                    final userKey = username;
-
-                    // ✅ Save login data in Hive for this user
-                    await loginBox.put('${userKey}_loginData', response.body);
-                    await loginBox.put('${userKey}_username', username);
-                    await loginBox.put('${userKey}_password', password);
-
-                    showCustomSuccessSnackbar(
-                      title: 'Login Successful',
-                      message: 'Welcome to Bellissemo!',
-                    );
-
-                    SaveDataLocal.saveLogInData(loginData!);
-                    Get.offAll(HomeMenuScreen());
-
-                    setState(() {
-                      isLogin = false;
-                      emailController.clear();
-                      passwordController.clear();
-                    });
-                  } else if (response.statusCode == 403) {
-                    showCustomErrorSnackbar(
-                      title: 'Login Failed',
-                      message:
-                          'Invalid username or password. Please try again.',
-                    );
-                    setState(() {
-                      isLogin = false;
-                    });
-                  } else {
-                    showCustomErrorSnackbar(
-                      title: 'Server Error',
-                      message: 'Something went wrong. Please try again later.',
-                    );
-                    setState(() {
-                      isLogin = false;
-                    });
-                  }
-                })
-                .catchError((error, stacktrace) {
-                  print("❌ API CatchError: $error");
-                  print("🛑 Stacktrace: $stacktrace");
-
+                if (response.statusCode == 200) {
+                  await handleSuccessfulLogin(response.body);
+                } else if (response.statusCode == 403) {
                   showCustomErrorSnackbar(
-                    title: 'Network Error',
-                    message:
-                        'Unable to connect. Please check your internet and try again.',
+                    title: 'Login Failed',
+                    message: 'Invalid username or password. Please try again.',
                   );
-                  setState(() {
-                    isLogin = false;
-                  });
-                });
-          } catch (e, s) {
-            print("🔥 Exception Caught: $e");
-            print("📌 Stacktrace: $s");
+                  setState(() => isLogin = false);
+                } else {
+                  showCustomErrorSnackbar(
+                    title: 'Server Error',
+                    message: 'Something went wrong. Please try again later.',
+                  );
+                  setState(() => isLogin = false);
+                }
+              })
+              .catchError((error, stacktrace) {
+                print("❌ API Error: $error");
+                print("🛑 Stacktrace: $stacktrace");
 
-            showCustomErrorSnackbar(
-              title: 'Unexpected Error',
-              message: 'Something went wrong. Please try again.',
-            );
-            setState(() {
-              isLogin = false;
-            });
-          }
+                showCustomErrorSnackbar(
+                  title: 'Network Error',
+                  message: 'Unable to connect. Please check your internet.',
+                );
+                setState(() => isLogin = false);
+              });
         } else {
-          // 🔹 Offline Mode
-          print("⚠️ No Internet Connection - Trying Offline Login");
+          // ⚠️ Offline Login
+          print("⚠️ No Internet - Attempting Offline Login");
 
-          final userKey = username;
-          final cachedData = loginBox.get('${userKey}_loginData');
-          final cachedUsername = loginBox.get('${userKey}_username');
-          final cachedPassword = loginBox.get('${userKey}_password');
+          final cachedData = loginBox.get('${username}_loginData');
+          final cachedUsername = loginBox.get('${username}_username');
+          final cachedPassword = loginBox.get('${username}_password');
 
           if (cachedData != null &&
               cachedUsername == username &&
               cachedPassword == password) {
-            // ✅ Allow offline login for this user
-            loginData = LoginModal.fromJson(json.decode(cachedData));
-
-            showCustomSuccessSnackbar(
-              title: 'Login Successful',
-              message: 'Welcome back to Bellissemo!',
-            );
-
-            Get.offAll(HomeMenuScreen());
+            await handleSuccessfulLogin(cachedData);
           } else {
             showCustomErrorSnackbar(
               title: 'Login Failed',
               message:
-                  'No saved login found for this account. Please connect to the internet and try again.',
+                  'No saved login found for this account. Connect to the internet and try again.',
             );
+            setState(() => isLogin = false);
           }
-
-          setState(() {
-            isLogin = false;
-          });
         }
-      });
-    }
+      } catch (e, s) {
+        print("🔥 Exception: $e");
+        print("📌 Stacktrace: $s");
+
+        showCustomErrorSnackbar(
+          title: 'Unexpected Error',
+          message: 'Something went wrong. Please try again.',
+        );
+        setState(() => isLogin = false);
+      }
+    });
   }
 }
