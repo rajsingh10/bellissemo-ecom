@@ -24,7 +24,7 @@ class EditProfileScreen extends StatelessWidget {
     final TextEditingController dobController = TextEditingController();
 
     return Scaffold(
-      backgroundColor: AppColors.containerColor,
+      backgroundColor: AppColors.bgColor,
       body: SingleChildScrollView(
         child: Column(
           children: [

@@ -1,14 +1,24 @@
+import 'dart:convert';
+import 'dart:developer';
+
+import 'package:bellissemo_ecom/ui/cart/modal/viewCartDataModal.dart';
+import 'package:bellissemo_ecom/ui/cart/service/cartServices.dart';
 import 'package:bellissemo_ecom/utils/customButton.dart';
 import 'package:bellissemo_ecom/utils/customMenuDrawer.dart';
+import 'package:bellissemo_ecom/utils/snackBars.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../ApiCalling/apiConfigs.dart';
+import '../../../apiCalling/checkInternetModule.dart';
+import '../../../services/hiveServices.dart';
 import '../../../utils/cachedNetworkImage.dart';
 import '../../../utils/colors.dart';
 import '../../../utils/fontFamily.dart';
 import '../../../utils/titlebarWidget.dart';
+import '../../customers/view/customerAddressScreen.dart';
 
 class CheckOutScreen extends StatefulWidget {
   const CheckOutScreen({super.key});
@@ -18,22 +28,7 @@ class CheckOutScreen extends StatefulWidget {
 }
 
 class _CheckOutScreenState extends State<CheckOutScreen> {
-  final List<Product> products = [
-    Product(
-      name: "Maybelline Lip Liner",
-      imageUrl:
-          "https://m.media-amazon.com/images/I/71Y+L4lMHWL._UF1000,1000_QL80_.jpg",
-      quantity: 1,
-      price: 19.99,
-    ),
-    Product(
-      name: "Revlon Face Powder",
-      imageUrl:
-          "https://m.media-amazon.com/images/I/71JgzO1Pp5L._UF1000,1000_QL80_.jpg",
-      quantity: 1,
-      price: 79.99,
-    ),
-  ];
+
   String? customerName;
   int? customerId;
 
@@ -45,11 +40,39 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     });
   }
 
+  bool isLoading = true;
+
+  Future<void> loadInitialData() async {
+    setState(() => isLoading = true);
+    _loadCachedData();
+    final stopwatch = Stopwatch()..start();
+    try {
+      await Future.wait([_fetchCart().then((_) => setState(() {}))]);
+    } catch (e) {
+      log("Error loading initial data: $e");
+    } finally {
+      stopwatch.stop();
+      log("All API calls completed in ${stopwatch.elapsed.inMilliseconds} ms");
+      setState(() => isLoading = false);
+    }
+  }
+
+  void _loadCachedData() {
+    var viewCartbox = HiveService().getViewCartBox();
+
+    final cachedCart = viewCartbox.get('cart_$customerId');
+    if (cachedCart != null) {
+      viewCartData = ViewCartDataModal.fromJson(json.decode(cachedCart));
+    }
+    setState(() {});
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _loadCustomer();
+    loadInitialData();
   }
 
   @override
@@ -148,10 +171,15 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                 ],
                               ),
 
-                              Icon(
-                                Icons.edit_rounded,
-                                size: 20.sp,
-                                color: AppColors.mainColor,
+                              InkWell(
+                                onTap: (){
+                                  Get.to(CustomerAddressScreen());
+                                },
+                                child: Icon(
+                                  Icons.edit_rounded,
+                                  size: 20.sp,
+                                  color: AppColors.mainColor,
+                                ),
                               ),
                             ],
                           ),
@@ -215,58 +243,217 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                           ),
                           Divider(),
 
-                          for (var product in products) ...[
-                            Row(
+                          Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: AppColors.whiteColor,
+                            ),
+                            child: Column(
                               children: [
-                                // Using CustomNetworkImage
-                                CustomNetworkImage(
-                                  imageUrl: product.imageUrl,
-                                  width: 20.w,
-                                  height: 10.h,
-                                  radius: 8,
-                                  isFit: true,
-                                ),
-                                SizedBox(width: 3.w),
-                                // Product Details
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        product.name,
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontFamily: FontFamily.semiBold,
-                                          color: AppColors.blackColor,
-                                        ),
-                                      ),
-                                      SizedBox(height: 0.5.h),
-                                      Text(
-                                        "Qty: ${product.quantity}",
-                                        style: TextStyle(
-                                          fontSize: 14.sp,
-                                          fontFamily: FontFamily.regular,
-                                          color: AppColors.gray,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                // Product Price
-                                Text(
-                                  "\$${(product.price * product.quantity).toStringAsFixed(2)}",
+                                SizedBox(height: 1.h),
+                                viewCartData?.items?.length == 0 ||
+                                    viewCartData?.items?.length ==
+                                        null ||
+                                    viewCartData?.items?.length == []
+                                    ? Text(
+                                  "No Cart Available",
                                   style: TextStyle(
-                                    fontSize: 16.sp,
-                                    fontFamily: FontFamily.semiBold,
+                                    fontFamily: FontFamily.bold,
+                                    fontSize: 15.sp,
                                     color: AppColors.blackColor,
                                   ),
+                                )
+                                    : Column(
+                                  children: [
+                                    for (
+                                    int i = 0;
+                                    i <
+                                        (viewCartData
+                                            ?.items
+                                            ?.length ??
+                                            0);
+                                    i++
+                                    )
+                                      Column(
+                                        children: [
+                                          Container(
+                                            // margin: EdgeInsets.symmetric(vertical: 1.h, horizontal: 2.w),
+                                            padding: EdgeInsets.all(
+                                              2.w,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color:
+                                              AppColors
+                                                  .whiteColor,
+                                              borderRadius:
+                                              BorderRadius.circular(
+                                                15,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color:
+                                                  Colors
+                                                      .grey
+                                                      .shade300,
+                                                  blurRadius: 10,
+                                                  offset: Offset(
+                                                    0,
+                                                    5,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment
+                                                  .start,
+                                              children: [
+                                                // Product Image
+                                                ClipRRect(
+                                                  borderRadius:
+                                                  BorderRadius.circular(
+                                                    12,
+                                                  ),
+                                                  child: CustomNetworkImage(
+                                                    imageUrl:
+                                                    viewCartData
+                                                        ?.items?[i]
+                                                        .images?[0]
+                                                        .src ??
+                                                        '',
+                                                    height: 80,
+                                                    width: 80,
+                                                    radius: 12,
+                                                    isCircle: false,
+                                                    isFit: true,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 3.w),
+
+                                                // Product Details
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                    CrossAxisAlignment
+                                                        .start,
+                                                    children: [
+                                                      Text(
+                                                        viewCartData
+                                                            ?.items?[i]
+                                                            .name ??
+                                                            "",
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                          FontFamily
+                                                              .bold,
+                                                          fontSize:
+                                                          15.sp,
+                                                          color:
+                                                          AppColors
+                                                              .blackColor,
+                                                        ),
+                                                        maxLines: 2,
+                                                        overflow:
+                                                        TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                      SizedBox(
+                                                        height: 0.5.h,
+                                                      ),
+
+                                                      Text(
+                                                        "Qty:  ${viewCartData
+                                                            ?.items?[i]
+                                                            .quantity ??
+                                                            ""}",
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                          FontFamily
+                                                              .light,
+                                                          fontSize:
+                                                          15.sp,
+                                                          color:
+                                                          AppColors
+                                                              .blackColor,
+                                                        ),
+                                                        maxLines: 2,
+                                                        overflow:
+                                                        TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+
+                                                // Price + Delete
+                                                Column(
+                                                  crossAxisAlignment:
+                                                  CrossAxisAlignment
+                                                      .end,
+                                                  children: [
+                                                    InkWell(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          // cartItems.removeAt(i);
+                                                        });
+                                                      },
+                                                      child: Container(
+                                                        height:
+                                                        isIpad
+                                                            ? 24.sp
+                                                            : 0.sp,
+                                                        padding: EdgeInsets.all(
+                                                          isIpad
+                                                              ? 1.w
+                                                              : 1.5.w,
+                                                        ),
+                                                        decoration: BoxDecoration(
+                                                          color:
+                                                          AppColors
+                                                              .mainColor,
+                                                          shape:
+                                                          BoxShape
+                                                              .circle,
+                                                        ),
+                                                        child: Icon(
+                                                          Icons
+                                                              .delete_outline_rounded,
+                                                          color:
+                                                          AppColors
+                                                              .whiteColor,
+                                                          size:
+                                                          isIpad
+                                                              ? 16.sp
+                                                              : 0,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      height: 2.h,
+                                                    ),
+                                                    // Text(
+                                                    //   "\$ ${  viewCartData?.items?[i].prices?.price ?? ""}",
+                                                    //   style: TextStyle(
+                                                    //     color: AppColors.blackColor,
+                                                    //     fontSize: 14.sp,
+                                                    //     fontFamily:
+                                                    //         FontFamily.semiBold,
+                                                    //   ),
+                                                    // ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(height: 1.h),
+                                        ],
+                                      ),
+                                  ],
                                 ),
                               ],
                             ),
-                            SizedBox(height: 1.h),
-                            Divider(),
-                          ],
+                          ),
                         ],
                       ),
                     ),
@@ -305,10 +492,11 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
 
                           // SizedBox(height: 1.h),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "Subtotal",
+                                "Sub Total",
                                 style: TextStyle(
                                   color: AppColors.blackColor,
                                   fontSize: 16.sp,
@@ -316,7 +504,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                 ),
                               ),
                               Text(
-                                "\$150.00 ",
+                                "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalItems}",
                                 style: TextStyle(
                                   color: AppColors.blackColor,
                                   fontSize: 16.sp,
@@ -327,7 +515,31 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                           ),
                           SizedBox(height: 1.h),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Total Tax",
+                                style: TextStyle(
+                                  color: AppColors.blackColor,
+                                  fontSize: 16.sp,
+                                  fontFamily: FontFamily.semiBold,
+                                ),
+                              ),
+                              Text(
+                                "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalTax}",
+                                style: TextStyle(
+                                  color: AppColors.blackColor,
+                                  fontSize: 16.sp,
+                                  fontFamily: FontFamily.semiBold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 1.h),
+                          Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 "Shipping",
@@ -338,7 +550,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                 ),
                               ),
                               Text(
-                                "\$5.00 ",
+                                " ${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalShipping ?? "0.0"}",
                                 style: TextStyle(
                                   color: AppColors.gray,
                                   fontSize: 16.sp,
@@ -349,10 +561,11 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                           ),
                           SizedBox(height: 1.h),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "Tax",
+                                "Discount Tax",
                                 style: TextStyle(
                                   color: AppColors.gray,
                                   fontSize: 16.sp,
@@ -360,7 +573,10 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                 ),
                               ),
                               Text(
-                                "\$0.00",
+                                "${viewCartData?.totals?.currencySymbol} ${ viewCartData?.totals?.totalDiscount ??
+                                    ""}",
+
+                                // "\$ ${tax.toStringAsFixed(2)}",
                                 style: TextStyle(
                                   color: AppColors.gray,
                                   fontSize: 16.sp,
@@ -371,21 +587,24 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                           ),
                           Divider(),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 "Total",
                                 style: TextStyle(
                                   color: AppColors.blackColor,
-                                  fontSize: 18.sp,
+                                  fontSize: 17.sp,
                                   fontFamily: FontFamily.semiBold,
                                 ),
                               ),
                               Text(
-                                "\$155.00",
+                                "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalPrice ??
+                                    ""}" ,
+                                // "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
                                 style: TextStyle(
                                   color: AppColors.blackColor,
-                                  fontSize: 18.sp,
+                                  fontSize: 17.sp,
                                   fontFamily: FontFamily.semiBold,
                                 ),
                               ),
@@ -416,18 +635,52 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
       ).paddingSymmetric(horizontal: 3.w, vertical: 1.5.h),
     );
   }
+  Future<void> _fetchCart() async {
+    var box = HiveService().getViewCartBox();
+
+    if (!await checkInternet()) {
+      final cachedData = box.get('cart_$customerId');
+      if (cachedData != null) {
+        final data = json.decode(cachedData);
+        viewCartData = ViewCartDataModal.fromJson(data);
+      } else {
+        showCustomErrorSnackbar(
+          title: 'No Internet',
+          message: 'Please check your connection and try again.',
+        );
+      }
+      return;
+    }
+
+    try {
+      final response = await CartService().fetchCart(customerId);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        viewCartData = ViewCartDataModal.fromJson(data);
+        await box.put("cart_$customerId", response.body);
+      } else {
+        final cachedData = box.get('cart_$customerId');
+        if (cachedData != null) {
+          final data = json.decode(cachedData);
+          viewCartData = ViewCartDataModal.fromJson(data);
+        }
+        showCustomErrorSnackbar(
+          title: 'Server Error',
+          message: 'Something went wrong. Please try again later.',
+        );
+      }
+    } catch (_) {
+      final cachedData = box.get('cart_$customerId');
+      if (cachedData != null) {
+        final data = json.decode(cachedData);
+        viewCartData = ViewCartDataModal.fromJson(data);
+      }
+      showCustomErrorSnackbar(
+        title: 'Network Error',
+        message: 'Unable to connect. Please check your internet and try again.',
+      );
+    }
+  }
 }
 
-class Product {
-  final String name;
-  final String imageUrl;
-  final int quantity;
-  final double price;
 
-  Product({
-    required this.name,
-    required this.imageUrl,
-    required this.quantity,
-    required this.price,
-  });
-}
