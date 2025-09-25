@@ -272,7 +272,38 @@ class _CartScreenState extends State<CartScreen> {
                                                                         // Decrease
                                                                         GestureDetector(
                                                                           onTap:
-                                                                              () {},
+                                                                              () async{
+                                                                                final item = viewCartData?.items?[i];
+                                                                                if (item == null) return;
+
+                                                                                final cartService = CartService();
+                                                                                final currentQty = item.quantity ?? 1;
+
+                                                                                try {
+                                                                                  // 🔹 Offline/Online increase
+                                                                                  await cartService.decreaseCart(
+                                                                                    cartItemKey: item.key ?? "",
+                                                                                    currentQuantity: currentQty,
+                                                                                  );
+
+                                                                                  // 🔹 Immediately update UI
+                                                                                  setState(() {
+                                                                                    item.quantity = currentQty - 1;
+                                                                                    updateCartTotalsLocally();
+                                                                                  });
+
+                                                                                  // 🔹 Only fetch cart from server if online
+                                                                                  if (await checkInternet()) {
+                                                                                await _fetchCart(); // just call it
+                                                                                setState(() {}); // refresh UI after _fetchCart updates viewCartData
+                                                                                }
+                                                                                } catch (e) {
+                                                                                showCustomErrorSnackbar(
+                                                                                title: "Error",
+                                                                                message: "Failed to update cart\n$e",
+                                                                                );
+                                                                                }
+                                                                              },
                                                                           child: Container(
                                                                             padding: EdgeInsets.all(
                                                                               1.5.w,
@@ -302,7 +333,7 @@ class _CartScreenState extends State<CartScreen> {
 
                                                                         // Quantity text
                                                                         Text(
-                                                                          "1",
+                                                                          (viewCartData?.items?[i].quantity ?? 0).toString(),
                                                                           style: TextStyle(
                                                                             fontSize:
                                                                                 14.sp,
@@ -320,10 +351,45 @@ class _CartScreenState extends State<CartScreen> {
 
                                                                         // Increase
                                                                         GestureDetector(
-                                                                          onTap: () {
-                                                                            setState(() {
-                                                                              // cartItems[i]["qty"]++;
-                                                                            });
+                                                                          onTap: () async {
+
+                                                                            final item = viewCartData?.items?[i];
+                                                                            if (item == null) return;
+
+                                                                            final cartService = CartService();
+                                                                            final currentQty = item.quantity ?? 1;
+
+                                                                            try {
+                                                                              // 🔹 Offline/Online increase
+                                                                              await cartService.increaseCart(
+                                                                                cartItemKey: item.key ?? "",
+                                                                                currentQuantity: currentQty,
+                                                                              );
+
+                                                                              // 🔹 Immediately update UI
+                                                                              setState(() {
+                                                                                item.quantity = currentQty + 1;
+                                                                                updateCartTotalsLocally();
+                                                                              });
+
+                                                                              // 🔹 Only fetch cart from server if online
+                                                                              if (await checkInternet()) {
+                                                                                await _fetchCart(); // just call it
+                                                                                setState(() {}); // refresh UI after _fetchCart updates viewCartData
+                                                                              }
+                                                                            } catch (e,stackTrace) {
+                                                                              showCustomErrorSnackbar(
+                                                                                title: "Error",
+                                                                                message: "Failed to update cart\n$e",
+                                                                              );
+                                                                              print("e========>>>>>>${e}");
+                                                                              print("e========>>>>>>${stackTrace}");
+                                                                              print("e========>>>>>>${stackTrace}");
+                                                                            }
+
+
+
+
                                                                           },
                                                                           child: Container(
                                                                             padding: EdgeInsets.all(
@@ -512,7 +578,7 @@ class _CartScreenState extends State<CartScreen> {
                                     SizedBox(height: 2.h),
                                     Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           "Sub Total",
@@ -523,7 +589,7 @@ class _CartScreenState extends State<CartScreen> {
                                           ),
                                         ),
                                         Text(
-                                          "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalItems}",
+                                          "${viewCartData?.totals?.currencySymbol} ${(viewCartData?.totals?.totalItems ?? 0).toString()}",
                                           style: TextStyle(
                                             color: AppColors.blackColor,
                                             fontSize: 16.sp,
@@ -592,8 +658,7 @@ class _CartScreenState extends State<CartScreen> {
                                           ),
                                         ),
                                         Text(
-                                          "${viewCartData?.totals?.currencySymbol} ${ viewCartData?.totals?.totalDiscount ??
-                                              ""}",
+                                          "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalDiscount ?? ""}",
 
                                           // "\$ ${tax.toStringAsFixed(2)}",
                                           style: TextStyle(
@@ -618,8 +683,7 @@ class _CartScreenState extends State<CartScreen> {
                                           ),
                                         ),
                                         Text(
-                                         "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalPrice ??
-                                             ""}" ,
+                                          "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalPrice ?? ""}",
                                           // "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
                                           style: TextStyle(
                                             color: AppColors.blackColor,
@@ -714,6 +778,45 @@ class _CartScreenState extends State<CartScreen> {
       ),
     );
   }
+  void updateCartTotalsLocally() {
+    if (viewCartData == null) return;
+
+    double subtotal = 0.0;
+    double tax = 0.0;
+    double shipping = double.tryParse(viewCartData?.totals?.totalShipping ?? '0') ?? 0.0;
+    double discount = double.tryParse(viewCartData?.totals?.totalDiscount ?? '0') ?? 0.0;
+
+    for (var item in viewCartData!.items ?? []) {
+      // Safe way - check if prices exists
+      if (item.prices != null) {
+        double itemPrice = double.tryParse(item.prices!.price ?? '0') ?? 0.0;
+        int quantity = item.quantity ?? 0;
+
+        subtotal += itemPrice * quantity;
+
+        // Tax ના લીધે error આવે છે તો temporary tax = 0 set કરો
+        // અથવા તમારા API response માં tax નું correct field name use કરો
+        double itemTax = 0.0; // Temporary - tax નો issue solve થઈ જશે
+        // double itemTax = double.tryParse(item.prices?.priceTax ?? '0') ?? 0.0; // Original line
+
+        tax += itemTax * quantity;
+      }
+    }
+
+    double totalPrice = subtotal + tax + shipping - discount;
+
+    viewCartData!.totals = Totals(
+      currencySymbol: viewCartData!.totals?.currencySymbol ?? "\$",
+      totalItems: subtotal.round().toString(),
+      totalTax: tax.round().toString(),
+      totalShipping: shipping.round().toString(),
+      totalDiscount: discount.round().toString(),
+      totalPrice: totalPrice.round().toString(),
+    );
+  }
+
+
+
 
   Future<void> _fetchCart() async {
     var box = HiveService().getViewCartBox();

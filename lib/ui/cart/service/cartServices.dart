@@ -479,7 +479,8 @@ class CartService {
     String? itemNote,
     int? variationId,
     Map<String, dynamic>? variation,
-  }) async {
+  }) async
+  {
     final cartData = await getProductCartData(productId: productId);
 
     num totalQuantity = cartData["totalQuantity"] ?? 0;
@@ -586,6 +587,204 @@ class CartService {
       return null;
     }
   }
+
+
+  // ----------------- Increase Cart Item -----------------
+  Future<Response?> increaseCart({
+    required String cartItemKey,
+    required int currentQuantity,
+    bool isSync = false, // prevent infinite loop during sync
+  }) async {
+    final newQuantity = currentQuantity + 1;
+
+    final box = HiveService().getAddCartBox();
+    final cacheBox = HiveService().getProductCartDataBox();
+    if (!cacheBox.isOpen) await HiveService().init();
+
+    // 🔹 Update local cache
+    await cacheBox.put("cartData_$cartItemKey", {
+      "totalQuantity": newQuantity,
+      "cartItemKey": cartItemKey,
+    });
+
+    print("🛒 Local cache updated → $cartItemKey : $newQuantity");
+
+    // ---------------- OFFLINE ----------------
+    if (!await checkInternet()) {
+      if (!isSync) {
+        await box.put(
+          "offline_update_cart_${DateTime.now().millisecondsSinceEpoch}",
+          {
+            "action": "update_qty",
+            "cart_item_key": cartItemKey,
+            "quantity": newQuantity,
+            "timestamp": DateTime.now().toIso8601String(),
+          },
+        );
+        print("⚠️ Offline: queued increase → $cartItemKey : $newQuantity");
+      }
+      return null;
+    }
+
+    // ---------------- ONLINE ----------------
+    try {
+      final loginData = await SaveDataLocal.getDataFromLocal();
+      final token = loginData?.token ?? '';
+      if (token.isEmpty) throw Exception("Token not found");
+
+      final headers = {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      };
+
+      final body = {
+        "cart_item_key": cartItemKey,
+        "quantity": newQuantity,
+      };
+
+      final response = await _dio.post(
+        apiEndpoints.updateCart,
+        data: jsonEncode(body),
+        options: Options(headers: headers),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("✅ Cart updated online → $cartItemKey : $newQuantity");
+      }
+
+      return response;
+    } catch (e) {
+      if (!isSync) {
+        await box.put(
+          "offline_update_cart_${DateTime.now().millisecondsSinceEpoch}",
+          {
+            "action": "update_qty",
+            "cart_item_key": cartItemKey,
+            "quantity": newQuantity,
+            "timestamp": DateTime.now().toIso8601String(),
+          },
+        );
+        print("⚠️ Failed online, saved offline → $cartItemKey : $newQuantity");
+      }
+      return null;
+    }
+  }
+
+  // ----------------- Decrease Cart Item -----------------
+  Future<Response?> decreaseCart({
+    required String cartItemKey,
+    required int currentQuantity,
+    bool isSync = false,
+  }) async {
+    if (currentQuantity <= 1) return null; // optional: prevent < 1
+
+    final newQuantity = currentQuantity - 1;
+
+    final box = HiveService().getAddCartBox();
+    final cacheBox = HiveService().getProductCartDataBox();
+    if (!cacheBox.isOpen) await HiveService().init();
+
+    // 🔹 Update local cache
+    await cacheBox.put("cartData_$cartItemKey", {
+      "totalQuantity": newQuantity,
+      "cartItemKey": cartItemKey,
+    });
+
+    print("🛒 Local cache updated → $cartItemKey : $newQuantity");
+
+    // ---------------- OFFLINE ----------------
+    if (!await checkInternet()) {
+      if (!isSync) {
+        await box.put(
+          "offline_update_cart_${DateTime.now().millisecondsSinceEpoch}",
+          {
+            "action": "update_qty",
+            "cart_item_key": cartItemKey,
+            "quantity": newQuantity,
+            "timestamp": DateTime.now().toIso8601String(),
+          },
+        );
+        print("⚠️ Offline: queued decrease → $cartItemKey : $newQuantity");
+      }
+      return null;
+    }
+
+    // ---------------- ONLINE ----------------
+    try {
+      final loginData = await SaveDataLocal.getDataFromLocal();
+      final token = loginData?.token ?? '';
+      if (token.isEmpty) throw Exception("Token not found");
+
+      final headers = {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      };
+
+      final body = {
+        "cart_item_key": cartItemKey,
+        "quantity": newQuantity,
+      };
+
+      final response = await _dio.post(
+        apiEndpoints.updateCart,
+        data: jsonEncode(body),
+        options: Options(headers: headers),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("✅ Cart updated online → $cartItemKey : $newQuantity");
+      }
+
+      return response;
+    } catch (e) {
+      if (!isSync) {
+        await box.put(
+          "offline_update_cart_${DateTime.now().millisecondsSinceEpoch}",
+          {
+            "action": "update_qty",
+            "cart_item_key": cartItemKey,
+            "quantity": newQuantity,
+            "timestamp": DateTime.now().toIso8601String(),
+          },
+        );
+        print("⚠️ Failed online, saved offline → $cartItemKey : $newQuantity");
+      }
+      return null;
+    }
+  }
+
+  // ----------------- Sync Offline Queue -----------------
+  Future<void> syncOfflineUpdate() async {
+    final box = HiveService().getAddCartBox();
+    if (!await checkInternet()) return; // only sync when online
+
+    final keys = box.keys
+        .where((k) => k.toString().startsWith("offline_update_cart_"))
+        .toList();
+
+    for (var key in keys) {
+      final data = box.get(key);
+      if (data == null) continue;
+
+      try {
+        await increaseCart(
+          cartItemKey: data['cart_item_key'],
+          currentQuantity: data['quantity'] - 1, // because increaseCart adds 1
+          isSync: true, // important: prevent infinite loop
+        );
+        await box.delete(key); // remove from offline queue on success
+        print("✅ Synced offline cart → ${data['cart_item_key']} : ${data['quantity']}");
+      } catch (e) {
+        print("⚠️ Failed to sync offline cart → ${data['cart_item_key']}: $e");
+      }
+    }
+  }
+
+
+
+
 
   // ----------------- Clear Cart -----------------
   Future<Response?> clearCart() async {

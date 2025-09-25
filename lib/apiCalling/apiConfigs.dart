@@ -1,5 +1,6 @@
 import 'package:bellissemo_ecom/ui/login/modal/loginModal.dart';
 
+import '../ui/cart/modal/updateQtyModal.dart';
 import '../ui/cart/modal/viewCartDataModal.dart';
 import '../ui/category/modal/fetchCategoriesModal.dart';
 import '../ui/category/modal/fetchSubCategoriesModal.dart';
@@ -29,3 +30,4 @@ FetchSubCategoriesModal? subCategories;
 CustomerOrderWiseModal? customerOrders;
 ViewCartDataModal? viewCartData;
 FetchPdfFileModal? fetchPdfFile;
+UpdateQtyModal? updateQtyModal;

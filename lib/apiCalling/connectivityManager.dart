@@ -20,6 +20,7 @@ class ConnectivityManager {
         if (await checkInternet()) {
           await CartService().syncOfflineCart();
           await CartService().syncOfflineActions();
+          await CartService().syncOfflineUpdate();
         }
       });
     });

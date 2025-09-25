@@ -15,6 +15,8 @@ class apiEndpoints {
   static String addToCart = "$baseUrl/wp-json/bellissemo/v1/add-to-cart";
   static String removeFromCart =
       "$baseUrl/wp-json/bellissemo/v1/update-cart-item";
+  static String updateCart =
+      "$baseUrl/wp-json/bellissemo/v1/update-cart-item";
   static String checkCart = "$baseUrl/wp-json/bellissemo/v1/cart/contains/";
   static String clearCart = "$baseUrl/wp-json/bellissemo/v1/cart/clear";
   static String orderHistory = "$baseUrl/wp-json/wc/v3/orders?customer=";
