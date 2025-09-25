@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:bellissemo_ecom/apiCalling/Loader.dart';
 import 'package:bellissemo_ecom/ui/cart/modal/viewCartDataModal.dart';
 import 'package:bellissemo_ecom/ui/cart/service/cartServices.dart';
 import 'package:bellissemo_ecom/utils/customButton.dart';
@@ -28,7 +29,6 @@ class CheckOutScreen extends StatefulWidget {
 }
 
 class _CheckOutScreenState extends State<CheckOutScreen> {
-
   String? customerName;
   int? customerId;
 
@@ -79,549 +79,590 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.containerColor,
-      body: Column(
-        children: [
-          TitleBar(
-            title: 'Checkout',
-            isDrawerEnabled: false,
-            isBackEnabled: true,
-          ),
-          SizedBox(height: 1.h),
-          Expanded(
-            child: SingleChildScrollView(
-              physics: ClampingScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body:
+          isLoading
+              ? Loader()
+              : Column(
                 children: [
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: AppColors.whiteColor,
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.local_shipping_rounded,
-                                color: AppColors.mainColor,
-                                size: 21.sp,
-                              ),
-                              Text(
-                                "Shipping Details",
-                                style: TextStyle(
-                                  color: AppColors.mainColor,
-                                  fontSize: 20.sp,
-                                  fontFamily: FontFamily.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Divider(),
-
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.person_outline_rounded,
-                                size: 20.sp,
-                                color: AppColors.mainColor,
-                              ),
-                              Text(
-                                "Customer Name",
-                                style: TextStyle(
-                                  color: AppColors.mainColor,
-                                  fontSize: 16.sp,
-                                  fontFamily: FontFamily.semiBold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Text(
-                            customerName.toString(),
-                            style: TextStyle(
-                              color: AppColors.blackColor,
-                              fontSize: 16.sp,
-                              fontFamily: FontFamily.semiBold,
-                            ),
-                          ),
-                          SizedBox(height: 1.h),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.location_on_outlined,
-                                    size: 20.sp,
-                                    color: AppColors.mainColor,
-                                  ),
-                                  Text(
-                                    "Address",
-                                    style: TextStyle(
-                                      color: AppColors.mainColor,
-                                      fontSize: 16.sp,
-                                      fontFamily: FontFamily.semiBold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              InkWell(
-                                onTap: (){
-                                  Get.to(CustomerAddressScreen());
-                                },
-                                child: Icon(
-                                  Icons.edit_rounded,
-                                  size: 20.sp,
-                                  color: AppColors.mainColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Text(
-                            "117, Albany Gardens,Colchester,Essex,United Kingdom",
-                            style: TextStyle(
-                              color: AppColors.blackColor,
-                              fontSize: 16.sp,
-                              fontFamily: FontFamily.semiBold,
-                            ),
-                          ),
-                          SizedBox(height: 1.h),
-                          // Row(
-                          //   children: [
-                          //     Icon(Icons.location_on_outlined,size: 20.sp,color: AppColors.blackColor,),
-                          //     Flexible(
-                          //       child: Text("117, Albany Gardens,Colchester,Essex,United kingdom",
-                          //         style: TextStyle(
-                          //             color: AppColors.blackColor,fontSize: 16.sp,
-                          //             fontFamily: FontFamily.semiBold
-                          //
-                          //         ),
-                          //       ),
-                          //     ),
-                          //     Icon(Icons.edit_rounded,size: 20.sp,color: AppColors.mainColor,),
-                          //   ],
-                          // )
-                        ],
-                      ),
-                    ),
+                  TitleBar(
+                    title: 'Checkout',
+                    isDrawerEnabled: false,
+                    isBackEnabled: true,
                   ),
                   SizedBox(height: 1.h),
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: AppColors.whiteColor,
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: ClampingScrollPhysics(),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.shopping_bag_rounded,
-                                color: AppColors.mainColor,
-                                size: 21.sp,
-                              ),
-                              Text(
-                                "Order",
-                                style: TextStyle(
-                                  color: AppColors.mainColor,
-                                  fontSize: 20.sp,
-                                  fontFamily: FontFamily.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Divider(),
-
                           Container(
                             width: double.infinity,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               color: AppColors.whiteColor,
                             ),
-                            child: Column(
-                              children: [
-                                SizedBox(height: 1.h),
-                                viewCartData?.items?.length == 0 ||
-                                    viewCartData?.items?.length ==
-                                        null ||
-                                    viewCartData?.items?.length == []
-                                    ? Text(
-                                  "No Cart Available",
-                                  style: TextStyle(
-                                    fontFamily: FontFamily.bold,
-                                    fontSize: 15.sp,
-                                    color: AppColors.blackColor,
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.local_shipping_rounded,
+                                        color: AppColors.mainColor,
+                                        size: 21.sp,
+                                      ),
+                                      Text(
+                                        "Shipping Details",
+                                        style: TextStyle(
+                                          color: AppColors.mainColor,
+                                          fontSize: 20.sp,
+                                          fontFamily: FontFamily.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                )
-                                    : Column(
-                                  children: [
-                                    for (
-                                    int i = 0;
-                                    i <
-                                        (viewCartData
-                                            ?.items
-                                            ?.length ??
-                                            0);
-                                    i++
-                                    )
-                                      Column(
+                                  Divider(),
+
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.person_outline_rounded,
+                                        size: 20.sp,
+                                        color: AppColors.mainColor,
+                                      ),
+                                      Text(
+                                        "Customer Name",
+                                        style: TextStyle(
+                                          color: AppColors.mainColor,
+                                          fontSize: 16.sp,
+                                          fontFamily: FontFamily.semiBold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    customerName.toString(),
+                                    style: TextStyle(
+                                      color: AppColors.blackColor,
+                                      fontSize: 16.sp,
+                                      fontFamily: FontFamily.semiBold,
+                                    ),
+                                  ),
+                                  SizedBox(height: 1.h),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
                                         children: [
-                                          Container(
-                                            // margin: EdgeInsets.symmetric(vertical: 1.h, horizontal: 2.w),
-                                            padding: EdgeInsets.all(
-                                              2.w,
+                                          Icon(
+                                            Icons.location_on_outlined,
+                                            size: 20.sp,
+                                            color: AppColors.mainColor,
+                                          ),
+                                          Text(
+                                            "Address",
+                                            style: TextStyle(
+                                              color: AppColors.mainColor,
+                                              fontSize: 16.sp,
+                                              fontFamily: FontFamily.semiBold,
                                             ),
-                                            decoration: BoxDecoration(
-                                              color:
-                                              AppColors
-                                                  .whiteColor,
-                                              borderRadius:
-                                              BorderRadius.circular(
-                                                15,
+                                          ),
+                                        ],
+                                      ),
+
+                                      InkWell(
+                                        onTap: () {
+                                          Get.to(
+                                            CustomerAddressScreen(
+                                              email:
+                                                  viewCartData
+                                                      ?.billingAddress
+                                                      ?.email,
+                                              fName:
+                                                  viewCartData
+                                                      ?.billingAddress
+                                                      ?.firstName,
+                                              lName:
+                                                  viewCartData
+                                                      ?.billingAddress
+                                                      ?.lastName,
+                                              address1:
+                                                  viewCartData
+                                                      ?.billingAddress
+                                                      ?.address1,
+                                              address2:
+                                                  viewCartData
+                                                      ?.billingAddress
+                                                      ?.address2,
+                                              city:
+                                                  viewCartData
+                                                      ?.billingAddress
+                                                      ?.city,
+                                              country:
+                                                  viewCartData
+                                                      ?.billingAddress
+                                                      ?.country,
+                                              postcode:
+                                                  viewCartData
+                                                      ?.billingAddress
+                                                      ?.postcode,
+                                              state:
+                                                  viewCartData
+                                                      ?.billingAddress
+                                                      ?.state,
+                                            ),
+                                          );
+                                        },
+                                        child: Icon(
+                                          Icons.edit_rounded,
+                                          size: 20.sp,
+                                          color: AppColors.mainColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  viewCartData?.billingAddress?.address1 == ''
+                                      ? Center(
+                                        child: Text(
+                                          "No Address Available",
+                                          style: TextStyle(
+                                            color: AppColors.blackColor,
+                                            fontSize: 16.sp,
+                                            fontFamily: FontFamily.semiBold,
+                                          ),
+                                        ),
+                                      )
+                                      : Text(
+                                        "${viewCartData?.billingAddress?.firstName ?? ""} ${viewCartData?.billingAddress?.lastName ?? ""}\n${viewCartData?.billingAddress?.email ?? ""}\n${viewCartData?.billingAddress?.address1 ?? ""} ${viewCartData?.billingAddress?.address2 ?? ""} ${viewCartData?.billingAddress?.city ?? ""} ${viewCartData?.billingAddress?.state ?? ""} ${viewCartData?.billingAddress?.country ?? ""} ${viewCartData?.billingAddress?.postcode ?? ""}",
+                                        style: TextStyle(
+                                          color: AppColors.blackColor,
+                                          fontSize: 16.sp,
+                                          fontFamily: FontFamily.semiBold,
+                                        ),
+                                      ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 1.h),
+                          Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: AppColors.whiteColor,
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.shopping_bag_rounded,
+                                        color: AppColors.mainColor,
+                                        size: 21.sp,
+                                      ),
+                                      Text(
+                                        "Order",
+                                        style: TextStyle(
+                                          color: AppColors.mainColor,
+                                          fontSize: 20.sp,
+                                          fontFamily: FontFamily.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Divider(),
+
+                                  Container(
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: AppColors.whiteColor,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        SizedBox(height: 1.h),
+                                        viewCartData?.items?.length == 0 ||
+                                                viewCartData?.items?.length ==
+                                                    null ||
+                                                viewCartData?.items?.length ==
+                                                    []
+                                            ? Text(
+                                              "No Cart Available",
+                                              style: TextStyle(
+                                                fontFamily: FontFamily.bold,
+                                                fontSize: 15.sp,
+                                                color: AppColors.blackColor,
                                               ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color:
-                                                  Colors
-                                                      .grey
-                                                      .shade300,
-                                                  blurRadius: 10,
-                                                  offset: Offset(
-                                                    0,
-                                                    5,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                              CrossAxisAlignment
-                                                  .start,
+                                            )
+                                            : Column(
                                               children: [
-                                                // Product Image
-                                                ClipRRect(
-                                                  borderRadius:
-                                                  BorderRadius.circular(
-                                                    12,
-                                                  ),
-                                                  child: CustomNetworkImage(
-                                                    imageUrl:
-                                                    viewCartData
-                                                        ?.items?[i]
-                                                        .images?[0]
-                                                        .src ??
-                                                        '',
-                                                    height: 80,
-                                                    width: 80,
-                                                    radius: 12,
-                                                    isCircle: false,
-                                                    isFit: true,
-                                                  ),
-                                                ),
-                                                SizedBox(width: 3.w),
-
-                                                // Product Details
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .start,
+                                                for (
+                                                  int i = 0;
+                                                  i <
+                                                      (viewCartData
+                                                              ?.items
+                                                              ?.length ??
+                                                          0);
+                                                  i++
+                                                )
+                                                  Column(
                                                     children: [
-                                                      Text(
-                                                        viewCartData
-                                                            ?.items?[i]
-                                                            .name ??
-                                                            "",
-                                                        style: TextStyle(
-                                                          fontFamily:
-                                                          FontFamily
-                                                              .bold,
-                                                          fontSize:
-                                                          15.sp,
-                                                          color:
-                                                          AppColors
-                                                              .blackColor,
-                                                        ),
-                                                        maxLines: 2,
-                                                        overflow:
-                                                        TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                      SizedBox(
-                                                        height: 0.5.h,
-                                                      ),
-
-                                                      Text(
-                                                        "Qty:  ${viewCartData
-                                                            ?.items?[i]
-                                                            .quantity ??
-                                                            ""}",
-                                                        style: TextStyle(
-                                                          fontFamily:
-                                                          FontFamily
-                                                              .light,
-                                                          fontSize:
-                                                          15.sp,
-                                                          color:
-                                                          AppColors
-                                                              .blackColor,
-                                                        ),
-                                                        maxLines: 2,
-                                                        overflow:
-                                                        TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-
-                                                // Price + Delete
-                                                Column(
-                                                  crossAxisAlignment:
-                                                  CrossAxisAlignment
-                                                      .end,
-                                                  children: [
-                                                    InkWell(
-                                                      onTap: () {
-                                                        setState(() {
-                                                          // cartItems.removeAt(i);
-                                                        });
-                                                      },
-                                                      child: Container(
-                                                        height:
-                                                        isIpad
-                                                            ? 24.sp
-                                                            : 0.sp,
+                                                      Container(
+                                                        // margin: EdgeInsets.symmetric(vertical: 1.h, horizontal: 2.w),
                                                         padding: EdgeInsets.all(
-                                                          isIpad
-                                                              ? 1.w
-                                                              : 1.5.w,
+                                                          2.w,
                                                         ),
                                                         decoration: BoxDecoration(
                                                           color:
-                                                          AppColors
-                                                              .mainColor,
-                                                          shape:
-                                                          BoxShape
-                                                              .circle,
+                                                              AppColors
+                                                                  .whiteColor,
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                15,
+                                                              ),
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              color:
+                                                                  Colors
+                                                                      .grey
+                                                                      .shade300,
+                                                              blurRadius: 10,
+                                                              offset: Offset(
+                                                                0,
+                                                                5,
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
-                                                        child: Icon(
-                                                          Icons
-                                                              .delete_outline_rounded,
-                                                          color:
-                                                          AppColors
-                                                              .whiteColor,
-                                                          size:
-                                                          isIpad
-                                                              ? 16.sp
-                                                              : 0,
+                                                        child: Row(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            // Product Image
+                                                            ClipRRect(
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    12,
+                                                                  ),
+                                                              child: CustomNetworkImage(
+                                                                imageUrl:
+                                                                    viewCartData
+                                                                        ?.items?[i]
+                                                                        .images?[0]
+                                                                        .src ??
+                                                                    '',
+                                                                height: 80,
+                                                                width: 80,
+                                                                radius: 12,
+                                                                isCircle: false,
+                                                                isFit: true,
+                                                              ),
+                                                            ),
+                                                            SizedBox(
+                                                              width: 3.w,
+                                                            ),
+
+                                                            // Product Details
+                                                            Expanded(
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    viewCartData
+                                                                            ?.items?[i]
+                                                                            .name ??
+                                                                        "",
+                                                                    style: TextStyle(
+                                                                      fontFamily:
+                                                                          FontFamily
+                                                                              .bold,
+                                                                      fontSize:
+                                                                          15.sp,
+                                                                      color:
+                                                                          AppColors
+                                                                              .blackColor,
+                                                                    ),
+                                                                    maxLines: 2,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height:
+                                                                        0.5.h,
+                                                                  ),
+
+                                                                  Text(
+                                                                    "Qty:  ${viewCartData?.items?[i].quantity ?? ""}",
+                                                                    style: TextStyle(
+                                                                      fontFamily:
+                                                                          FontFamily
+                                                                              .light,
+                                                                      fontSize:
+                                                                          15.sp,
+                                                                      color:
+                                                                          AppColors
+                                                                              .blackColor,
+                                                                    ),
+                                                                    maxLines: 2,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+
+                                                            // Price + Delete
+                                                            Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .end,
+                                                              children: [
+                                                                InkWell(
+                                                                  onTap: () {
+                                                                    setState(() {
+                                                                      // cartItems.removeAt(i);
+                                                                    });
+                                                                  },
+                                                                  child: Container(
+                                                                    height:
+                                                                        isIpad
+                                                                            ? 24.sp
+                                                                            : 0.sp,
+                                                                    padding: EdgeInsets.all(
+                                                                      isIpad
+                                                                          ? 1.w
+                                                                          : 1.5
+                                                                              .w,
+                                                                    ),
+                                                                    decoration: BoxDecoration(
+                                                                      color:
+                                                                          AppColors
+                                                                              .mainColor,
+                                                                      shape:
+                                                                          BoxShape
+                                                                              .circle,
+                                                                    ),
+                                                                    child: Icon(
+                                                                      Icons
+                                                                          .delete_outline_rounded,
+                                                                      color:
+                                                                          AppColors
+                                                                              .whiteColor,
+                                                                      size:
+                                                                          isIpad
+                                                                              ? 16.sp
+                                                                              : 0,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                  height: 2.h,
+                                                                ),
+                                                                // Text(
+                                                                //   "\$ ${  viewCartData?.items?[i].prices?.price ?? ""}",
+                                                                //   style: TextStyle(
+                                                                //     color: AppColors.blackColor,
+                                                                //     fontSize: 14.sp,
+                                                                //     fontFamily:
+                                                                //         FontFamily.semiBold,
+                                                                //   ),
+                                                                // ),
+                                                              ],
+                                                            ),
+                                                          ],
                                                         ),
                                                       ),
-                                                    ),
-                                                    SizedBox(
-                                                      height: 2.h,
-                                                    ),
-                                                    // Text(
-                                                    //   "\$ ${  viewCartData?.items?[i].prices?.price ?? ""}",
-                                                    //   style: TextStyle(
-                                                    //     color: AppColors.blackColor,
-                                                    //     fontSize: 14.sp,
-                                                    //     fontFamily:
-                                                    //         FontFamily.semiBold,
-                                                    //   ),
-                                                    // ),
-                                                  ],
-                                                ),
+                                                      SizedBox(height: 1.h),
+                                                    ],
+                                                  ),
                                               ],
                                             ),
-                                          ),
-                                          SizedBox(height: 1.h),
-                                        ],
-                                      ),
-                                  ],
-                                ),
-                              ],
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
+                          SizedBox(height: 1.h),
+                          Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: AppColors.whiteColor,
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.receipt_long_rounded,
+                                        color: AppColors.mainColor,
+                                        size: 21.sp,
+                                      ),
+                                      Text(
+                                        "Order Summary",
+                                        style: TextStyle(
+                                          color: AppColors.mainColor,
+                                          fontSize: 20.sp,
+                                          fontFamily: FontFamily.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Divider(),
+
+                                  // SizedBox(height: 1.h),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Sub Total",
+                                        style: TextStyle(
+                                          color: AppColors.blackColor,
+                                          fontSize: 16.sp,
+                                          fontFamily: FontFamily.semiBold,
+                                        ),
+                                      ),
+                                      Text(
+                                        "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalItems}",
+                                        style: TextStyle(
+                                          color: AppColors.blackColor,
+                                          fontSize: 16.sp,
+                                          fontFamily: FontFamily.semiBold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 1.h),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Total Tax",
+                                        style: TextStyle(
+                                          color: AppColors.blackColor,
+                                          fontSize: 16.sp,
+                                          fontFamily: FontFamily.semiBold,
+                                        ),
+                                      ),
+                                      Text(
+                                        "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalTax}",
+                                        style: TextStyle(
+                                          color: AppColors.blackColor,
+                                          fontSize: 16.sp,
+                                          fontFamily: FontFamily.semiBold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 1.h),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Shipping",
+                                        style: TextStyle(
+                                          color: AppColors.gray,
+                                          fontSize: 16.sp,
+                                          fontFamily: FontFamily.semiBold,
+                                        ),
+                                      ),
+                                      Text(
+                                        " ${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalShipping ?? "0.0"}",
+                                        style: TextStyle(
+                                          color: AppColors.gray,
+                                          fontSize: 16.sp,
+                                          fontFamily: FontFamily.semiBold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 1.h),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Discount Tax",
+                                        style: TextStyle(
+                                          color: AppColors.gray,
+                                          fontSize: 16.sp,
+                                          fontFamily: FontFamily.semiBold,
+                                        ),
+                                      ),
+                                      Text(
+                                        "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalDiscount ?? ""}",
+
+                                        // "\$ ${tax.toStringAsFixed(2)}",
+                                        style: TextStyle(
+                                          color: AppColors.gray,
+                                          fontSize: 16.sp,
+                                          fontFamily: FontFamily.semiBold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Divider(),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Total",
+                                        style: TextStyle(
+                                          color: AppColors.blackColor,
+                                          fontSize: 17.sp,
+                                          fontFamily: FontFamily.semiBold,
+                                        ),
+                                      ),
+                                      Text(
+                                        "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalPrice ?? ""}",
+                                        // "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
+                                        style: TextStyle(
+                                          color: AppColors.blackColor,
+                                          fontSize: 17.sp,
+                                          fontFamily: FontFamily.semiBold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 0.5.h),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 1.h),
                         ],
                       ),
                     ),
                   ),
-                  SizedBox(height: 1.h),
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: AppColors.whiteColor,
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.receipt_long_rounded,
-                                color: AppColors.mainColor,
-                                size: 21.sp,
-                              ),
-                              Text(
-                                "Order Summary",
-                                style: TextStyle(
-                                  color: AppColors.mainColor,
-                                  fontSize: 20.sp,
-                                  fontFamily: FontFamily.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Divider(),
-
-                          // SizedBox(height: 1.h),
-                          Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Sub Total",
-                                style: TextStyle(
-                                  color: AppColors.blackColor,
-                                  fontSize: 16.sp,
-                                  fontFamily: FontFamily.semiBold,
-                                ),
-                              ),
-                              Text(
-                                "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalItems}",
-                                style: TextStyle(
-                                  color: AppColors.blackColor,
-                                  fontSize: 16.sp,
-                                  fontFamily: FontFamily.semiBold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 1.h),
-                          Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Total Tax",
-                                style: TextStyle(
-                                  color: AppColors.blackColor,
-                                  fontSize: 16.sp,
-                                  fontFamily: FontFamily.semiBold,
-                                ),
-                              ),
-                              Text(
-                                "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalTax}",
-                                style: TextStyle(
-                                  color: AppColors.blackColor,
-                                  fontSize: 16.sp,
-                                  fontFamily: FontFamily.semiBold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 1.h),
-                          Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Shipping",
-                                style: TextStyle(
-                                  color: AppColors.gray,
-                                  fontSize: 16.sp,
-                                  fontFamily: FontFamily.semiBold,
-                                ),
-                              ),
-                              Text(
-                                " ${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalShipping ?? "0.0"}",
-                                style: TextStyle(
-                                  color: AppColors.gray,
-                                  fontSize: 16.sp,
-                                  fontFamily: FontFamily.semiBold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 1.h),
-                          Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Discount Tax",
-                                style: TextStyle(
-                                  color: AppColors.gray,
-                                  fontSize: 16.sp,
-                                  fontFamily: FontFamily.semiBold,
-                                ),
-                              ),
-                              Text(
-                                "${viewCartData?.totals?.currencySymbol} ${ viewCartData?.totals?.totalDiscount ??
-                                    ""}",
-
-                                // "\$ ${tax.toStringAsFixed(2)}",
-                                style: TextStyle(
-                                  color: AppColors.gray,
-                                  fontSize: 16.sp,
-                                  fontFamily: FontFamily.semiBold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Divider(),
-                          Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Total",
-                                style: TextStyle(
-                                  color: AppColors.blackColor,
-                                  fontSize: 17.sp,
-                                  fontFamily: FontFamily.semiBold,
-                                ),
-                              ),
-                              Text(
-                                "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalPrice ??
-                                    ""}" ,
-                                // "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
-                                style: TextStyle(
-                                  color: AppColors.blackColor,
-                                  fontSize: 17.sp,
-                                  fontFamily: FontFamily.semiBold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 0.5.h),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 1.h),
                 ],
-              ),
-            ),
-          ),
-        ],
-      ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
+              ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
       bottomNavigationBar: CustomButton(
         title: "Submit Order",
         route: () {},
@@ -635,6 +676,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
       ).paddingSymmetric(horizontal: 3.w, vertical: 1.5.h),
     );
   }
+
   Future<void> _fetchCart() async {
     var box = HiveService().getViewCartBox();
 
@@ -682,5 +724,3 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     }
   }
 }
-
-

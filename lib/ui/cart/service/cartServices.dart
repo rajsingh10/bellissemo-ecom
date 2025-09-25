@@ -479,8 +479,7 @@ class CartService {
     String? itemNote,
     int? variationId,
     Map<String, dynamic>? variation,
-  }) async
-  {
+  }) async {
     final cartData = await getProductCartData(productId: productId);
 
     num totalQuantity = cartData["totalQuantity"] ?? 0;
@@ -588,7 +587,6 @@ class CartService {
     }
   }
 
-
   // ----------------- Increase Cart Item -----------------
   Future<Response?> increaseCart({
     required String cartItemKey,
@@ -638,10 +636,7 @@ class CartService {
         "Accept": "application/json",
       };
 
-      final body = {
-        "cart_item_key": cartItemKey,
-        "quantity": newQuantity,
-      };
+      final body = {"cart_item_key": cartItemKey, "quantity": newQuantity};
 
       final response = await _dio.post(
         apiEndpoints.updateCart,
@@ -722,10 +717,7 @@ class CartService {
         "Accept": "application/json",
       };
 
-      final body = {
-        "cart_item_key": cartItemKey,
-        "quantity": newQuantity,
-      };
+      final body = {"cart_item_key": cartItemKey, "quantity": newQuantity};
 
       final response = await _dio.post(
         apiEndpoints.updateCart,
@@ -760,9 +752,10 @@ class CartService {
     final box = HiveService().getAddCartBox();
     if (!await checkInternet()) return; // only sync when online
 
-    final keys = box.keys
-        .where((k) => k.toString().startsWith("offline_update_cart_"))
-        .toList();
+    final keys =
+        box.keys
+            .where((k) => k.toString().startsWith("offline_update_cart_"))
+            .toList();
 
     for (var key in keys) {
       final data = box.get(key);
@@ -775,16 +768,14 @@ class CartService {
           isSync: true, // important: prevent infinite loop
         );
         await box.delete(key); // remove from offline queue on success
-        print("✅ Synced offline cart → ${data['cart_item_key']} : ${data['quantity']}");
+        print(
+          "✅ Synced offline cart → ${data['cart_item_key']} : ${data['quantity']}",
+        );
       } catch (e) {
         print("⚠️ Failed to sync offline cart → ${data['cart_item_key']}: $e");
       }
     }
   }
-
-
-
-
 
   // ----------------- Clear Cart -----------------
   Future<Response?> clearCart() async {

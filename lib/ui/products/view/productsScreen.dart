@@ -226,7 +226,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             await downloadFile(
                               null, // No URL needed
                               context,
-                              "${widget.cate} - offline",
+                              "${widget.cate} - Catalog",
                               'pdf',
                               fileBytes: Uint8List.fromList(cachedBytes),
                             );
@@ -247,7 +247,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           await downloadFile(
                             pdfLink,
                             context,
-                            "${widget.cate} - ${pdfLink.split('/').last.split('.').first}",
+                            "${widget.cate} - Catalog - ${pdfLink.split('/').last.split('.').first}",
                             pdfLink.split('/').last.split('.').last,
                           );
                         },

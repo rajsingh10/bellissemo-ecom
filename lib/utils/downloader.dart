@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:bellissemo_ecom/utils/snackBars.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -76,7 +76,7 @@ Future<void> downloadFile(
     String formattedTime = DateFormat(
       'yyyy-MM-dd-hh-mm-ss-a',
     ).format(DateTime.now());
-    String filePath = '${appDir.path}/$filename-$formattedTime.$extension';
+    String filePath = '${appDir.path}/$filename - $formattedTime.$extension';
 
     showDialog(
       barrierDismissible: false,
@@ -150,13 +150,25 @@ Future<void> downloadFile(
         },
       );
     }
+    String cleanFilePath(String filePath) {
+      return filePath.replaceFirst('/storage/emulated/0/', '');
+    }
 
     if (Navigator.canPop(context)) Navigator.of(context).pop();
-
-    Fluttertoast.showToast(msg: "File downloaded: $filePath");
+    showCustomSuccessSnackbar(
+      title: 'File Downloaded',
+      message: 'File Saved to ${cleanFilePath(filePath)}',
+    );
+    // print('file path : $filePath');
+    // Fluttertoast.showToast(msg: "File downloaded: $filePath");
   } catch (e) {
     if (Navigator.canPop(context)) Navigator.of(context).pop();
-    Fluttertoast.showToast(msg: "Error occurred: $e");
+    // Fluttertoast.showToast(msg: "Error occurred: $e");
+    showCustomErrorSnackbar(
+      title: 'Sorry',
+      message:
+          'There was an error while downloading the file please try again later...',
+    );
   }
 }
 

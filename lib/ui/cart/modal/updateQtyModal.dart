@@ -13,20 +13,21 @@ class UpdateQtyModal {
   String? cartSubtotal;
   String? message;
 
-  UpdateQtyModal(
-      {this.success,
-        this.updated,
-        this.cartItemKey,
-        this.oldQuantity,
-        this.newQuantity,
-        this.productName,
-        this.productPrice,
-        this.lineTotal,
-        this.lineSubtotal,
-        this.cartCount,
-        this.cartTotal,
-        this.cartSubtotal,
-        this.message});
+  UpdateQtyModal({
+    this.success,
+    this.updated,
+    this.cartItemKey,
+    this.oldQuantity,
+    this.newQuantity,
+    this.productName,
+    this.productPrice,
+    this.lineTotal,
+    this.lineSubtotal,
+    this.cartCount,
+    this.cartTotal,
+    this.cartSubtotal,
+    this.message,
+  });
 
   UpdateQtyModal.fromJson(Map<String, dynamic> json) {
     success = json['success'];
@@ -45,20 +46,20 @@ class UpdateQtyModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['success'] = this.success;
-    data['updated'] = this.updated;
-    data['cart_item_key'] = this.cartItemKey;
-    data['old_quantity'] = this.oldQuantity;
-    data['new_quantity'] = this.newQuantity;
-    data['product_name'] = this.productName;
-    data['product_price'] = this.productPrice;
-    data['line_total'] = this.lineTotal;
-    data['line_subtotal'] = this.lineSubtotal;
-    data['cart_count'] = this.cartCount;
-    data['cart_total'] = this.cartTotal;
-    data['cart_subtotal'] = this.cartSubtotal;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['success'] = success;
+    data['updated'] = updated;
+    data['cart_item_key'] = cartItemKey;
+    data['old_quantity'] = oldQuantity;
+    data['new_quantity'] = newQuantity;
+    data['product_name'] = productName;
+    data['product_price'] = productPrice;
+    data['line_total'] = lineTotal;
+    data['line_subtotal'] = lineSubtotal;
+    data['cart_count'] = cartCount;
+    data['cart_total'] = cartTotal;
+    data['cart_subtotal'] = cartSubtotal;
+    data['message'] = message;
     return data;
   }
 }
