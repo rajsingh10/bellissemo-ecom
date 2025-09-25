@@ -404,7 +404,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                                                                   AppColors
                                                                       .blackColor,
                                                               height: 5.h,
-                                                              width: 30.w,
+                                                              width: 27.w,
                                                               fontsize: 15.sp,
                                                               radius: 12.0,
                                                             ),
@@ -450,7 +450,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                                                                   AppColors
                                                                       .whiteColor,
                                                               height: 5.h,
-                                                              width: 30.w,
+                                                              width: 27.w,
                                                               fontsize: 15.sp,
                                                               radius: 12.0,
                                                               iconData:
@@ -1167,7 +1167,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                         color: AppColors.containerColor,
                         fontcolor: AppColors.blackColor,
                         height: 5.h,
-                        width: 30.w,
+                        width: 27.w,
                         fontsize: 15.sp,
                         radius: 12.0,
                       ),
@@ -1203,7 +1203,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                         color: AppColors.mainColor,
                         fontcolor: AppColors.whiteColor,
                         height: 5.h,
-                        width: 30.w,
+                        width: 27.w,
                         fontsize: 15.sp,
                         radius: 12.0,
                         iconData: Icons.check,

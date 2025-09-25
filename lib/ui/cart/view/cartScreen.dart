@@ -468,40 +468,76 @@ class _CartScreenState extends State<CartScreen> {
                                                                     .end,
                                                             children: [
                                                               InkWell(
-                                                                onTap: () {
-                                                                  setState(() {
-                                                                    // cartItems.removeAt(i);
-                                                                  });
+                                                                onTap: () async {
+                                                                  final item =
+                                                                      viewCartData
+                                                                          ?.items?[i];
+                                                                  if (item ==
+                                                                      null)
+                                                                    return;
+
+                                                                  final cartService =
+                                                                      CartService();
+
+                                                                  try {
+                                                                    // 🔹 Offline/Online increase
+                                                                    await cartService.removeFromCart(
+                                                                      cartItemKey:
+                                                                          item.key ??
+                                                                          "",
+                                                                    );
+
+                                                                    // 🔹 Immediately update UI
+                                                                    setState(() {
+                                                                      viewCartData
+                                                                          ?.items
+                                                                          ?.removeAt(
+                                                                            i,
+                                                                          );
+                                                                      updateCartTotalsLocally();
+                                                                    });
+
+                                                                    // 🔹 Only fetch cart from server if online
+                                                                    if (await checkInternet()) {
+                                                                      await _fetchCart(); // just call it
+                                                                      setState(
+                                                                        () {},
+                                                                      ); // refresh UI after _fetchCart updates viewCartData
+                                                                    }
+                                                                  } catch (
+                                                                    e,
+                                                                    stackTrace
+                                                                  ) {
+                                                                    showCustomErrorSnackbar(
+                                                                      title:
+                                                                          "Error",
+                                                                      message:
+                                                                          "Failed to update cart\n$e",
+                                                                    );
+                                                                    print(
+                                                                      "e========>>>>>>$e",
+                                                                    );
+                                                                    print(
+                                                                      "e========>>>>>>$stackTrace",
+                                                                    );
+                                                                    print(
+                                                                      "e========>>>>>>$stackTrace",
+                                                                    );
+                                                                  }
+                                                                  log(
+                                                                    'Hello Clear Button',
+                                                                  );
                                                                 },
-                                                                child: Container(
-                                                                  height:
+                                                                child: Icon(
+                                                                  Icons
+                                                                      .delete_outline_rounded,
+                                                                  color:
+                                                                      AppColors
+                                                                          .redColor,
+                                                                  size:
                                                                       isIpad
-                                                                          ? 24.sp
-                                                                          : 0.sp,
-                                                                  padding: EdgeInsets.all(
-                                                                    isIpad
-                                                                        ? 1.w
-                                                                        : 1.5.w,
-                                                                  ),
-                                                                  decoration: BoxDecoration(
-                                                                    color:
-                                                                        AppColors
-                                                                            .mainColor,
-                                                                    shape:
-                                                                        BoxShape
-                                                                            .circle,
-                                                                  ),
-                                                                  child: Icon(
-                                                                    Icons
-                                                                        .delete_outline_rounded,
-                                                                    color:
-                                                                        AppColors
-                                                                            .whiteColor,
-                                                                    size:
-                                                                        isIpad
-                                                                            ? 16.sp
-                                                                            : 0,
-                                                                  ),
+                                                                          ? 16.sp
+                                                                          : 18.sp,
                                                                 ),
                                                               ),
                                                               SizedBox(
@@ -676,7 +712,7 @@ class _CartScreenState extends State<CartScreen> {
                                           ),
                                         ),
                                         Text(
-                                          " ${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalShipping ?? "0.0"}",
+                                          " ${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalShipping ?? "0"}",
                                           style: TextStyle(
                                             color: AppColors.gray,
                                             fontSize: 16.sp,
