@@ -940,9 +940,14 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         setState(() {
           isAddingToCart = false;
         });
-        Get.to(Homescreen());
+        Get.offAll(Homescreen());
       } else {
         await box.delete("cart_$customerId");
+        await box.flush();
+        print("Remaining keys: ${box.keys.toList()}");
+        setState(() {
+          viewCartData = null;  // or empty model
+        });
         showCustomSuccessSnackbar(
           title: "Offline Mode",
           message: "Product added offline. It will sync once internet is back.",
@@ -950,7 +955,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         setState(() {
           isAddingToCart = false;
         });
-        Get.to(Homescreen());
+        Get.offAll(Homescreen());
       }
     } catch (e) {
       showCustomErrorSnackbar(

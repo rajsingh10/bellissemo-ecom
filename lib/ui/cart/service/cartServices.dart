@@ -461,7 +461,8 @@ class CartService {
     String? itemNote,
     int? variationId,
     Map<String, dynamic>? variation,
-  }) async {
+  }) async
+  {
     final cartData = await getProductCartData(productId: productId);
 
     num totalQuantity = cartData["totalQuantity"] ?? 0;
@@ -963,6 +964,77 @@ class CartService {
   //     return null;
   //   }
   // }
+///
+  // Future<Response?> submitOrderApi({
+  //   required String note,
+  //   required String deliveryDate,
+  //   required var shippingCharge,
+  //   int? customerId,
+  //   required List<Map<String, dynamic>> items,
+  //   List<Map<String, dynamic>>? coupons,
+  // }) async
+  // {
+  //   final box = HiveService().getSubmitOrderBox();
+  //
+  //   // 🔹 Create full Order Body
+  //   Map<String, dynamic> body = {
+  //     "customer_id": customerId ?? 3,
+  //     "order_note": note,
+  //     "items": items,
+  //     "shipping_lines": [
+  //       {
+  //         "method_id": "flat_rate",
+  //         "method_title": "Delivery",
+  //         "total": shippingCharge
+  //       }
+  //     ],
+  //     "coupon_lines": coupons ?? [],
+  //     "delivery_date": deliveryDate,
+  //     "hide_prices_by_default": false,
+  //     "status": "completed"
+  //   };
+  //
+  //   print("📦 Cart Body:\n${prettyPrintJson(body)}");
+  //
+  //   // 🔹 Check Internet
+  //   if (!await checkInternet()) {
+  //     await _saveOfflineOrder(box, body);
+  //     print("📦 Saved offline (no internet)");
+  //     return null;
+  //   }
+  //
+  //   try {
+  //     final loginData = await SaveDataLocal.getDataFromLocal();
+  //     final token = loginData?.token ?? '';
+  //     if (token.isEmpty) throw Exception("Token not found");
+  //
+  //     final headers = {
+  //       "Authorization": "Bearer $token",
+  //       "Content-Type": "application/json",
+  //       "Accept": "application/json",
+  //     };
+  //
+  //     final response = await _dio.post(
+  //       apiEndpoints.submitOrder,
+  //       data: jsonEncode(body),
+  //       options: Options(headers: headers),
+  //     );
+  //
+  //     if (response.statusCode == 200 || response.statusCode == 201) {
+  //       await box.put(
+  //         "order_${DateTime.now().millisecondsSinceEpoch}",
+  //         response.data,
+  //       );
+  //     }
+  //
+  //     return response;
+  //   } catch (e) {
+  //     await _saveOfflineOrder(box, body);
+  //     print("📦 Saved offline due to error: $e");
+  //     return null;
+  //   }
+  // }
+
   Future<Response?> submitOrderApi({
     required String note,
     required String deliveryDate,
@@ -972,6 +1044,7 @@ class CartService {
     List<Map<String, dynamic>>? coupons,
   }) async {
     final box = HiveService().getSubmitOrderBox();
+    final cartBox = HiveService().getViewCartBox(); // 🔹 Cart Box Reference
 
     // 🔹 Create full Order Body
     Map<String, dynamic> body = {
@@ -997,6 +1070,7 @@ class CartService {
     if (!await checkInternet()) {
       await _saveOfflineOrder(box, body);
       print("📦 Saved offline (no internet)");
+      await cartBox.delete('cart_$customerId'); // ✅ Clear cart offline
       return null;
     }
 
@@ -1022,15 +1096,24 @@ class CartService {
           "order_${DateTime.now().millisecondsSinceEpoch}",
           response.data,
         );
+
+        // ✅ Clear Cart on Success
+        await cartBox.delete('cart_$customerId');
+        print("🛒 Cart cleared after successful order");
       }
 
       return response;
     } catch (e) {
       await _saveOfflineOrder(box, body);
       print("📦 Saved offline due to error: $e");
+
+      // ✅ Optionally clear cart even if offline order is saved
+      await cartBox.delete('cart_$customerId');
+      print("🛒 Cart cleared after offline save");
       return null;
     }
   }
+
 
   /// 🔹 Helper: Save offline order
   Future<void> _saveOfflineOrder(Box box, Map<String, dynamic> body) async {

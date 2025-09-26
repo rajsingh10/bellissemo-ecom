@@ -69,11 +69,22 @@ class _CartScreenState extends State<CartScreen> {
     var viewCartbox = HiveService().getViewCartBox();
 
     final cachedCart = viewCartbox.get('cart_$customerId');
-    if (cachedCart != null) {
-      viewCartData = ViewCartDataModal.fromJson(json.decode(cachedCart));
+
+    if (cachedCart != null && cachedCart.toString().isNotEmpty) {
+      try {
+        final data = json.decode(cachedCart);
+        viewCartData = ViewCartDataModal.fromJson(data);
+      } catch (e) {
+        log("Error decoding cached cart: $e");
+        viewCartData = null;
+      }
+    } else {
+      viewCartData = null; // No offline data
     }
+
     setState(() {});
   }
+
 
   @override
   void initState() {
@@ -85,12 +96,6 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // double subtotal = 0;
-    // for (var item in cartItems) {
-    //   subtotal += item["price"] * item["qty"];
-    // }
-    // double shipping = 5.0;
-    // double tax = subtotal * 0.1;
     return Scaffold(
       backgroundColor: AppColors.bgColor,
       body:
@@ -108,9 +113,6 @@ class _CartScreenState extends State<CartScreen> {
                       });
                     },
                   ),
-                  // isSearchEnabled
-                  //     ? SearchField(controller: searchController)
-                  //     : SizedBox.shrink(),
                   SizedBox(height: 1.h),
                   viewCartData?.items?.length == 0 ||
                           viewCartData?.items?.length == null ||
@@ -874,10 +876,7 @@ class _CartScreenState extends State<CartScreen> {
 
         subtotal += itemPrice * quantity;
 
-        // Tax ના લીધે error આવે છે તો temporary tax = 0 set કરો
-        // અથવા તમારા API response માં tax નું correct field name use કરો
         double itemTax = 0.0; // Temporary - tax નો issue solve થઈ જશે
-        // double itemTax = double.tryParse(item.prices?.priceTax ?? '0') ?? 0.0; // Original line
 
         tax += itemTax * quantity;
       }
@@ -895,45 +894,72 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
+
   Future<void> _fetchCart() async {
     var box = HiveService().getViewCartBox();
 
+    // ✅ Offline mode
     if (!await checkInternet()) {
       final cachedData = box.get('cart_$customerId');
-      if (cachedData != null) {
-        final data = json.decode(cachedData);
-        viewCartData = ViewCartDataModal.fromJson(data);
+
+      if (cachedData != null && cachedData.toString().isNotEmpty) {
+        try {
+          final data = json.decode(cachedData);
+          viewCartData = ViewCartDataModal.fromJson(data);
+        } catch (e) {
+          log("Error decoding cached cart: $e");
+          viewCartData = null;
+        }
       } else {
+        viewCartData = null;
         showCustomErrorSnackbar(
           title: 'No Internet',
-          message: 'Please check your connection and try again.',
+          message: 'Your cart is empty or offline data not found.',
         );
       }
       return;
     }
 
+    // ✅ Online mode
     try {
       final response = await CartService().fetchCart(customerId);
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        viewCartData = ViewCartDataModal.fromJson(data);
-        await box.put("cart_$customerId", response.body);
+
+        if (data == null || (data['items'] as List).isEmpty) {
+          viewCartData = null;
+          await box.delete('cart_$customerId'); // clear cache
+        } else {
+          viewCartData = ViewCartDataModal.fromJson(data);
+          await box.put('cart_$customerId', response.body); // save raw JSON string
+        }
       } else {
+        // fallback to cache
         final cachedData = box.get('cart_$customerId');
-        if (cachedData != null) {
+        if (cachedData != null && cachedData.toString().isNotEmpty) {
           final data = json.decode(cachedData);
           viewCartData = ViewCartDataModal.fromJson(data);
+        } else {
+          viewCartData = null;
         }
         showCustomErrorSnackbar(
           title: 'Server Error',
           message: 'Something went wrong. Please try again later.',
         );
       }
-    } catch (_) {
+    } catch (e) {
+      // fallback to cache
       final cachedData = box.get('cart_$customerId');
-      if (cachedData != null) {
-        final data = json.decode(cachedData);
-        viewCartData = ViewCartDataModal.fromJson(data);
+      if (cachedData != null && cachedData.toString().isNotEmpty) {
+        try {
+          final data = json.decode(cachedData);
+          viewCartData = ViewCartDataModal.fromJson(data);
+        } catch (_) {
+          viewCartData = null;
+        }
+      } else {
+        viewCartData = null;
       }
       showCustomErrorSnackbar(
         title: 'Network Error',
@@ -941,4 +967,53 @@ class _CartScreenState extends State<CartScreen> {
       );
     }
   }
+
+
+
+  // Future<void> _fetchCart() async {
+  //   var box = HiveService().getViewCartBox();
+  //
+  //   if (!await checkInternet()) {
+  //     final cachedData = box.get('cart_$customerId');
+  //     if (cachedData != null) {
+  //       final data = json.decode(cachedData);
+  //       viewCartData = ViewCartDataModal.fromJson(data);
+  //     } else {
+  //       showCustomErrorSnackbar(
+  //         title: 'No Internet',
+  //         message: 'Please check your connection and try again.',
+  //       );
+  //     }
+  //     return;
+  //   }
+  //
+  //   try {
+  //     final response = await CartService().fetchCart(customerId);
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.body);
+  //       viewCartData = ViewCartDataModal.fromJson(data);
+  //       await box.put("cart_$customerId", response.body);
+  //     } else {
+  //       final cachedData = box.get('cart_$customerId');
+  //       if (cachedData != null) {
+  //         final data = json.decode(cachedData);
+  //         viewCartData = ViewCartDataModal.fromJson(data);
+  //       }
+  //       showCustomErrorSnackbar(
+  //         title: 'Server Error',
+  //         message: 'Something went wrong. Please try again later.',
+  //       );
+  //     }
+  //   } catch (_) {
+  //     final cachedData = box.get('cart_$customerId');
+  //     if (cachedData != null) {
+  //       final data = json.decode(cachedData);
+  //       viewCartData = ViewCartDataModal.fromJson(data);
+  //     }
+  //     showCustomErrorSnackbar(
+  //       title: 'Network Error',
+  //       message: 'Unable to connect. Please check your internet and try again.',
+  //     );
+  //   }
+  // }
 }
