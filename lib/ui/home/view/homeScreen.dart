@@ -1689,6 +1689,7 @@ class _HomescreenState extends State<Homescreen> {
                         route: () async {
                           if (selectedCustomerId != null &&
                               selectedCustomerName != null) {
+                            Get.back();
                             final prevCustomerId = prefs.getInt("customerId");
 
                             if (prevCustomerId != selectedCustomerId) {

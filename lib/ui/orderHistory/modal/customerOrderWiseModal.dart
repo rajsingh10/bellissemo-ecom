@@ -1,6 +1,6 @@
 class CustomerOrderWiseModal {
-  int? id;
-  int? parentId;
+  var id;
+  var parentId;
   String? status;
   String? currency;
   String? version;
@@ -14,7 +14,7 @@ class CustomerOrderWiseModal {
   String? cartTax;
   String? total;
   String? totalTax;
-  int? customerId;
+  var customerId;
   String? orderKey;
   Billing? billing;
   Shipping? shipping;
@@ -309,11 +309,11 @@ class Shipping {
 }
 
 class LineItems {
-  int? id;
+  var id;
   String? name;
-  int? productId;
-  int? variationId;
-  int? quantity;
+  var productId;
+  var variationId;
+  var quantity;
   String? taxClass;
   String? subtotal;
   String? subtotalTax;
@@ -322,7 +322,7 @@ class LineItems {
   List<MetaData>? metaData;
   String? sku;
   String? globalUniqueId;
-  int? price;
+  var price;
   Image? image;
   String? parentName;
 
@@ -396,7 +396,7 @@ class LineItems {
 }
 
 class MetaData {
-  int? id;
+  var id;
   String? key;
   String? value;
   String? displayKey;
@@ -424,7 +424,7 @@ class MetaData {
 }
 
 class Image {
-  int? id;
+  var id;
   String? src;
 
   Image({this.id, this.src});
@@ -443,7 +443,7 @@ class Image {
 }
 
 class FeeLines {
-  int? id;
+  var id;
   String? name;
   String? taxClass;
   String? taxStatus;

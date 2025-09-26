@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 import '../ui/cart/service/cartServices.dart';
+import '../ui/customers/services/addressService.dart';
 import 'checkInternetModule.dart';
 
 class ConnectivityManager {
@@ -22,6 +23,7 @@ class ConnectivityManager {
           await CartService().syncOfflineActions();
           await CartService().syncOfflineUpdate();
           await CartService().syncOfflineOrders();
+          await UpdateAddressService().syncOfflineAddress();
         }
       });
     });

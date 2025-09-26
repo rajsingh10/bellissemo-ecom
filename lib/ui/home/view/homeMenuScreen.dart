@@ -1176,6 +1176,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                         route: () async {
                           if (selectedCustomerId != null &&
                               selectedCustomerName != null) {
+                            Get.back();
                             final prevCustomerId = prefs.getInt("customerId");
 
                             if (prevCustomerId != selectedCustomerId) {
@@ -1192,7 +1193,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                             }
 
                             // Close dialog only after saving
-                            Get.back();
+
                           } else {
                             setState(() {
                               errorText =

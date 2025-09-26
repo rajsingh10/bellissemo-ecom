@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:bellissemo_ecom/services/hiveServices.dart';
 import 'package:bellissemo_ecom/ui/cart/service/cartServices.dart';
+import 'package:bellissemo_ecom/ui/customers/services/addressService.dart';
 import 'package:bellissemo_ecom/ui/greetingsScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,6 +21,7 @@ void main() async {
     await CartService().syncOfflineActions();
     await CartService().syncOfflineOrders();
     await CartService().syncOfflineUpdate();
+    await UpdateAddressService().syncOfflineAddress();
   }
   runApp(const OrientationHandler());
 }

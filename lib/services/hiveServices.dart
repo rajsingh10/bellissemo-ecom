@@ -24,6 +24,7 @@ class HiveService {
   late Box viewCartBox;
   late Box pdfFileBox;
   late Box submitOrderBox;
+  late Box addressBox;
 
   // Initialize Hive and open all boxes
   Future<void> init() async {
@@ -46,6 +47,7 @@ class HiveService {
     viewCartBox = await Hive.openBox('viewCartBox');
     pdfFileBox = await Hive.openBox('pdfFileBox');
     submitOrderBox = await Hive.openBox('submitOrderBox');
+    addressBox = await Hive.openBox('addressBox');
   }
 
   // Helper getters
@@ -80,4 +82,6 @@ class HiveService {
   Box getPdfFileBox() => viewCartBox;
 
   Box getSubmitOrderBox() => submitOrderBox;
+
+  Box getAddressBox() => addressBox;
 }

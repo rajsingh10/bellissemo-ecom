@@ -4,8 +4,10 @@ import 'package:sizer/sizer.dart';
 
 import '../../../utils/colors.dart';
 import '../../../utils/fontFamily.dart';
+import '../../../utils/snackBars.dart';
 import '../../../utils/textFields.dart';
 import '../../../utils/titlebarWidget.dart';
+import '../services/addressService.dart';
 
 class CustomerAddressScreen extends StatefulWidget {
   String? fName,
@@ -16,7 +18,8 @@ class CustomerAddressScreen extends StatefulWidget {
       city,
       postcode,
       state,
-      country;
+      country,
+      id;
 
   CustomerAddressScreen({
     super.key,
@@ -29,6 +32,7 @@ class CustomerAddressScreen extends StatefulWidget {
     required this.postcode,
     required this.state,
     required this.country,
+    required this.id,
   });
 
   @override
@@ -172,8 +176,51 @@ class _CustomerAddressScreenState extends State<CustomerAddressScreen> {
 
             /// Save Button
             InkWell(
-              onTap: () {
-                Get.back(); // Save logic here
+              onTap: () async {
+                final service = UpdateAddressService();
+
+                final billing = {
+                  "first_name": firstNameController.text.trim(),
+                  "last_name": lastNameController.text.trim(),
+                  "address_1": address1Controller.text.trim(),
+                  "address_2": address2Controller.text.trim(),
+                  "city": cityController.text.trim(),
+                  "postcode": postcode.text.trim(),
+                  "country": countryController.text.trim(),
+                  "state": stateController.text.trim(),
+                  "email": emailController.text.trim(),
+                };
+
+                final shipping = {
+                  "first_name": firstNameController.text.trim(),
+                  "last_name": lastNameController.text.trim(),
+
+                  "address_1": address1Controller.text.trim(),
+                  "address_2": address2Controller.text.trim(),
+                  "city": cityController.text.trim(),
+                  "postcode": postcode.text.trim(),
+                  "country": countryController.text.trim(),
+                  "state": stateController.text.trim(),
+                };
+
+                final response = await service.updateAddress(
+                  billing: billing,
+                  shipping: shipping,
+                  id:widget.id ?? ''
+                );
+
+                if (response != null && response.statusCode == 200) {
+                  showCustomSuccessSnackbar(
+                    title: "Address Updated",
+                    message: "Your address has been successfully updated.",
+                  );
+                } else {
+                  showCustomSuccessSnackbar(
+                    title: "Offline Mode",
+                    message:
+                        "Address saved offline. It will sync once internet is back.",
+                  );
+                }
               },
               child: Container(
                 width: double.infinity,
