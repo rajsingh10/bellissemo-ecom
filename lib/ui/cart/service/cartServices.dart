@@ -897,18 +897,87 @@ class CartService {
 
 
   /// submit order ////
+  // Future<Response?> submitOrderApi({
+  //   required String note,
+  //   required String deliveryDate,
+  //   required var shippingCharge,
+  //   int? customerId,
+  //
+  // }) async {
+  //   final box = HiveService().getSubmitOrderBox();
+  //
+  //   // 🔹 Create Order Body
+  //   Map<String, dynamic> body = {
+  //     "customer_id": customerId,
+  //     "shipping_lines": [
+  //       {
+  //         "method_id": "flat_rate",
+  //         "method_title": "Delivery",
+  //         "total": shippingCharge
+  //       }
+  //     ],
+  //     "delivery_date": deliveryDate,
+  //     "order_note": note,
+  //     "hide_prices_by_default": false,
+  //     "status": "completed"
+  //   };
+  //
+  //   print("📦 Cart Body:\n${prettyPrintJson(body)}");
+  //
+  //   // 🔹 Check Internet
+  //   if (!await checkInternet()) {
+  //     await _saveOfflineOrder(box, body);
+  //     print("📦 Saved offline (no internet)");
+  //     return null;
+  //   }
+  //
+  //   try {
+  //     final loginData = await SaveDataLocal.getDataFromLocal();
+  //     final token = loginData?.token ?? '';
+  //     if (token.isEmpty) throw Exception("Token not found");
+  //
+  //     final headers = {
+  //       "Authorization": "Bearer $token",
+  //       "Content-Type": "application/json",
+  //       "Accept": "application/json",
+  //     };
+  //
+  //     final response = await _dio.post(
+  //       apiEndpoints.submitOrder,
+  //       data: jsonEncode(body),
+  //       options: Options(headers: headers),
+  //     );
+  //
+  //     if (response.statusCode == 200 || response.statusCode == 201) {
+  //       // 🔹 Save successful order response
+  //       await box.put(
+  //         "order_${DateTime.now().millisecondsSinceEpoch}",
+  //         response.data,
+  //       );
+  //     }
+  //
+  //     return response;
+  //   } catch (e) {
+  //     await _saveOfflineOrder(box, body);
+  //     print("📦 Saved offline due to error: $e");
+  //     return null;
+  //   }
+  // }
   Future<Response?> submitOrderApi({
     required String note,
     required String deliveryDate,
     required var shippingCharge,
     int? customerId,
-
+    required List<Map<String, dynamic>> items,
+    List<Map<String, dynamic>>? coupons,
   }) async {
     final box = HiveService().getSubmitOrderBox();
 
-    // 🔹 Create Order Body
+    // 🔹 Create full Order Body
     Map<String, dynamic> body = {
-      "customer_id": customerId,
+      "customer_id": customerId ?? 3,
+      "order_note": note,
+      "items": items,
       "shipping_lines": [
         {
           "method_id": "flat_rate",
@@ -916,8 +985,8 @@ class CartService {
           "total": shippingCharge
         }
       ],
+      "coupon_lines": coupons ?? [],
       "delivery_date": deliveryDate,
-      "order_note": note,
       "hide_prices_by_default": false,
       "status": "completed"
     };
@@ -949,7 +1018,6 @@ class CartService {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // 🔹 Save successful order response
         await box.put(
           "order_${DateTime.now().millisecondsSinceEpoch}",
           response.data,

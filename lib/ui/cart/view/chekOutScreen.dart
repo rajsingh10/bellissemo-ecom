@@ -182,6 +182,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                         onTap: () {
                                           Get.to(
                                             CustomerAddressScreen(
+                                              id: customerId.toString(),
                                               email:
                                                   viewCartData
                                                       ?.billingAddress
@@ -728,7 +729,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                             final DateTime? picked = await showDatePicker(
                               context: context,
                               initialDate: DateTime.now(),
-                              firstDate: DateTime.now(), // ⬅️ હવે આજથી પહેલાંની date disable થઈ જશે
+                              firstDate: DateTime.now(),
+                              // ⬅️ હવે આજથી પહેલાંની date disable થઈ જશે
                               lastDate: DateTime(2100),
                             );
                             if (picked != null) {
@@ -755,9 +757,10 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                       : "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}",
                                   style: TextStyle(
                                     fontSize: 14.sp,
-                                    color: selectedDate == null
-                                        ? Colors.grey
-                                        : AppColors.blackColor,
+                                    color:
+                                        selectedDate == null
+                                            ? Colors.grey
+                                            : AppColors.blackColor,
                                   ),
                                 ),
                                 Icon(
@@ -769,7 +772,6 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                             ),
                           ),
                         ),
-
 
                         SizedBox(height: 1.h),
 
@@ -816,8 +818,17 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                       ),
                       CustomButton(
                         title: "Confirm",
-                        route: ()  {
-                          sumbitOrderapi("${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}");
+                        route: () {
+                          if (viewCartData?.billingAddress?.address1 == '') {
+                            showCustomErrorSnackbar(
+                              title: 'Address Required',
+                              message: 'Please add an address to continue',
+                            );
+                          } else {
+                            sumbitOrderapi(
+                              "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}",
+                            );
+                          }
                         },
                         color: AppColors.mainColor,
                         fontcolor: AppColors.whiteColor,
@@ -892,19 +903,33 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
       );
     }
   }
-  bool  isAddingToCart =false;
+
+  bool isAddingToCart = false;
+
   Future<void> sumbitOrderapi(date) async {
     setState(() {
       isAddingToCart = true;
     });
     final cartService = CartService();
-
+    final box = HiveService().getViewCartBox();
+    List<Map<String, dynamic>> items =
+        viewCartData?.items?.map((item) {
+          return {
+            "product_id": item.id,
+            "quantity": item.quantity,
+            "override_price": item.prices?.price ?? 0,
+            "note": item.description ?? "",
+          };
+        }).toList() ??
+        [];
     try {
       final response = await cartService.submitOrderApi(
-       deliveryDate: date,
-        note:notesController.text.trim() ,
-        shippingCharge:totalController.text.trim() ,
+        deliveryDate: date,
+        note: notesController.text.trim(),
+        shippingCharge: totalController.text.trim(),
         customerId: customerId,
+        items: items,
+        coupons: [],
       );
 
       if (response != null && response.statusCode == 200) {
@@ -917,6 +942,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         });
         Get.to(Homescreen());
       } else {
+        await box.delete("cart_$customerId");
         showCustomSuccessSnackbar(
           title: "Offline Mode",
           message: "Product added offline. It will sync once internet is back.",
