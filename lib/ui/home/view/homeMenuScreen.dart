@@ -1193,7 +1193,6 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                             }
 
                             // Close dialog only after saving
-
                           } else {
                             setState(() {
                               errorText =

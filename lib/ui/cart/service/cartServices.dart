@@ -461,8 +461,7 @@ class CartService {
     String? itemNote,
     int? variationId,
     Map<String, dynamic>? variation,
-  }) async
-  {
+  }) async {
     final cartData = await getProductCartData(productId: productId);
 
     num totalQuantity = cartData["totalQuantity"] ?? 0;
@@ -896,7 +895,6 @@ class CartService {
     return responseJson;
   }
 
-
   /// submit order ////
   // Future<Response?> submitOrderApi({
   //   required String note,
@@ -964,7 +962,7 @@ class CartService {
   //     return null;
   //   }
   // }
-///
+  ///
   // Future<Response?> submitOrderApi({
   //   required String note,
   //   required String deliveryDate,
@@ -1055,13 +1053,13 @@ class CartService {
         {
           "method_id": "flat_rate",
           "method_title": "Delivery",
-          "total": shippingCharge
-        }
+          "total": shippingCharge,
+        },
       ],
       "coupon_lines": coupons ?? [],
       "delivery_date": deliveryDate,
       "hide_prices_by_default": false,
-      "status": "completed"
+      "status": "completed",
     };
 
     print("📦 Cart Body:\n${prettyPrintJson(body)}");
@@ -1114,17 +1112,20 @@ class CartService {
     }
   }
 
-
   /// 🔹 Helper: Save offline order
   Future<void> _saveOfflineOrder(Box box, Map<String, dynamic> body) async {
-    await box.put("offline_order_${DateTime.now().millisecondsSinceEpoch}", body);
-
+    await box.put(
+      "offline_order_${DateTime.now().millisecondsSinceEpoch}",
+      body,
+    );
   }
 
   /// 🔹 Sync Offline Orders when internet comes back
   Future<void> syncOfflineOrders() async {
     final box = HiveService().getSubmitOrderBox();
-    final keys = box.keys.where((k) => k.toString().startsWith("offline_order_"));
+    final keys = box.keys.where(
+      (k) => k.toString().startsWith("offline_order_"),
+    );
 
     if (keys.isEmpty) return;
 
@@ -1158,5 +1159,4 @@ class CartService {
       }
     }
   }
-
 }

@@ -11,6 +11,7 @@ class CustomNetworkImage extends StatelessWidget {
   final double radius;
   final bool isCircle; // ✅ Added separate flag for circle
   final bool isFit; // ✅ Added separate flag for circle
+  final bool isAssetFit; // ✅ Added separate flag for circle
   final bool isProfile;
 
   const CustomNetworkImage({
@@ -21,6 +22,7 @@ class CustomNetworkImage extends StatelessWidget {
     this.radius = 0,
     this.isCircle = false, // default is rectangle with radius
     this.isFit = true, // default is rectangle with radius
+    this.isAssetFit = false, // default is rectangle with radius
     this.isProfile = false,
   });
 
@@ -58,6 +60,7 @@ class CustomNetworkImage extends StatelessWidget {
           isProfile ? Imgs.defaultProfile : Imgs.defaultImage,
           height: height,
           width: width,
+          fit: isAssetFit ? BoxFit.cover : BoxFit.contain,
         );
       },
     );

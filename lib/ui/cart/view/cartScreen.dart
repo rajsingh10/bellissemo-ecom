@@ -85,7 +85,6 @@ class _CartScreenState extends State<CartScreen> {
     setState(() {});
   }
 
-
   @override
   void initState() {
     // TODO: implement initState
@@ -894,7 +893,6 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-
   Future<void> _fetchCart() async {
     var box = HiveService().getViewCartBox();
 
@@ -932,7 +930,10 @@ class _CartScreenState extends State<CartScreen> {
           await box.delete('cart_$customerId'); // clear cache
         } else {
           viewCartData = ViewCartDataModal.fromJson(data);
-          await box.put('cart_$customerId', response.body); // save raw JSON string
+          await box.put(
+            'cart_$customerId',
+            response.body,
+          ); // save raw JSON string
         }
       } else {
         // fallback to cache
@@ -967,8 +968,6 @@ class _CartScreenState extends State<CartScreen> {
       );
     }
   }
-
-
 
   // Future<void> _fetchCart() async {
   //   var box = HiveService().getViewCartBox();

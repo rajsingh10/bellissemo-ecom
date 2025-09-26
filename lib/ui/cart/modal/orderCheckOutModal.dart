@@ -6,13 +6,14 @@ class OrderCheckOutModal {
   int? subtotal;
   String? discountTotal;
 
-  OrderCheckOutModal(
-      {this.id,
-        this.number,
-        this.status,
-        this.total,
-        this.subtotal,
-        this.discountTotal});
+  OrderCheckOutModal({
+    this.id,
+    this.number,
+    this.status,
+    this.total,
+    this.subtotal,
+    this.discountTotal,
+  });
 
   OrderCheckOutModal.fromJson(Map<String, dynamic> json) {
     id = json['id'];

@@ -16,6 +16,7 @@ import '../../../ApiCalling/apiConfigs.dart';
 import '../../../apiCalling/checkInternetModule.dart';
 import '../../../services/hiveServices.dart';
 import '../../../utils/cachedNetworkImage.dart';
+import '../../../utils/emptyWidget.dart';
 import '../../../utils/multipleImagesSlider.dart';
 import '../../../utils/snackBars.dart';
 import '../../../utils/textFields.dart';
@@ -128,6 +129,27 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       body:
           isLoading
               ? Loader()
+              : productDetails == null
+              ? Padding(
+                padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 0.5.h),
+                child: Column(
+                  children: [
+                    TitleBar(
+                      title: 'Product Details',
+                      isDrawerEnabled: true,
+                      isBackEnabled: true,
+                    ),
+                    SizedBox(height: 2.h),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 15.h),
+                      child: emptyWidget(
+                        icon: Icons.shopping_cart_outlined,
+                        text: 'Product Details',
+                      ),
+                    ),
+                  ],
+                ),
+              )
               : Stack(
                 children: [
                   SingleChildScrollView(

@@ -946,7 +946,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         await box.flush();
         print("Remaining keys: ${box.keys.toList()}");
         setState(() {
-          viewCartData = null;  // or empty model
+          viewCartData = null; // or empty model
         });
         showCustomSuccessSnackbar(
           title: "Offline Mode",

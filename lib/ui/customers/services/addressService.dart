@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+
 import 'package:dio/dio.dart';
 
 import '../../../Apicalling/sharedpreferance.dart';
@@ -46,13 +47,10 @@ class UpdateAddressService {
         "Content-Type": "application/json",
         "Accept": "application/json",
       };
-log('Hello : ${apiEndpoints.updateAddress}$id}');
+      log('Hello : ${apiEndpoints.updateAddress}$id');
       final response = await _dio.put(
         "${apiEndpoints.updateAddress}$id", // id in URL
-        data: jsonEncode({
-          "billing": billing,
-          "shipping": shipping,
-        }),
+        data: jsonEncode({"billing": billing, "shipping": shipping}),
         options: Options(headers: headers),
       );
 
@@ -74,7 +72,10 @@ log('Hello : ${apiEndpoints.updateAddress}$id}');
   // ----------------- Sync Offline Address -----------------
   Future<void> syncOfflineAddress() async {
     final box = HiveService().getAddressBox();
-    final keys = box.keys.where((k) => k.toString().startsWith("offline_address_")).toList();
+    final keys =
+        box.keys
+            .where((k) => k.toString().startsWith("offline_address_"))
+            .toList();
 
     if (keys.isEmpty) return;
 

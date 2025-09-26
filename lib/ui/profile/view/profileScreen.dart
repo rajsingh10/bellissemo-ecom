@@ -18,7 +18,6 @@ import '../../../utils/snackBars.dart';
 import '../../../utils/titlebarWidget.dart';
 import '../modal/profileModal.dart';
 import '../provider/profileProvider.dart';
-import 'editProfileScreen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -158,6 +157,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         isCircle: true,
                                         isProfile: true,
                                         isFit: true,
+                                        isAssetFit: true,
                                       ),
                                     )
                                     : Container(
@@ -178,6 +178,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         isCircle: true,
                                         isProfile: true,
                                         isFit: true,
+                                        isAssetFit: true,
                                       ),
                                     ),
                           ),
@@ -461,28 +462,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     SizedBox(height: 3.h),
-                    InkWell(
-                      onTap: () {
-                        Get.to(() => EditProfileScreen());
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 14),
-                        decoration: BoxDecoration(
-                          color: AppColors.mainColor,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "Edit Profile",
-                            style: TextStyle(
-                              color: AppColors.whiteColor,
-                              fontSize: 18.sp,
-                              fontFamily: FontFamily.semiBold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    // InkWell(
+                    //   onTap: () {
+                    //     Get.to(() => EditProfileScreen());
+                    //   },
+                    //   child: Container(
+                    //     padding: EdgeInsets.symmetric(vertical: 14),
+                    //     decoration: BoxDecoration(
+                    //       color: AppColors.mainColor,
+                    //       borderRadius: BorderRadius.circular(10),
+                    //     ),
+                    //     child: Center(
+                    //       child: Text(
+                    //         "Edit Profile",
+                    //         style: TextStyle(
+                    //           color: AppColors.whiteColor,
+                    //           fontSize: 18.sp,
+                    //           fontFamily: FontFamily.semiBold,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                     SizedBox(height: 3.h),
                   ],
                 ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),

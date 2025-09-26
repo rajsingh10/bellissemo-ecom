@@ -206,7 +206,7 @@ class _CustomerAddressScreenState extends State<CustomerAddressScreen> {
                 final response = await service.updateAddress(
                   billing: billing,
                   shipping: shipping,
-                  id:widget.id ?? ''
+                  id: widget.id ?? '',
                 );
 
                 if (response != null && response.statusCode == 200) {
