@@ -21,6 +21,7 @@ class ConnectivityManager {
           await CartService().syncOfflineCart();
           await CartService().syncOfflineActions();
           await CartService().syncOfflineUpdate();
+          await CartService().syncOfflineOrders();
         }
       });
     });

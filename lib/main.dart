@@ -18,7 +18,8 @@ void main() async {
   if (await checkInternet()) {
     await CartService().syncOfflineCart();
     await CartService().syncOfflineActions();
-    // await CartService().syncOfflineUpdate();
+    await CartService().syncOfflineOrders();
+    await CartService().syncOfflineUpdate();
   }
   runApp(const OrientationHandler());
 }

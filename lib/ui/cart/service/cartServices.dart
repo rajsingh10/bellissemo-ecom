@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../ApiCalling/response.dart';
@@ -893,4 +894,118 @@ class CartService {
 
     return responseJson;
   }
+
+
+  /// submit order ////
+  Future<Response?> submitOrderApi({
+    required String note,
+    required String deliveryDate,
+    required var shippingCharge,
+    int? customerId,
+
+  }) async {
+    final box = HiveService().getSubmitOrderBox();
+
+    // 🔹 Create Order Body
+    Map<String, dynamic> body = {
+      "customer_id": customerId,
+      "shipping_lines": [
+        {
+          "method_id": "flat_rate",
+          "method_title": "Delivery",
+          "total": shippingCharge
+        }
+      ],
+      "delivery_date": deliveryDate,
+      "order_note": note,
+      "hide_prices_by_default": false,
+      "status": "completed"
+    };
+
+    print("📦 Cart Body:\n${prettyPrintJson(body)}");
+
+    // 🔹 Check Internet
+    if (!await checkInternet()) {
+      await _saveOfflineOrder(box, body);
+      print("📦 Saved offline (no internet)");
+      return null;
+    }
+
+    try {
+      final loginData = await SaveDataLocal.getDataFromLocal();
+      final token = loginData?.token ?? '';
+      if (token.isEmpty) throw Exception("Token not found");
+
+      final headers = {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      };
+
+      final response = await _dio.post(
+        apiEndpoints.submitOrder,
+        data: jsonEncode(body),
+        options: Options(headers: headers),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // 🔹 Save successful order response
+        await box.put(
+          "order_${DateTime.now().millisecondsSinceEpoch}",
+          response.data,
+        );
+      }
+
+      return response;
+    } catch (e) {
+      await _saveOfflineOrder(box, body);
+      print("📦 Saved offline due to error: $e");
+      return null;
+    }
+  }
+
+  /// 🔹 Helper: Save offline order
+  Future<void> _saveOfflineOrder(Box box, Map<String, dynamic> body) async {
+    await box.put("offline_order_${DateTime.now().millisecondsSinceEpoch}", body);
+
+  }
+
+  /// 🔹 Sync Offline Orders when internet comes back
+  Future<void> syncOfflineOrders() async {
+    final box = HiveService().getSubmitOrderBox();
+    final keys = box.keys.where((k) => k.toString().startsWith("offline_order_"));
+
+    if (keys.isEmpty) return;
+
+    final loginData = await SaveDataLocal.getDataFromLocal();
+    final token = loginData?.token ?? '';
+    if (token.isEmpty) return;
+
+    final headers = {
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    };
+
+    for (var key in keys) {
+      final body = box.get(key);
+
+      try {
+        final response = await _dio.post(
+          apiEndpoints.submitOrder,
+          data: jsonEncode(body),
+          options: Options(headers: headers),
+        );
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          // 🔹 Delete offline order after successful sync
+          await box.delete(key);
+          print("✅ Synced offline order: $key");
+        }
+      } catch (e) {
+        print("⚠️ Failed to sync $key: $e");
+      }
+    }
+  }
+
 }
