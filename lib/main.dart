@@ -21,6 +21,7 @@ void main() async {
     await CartService().syncOfflineActions();
     await CartService().syncOfflineOrders();
     await CartService().syncOfflineUpdate();
+    await CartService().syncAppliedCoupons();
     await UpdateAddressService().syncOfflineAddress();
   }
   runApp(const OrientationHandler());

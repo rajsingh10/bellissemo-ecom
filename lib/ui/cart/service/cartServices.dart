@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 
@@ -1040,7 +1041,8 @@ class CartService {
     int? customerId,
     required List<Map<String, dynamic>> items,
     List<Map<String, dynamic>>? coupons,
-  }) async {
+  }) async
+  {
     final box = HiveService().getSubmitOrderBox();
     final cartBox = HiveService().getViewCartBox(); // 🔹 Cart Box Reference
 
@@ -1159,4 +1161,261 @@ class CartService {
       }
     }
   }
+
+
+  /// couponList ///
+  Future<http.Response> couponsListApi() async {
+    String url = apiEndpoints.couponsList;
+    LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
+    String token = loginData?.token ?? '';
+    print("my token :: $token");
+    if (token.isEmpty) {
+      throw Exception('Token not found');
+    }
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $token',
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    };
+    print(url);
+    var responseJson;
+    final response = await http
+        .get(Uri.parse(url), headers: headers)
+        .timeout(
+      const Duration(seconds: 60),
+      onTimeout: () {
+        throw const SocketException('Something went wrong');
+      },
+    );
+    responseJson = responses(response);
+
+    return responseJson;
+  }
+  Future<Response?> applyCoupon({
+    required String couponCode,
+    required Callback onSuccess,
+    bool isSync = false,
+  }) async {
+    final box = HiveService().getAddCartBox();
+    final cacheBox = HiveService().getProductCartDataBox();
+    if (!cacheBox.isOpen) await HiveService().init();
+
+    // 🔹 Update local cache
+    await cacheBox.put("applied_coupon", {
+      "couponCode": couponCode,
+      "appliedAt": DateTime.now().toIso8601String(),
+    });
+
+    print("🎟️ Local coupon cache updated → $couponCode");
+
+    // ---------------- OFFLINE ----------------
+    if (!await checkInternet()) {
+      if (!isSync) {
+        await box.put(
+          "offline_apply_coupon_${DateTime.now().millisecondsSinceEpoch}",
+          {
+            "action": "apply_coupon",
+            "coupon_code": couponCode,
+            "timestamp": DateTime.now().toIso8601String(),
+          },
+        );
+        print("⚠️ Offline: queued coupon apply → $couponCode");
+      }
+      return null;
+    }
+
+    // ---------------- ONLINE ----------------
+    try {
+      final loginData = await SaveDataLocal.getDataFromLocal();
+      final token = loginData?.token ?? '';
+      if (token.isEmpty) throw Exception("Token not found");
+
+      final headers = {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      };
+
+      final body = {
+        "coupon_code": couponCode,
+      };
+
+      final response = await _dio.post(
+        apiEndpoints.applyCoupons,
+        data: jsonEncode(body),
+        options: Options(headers: headers),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("✅ Coupon applied online → $couponCode");
+        onSuccess();
+      }
+
+      return response;
+    } catch (e) {
+      if (!isSync) {
+        await box.put(
+          "offline_apply_coupon_${DateTime.now().millisecondsSinceEpoch}",
+          {
+            "action": "apply_coupon",
+            "coupon_code": couponCode,
+            "timestamp": DateTime.now().toIso8601String(),
+          },
+        );
+        print("⚠️ Failed online, saved offline → $couponCode");
+      }
+      return null;
+    }
+  }
+  Future<void> syncAppliedCoupons() async {
+    final box = HiveService().getAddCartBox();
+
+    if (!await checkInternet()) {
+      print("🚫 No internet, sync skipped.");
+      return;
+    }
+
+    final keys = box.keys.where((k) => k.toString().startsWith("offline_apply_coupon_")).toList();
+
+    if (keys.isEmpty) {
+      print("✅ No offline coupons to sync.");
+      return;
+    }
+
+    print("🔄 Syncing ${keys.length} offline coupons...");
+
+    for (final key in keys) {
+      final data = box.get(key);
+
+      if (data != null && data["coupon_code"] != null) {
+        final couponCode = data["coupon_code"];
+        final response = await applyCoupon(couponCode: couponCode, isSync: true,onSuccess: () {
+
+        },);
+
+        if (response != null && (response.statusCode == 200 || response.statusCode == 201)) {
+          await box.delete(key);
+          print("☑️ Synced & removed → $couponCode");
+        } else {
+          print("⚠️ Sync failed for → $couponCode");
+        }
+      }
+    }
+  }
+
+  Future<Response?> removeCoupon({
+    required String couponCode,
+    required Callback onSuccess,
+    bool isSync = false,
+  }) async
+  {
+    final box = HiveService().getAddCartBox();
+    final cacheBox = HiveService().getProductCartDataBox();
+    if (!cacheBox.isOpen) await HiveService().init();
+
+    // 🔹 Remove from local cache
+    final appliedCoupon = cacheBox.get("applied_coupon");
+    if (appliedCoupon != null && appliedCoupon["couponCode"] == couponCode) {
+      await cacheBox.delete("applied_coupon");
+      print("🗑️ Local coupon removed → $couponCode");
+    }
+
+    // ---------------- OFFLINE ----------------
+    if (!await checkInternet()) {
+      if (!isSync) {
+        await box.put(
+          "offline_remove_coupon_${DateTime.now().millisecondsSinceEpoch}",
+          {
+            "action": "remove_coupon",
+            "coupon_code": couponCode,
+            "timestamp": DateTime.now().toIso8601String(),
+          },
+        );
+        print("⚠️ Offline: queued coupon removal → $couponCode");
+      }
+      return null;
+    }
+
+    // ---------------- ONLINE ----------------
+    try {
+      final loginData = await SaveDataLocal.getDataFromLocal();
+      final token = loginData?.token ?? '';
+      if (token.isEmpty) throw Exception("Token not found");
+
+      final headers = {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      };
+
+      final body = {
+        "coupon_code": couponCode,
+      };
+
+      final response = await _dio.post(
+        apiEndpoints.removeCoupons, // <-- Your remove coupon API endpoint
+        data: jsonEncode(body),
+        options: Options(headers: headers),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("✅ Coupon removed online → $couponCode");
+        onSuccess();
+      }
+
+      return response;
+    } catch (e) {
+      if (!isSync) {
+        await box.put(
+          "offline_remove_coupon_${DateTime.now().millisecondsSinceEpoch}",
+          {
+            "action": "remove_coupon",
+            "coupon_code": couponCode,
+            "timestamp": DateTime.now().toIso8601String(),
+          },
+        );
+        print("⚠️ Failed online, saved removal offline → $couponCode");
+      }
+      return null;
+    }
+  }
+
+  Future<void> syncRemovedCoupons() async {
+    final box = HiveService().getAddCartBox();
+
+    if (!await checkInternet()) {
+      print("🚫 No internet, removal sync skipped.");
+      return;
+    }
+
+    final keys = box.keys.where((k) => k.toString().startsWith("offline_remove_coupon_")).toList();
+
+    if (keys.isEmpty) {
+      print("✅ No offline coupon removals to sync.");
+      return;
+    }
+
+    print("🔄 Syncing ${keys.length} offline coupon removals...");
+
+    for (final key in keys) {
+      final data = box.get(key);
+
+      if (data != null && data["coupon_code"] != null) {
+        final couponCode = data["coupon_code"];
+        final response = await removeCoupon(
+          couponCode: couponCode,
+          isSync: true,
+          onSuccess: () {},
+        );
+
+        if (response != null && (response.statusCode == 200 || response.statusCode == 201)) {
+          await box.delete(key);
+          print("☑️ Removal synced & removed → $couponCode");
+        } else {
+          print("⚠️ Removal sync failed for → $couponCode");
+        }
+      }
+    }
+  }
+
 }

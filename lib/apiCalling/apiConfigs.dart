@@ -1,6 +1,9 @@
 import 'package:bellissemo_ecom/ui/login/modal/loginModal.dart';
 
+import '../ui/cart/modal/copunsApplyModal.dart';
+import '../ui/cart/modal/copunsListModal.dart';
 import '../ui/cart/modal/orderCheckOutModal.dart';
+import '../ui/cart/modal/removeCouponsModal.dart';
 import '../ui/cart/modal/updateQtyModal.dart';
 import '../ui/cart/modal/viewCartDataModal.dart';
 import '../ui/category/modal/fetchCategoriesModal.dart';
@@ -33,3 +36,6 @@ ViewCartDataModal? viewCartData;
 FetchPdfFileModal? fetchPdfFile;
 UpdateQtyModal? updateQtyModal;
 OrderCheckOutModal? orderCheckOutModal;
+CouponListModal? couponListModal;
+CopunsApplyModal? copunsApplyModal;
+RemoveCouponsModal? removeCouponsModal;

@@ -20,6 +20,7 @@ import '../../../utils/customButton.dart';
 import '../../../utils/emptyWidget.dart';
 import '../../../utils/snackBars.dart';
 import '../../../utils/titlebarWidget.dart';
+import '../modal/copunsListModal.dart';
 import '../service/cartServices.dart';
 
 class CartScreen extends StatefulWidget {
@@ -52,10 +53,17 @@ class _CartScreenState extends State<CartScreen> {
 
   Future<void> loadInitialData() async {
     setState(() => isLoading = true);
+
+    // 🔹 Load cached data first
     _loadCachedData();
+
     final stopwatch = Stopwatch()..start();
     try {
-      await Future.wait([_fetchCart().then((_) => setState(() {}))]);
+      // 🔹 Run APIs parallel (cart + coupons)
+      await Future.wait([
+        _fetchCart().then((_) => setState(() {})),
+        _fetchCoupons().then((_) => setState(() {})),
+      ]);
     } catch (e) {
       log("Error loading initial data: $e");
     } finally {
@@ -67,9 +75,10 @@ class _CartScreenState extends State<CartScreen> {
 
   void _loadCachedData() {
     var viewCartbox = HiveService().getViewCartBox();
+    var couponBox = HiveService().getCouponListBox();
 
+    // 🔹 Load cached cart
     final cachedCart = viewCartbox.get('cart_$customerId');
-
     if (cachedCart != null && cachedCart.toString().isNotEmpty) {
       try {
         final data = json.decode(cachedCart);
@@ -79,7 +88,21 @@ class _CartScreenState extends State<CartScreen> {
         viewCartData = null;
       }
     } else {
-      viewCartData = null; // No offline data
+      viewCartData = null; // No offline cart
+    }
+
+    // 🔹 Load cached coupons
+    final cachedCoupons = couponBox.get('coupons'); // without customerId key
+    if (cachedCoupons != null && cachedCoupons.toString().isNotEmpty) {
+      try {
+        final List data = json.decode(cachedCoupons);
+        couponslist = data.map((e) => CouponListModal.fromJson(e)).toList();
+      } catch (e) {
+        log("Error decoding cached coupons: $e");
+        couponslist = [];
+      }
+    } else {
+      couponslist = []; // No offline coupons
     }
 
     setState(() {});
@@ -597,10 +620,76 @@ class _CartScreenState extends State<CartScreen> {
                                       ],
                                     ),
                                     SizedBox(height: 1.5.h),
+                                    // Row(
+                                    //   children: [
+                                    //     Expanded(
+                                    //       child: TextField(
+                                    //         onTap: (){
+                                    //           _showCouponDialog(context);
+                                    //         },
+                                    //         controller: couponController,
+                                    //         decoration: InputDecoration(
+                                    //
+                                    //           hintText: "Enter Discount Code",
+                                    //           hintStyle: TextStyle(
+                                    //             fontSize: 16.sp,
+                                    //             fontFamily: FontFamily.semiBold,
+                                    //           ),
+                                    //           contentPadding:
+                                    //               EdgeInsets.symmetric(
+                                    //                 vertical: 12,
+                                    //                 horizontal: 12,
+                                    //               ),
+                                    //           border: OutlineInputBorder(
+                                    //             borderRadius:
+                                    //                 BorderRadius.circular(8),
+                                    //             borderSide: BorderSide(
+                                    //               color: Colors.grey.shade400,
+                                    //             ),
+                                    //           ),
+                                    //           filled: true,
+                                    //           fillColor:
+                                    //               AppColors.containerColor,
+                                    //         ),
+                                    //       ),
+                                    //     ),
+                                    //     SizedBox(width: 2.w),
+                                    //     ElevatedButton(
+                                    //       onPressed: () {
+                                    //         _showCouponDialog(context);
+                                    //
+                                    //       },
+                                    //       style: ElevatedButton.styleFrom(
+                                    //         backgroundColor:
+                                    //             AppColors.mainColor,
+                                    //         padding: EdgeInsets.symmetric(
+                                    //           vertical: 12,
+                                    //           horizontal: 16,
+                                    //         ),
+                                    //         shape: RoundedRectangleBorder(
+                                    //           borderRadius:
+                                    //               BorderRadius.circular(8),
+                                    //         ),
+                                    //       ),
+                                    //       child: Text(
+                                    //         "Apply",
+                                    //         style: TextStyle(
+                                    //           color: AppColors.whiteColor,
+                                    //           fontSize: 16.sp,
+                                    //           fontFamily: FontFamily.semiBold,
+                                    //         ),
+                                    //       ),
+                                    //     ),
+                                    //   ],
+                                    // ),
                                     Row(
                                       children: [
                                         Expanded(
                                           child: TextField(
+                                            onTap: () {
+                                              _showCouponDialog(context);
+                                            },
+                                            controller: couponController,
                                             decoration: InputDecoration(
                                               hintText: "Enter Discount Code",
                                               hintStyle: TextStyle(
@@ -626,33 +715,92 @@ class _CartScreenState extends State<CartScreen> {
                                           ),
                                         ),
                                         SizedBox(width: 2.w),
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            // Apply discount code logic here
+                                        ValueListenableBuilder<
+                                          TextEditingValue
+                                        >(
+                                          valueListenable: couponController,
+                                          builder: (context, value, child) {
+                                            final hasText =
+                                                value.text.isNotEmpty;
+                                            return ElevatedButton(
+                                              onPressed: () async {
+                                                if (hasText) {
+                                                  setState(() {
+                                                    couponController.text =
+                                                        viewCartData
+                                                            ?.coupons?[0]
+                                                            .code ??
+                                                        "";
+                                                    discount1 = double.parse(
+                                                      (viewCartData
+                                                              ?.totals
+                                                              ?.totalDiscount)
+                                                          .toString(),
+                                                    );
+                                                    updateCartTotalsLocally(
+                                                      offlineDiscount: 0,
+                                                    );
+                                                  });
+                                                  print(
+                                                    "discount1=====>>>>>${discount1}",
+                                                  );
+
+                                                  final cartService =
+                                                      CartService();
+
+                                                  await cartService.removeCoupon(
+                                                    couponCode:
+                                                        couponController.text,
+                                                    onSuccess: () {
+                                                      print(
+                                                        "API call successful",
+                                                      );
+
+                                                      Get.offAll(
+                                                        () => CartScreen(),
+                                                      );
+                                                      _fetchCart();
+                                                    },
+                                                  );
+                                                  // Remove coupon logic
+                                                  // removeCoupon(
+                                                  //   couponCode: couponController.text,
+                                                  //   onSuccess: () {
+                                                  //     couponController.clear(); // Clear field after removing
+                                                  //   },
+                                                  // );
+                                                } else {
+                                                  // Show coupon dialog or apply logic
+                                                  _showCouponDialog(context);
+                                                }
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    AppColors.mainColor,
+                                                padding: EdgeInsets.symmetric(
+                                                  vertical: 12,
+                                                  horizontal: 16,
+                                                ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                hasText ? "Remove" : "Apply",
+                                                style: TextStyle(
+                                                  color: AppColors.whiteColor,
+                                                  fontSize: 16.sp,
+                                                  fontFamily:
+                                                      FontFamily.semiBold,
+                                                ),
+                                              ),
+                                            );
                                           },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                AppColors.mainColor,
-                                            padding: EdgeInsets.symmetric(
-                                              vertical: 12,
-                                              horizontal: 16,
-                                            ),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                          ),
-                                          child: Text(
-                                            "Apply",
-                                            style: TextStyle(
-                                              color: AppColors.whiteColor,
-                                              fontSize: 16.sp,
-                                              fontFamily: FontFamily.semiBold,
-                                            ),
-                                          ),
                                         ),
                                       ],
                                     ),
+
                                     SizedBox(height: 2.h),
                                     Row(
                                       mainAxisAlignment:
@@ -667,7 +815,7 @@ class _CartScreenState extends State<CartScreen> {
                                           ),
                                         ),
                                         Text(
-                                          "${viewCartData?.totals?.currencySymbol} ${(viewCartData?.totals?.totalItems ?? 0).toString()}",
+                                          "${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.totalItems ?? '0')! / 100).toStringAsFixed(2)}",
                                           style: TextStyle(
                                             color: AppColors.blackColor,
                                             fontSize: 16.sp,
@@ -690,7 +838,7 @@ class _CartScreenState extends State<CartScreen> {
                                           ),
                                         ),
                                         Text(
-                                          "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalTax}",
+                                          "${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.totalTax ?? '0')! / 100).toStringAsFixed(2)}",
                                           style: TextStyle(
                                             color: AppColors.blackColor,
                                             fontSize: 16.sp,
@@ -699,13 +847,14 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                       ],
                                     ),
+
                                     SizedBox(height: 1.h),
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          "Shipping",
+                                          "Discount",
                                           style: TextStyle(
                                             color: AppColors.gray,
                                             fontSize: 16.sp,
@@ -713,30 +862,7 @@ class _CartScreenState extends State<CartScreen> {
                                           ),
                                         ),
                                         Text(
-                                          " ${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalShipping ?? "0"}",
-                                          style: TextStyle(
-                                            color: AppColors.gray,
-                                            fontSize: 16.sp,
-                                            fontFamily: FontFamily.semiBold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 1.h),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "Discount Tax",
-                                          style: TextStyle(
-                                            color: AppColors.gray,
-                                            fontSize: 16.sp,
-                                            fontFamily: FontFamily.semiBold,
-                                          ),
-                                        ),
-                                        Text(
-                                          "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalDiscount ?? ""}",
+                                          "${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.totalDiscount ?? '0')! / 100).toStringAsFixed(2)}",
 
                                           // "\$ ${tax.toStringAsFixed(2)}",
                                           style: TextStyle(
@@ -761,7 +887,7 @@ class _CartScreenState extends State<CartScreen> {
                                           ),
                                         ),
                                         Text(
-                                          "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalPrice ?? ""}",
+                                          "${viewCartData?.totals?.currencySymbol}${(double.tryParse(viewCartData?.totals?.totalPrice ?? '0')! / 100).toStringAsFixed(2)}",
                                           // "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
                                           style: TextStyle(
                                             color: AppColors.blackColor,
@@ -817,7 +943,7 @@ class _CartScreenState extends State<CartScreen> {
                         ),
                         SizedBox(height: 0.5.h),
                         Text(
-                          "${viewCartData?.totals?.currencySymbol} ${(viewCartData?.totals?.totalPrice).toString()}",
+                          "${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.totalPrice ?? '0')! / 100).toStringAsFixed(2)}",
                           // "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
                           style: TextStyle(
                             color: AppColors.blackColor,
@@ -857,44 +983,152 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  void updateCartTotalsLocally() {
+  double discount1 = 0.0;
+
+  void updateCartTotalsLocally({double? offlineDiscount}) {
+    print("offlineDiscount=====>>>>>>>>${offlineDiscount}");
     if (viewCartData == null) return;
 
     double subtotal = 0.0;
     double tax = 0.0;
     double shipping =
         double.tryParse(viewCartData?.totals?.totalShipping ?? '0') ?? 0.0;
+
+    // Start with existing discount
     double discount =
         double.tryParse(viewCartData?.totals?.totalDiscount ?? '0') ?? 0.0;
 
+    // Add any new offline discount
+    if (offlineDiscount != null) {
+      discount += offlineDiscount;
+    }
+
     for (var item in viewCartData!.items ?? []) {
-      // Safe way - check if prices exists
       if (item.prices != null) {
         double itemPrice = double.tryParse(item.prices!.price ?? '0') ?? 0.0;
         int quantity = item.quantity ?? 0;
 
         subtotal += itemPrice * quantity;
 
-        double itemTax = 0.0; // Temporary - tax નો issue solve થઈ જશે
-
+        double itemTax = 0.0; // Temporary
         tax += itemTax * quantity;
       }
     }
 
     double totalPrice = subtotal + tax + shipping - discount;
-
-    viewCartData!.totals = Totals(
-      currencySymbol: viewCartData!.totals?.currencySymbol ?? "\$",
-      totalItems: subtotal.round().toString(),
-      totalTax: tax.round().toString(),
-      totalShipping: shipping.round().toString(),
-      totalDiscount: discount.round().toString(),
-      totalPrice: totalPrice.round().toString(),
-    );
+    print("totalPrice======>>>>>>${totalPrice}");
+    setState(() {
+      viewCartData!.totals = Totals(
+        currencySymbol: viewCartData!.totals?.currencySymbol ?? "\$",
+        totalItems: subtotal.round().toString(),
+        totalTax: tax.round().toString(),
+        totalShipping: shipping.round().toString(),
+        totalDiscount: discount.round().toString(),
+        totalPrice: totalPrice.round().toString(),
+      );
+    });
   }
 
+  //   Future<void> _fetchCart() async {
+  //     var box = HiveService().getViewCartBox();
+  //
+  //     // ✅ Offline mode
+  //     if (!await checkInternet()) {
+  //       final cachedData = box.get('cart_$customerId');
+  //
+  //       if (cachedData != null && cachedData.toString().isNotEmpty) {
+  //         try {
+  //           final data = json.decode(cachedData);
+  //           viewCartData = ViewCartDataModal.fromJson(data);
+  //           setState(() {
+  //             couponController.text =viewCartData?.coupons?.length==0||viewCartData?.coupons?.length==[]?"":viewCartData?.coupons?[0].code ?? "";
+  //           });
+  //         } catch (e) {
+  //           log("Error decoding cached cart: $e");
+  //           viewCartData = null;
+  //         }
+  //       } else {
+  //         viewCartData = null;
+  //         showCustomErrorSnackbar(
+  //           title: 'No Internet',
+  //           message: 'Your cart is empty or offline data not found.',
+  //         );
+  //       }
+  //       return;
+  //     }
+  //
+  //     // ✅ Online mode
+  //     try {
+  //       final response = await CartService().fetchCart(customerId);
+  //
+  //       if (response.statusCode == 200) {
+  //         final data = json.decode(response.body);
+  //
+  // print("=======>>>>> ave che ");
+  //         if (data == null || (data['items'] as List).isEmpty) {
+  //           viewCartData = null;
+  //           await box.delete('cart_$customerId'); // clear cache
+  //         } else {
+  //           viewCartData = ViewCartDataModal.fromJson(data);
+  //           setState(() {
+  //             couponController.text =viewCartData?.coupons?.length==0||viewCartData?.coupons?.length==[]?"":viewCartData?.coupons?[0].code ?? "";
+  //           });
+  //           await box.put(
+  //             'cart_$customerId',
+  //             response.body,
+  //           ); // save raw JSON string
+  //         }
+  //       } else {
+  //         // fallback to cache
+  //         final cachedData = box.get('cart_$customerId');
+  //         if (cachedData != null && cachedData.toString().isNotEmpty) {
+  //           final data = json.decode(cachedData);
+  //           viewCartData = ViewCartDataModal.fromJson(data);
+  //           setState(() {
+  //             couponController.text =viewCartData?.coupons?.length==0||viewCartData?.coupons?.length==[]?"":viewCartData?.coupons?[0].code ?? "";
+  //           });
+  //         } else {
+  //           viewCartData = null;
+  //         }
+  //         showCustomErrorSnackbar(
+  //           title: 'Server Error',
+  //           message: 'Something went wrong. Please try again later.',
+  //         );
+  //       }
+  //     } catch (e,stackTrace) {
+  //       print("=====>>>>>>>${stackTrace}");
+  //       // fallback to cache
+  //       final cachedData = box.get('cart_$customerId');
+  //       if (cachedData != null && cachedData.toString().isNotEmpty) {
+  //         try {
+  //           final data = json.decode(cachedData);
+  //           viewCartData = ViewCartDataModal.fromJson(data);
+  //           setState(() {
+  //             couponController.text =viewCartData?.coupons?.length==0||viewCartData?.coupons?.length==[]?"":viewCartData?.coupons?[0].code ?? "";
+  //           });
+  //         } catch (_) {
+  //           viewCartData = null;
+  //         }
+  //       } else {
+  //         viewCartData = null;
+  //       }
+  //       showCustomErrorSnackbar(
+  //         title: 'Network Error',
+  //         message: 'Unable to connect. Please check your internet and try again.',
+  //       );
+  //     }
+  //   }
   Future<void> _fetchCart() async {
     var box = HiveService().getViewCartBox();
+
+    // Helper to safely set couponController
+    void updateCouponText() {
+      final coupons = viewCartData?.coupons;
+      couponController.text =
+          (coupons != null && coupons.isNotEmpty)
+              ? (coupons[0].code ?? "")
+              : "";
+    }
 
     // ✅ Offline mode
     if (!await checkInternet()) {
@@ -904,16 +1138,20 @@ class _CartScreenState extends State<CartScreen> {
         try {
           final data = json.decode(cachedData);
           viewCartData = ViewCartDataModal.fromJson(data);
+
+          if (mounted) updateCouponText();
         } catch (e) {
           log("Error decoding cached cart: $e");
           viewCartData = null;
         }
       } else {
         viewCartData = null;
-        showCustomErrorSnackbar(
-          title: 'No Internet',
-          message: 'Your cart is empty or offline data not found.',
-        );
+        if (mounted) {
+          showCustomErrorSnackbar(
+            title: 'No Internet',
+            message: 'Your cart is empty or offline data not found.',
+          );
+        }
       }
       return;
     }
@@ -930,10 +1168,8 @@ class _CartScreenState extends State<CartScreen> {
           await box.delete('cart_$customerId'); // clear cache
         } else {
           viewCartData = ViewCartDataModal.fromJson(data);
-          await box.put(
-            'cart_$customerId',
-            response.body,
-          ); // save raw JSON string
+          if (mounted) updateCouponText();
+          await box.put('cart_$customerId', response.body); // save raw JSON
         }
       } else {
         // fallback to cache
@@ -941,26 +1177,87 @@ class _CartScreenState extends State<CartScreen> {
         if (cachedData != null && cachedData.toString().isNotEmpty) {
           final data = json.decode(cachedData);
           viewCartData = ViewCartDataModal.fromJson(data);
+          if (mounted) updateCouponText();
         } else {
           viewCartData = null;
         }
-        showCustomErrorSnackbar(
-          title: 'Server Error',
-          message: 'Something went wrong. Please try again later.',
-        );
+        if (mounted)
+          showCustomErrorSnackbar(
+            title: 'Server Error',
+            message: 'Something went wrong. Please try again later.',
+          );
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print("Error fetching cart: $stackTrace");
+
       // fallback to cache
       final cachedData = box.get('cart_$customerId');
       if (cachedData != null && cachedData.toString().isNotEmpty) {
         try {
           final data = json.decode(cachedData);
           viewCartData = ViewCartDataModal.fromJson(data);
+          if (mounted) updateCouponText();
         } catch (_) {
           viewCartData = null;
         }
       } else {
         viewCartData = null;
+      }
+
+      if (mounted)
+        showCustomErrorSnackbar(
+          title: 'Network Error',
+          message:
+              'Unable to connect. Please check your internet and try again.',
+        );
+    }
+  }
+
+  List<CouponListModal> couponslist = [];
+
+  Future<void> _fetchCoupons() async {
+    var box = HiveService().getCouponListBox();
+
+    if (!await checkInternet()) {
+      final cachedData = box.get('coupons');
+      if (cachedData != null) {
+        final List data = json.decode(cachedData);
+        couponslist = data.map((e) => CouponListModal.fromJson(e)).toList();
+      } else {
+        showCustomErrorSnackbar(
+          title: 'No Internet',
+          message: 'Please check your connection and try again.',
+        );
+      }
+      return;
+    }
+
+    try {
+      final response = await CartService().couponsListApi();
+      if (response.statusCode == 200) {
+        final List data = json.decode(response.body);
+        couponslist = data.map((e) => CouponListModal.fromJson(e)).toList();
+
+        // Save coupons to Hive
+        await box.put('coupons', response.body);
+      } else {
+        // Fallback: load cache if server fails
+        final cachedData = box.get('coupons');
+        if (cachedData != null) {
+          final List data = json.decode(cachedData);
+          couponslist = data.map((e) => CouponListModal.fromJson(e)).toList();
+        }
+        showCustomErrorSnackbar(
+          title: 'Server Error',
+          message: 'Something went wrong. Please try again later.',
+        );
+      }
+    } catch (_) {
+      // Fallback: load cache on network error
+      final cachedData = box.get('coupons');
+      if (cachedData != null) {
+        final List data = json.decode(cachedData);
+        couponslist = data.map((e) => CouponListModal.fromJson(e)).toList();
       }
       showCustomErrorSnackbar(
         title: 'Network Error',
@@ -969,50 +1266,129 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
-  // Future<void> _fetchCart() async {
-  //   var box = HiveService().getViewCartBox();
-  //
-  //   if (!await checkInternet()) {
-  //     final cachedData = box.get('cart_$customerId');
-  //     if (cachedData != null) {
-  //       final data = json.decode(cachedData);
-  //       viewCartData = ViewCartDataModal.fromJson(data);
-  //     } else {
-  //       showCustomErrorSnackbar(
-  //         title: 'No Internet',
-  //         message: 'Please check your connection and try again.',
-  //       );
-  //     }
-  //     return;
-  //   }
-  //
-  //   try {
-  //     final response = await CartService().fetchCart(customerId);
-  //     if (response.statusCode == 200) {
-  //       final data = json.decode(response.body);
-  //       viewCartData = ViewCartDataModal.fromJson(data);
-  //       await box.put("cart_$customerId", response.body);
-  //     } else {
-  //       final cachedData = box.get('cart_$customerId');
-  //       if (cachedData != null) {
-  //         final data = json.decode(cachedData);
-  //         viewCartData = ViewCartDataModal.fromJson(data);
-  //       }
-  //       showCustomErrorSnackbar(
-  //         title: 'Server Error',
-  //         message: 'Something went wrong. Please try again later.',
-  //       );
-  //     }
-  //   } catch (_) {
-  //     final cachedData = box.get('cart_$customerId');
-  //     if (cachedData != null) {
-  //       final data = json.decode(cachedData);
-  //       viewCartData = ViewCartDataModal.fromJson(data);
-  //     }
-  //     showCustomErrorSnackbar(
-  //       title: 'Network Error',
-  //       message: 'Unable to connect. Please check your internet and try again.',
-  //     );
-  //   }
-  // }
+  void _showCouponDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: Text(
+                "Available Coupons",
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontFamily: FontFamily.semiBold,
+                ),
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child:
+                    couponslist.isEmpty
+                        ? Center(
+                          child: Text(
+                            "No Coupons Available",
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        )
+                        : SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              for (var coupon in couponslist)
+                                Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: ListTile(
+                                    title: Text(
+                                      coupon.code ?? "",
+                                      style: TextStyle(
+                                        fontFamily: FontFamily.semiBold,
+                                      ),
+                                    ),
+                                    trailing: TextButton(
+                                      onPressed: () async {
+                                        // set selected coupon into textfield
+                                        setState(() {
+                                          couponController.text =
+                                              coupon.code ?? "";
+                                          discount1 = double.parse(
+                                            coupon.amount ?? "",
+                                          );
+                                          updateCartTotalsLocally(
+                                            offlineDiscount: discount1,
+                                          );
+                                        });
+                                        print(
+                                          "discount1=====>>>>>${discount1}",
+                                        );
+
+                                        final cartService = CartService();
+
+                                        await cartService.applyCoupon(
+                                          couponCode: couponController.text,
+                                          onSuccess: () {
+                                            print("API call successful");
+
+                                            WidgetsBinding.instance
+                                                .addPostFrameCallback((_) {
+                                                  Get.offAll(
+                                                    () => CartScreen(),
+                                                  );
+                                                  _fetchCart();
+                                                });
+                                          },
+                                        );
+
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text(
+                                        "Apply",
+                                        style: TextStyle(
+                                          color: AppColors.mainColor,
+                                          fontFamily: FontFamily.semiBold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+              ),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.mainColor,
+                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: AppColors.whiteColor,
+                      fontSize: 16.sp,
+                      fontFamily: FontFamily.semiBold,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  TextEditingController couponController = TextEditingController();
 }

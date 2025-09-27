@@ -23,6 +23,7 @@ class ConnectivityManager {
           await CartService().syncOfflineActions();
           await CartService().syncOfflineUpdate();
           await CartService().syncOfflineOrders();
+          await CartService().syncAppliedCoupons();
           await UpdateAddressService().syncOfflineAddress();
         }
       });

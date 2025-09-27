@@ -26,4 +26,7 @@ class apiEndpoints {
   static String fetchPdfFile =
       "$baseUrl/wp-json/bellissemo/v1/catalog/pdf/dompdf?taxonomy=product_cat&taxonomy_value=";
   static String updateAddress = "$baseUrl/wp-json/wc/v3/customers/";
+  static String couponsList = "$baseUrl/wp-json/bellissemo/v1/coupons";
+  static String applyCoupons = "$baseUrl/wp-json/bellissemo/v1/apply-coupon";
+  static String removeCoupons = "$baseUrl/wp-json/bellissemo/v1/remove-coupon";
 }
