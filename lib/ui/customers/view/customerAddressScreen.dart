@@ -194,13 +194,13 @@ class _CustomerAddressScreenState extends State<CustomerAddressScreen> {
                 final shipping = {
                   "first_name": firstNameController.text.trim(),
                   "last_name": lastNameController.text.trim(),
-
                   "address_1": address1Controller.text.trim(),
                   "address_2": address2Controller.text.trim(),
                   "city": cityController.text.trim(),
                   "postcode": postcode.text.trim(),
                   "country": countryController.text.trim(),
                   "state": stateController.text.trim(),
+                  "email": emailController.text.trim(),
                 };
 
                 final response = await service.updateAddress(
