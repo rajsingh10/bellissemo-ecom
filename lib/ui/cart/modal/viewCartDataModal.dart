@@ -11,18 +11,19 @@ class ViewCartDataModal {
   int? itemsCount;
   int? itemsWeight;
 
-  ViewCartDataModal(
-      {this.items,
-        this.coupons,
-        this.totals,
-        this.shippingAddress,
-        this.billingAddress,
-        this.needsPayment,
-        this.needsShipping,
-        this.paymentRequirements,
-        this.hasCalculatedShipping,
-        this.itemsCount,
-        this.itemsWeight});
+  ViewCartDataModal({
+    this.items,
+    this.coupons,
+    this.totals,
+    this.shippingAddress,
+    this.billingAddress,
+    this.needsPayment,
+    this.needsShipping,
+    this.paymentRequirements,
+    this.hasCalculatedShipping,
+    this.itemsCount,
+    this.itemsWeight,
+  });
 
   ViewCartDataModal.fromJson(Map<String, dynamic> json) {
     if (json['items'] != null) {
@@ -38,13 +39,15 @@ class ViewCartDataModal {
       });
     }
     totals =
-    json['totals'] != null ? new Totals.fromJson(json['totals']) : null;
-    shippingAddress = json['shipping_address'] != null
-        ? new ShippingAddress.fromJson(json['shipping_address'])
-        : null;
-    billingAddress = json['billing_address'] != null
-        ? new BillingAddress.fromJson(json['billing_address'])
-        : null;
+        json['totals'] != null ? new Totals.fromJson(json['totals']) : null;
+    shippingAddress =
+        json['shipping_address'] != null
+            ? new ShippingAddress.fromJson(json['shipping_address'])
+            : null;
+    billingAddress =
+        json['billing_address'] != null
+            ? new BillingAddress.fromJson(json['billing_address'])
+            : null;
     needsPayment = json['needs_payment'];
     needsShipping = json['needs_shipping'];
     paymentRequirements = json['payment_requirements'].cast<String>();
@@ -98,32 +101,34 @@ class Items {
   Prices? prices;
   String? catalogVisibility;
 
-  Items(
-      {this.key,
-        this.id,
-        this.type,
-        this.quantity,
-        this.quantityLimits,
-        this.name,
-        this.shortDescription,
-        this.description,
-        this.sku,
-        this.backordersAllowed,
-        this.showBackorderBadge,
-        this.soldIndividually,
-        this.permalink,
-        this.images,
-        this.prices,
-        this.catalogVisibility});
+  Items({
+    this.key,
+    this.id,
+    this.type,
+    this.quantity,
+    this.quantityLimits,
+    this.name,
+    this.shortDescription,
+    this.description,
+    this.sku,
+    this.backordersAllowed,
+    this.showBackorderBadge,
+    this.soldIndividually,
+    this.permalink,
+    this.images,
+    this.prices,
+    this.catalogVisibility,
+  });
 
   Items.fromJson(Map<String, dynamic> json) {
     key = json['key'];
     id = json['id'];
     type = json['type'];
     quantity = json['quantity'];
-    quantityLimits = json['quantity_limits'] != null
-        ? new QuantityLimits.fromJson(json['quantity_limits'])
-        : null;
+    quantityLimits =
+        json['quantity_limits'] != null
+            ? new QuantityLimits.fromJson(json['quantity_limits'])
+            : null;
     name = json['name'];
     shortDescription = json['short_description'];
     description = json['description'];
@@ -139,7 +144,7 @@ class Items {
       });
     }
     prices =
-    json['prices'] != null ? new Prices.fromJson(json['prices']) : null;
+        json['prices'] != null ? new Prices.fromJson(json['prices']) : null;
     catalogVisibility = json['catalog_visibility'];
   }
 
@@ -205,14 +210,15 @@ class Images {
   String? name;
   String? alt;
 
-  Images(
-      {this.id,
-        this.src,
-        this.thumbnail,
-        this.srcset,
-        this.sizes,
-        this.name,
-        this.alt});
+  Images({
+    this.id,
+    this.src,
+    this.thumbnail,
+    this.srcset,
+    this.sizes,
+    this.name,
+    this.alt,
+  });
 
   Images.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -251,19 +257,20 @@ class Prices {
   String? currencySuffix;
   RawPrices? rawPrices;
 
-  Prices(
-      {this.price,
-        this.regularPrice,
-        this.salePrice,
-        this.priceRange,
-        this.currencyCode,
-        this.currencySymbol,
-        this.currencyMinorUnit,
-        this.currencyDecimalSeparator,
-        this.currencyThousandSeparator,
-        this.currencyPrefix,
-        this.currencySuffix,
-        this.rawPrices});
+  Prices({
+    this.price,
+    this.regularPrice,
+    this.salePrice,
+    this.priceRange,
+    this.currencyCode,
+    this.currencySymbol,
+    this.currencyMinorUnit,
+    this.currencyDecimalSeparator,
+    this.currencyThousandSeparator,
+    this.currencyPrefix,
+    this.currencySuffix,
+    this.rawPrices,
+  });
 
   Prices.fromJson(Map<String, dynamic> json) {
     price = json['price'];
@@ -277,9 +284,10 @@ class Prices {
     currencyThousandSeparator = json['currency_thousand_separator'];
     currencyPrefix = json['currency_prefix'];
     currencySuffix = json['currency_suffix'];
-    rawPrices = json['raw_prices'] != null
-        ? new RawPrices.fromJson(json['raw_prices'])
-        : null;
+    rawPrices =
+        json['raw_prices'] != null
+            ? new RawPrices.fromJson(json['raw_prices'])
+            : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -337,9 +345,10 @@ class Coupons {
   Coupons.fromJson(Map<String, dynamic> json) {
     code = json['code'];
     discountType = json['discount_type'];
-    couponstotal = json['couponstotal'] != null
-        ? new Couponstotal.fromJson(json['couponstotal'])
-        : null;
+    couponstotal =
+        json['couponstotal'] != null
+            ? new Couponstotal.fromJson(json['couponstotal'])
+            : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -364,16 +373,17 @@ class Couponstotal {
   String? currencyPrefix;
   String? currencySuffix;
 
-  Couponstotal(
-      {this.totalDiscount,
-        this.totalDiscountTax,
-        this.currencyCode,
-        this.currencySymbol,
-        this.currencyMinorUnit,
-        this.currencyDecimalSeparator,
-        this.currencyThousandSeparator,
-        this.currencyPrefix,
-        this.currencySuffix});
+  Couponstotal({
+    this.totalDiscount,
+    this.totalDiscountTax,
+    this.currencyCode,
+    this.currencySymbol,
+    this.currencyMinorUnit,
+    this.currencyDecimalSeparator,
+    this.currencyThousandSeparator,
+    this.currencyPrefix,
+    this.currencySuffix,
+  });
 
   Couponstotal.fromJson(Map<String, dynamic> json) {
     totalDiscount = json['total_discount'];
@@ -421,24 +431,25 @@ class Totals {
   String? currencyPrefix;
   String? currencySuffix;
 
-  Totals(
-      {this.totalItems,
-        this.totalItemsTax,
-        this.totalFees,
-        this.totalFeesTax,
-        this.totalDiscount,
-        this.totalDiscountTax,
-        this.totalShipping,
-        this.totalShippingTax,
-        this.totalPrice,
-        this.totalTax,
-        this.currencyCode,
-        this.currencySymbol,
-        this.currencyMinorUnit,
-        this.currencyDecimalSeparator,
-        this.currencyThousandSeparator,
-        this.currencyPrefix,
-        this.currencySuffix});
+  Totals({
+    this.totalItems,
+    this.totalItemsTax,
+    this.totalFees,
+    this.totalFeesTax,
+    this.totalDiscount,
+    this.totalDiscountTax,
+    this.totalShipping,
+    this.totalShippingTax,
+    this.totalPrice,
+    this.totalTax,
+    this.currencyCode,
+    this.currencySymbol,
+    this.currencyMinorUnit,
+    this.currencyDecimalSeparator,
+    this.currencyThousandSeparator,
+    this.currencyPrefix,
+    this.currencySuffix,
+  });
 
   Totals.fromJson(Map<String, dynamic> json) {
     totalItems = json['total_items'];
@@ -495,17 +506,18 @@ class ShippingAddress {
   String? state;
   String? phone;
 
-  ShippingAddress(
-      {this.firstName,
-        this.lastName,
-        this.company,
-        this.address1,
-        this.address2,
-        this.city,
-        this.postcode,
-        this.country,
-        this.state,
-        this.phone});
+  ShippingAddress({
+    this.firstName,
+    this.lastName,
+    this.company,
+    this.address1,
+    this.address2,
+    this.city,
+    this.postcode,
+    this.country,
+    this.state,
+    this.phone,
+  });
 
   ShippingAddress.fromJson(Map<String, dynamic> json) {
     firstName = json['first_name'];
@@ -549,18 +561,19 @@ class BillingAddress {
   String? email;
   String? phone;
 
-  BillingAddress(
-      {this.firstName,
-        this.lastName,
-        this.company,
-        this.address1,
-        this.address2,
-        this.city,
-        this.postcode,
-        this.country,
-        this.state,
-        this.email,
-        this.phone});
+  BillingAddress({
+    this.firstName,
+    this.lastName,
+    this.company,
+    this.address1,
+    this.address2,
+    this.city,
+    this.postcode,
+    this.country,
+    this.state,
+    this.email,
+    this.phone,
+  });
 
   BillingAddress.fromJson(Map<String, dynamic> json) {
     firstName = json['first_name'];

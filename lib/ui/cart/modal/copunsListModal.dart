@@ -10,17 +10,18 @@ class CouponListModal {
   String? minimumAmount;
   String? maximumAmount;
 
-  CouponListModal(
-      {this.id,
-        this.code,
-        this.amount,
-        this.discountType,
-        this.dateExpires,
-        this.usageLimit,
-        this.usageCount,
-        this.individualUse,
-        this.minimumAmount,
-        this.maximumAmount});
+  CouponListModal({
+    this.id,
+    this.code,
+    this.amount,
+    this.discountType,
+    this.dateExpires,
+    this.usageLimit,
+    this.usageCount,
+    this.individualUse,
+    this.minimumAmount,
+    this.maximumAmount,
+  });
 
   CouponListModal.fromJson(Map<String, dynamic> json) {
     id = json['id'];

@@ -41,7 +41,7 @@ class UpdateAddressService {
       final loginData = await SaveDataLocal.getDataFromLocal();
       final token = loginData?.token ?? '';
       if (token.isEmpty) throw Exception("Token not found");
-log('Token : $token');
+      log('Token : $token');
       final headers = {
         "Authorization": "Bearer $token",
         "Content-Type": "application/json",
@@ -53,7 +53,7 @@ log('Token : $token');
         data: jsonEncode({"billing": billing, "shipping": shipping}),
         options: Options(headers: headers),
       );
-log('Data : ${jsonEncode({"billing": billing, "shipping": shipping})}');
+      log('Data : ${jsonEncode({"billing": billing, "shipping": shipping})}');
       if (response.statusCode == 200 || response.statusCode == 201) {
         await box.put("address_latest", response.data);
       }

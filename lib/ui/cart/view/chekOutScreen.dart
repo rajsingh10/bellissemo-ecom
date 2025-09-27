@@ -84,91 +84,64 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
       body:
           isLoading
               ? Loader()
-              : Column(
+              : Stack(
                 children: [
-                  TitleBar(
-                    title: 'Checkout',
-                    isDrawerEnabled: false,
-                    isBackEnabled: true,
-                  ),
-                  SizedBox(height: 1.h),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      physics: ClampingScrollPhysics(),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: AppColors.whiteColor,
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
+                  Column(
+                    children: [
+                      TitleBar(
+                        title: 'Checkout',
+                        isDrawerEnabled: false,
+                        isBackEnabled: true,
+                      ),
+                      SizedBox(height: 1.h),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          physics: ClampingScrollPhysics(),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: AppColors.whiteColor,
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Icon(
-                                        Icons.local_shipping_rounded,
-                                        color: AppColors.mainColor,
-                                        size: 21.sp,
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.local_shipping_rounded,
+                                            color: AppColors.mainColor,
+                                            size: 21.sp,
+                                          ),
+                                          Text(
+                                            "Shipping Details",
+                                            style: TextStyle(
+                                              color: AppColors.mainColor,
+                                              fontSize: 20.sp,
+                                              fontFamily: FontFamily.bold,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Text(
-                                        "Shipping Details",
-                                        style: TextStyle(
-                                          color: AppColors.mainColor,
-                                          fontSize: 20.sp,
-                                          fontFamily: FontFamily.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Divider(),
+                                      Divider(),
 
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.person_outline_rounded,
-                                        size: 20.sp,
-                                        color: AppColors.mainColor,
-                                      ),
-                                      Text(
-                                        "Customer Name",
-                                        style: TextStyle(
-                                          color: AppColors.mainColor,
-                                          fontSize: 16.sp,
-                                          fontFamily: FontFamily.semiBold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Text(
-                                    customerName.toString(),
-                                    style: TextStyle(
-                                      color: AppColors.blackColor,
-                                      fontSize: 16.sp,
-                                      fontFamily: FontFamily.semiBold,
-                                    ),
-                                  ),
-                                  SizedBox(height: 1.h),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
                                       Row(
                                         children: [
                                           Icon(
-                                            Icons.location_on_outlined,
+                                            Icons.person_outline_rounded,
                                             size: 20.sp,
                                             color: AppColors.mainColor,
                                           ),
                                           Text(
-                                            "Address",
+                                            "Customer Name",
                                             style: TextStyle(
                                               color: AppColors.mainColor,
                                               fontSize: 16.sp,
@@ -177,683 +150,934 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                           ),
                                         ],
                                       ),
-
-                                      InkWell(
-                                        onTap: () {
-                                          Get.to(
-                                            CustomerAddressScreen(
-                                              id: customerId.toString(),
-                                              email:
-                                                  viewCartData
-                                                      ?.billingAddress
-                                                      ?.email,
-                                              fName:
-                                                  viewCartData
-                                                      ?.billingAddress
-                                                      ?.firstName,
-                                              lName:
-                                                  viewCartData
-                                                      ?.billingAddress
-                                                      ?.lastName,
-                                              address1:
-                                                  viewCartData
-                                                      ?.billingAddress
-                                                      ?.address1,
-                                              address2:
-                                                  viewCartData
-                                                      ?.billingAddress
-                                                      ?.address2,
-                                              city:
-                                                  viewCartData
-                                                      ?.billingAddress
-                                                      ?.city,
-                                              country:
-                                                  viewCartData
-                                                      ?.billingAddress
-                                                      ?.country,
-                                              postcode:
-                                                  viewCartData
-                                                      ?.billingAddress
-                                                      ?.postcode,
-                                              state:
-                                                  viewCartData
-                                                      ?.billingAddress
-                                                      ?.state,
-                                            ),
-                                          );
-                                        },
-                                        child: Icon(
-                                          Icons.edit_rounded,
-                                          size: 20.sp,
-                                          color: AppColors.mainColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  viewCartData?.billingAddress?.address1 == ''
-                                      ? Center(
-                                        child: Text(
-                                          "No Address Available",
-                                          style: TextStyle(
-                                            color: AppColors.blackColor,
-                                            fontSize: 16.sp,
-                                            fontFamily: FontFamily.semiBold,
-                                          ),
-                                        ),
-                                      )
-                                      : Text(
-                                        "${viewCartData?.billingAddress?.firstName ?? ""} ${viewCartData?.billingAddress?.lastName ?? ""}\n${viewCartData?.billingAddress?.email ?? ""}\n${viewCartData?.billingAddress?.address1 ?? ""} ${viewCartData?.billingAddress?.address2 ?? ""} ${viewCartData?.billingAddress?.city ?? ""} ${viewCartData?.billingAddress?.state ?? ""} ${viewCartData?.billingAddress?.country ?? ""} ${viewCartData?.billingAddress?.postcode ?? ""}",
+                                      Text(
+                                        customerName.toString(),
                                         style: TextStyle(
                                           color: AppColors.blackColor,
                                           fontSize: 16.sp,
                                           fontFamily: FontFamily.semiBold,
                                         ),
                                       ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 1.h),
-                          Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: AppColors.whiteColor,
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.shopping_bag_rounded,
-                                        color: AppColors.mainColor,
-                                        size: 21.sp,
+                                      SizedBox(height: 1.h),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.location_on_outlined,
+                                                size: 20.sp,
+                                                color: AppColors.mainColor,
+                                              ),
+                                              Text(
+                                                "Address",
+                                                style: TextStyle(
+                                                  color: AppColors.mainColor,
+                                                  fontSize: 16.sp,
+                                                  fontFamily:
+                                                      FontFamily.semiBold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+
+                                          InkWell(
+                                            onTap: () {
+                                              Get.to(
+                                                CustomerAddressScreen(
+                                                  id: customerId.toString(),
+                                                  email:
+                                                      viewCartData
+                                                          ?.billingAddress
+                                                          ?.email,
+                                                  fName:
+                                                      viewCartData
+                                                          ?.billingAddress
+                                                          ?.firstName,
+                                                  lName:
+                                                      viewCartData
+                                                          ?.billingAddress
+                                                          ?.lastName,
+                                                  address1:
+                                                      viewCartData
+                                                          ?.billingAddress
+                                                          ?.address1,
+                                                  address2:
+                                                      viewCartData
+                                                          ?.billingAddress
+                                                          ?.address2,
+                                                  city:
+                                                      viewCartData
+                                                          ?.billingAddress
+                                                          ?.city,
+                                                  country:
+                                                      viewCartData
+                                                          ?.billingAddress
+                                                          ?.country,
+                                                  postcode:
+                                                      viewCartData
+                                                          ?.billingAddress
+                                                          ?.postcode,
+                                                  state:
+                                                      viewCartData
+                                                          ?.billingAddress
+                                                          ?.state,
+                                                ),
+                                              );
+                                            },
+                                            child: Icon(
+                                              Icons.edit_rounded,
+                                              size: 20.sp,
+                                              color: AppColors.mainColor,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Text(
-                                        "Order",
-                                        style: TextStyle(
-                                          color: AppColors.mainColor,
-                                          fontSize: 20.sp,
-                                          fontFamily: FontFamily.bold,
-                                        ),
-                                      ),
+                                      viewCartData?.billingAddress?.address1 ==
+                                              ''
+                                          ? Center(
+                                            child: Text(
+                                              "No Address Available",
+                                              style: TextStyle(
+                                                color: AppColors.blackColor,
+                                                fontSize: 16.sp,
+                                                fontFamily: FontFamily.semiBold,
+                                              ),
+                                            ),
+                                          )
+                                          : Text(
+                                            "${viewCartData?.billingAddress?.firstName ?? ""} ${viewCartData?.billingAddress?.lastName ?? ""}\n${viewCartData?.billingAddress?.email ?? ""}\n${viewCartData?.billingAddress?.address1 ?? ""}, ${viewCartData?.billingAddress?.address2 ?? ""}, ${viewCartData?.billingAddress?.city ?? ""}, ${viewCartData?.billingAddress?.state ?? ""}, ${viewCartData?.billingAddress?.country ?? ""} - ${viewCartData?.billingAddress?.postcode ?? ""}",
+                                            style: TextStyle(
+                                              color: AppColors.blackColor,
+                                              fontSize: 16.sp,
+                                              fontFamily: FontFamily.semiBold,
+                                            ),
+                                          ),
                                     ],
                                   ),
-                                  Divider(),
+                                ),
+                              ),
+                              SizedBox(height: 1.h),
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: AppColors.whiteColor,
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.shopping_bag_rounded,
+                                            color: AppColors.mainColor,
+                                            size: 21.sp,
+                                          ),
+                                          Text(
+                                            "Order",
+                                            style: TextStyle(
+                                              color: AppColors.mainColor,
+                                              fontSize: 20.sp,
+                                              fontFamily: FontFamily.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Divider(),
 
-                                  Container(
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: AppColors.whiteColor,
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        SizedBox(height: 1.h),
-                                        viewCartData?.items?.length == 0 ||
-                                                viewCartData?.items?.length ==
-                                                    null ||
-                                                viewCartData?.items?.length ==
-                                                    []
-                                            ? Text(
-                                              "No Cart Available",
-                                              style: TextStyle(
-                                                fontFamily: FontFamily.bold,
-                                                fontSize: 15.sp,
-                                                color: AppColors.blackColor,
-                                              ),
-                                            )
-                                            : Column(
-                                              children: [
-                                                for (
-                                                  int i = 0;
-                                                  i <
-                                                      (viewCartData
-                                                              ?.items
-                                                              ?.length ??
-                                                          0);
-                                                  i++
+                                      Container(
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                          color: AppColors.whiteColor,
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            SizedBox(height: 1.h),
+                                            viewCartData?.items?.length == 0 ||
+                                                    viewCartData
+                                                            ?.items
+                                                            ?.length ==
+                                                        null ||
+                                                    viewCartData
+                                                            ?.items
+                                                            ?.length ==
+                                                        []
+                                                ? Text(
+                                                  "No Cart Available",
+                                                  style: TextStyle(
+                                                    fontFamily: FontFamily.bold,
+                                                    fontSize: 15.sp,
+                                                    color: AppColors.blackColor,
+                                                  ),
                                                 )
-                                                  Column(
-                                                    children: [
-                                                      Container(
-                                                        // margin: EdgeInsets.symmetric(vertical: 1.h, horizontal: 2.w),
-                                                        padding: EdgeInsets.all(
-                                                          2.w,
-                                                        ),
-                                                        decoration: BoxDecoration(
-                                                          color:
-                                                              AppColors
-                                                                  .whiteColor,
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                15,
-                                                              ),
-                                                          boxShadow: [
-                                                            BoxShadow(
+                                                : Column(
+                                                  children: [
+                                                    for (
+                                                      int i = 0;
+                                                      i <
+                                                          (viewCartData
+                                                                  ?.items
+                                                                  ?.length ??
+                                                              0);
+                                                      i++
+                                                    )
+                                                      Column(
+                                                        children: [
+                                                          Container(
+                                                            // margin: EdgeInsets.symmetric(vertical: 1.h, horizontal: 2.w),
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                  2.w,
+                                                                ),
+                                                            decoration: BoxDecoration(
                                                               color:
-                                                                  Colors
-                                                                      .grey
-                                                                      .shade300,
-                                                              blurRadius: 10,
-                                                              offset: Offset(
-                                                                0,
-                                                                5,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        child: Row(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            // Product Image
-                                                            ClipRRect(
+                                                                  AppColors
+                                                                      .whiteColor,
                                                               borderRadius:
                                                                   BorderRadius.circular(
-                                                                    12,
+                                                                    15,
                                                                   ),
-                                                              child: CustomNetworkImage(
-                                                                imageUrl:
-                                                                    viewCartData
-                                                                        ?.items?[i]
-                                                                        .images?[0]
-                                                                        .src ??
-                                                                    '',
-                                                                height: 80,
-                                                                width: 80,
-                                                                radius: 12,
-                                                                isCircle: false,
-                                                                isFit: true,
-                                                              ),
+                                                              boxShadow: [
+                                                                BoxShadow(
+                                                                  color:
+                                                                      Colors
+                                                                          .grey
+                                                                          .shade300,
+                                                                  blurRadius:
+                                                                      10,
+                                                                  offset:
+                                                                      Offset(
+                                                                        0,
+                                                                        5,
+                                                                      ),
+                                                                ),
+                                                              ],
                                                             ),
-                                                            SizedBox(
-                                                              width: 3.w,
-                                                            ),
-
-                                                            // Product Details
-                                                            Expanded(
-                                                              child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Text(
-                                                                    viewCartData
-                                                                            ?.items?[i]
-                                                                            .name ??
-                                                                        "",
-                                                                    style: TextStyle(
-                                                                      fontFamily:
-                                                                          FontFamily
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          15.sp,
-                                                                      color:
-                                                                          AppColors
-                                                                              .blackColor,
-                                                                    ),
-                                                                    maxLines: 2,
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                  ),
-                                                                  SizedBox(
-                                                                    height:
-                                                                        0.5.h,
-                                                                  ),
-
-                                                                  Text(
-                                                                    "Qty:  ${viewCartData?.items?[i].quantity ?? ""}",
-                                                                    style: TextStyle(
-                                                                      fontFamily:
-                                                                          FontFamily
-                                                                              .light,
-                                                                      fontSize:
-                                                                          15.sp,
-                                                                      color:
-                                                                          AppColors
-                                                                              .blackColor,
-                                                                    ),
-                                                                    maxLines: 2,
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-
-                                                            // Price + Delete
-                                                            Column(
+                                                            child: Row(
                                                               crossAxisAlignment:
                                                                   CrossAxisAlignment
-                                                                      .end,
+                                                                      .start,
                                                               children: [
-                                                                InkWell(
-                                                                  onTap: () {
-                                                                    setState(() {
-                                                                      // cartItems.removeAt(i);
-                                                                    });
-                                                                  },
-                                                                  child: Container(
-                                                                    height:
-                                                                        isIpad
-                                                                            ? 24.sp
-                                                                            : 0.sp,
-                                                                    padding: EdgeInsets.all(
-                                                                      isIpad
-                                                                          ? 1.w
-                                                                          : 1.5
-                                                                              .w,
-                                                                    ),
-                                                                    decoration: BoxDecoration(
-                                                                      color:
-                                                                          AppColors
-                                                                              .mainColor,
-                                                                      shape:
-                                                                          BoxShape
-                                                                              .circle,
-                                                                    ),
-                                                                    child: Icon(
-                                                                      Icons
-                                                                          .delete_outline_rounded,
-                                                                      color:
-                                                                          AppColors
-                                                                              .whiteColor,
-                                                                      size:
-                                                                          isIpad
-                                                                              ? 16.sp
-                                                                              : 0,
-                                                                    ),
+                                                                // Product Image
+                                                                ClipRRect(
+                                                                  borderRadius:
+                                                                      BorderRadius.circular(
+                                                                        12,
+                                                                      ),
+                                                                  child: CustomNetworkImage(
+                                                                    imageUrl:
+                                                                        viewCartData
+                                                                            ?.items?[i]
+                                                                            .images?[0]
+                                                                            .src ??
+                                                                        '',
+                                                                    height: 80,
+                                                                    width: 80,
+                                                                    radius: 12,
+                                                                    isCircle:
+                                                                        false,
+                                                                    isFit: true,
                                                                   ),
                                                                 ),
                                                                 SizedBox(
-                                                                  height: 2.h,
+                                                                  width: 3.w,
                                                                 ),
-                                                                // Text(
-                                                                //   "\$ ${  viewCartData?.items?[i].prices?.price ?? ""}",
-                                                                //   style: TextStyle(
-                                                                //     color: AppColors.blackColor,
-                                                                //     fontSize: 14.sp,
-                                                                //     fontFamily:
-                                                                //         FontFamily.semiBold,
-                                                                //   ),
-                                                                // ),
+
+                                                                // Product Details
+                                                                Expanded(
+                                                                  child: Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      Text(
+                                                                        viewCartData?.items?[i].name ??
+                                                                            "",
+                                                                        style: TextStyle(
+                                                                          fontFamily:
+                                                                              FontFamily.bold,
+                                                                          fontSize:
+                                                                              15.sp,
+                                                                          color:
+                                                                              AppColors.blackColor,
+                                                                        ),
+                                                                        maxLines:
+                                                                            2,
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis,
+                                                                      ),
+                                                                      SizedBox(
+                                                                        height:
+                                                                            0.5.h,
+                                                                      ),
+
+                                                                      Text(
+                                                                        "Qty:  ${viewCartData?.items?[i].quantity ?? ""}",
+                                                                        style: TextStyle(
+                                                                          fontFamily:
+                                                                              FontFamily.light,
+                                                                          fontSize:
+                                                                              15.sp,
+                                                                          color:
+                                                                              AppColors.blackColor,
+                                                                        ),
+                                                                        maxLines:
+                                                                            2,
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis,
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+
+                                                                // Price + Delete
+                                                                Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .end,
+                                                                  children: [
+                                                                    InkWell(
+                                                                      onTap: () {
+                                                                        setState(
+                                                                          () {
+                                                                            // cartItems.removeAt(i);
+                                                                          },
+                                                                        );
+                                                                      },
+                                                                      child: Container(
+                                                                        height:
+                                                                            isIpad
+                                                                                ? 24.sp
+                                                                                : 0.sp,
+                                                                        padding: EdgeInsets.all(
+                                                                          isIpad
+                                                                              ? 1.w
+                                                                              : 1.5.w,
+                                                                        ),
+                                                                        decoration: BoxDecoration(
+                                                                          color:
+                                                                              AppColors.mainColor,
+                                                                          shape:
+                                                                              BoxShape.circle,
+                                                                        ),
+                                                                        child: Icon(
+                                                                          Icons
+                                                                              .delete_outline_rounded,
+                                                                          color:
+                                                                              AppColors.whiteColor,
+                                                                          size:
+                                                                              isIpad
+                                                                                  ? 16.sp
+                                                                                  : 0,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(
+                                                                      height:
+                                                                          2.h,
+                                                                    ),
+                                                                    // Text(
+                                                                    //   "\$ ${  viewCartData?.items?[i].prices?.price ?? ""}",
+                                                                    //   style: TextStyle(
+                                                                    //     color: AppColors.blackColor,
+                                                                    //     fontSize: 14.sp,
+                                                                    //     fontFamily:
+                                                                    //         FontFamily.semiBold,
+                                                                    //   ),
+                                                                    // ),
+                                                                  ],
+                                                                ),
                                                               ],
                                                             ),
-                                                          ],
-                                                        ),
+                                                          ),
+                                                          SizedBox(height: 1.h),
+                                                        ],
                                                       ),
-                                                      SizedBox(height: 1.h),
-                                                    ],
-                                                  ),
-                                              ],
-                                            ),
-                                      ],
-                                    ),
+                                                  ],
+                                                ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
-                          ),
-                          SizedBox(height: 1.h),
-                          Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: AppColors.whiteColor,
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
+                              SizedBox(height: 1.h),
+                              Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: AppColors.whiteColor,
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Icon(
-                                        Icons.receipt_long_rounded,
-                                        color: AppColors.mainColor,
-                                        size: 21.sp,
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.receipt_long_rounded,
+                                            color: AppColors.mainColor,
+                                            size: 21.sp,
+                                          ),
+                                          Text(
+                                            "Order Summary",
+                                            style: TextStyle(
+                                              color: AppColors.mainColor,
+                                              fontSize: 20.sp,
+                                              fontFamily: FontFamily.bold,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Text(
-                                        "Order Summary",
-                                        style: TextStyle(
-                                          color: AppColors.mainColor,
-                                          fontSize: 20.sp,
-                                          fontFamily: FontFamily.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Divider(),
+                                      Divider(),
 
-                                  // SizedBox(height: 1.h),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Sub Total",
-                                        style: TextStyle(
-                                          color: AppColors.blackColor,
-                                          fontSize: 16.sp,
-                                          fontFamily: FontFamily.semiBold,
-                                        ),
+                                      // SizedBox(height: 1.h),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "Sub Total",
+                                            style: TextStyle(
+                                              color: AppColors.blackColor,
+                                              fontSize: 16.sp,
+                                              fontFamily: FontFamily.semiBold,
+                                            ),
+                                          ),
+                                          Text(
+                                            "${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.totalItems ?? '0')! / 100).toStringAsFixed(2)}",
+                                            style: TextStyle(
+                                              color: AppColors.blackColor,
+                                              fontSize: 16.sp,
+                                              fontFamily: FontFamily.semiBold,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Text(
-                                        "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalItems}",
-                                        style: TextStyle(
-                                          color: AppColors.blackColor,
-                                          fontSize: 16.sp,
-                                          fontFamily: FontFamily.semiBold,
-                                        ),
+                                      SizedBox(height: 1.h),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "Total Tax",
+                                            style: TextStyle(
+                                              color: AppColors.blackColor,
+                                              fontSize: 16.sp,
+                                              fontFamily: FontFamily.semiBold,
+                                            ),
+                                          ),
+                                          Text(
+                                            "${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.totalTax ?? '0')! / 100).toStringAsFixed(2)}",
+                                            style: TextStyle(
+                                              color: AppColors.blackColor,
+                                              fontSize: 16.sp,
+                                              fontFamily: FontFamily.semiBold,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 1.h),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Total Tax",
-                                        style: TextStyle(
-                                          color: AppColors.blackColor,
-                                          fontSize: 16.sp,
-                                          fontFamily: FontFamily.semiBold,
-                                        ),
-                                      ),
-                                      Text(
-                                        "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalTax}",
-                                        style: TextStyle(
-                                          color: AppColors.blackColor,
-                                          fontSize: 16.sp,
-                                          fontFamily: FontFamily.semiBold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 1.h),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Shipping",
-                                        style: TextStyle(
-                                          color: AppColors.gray,
-                                          fontSize: 16.sp,
-                                          fontFamily: FontFamily.semiBold,
-                                        ),
-                                      ),
-                                      Text(
-                                        " ${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalShipping ?? "0.0"}",
-                                        style: TextStyle(
-                                          color: AppColors.gray,
-                                          fontSize: 16.sp,
-                                          fontFamily: FontFamily.semiBold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 1.h),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Discount Tax",
-                                        style: TextStyle(
-                                          color: AppColors.gray,
-                                          fontSize: 16.sp,
-                                          fontFamily: FontFamily.semiBold,
-                                        ),
-                                      ),
-                                      Text(
-                                        "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalDiscount ?? ""}",
+                                      SizedBox(height: 1.h),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "Shipping",
+                                            style: TextStyle(
+                                              color: AppColors.gray,
+                                              fontSize: 16.sp,
+                                              fontFamily: FontFamily.semiBold,
+                                            ),
+                                          ),
+                                          totalController.text == ''
+                                              ? InkWell(
+                                                onTap: () async {
+                                                  final shippingCharge = await Get.dialog<
+                                                    String
+                                                  >(
+                                                    Dialog(
+                                                      backgroundColor:
+                                                          Colors.transparent,
+                                                      child: StatefulBuilder(
+                                                        builder: (
+                                                          context,
+                                                          setState,
+                                                        ) {
+                                                          final _formKey =
+                                                              GlobalKey<
+                                                                FormState
+                                                              >();
+                                                          TextEditingController
+                                                          dialogController =
+                                                              TextEditingController();
 
-                                        // "\$ ${tax.toStringAsFixed(2)}",
-                                        style: TextStyle(
-                                          color: AppColors.gray,
-                                          fontSize: 16.sp,
-                                          fontFamily: FontFamily.semiBold,
-                                        ),
+                                                          return IntrinsicWidth(
+                                                            stepWidth: 300,
+                                                            // optional max width
+                                                            child: IntrinsicHeight(
+                                                              child: Container(
+                                                                padding:
+                                                                    EdgeInsets.all(
+                                                                      16,
+                                                                    ),
+                                                                decoration: BoxDecoration(
+                                                                  color:
+                                                                      AppColors
+                                                                          .whiteColor,
+                                                                  borderRadius:
+                                                                      BorderRadius.circular(
+                                                                        15,
+                                                                      ),
+                                                                ),
+                                                                child: Column(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .min,
+                                                                  children: [
+                                                                    Text(
+                                                                      "Apply Shipping Charges",
+                                                                      style: TextStyle(
+                                                                        fontSize:
+                                                                            18.sp,
+                                                                        fontFamily:
+                                                                            FontFamily.bold,
+                                                                        color:
+                                                                            AppColors.blackColor,
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(
+                                                                      height:
+                                                                          16,
+                                                                    ),
+                                                                    Form(
+                                                                      key:
+                                                                          _formKey,
+                                                                      child: AppTextField(
+                                                                        controller:
+                                                                            dialogController,
+                                                                        hintText:
+                                                                            "Enter Shipping Charge",
+                                                                        text:
+                                                                            "Shipping Charge",
+                                                                        isTextavailable:
+                                                                            true,
+                                                                        textInputType:
+                                                                            TextInputType.number,
+                                                                        maxline:
+                                                                            1,
+                                                                        validator: (
+                                                                          value,
+                                                                        ) {
+                                                                          if (value !=
+                                                                                  null &&
+                                                                              value.isNotEmpty &&
+                                                                              double.tryParse(
+                                                                                    value,
+                                                                                  ) ==
+                                                                                  null) {
+                                                                            return "Enter a valid number";
+                                                                          }
+                                                                          return null;
+                                                                        },
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(
+                                                                      height:
+                                                                          24,
+                                                                    ),
+                                                                    Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .spaceBetween,
+                                                                      children: [
+                                                                        CustomButton(
+                                                                          title:
+                                                                              "Cancel",
+                                                                          route:
+                                                                              () =>
+                                                                                  Get.back(),
+                                                                          color:
+                                                                              AppColors.containerColor,
+                                                                          fontcolor:
+                                                                              AppColors.blackColor,
+                                                                          height:
+                                                                              5.h,
+                                                                          width:
+                                                                              27.w,
+                                                                          fontsize:
+                                                                              15.sp,
+                                                                          radius:
+                                                                              12.0,
+                                                                        ),
+                                                                        CustomButton(
+                                                                          title:
+                                                                              "Confirm",
+                                                                          route: () {
+                                                                            if (!_formKey.currentState!.validate())
+                                                                              return;
+
+                                                                            final charge =
+                                                                                dialogController.text.trim().isEmpty
+                                                                                    ? "0"
+                                                                                    : dialogController.text.trim();
+
+                                                                            Get.back(
+                                                                              result:
+                                                                                  charge,
+                                                                            );
+                                                                          },
+                                                                          color:
+                                                                              AppColors.mainColor,
+                                                                          fontcolor:
+                                                                              AppColors.whiteColor,
+                                                                          height:
+                                                                              5.h,
+                                                                          width:
+                                                                              27.w,
+                                                                          fontsize:
+                                                                              15.sp,
+                                                                          radius:
+                                                                              12.0,
+                                                                          iconData:
+                                                                              Icons.check,
+                                                                          iconsize:
+                                                                              17.sp,
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                    barrierDismissible: true,
+                                                  );
+
+                                                  if (shippingCharge != null) {
+                                                    setState(() {
+                                                      totalController.text =
+                                                          shippingCharge;
+                                                    });
+                                                  }
+                                                },
+                                                child: Text(
+                                                  'Apply Shipping',
+                                                  style: TextStyle(
+                                                    color: AppColors.mainColor,
+                                                    fontSize: 16.sp,
+                                                    fontFamily:
+                                                        FontFamily.semiBold,
+                                                  ),
+                                                ),
+                                              )
+                                              : Text(
+                                                " ${viewCartData?.totals?.currencySymbol} ${totalController.text.trim().toString()}",
+                                                style: TextStyle(
+                                                  color: AppColors.gray,
+                                                  fontSize: 16.sp,
+                                                  fontFamily:
+                                                      FontFamily.semiBold,
+                                                ),
+                                              ),
+                                        ],
                                       ),
+                                      SizedBox(height: 1.h),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "Discount Tax",
+                                            style: TextStyle(
+                                              color: AppColors.gray,
+                                              fontSize: 16.sp,
+                                              fontFamily: FontFamily.semiBold,
+                                            ),
+                                          ),
+                                          Text(
+                                            "${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.totalDiscount ?? '0')! / 100).toStringAsFixed(2)}",
+                                            // "\$ ${tax.toStringAsFixed(2)}",
+                                            style: TextStyle(
+                                              color: AppColors.gray,
+                                              fontSize: 16.sp,
+                                              fontFamily: FontFamily.semiBold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Divider(),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "Total",
+                                            style: TextStyle(
+                                              color: AppColors.blackColor,
+                                              fontSize: 17.sp,
+                                              fontFamily: FontFamily.semiBold,
+                                            ),
+                                          ),
+                                          Text(
+                                            "${viewCartData?.totals?.currencySymbol} ${((int.tryParse(viewCartData?.totals?.totalPrice ?? "0") ?? 0) / 100 + (int.tryParse(totalController.text.trim()) ?? 0))}",
+                                            style: TextStyle(
+                                              color: AppColors.blackColor,
+                                              fontSize: 17.sp,
+                                              fontFamily: FontFamily.semiBold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 0.5.h),
                                     ],
-                                  ),
-                                  Divider(),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Total",
-                                        style: TextStyle(
-                                          color: AppColors.blackColor,
-                                          fontSize: 17.sp,
-                                          fontFamily: FontFamily.semiBold,
-                                        ),
-                                      ),
-                                      Text(
-                                        "${viewCartData?.totals?.currencySymbol} ${viewCartData?.totals?.totalPrice ?? ""}",
-                                        // "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
-                                        style: TextStyle(
-                                          color: AppColors.blackColor,
-                                          fontSize: 17.sp,
-                                          fontFamily: FontFamily.semiBold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 0.5.h),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 1.h),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
-      bottomNavigationBar: CustomButton(
-        title: "Submit Order",
-        route: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              String? errorText;
-              DateTime? selectedDate;
-
-              return StatefulBuilder(
-                builder: (context, setState) {
-                  return AlertDialog(
-                    backgroundColor: AppColors.whiteColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    title: Text(
-                      "Item Notes",
-                      style: TextStyle(
-                        fontSize: 18.sp,
-                        fontFamily: FontFamily.bold,
-                        color: AppColors.blackColor,
-                      ),
-                    ),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        /// Notes Field
-                        AppTextField(
-                          controller: notesController,
-                          hintText: "Enter Item notes here...",
-                          text: "Notes",
-                          isTextavailable: true,
-                          textInputType: TextInputType.multiline,
-                          maxline: 4,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Please enter Item notes";
-                            }
-                            return null;
-                          },
-                        ),
-
-                        SizedBox(height: 1.h),
-                        Row(
-                          children: [
-                            Text(
-                              "Delivery Date",
-                              style: TextStyle(
-                                color: AppColors.blackColor,
-                                fontSize: 17.sp,
-                                fontFamily: FontFamily.semiBold,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        /// Date Picker Field
-                        GestureDetector(
-                          onTap: () async {
-                            final DateTime? picked = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime.now(),
-                              // ⬅️ હવે આજથી પહેલાંની date disable થઈ જશે
-                              lastDate: DateTime(2100),
-                            );
-                            if (picked != null) {
-                              setState(() {
-                                selectedDate = picked;
-                              });
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 2.w,
-                              vertical: 1.h,
-                            ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.grey.shade400),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  selectedDate == null
-                                      ? "Select Delivery Date"
-                                      : "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}",
-                                  style: TextStyle(
-                                    fontSize: 14.sp,
-                                    color:
-                                        selectedDate == null
-                                            ? Colors.grey
-                                            : AppColors.blackColor,
                                   ),
                                 ),
-                                Icon(
-                                  Icons.calendar_today,
-                                  size: 18,
-                                  color: AppColors.mainColor,
-                                ),
-                              ],
-                            ),
+                              ),
+                              SizedBox(height: 1.h),
+                            ],
                           ),
                         ),
-
-                        SizedBox(height: 1.h),
-
-                        /// Total Amount Field
-                        AppTextField(
-                          controller: totalController,
-                          hintText: "Enter Shipping Charge",
-                          text: "Shipping Charge",
-                          isTextavailable: true,
-                          textInputType: TextInputType.number,
-                          maxline: 1,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Please enter Shipping Charge";
-                            }
-                            return null;
-                          },
-                        ),
-
-                        if (errorText != null) ...[
-                          SizedBox(height: 1.h),
-                          Text(
-                            errorText!,
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 14.sp,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    actions: [
-                      CustomButton(
-                        title: "Cancel",
-                        route: () {
-                          Get.back();
-                        },
-                        color: AppColors.containerColor,
-                        fontcolor: AppColors.blackColor,
-                        height: 5.h,
-                        width: 30.w,
-                        fontsize: 15.sp,
-                        radius: 12.0,
-                      ),
-                      CustomButton(
-                        title: "Confirm",
-                        route: () {
-                          if (viewCartData?.billingAddress?.address1 == '') {
-                            showCustomErrorSnackbar(
-                              title: 'Address Required',
-                              message: 'Please add an address to continue',
-                            );
-                          } else {
-                            sumbitOrderapi(
-                              "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}",
-                            );
-                          }
-                        },
-                        color: AppColors.mainColor,
-                        fontcolor: AppColors.whiteColor,
-                        height: 5.h,
-                        width: 30.w,
-                        fontsize: 15.sp,
-                        radius: 12.0,
-                        iconData: Icons.check,
-                        iconsize: 17.sp,
                       ),
                     ],
+                  ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
+                  if (isAddingToCart)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.3),
+                      ),
+                      child: Loader(),
+                    ),
+                ],
+              ),
+      bottomNavigationBar:
+          isAddingToCart
+              ? Container(height: 1)
+              : CustomButton(
+                title: "Submit Order",
+                route: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      String? errorText;
+                      DateTime? selectedDate;
+
+                      final _formKey = GlobalKey<FormState>();
+
+                      return StatefulBuilder(
+                        builder: (context, setState) {
+                          return AlertDialog(
+                            backgroundColor: AppColors.whiteColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            title: Text(
+                              "Item Notes",
+                              style: TextStyle(
+                                fontSize: 18.sp,
+                                fontFamily: FontFamily.bold,
+                                color: AppColors.blackColor,
+                              ),
+                            ),
+                            content: SingleChildScrollView(
+                              // ✅ Prevents keyboard render overflow
+                              child: Form(
+                                key: _formKey,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    /// Notes Field
+                                    AppTextField(
+                                      controller: notesController,
+                                      hintText: "Enter Item notes here...",
+                                      text: "Notes",
+                                      isTextavailable: true,
+                                      textInputType: TextInputType.multiline,
+                                      maxline: 4,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return "Please enter Item notes";
+                                        }
+                                        return null;
+                                      },
+                                    ),
+
+                                    SizedBox(height: 1.h),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "Delivery Date",
+                                          style: TextStyle(
+                                            color: AppColors.blackColor,
+                                            fontSize: 17.sp,
+                                            fontFamily: FontFamily.semiBold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
+                                    /// Date Picker Field
+                                    GestureDetector(
+                                      onTap: () async {
+                                        final DateTime? picked =
+                                            await showDatePicker(
+                                              context: context,
+                                              initialDate: DateTime.now(),
+                                              firstDate: DateTime.now(),
+                                              lastDate: DateTime(2100),
+                                            );
+                                        if (picked != null) {
+                                          setState(() {
+                                            selectedDate = picked;
+                                            errorText =
+                                                null; // clear error once selected
+                                          });
+                                        }
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 2.w,
+                                          vertical: 1.h,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                          border: Border.all(
+                                            color:
+                                                errorText != null
+                                                    ? Colors.red
+                                                    : Colors.grey.shade400,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              selectedDate == null
+                                                  ? "Select Delivery Date"
+                                                  : "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}",
+                                              style: TextStyle(
+                                                fontSize: 14.sp,
+                                                color:
+                                                    selectedDate == null
+                                                        ? Colors.grey
+                                                        : AppColors.blackColor,
+                                              ),
+                                            ),
+                                            Icon(
+                                              Icons.calendar_today,
+                                              size: 18,
+                                              color: AppColors.mainColor,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+
+                                    if (errorText != null) ...[
+                                      SizedBox(height: 0.5.h),
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          errorText!,
+                                          style: TextStyle(
+                                            color: Colors.red,
+                                            fontSize: 13.sp,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            ),
+                            actions: [
+                              CustomButton(
+                                title: "Cancel",
+                                route: () {
+                                  Get.back();
+                                },
+                                color: AppColors.containerColor,
+                                fontcolor: AppColors.blackColor,
+                                height: 5.h,
+                                width: 27.w,
+                                fontsize: 15.sp,
+                                radius: 12.0,
+                              ),
+                              CustomButton(
+                                title: "Confirm",
+                                route: () {
+                                  final isValid =
+                                      _formKey.currentState!.validate();
+
+                                  if (!isValid || selectedDate == null) {
+                                    setState(() {
+                                      if (selectedDate == null) {
+                                        errorText =
+                                            "Please select delivery date";
+                                      }
+                                    });
+                                    return;
+                                  }
+
+                                  if (viewCartData?.billingAddress?.address1 ==
+                                      '') {
+                                    showCustomErrorSnackbar(
+                                      title: 'Address Required',
+                                      message:
+                                          'Please add an address to continue',
+                                    );
+                                  } else {
+                                    Get.back();
+                                    sumbitOrderapi(
+                                      "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}",
+                                    );
+                                  }
+                                },
+                                color: AppColors.mainColor,
+                                fontcolor: AppColors.whiteColor,
+                                height: 5.h,
+                                width: 27.w,
+                                fontsize: 15.sp,
+                                radius: 12.0,
+                                iconData: Icons.check,
+                                iconsize: 17.sp,
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
                   );
                 },
-              );
-            },
-          );
-        },
-        color: AppColors.mainColor,
-        fontcolor: AppColors.whiteColor,
-        height: 7.h,
-        fontsize: 18.sp,
-        radius: isIpad ? 1.w : 3.w,
-        iconData: Icons.shopping_cart_checkout_sharp,
-        iconsize: 18.sp,
-      ).paddingSymmetric(horizontal: 3.w, vertical: 1.5.h),
+                color: AppColors.mainColor,
+                fontcolor: AppColors.whiteColor,
+                height: 7.h,
+                fontsize: 18.sp,
+                radius: isIpad ? 1.w : 3.w,
+                iconData: Icons.shopping_cart_checkout_sharp,
+                iconsize: 18.sp,
+              ).paddingSymmetric(horizontal: 3.w, vertical: 1.5.h),
     );
   }
 
@@ -922,20 +1146,28 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
           };
         }).toList() ??
         [];
+    List<Map<String, dynamic>> coupons =
+        viewCartData?.coupons?.map((item) {
+          return {"code": item.code ?? ""};
+        }).toList() ??
+        [];
     try {
       final response = await cartService.submitOrderApi(
         deliveryDate: date,
-        note: notesController.text.trim(),
-        shippingCharge: totalController.text.trim(),
+        note: notesController.text.trim().toString(),
+        shippingCharge:
+            totalController.text == ''
+                ? "0"
+                : totalController.text.trim().toString(),
         customerId: customerId,
         items: items,
-        coupons: [],
+        coupons: coupons,
       );
 
       if (response != null && response.statusCode == 200) {
         showCustomSuccessSnackbar(
-          title: "Added to Cart",
-          message: "This product has been successfully added to your cart.",
+          title: "Order added successfully",
+          message: "This order has been successfully added.",
         );
         setState(() {
           isAddingToCart = false;

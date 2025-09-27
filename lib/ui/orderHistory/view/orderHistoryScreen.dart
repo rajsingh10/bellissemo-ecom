@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:bellissemo_ecom/apiCalling/Loader.dart';
 import 'package:bellissemo_ecom/ui/orderHistory/provider/orderHistoryProvider.dart';
+import 'package:bellissemo_ecom/utils/customMenuDrawer.dart';
 import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -96,10 +97,14 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     loadInitialData();
   }
 
+  final GlobalKey<ScaffoldState> _scaffoldKeyOrder = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgColor,
+      key: _scaffoldKeyOrder,
+      drawer: CustomDrawer(),
       body:
           isLoading
               ? Loader()
@@ -109,6 +114,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     title: 'Order History',
                     isDrawerEnabled: true,
                     isSearchEnabled: true,
+                    drawerCallback: () {
+                      _scaffoldKeyOrder.currentState?.openDrawer();
+                    },
                     onSearch: () {
                       setState(() {
                         isSearchEnabled = !isSearchEnabled;
@@ -285,37 +293,21 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                   vertical: 4,
                                                 ),
                                                 decoration: BoxDecoration(
-                                                  color:
-                                                      order.status ==
-                                                              "Delivered"
-                                                          ? AppColors.greenColor
-                                                              .withOpacity(0.1)
-                                                          : order.status ==
-                                                              "Pending"
-                                                          ? AppColors
-                                                              .orangeColor
-                                                              .withOpacity(0.1)
-                                                          : Colors.red
-                                                              .withOpacity(0.1),
+                                                  color: AppColors.greenColor
+                                                      .withOpacity(0.1),
                                                   borderRadius:
                                                       BorderRadius.circular(8),
                                                 ),
                                                 child: Text(
-                                                  order.status ?? '',
+                                                  order
+                                                          .status
+                                                          ?.capitalizeFirst ??
+                                                      '',
                                                   style: TextStyle(
                                                     fontSize: 16.sp,
                                                     fontWeight: FontWeight.bold,
                                                     fontFamily: FontFamily.bold,
-                                                    color:
-                                                        order.status ==
-                                                                "Delivered"
-                                                            ? AppColors
-                                                                .greenColor
-                                                            : order.status ==
-                                                                "Pending"
-                                                            ? AppColors
-                                                                .orangeColor
-                                                            : Colors.red,
+                                                    color: AppColors.greenColor,
                                                   ),
                                                 ),
                                               ),
@@ -440,95 +432,95 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                                       .semiBold,
                                                             ),
                                                           ),
-                                                          SizedBox(height: 1.h),
-                                                          IntrinsicWidth(
-                                                            child: Container(
-                                                              padding:
-                                                                  EdgeInsets.symmetric(
-                                                                    horizontal:
-                                                                        isIpad
-                                                                            ? 0
-                                                                            : 2.w,
-                                                                    vertical:
-                                                                        0.5.h,
-                                                                  ),
-                                                              decoration: BoxDecoration(
-                                                                color:
-                                                                    AppColors
-                                                                        .containerColor,
-                                                                borderRadius:
-                                                                    BorderRadius.circular(
-                                                                      30,
-                                                                    ),
-                                                              ),
-                                                              child: Row(
-                                                                children: [
-                                                                  // Decrease
-                                                                  GestureDetector(
-                                                                    onTap:
-                                                                        () {},
-                                                                    child: Container(
-                                                                      padding:
-                                                                          EdgeInsets.all(
-                                                                            1.5.w,
-                                                                          ),
-                                                                      decoration: BoxDecoration(
-                                                                        color:
-                                                                            AppColors.cardBgColor,
-                                                                        shape:
-                                                                            BoxShape.circle,
-                                                                      ),
-                                                                      child: Icon(
-                                                                        Icons
-                                                                            .remove,
-                                                                        size:
-                                                                            isIpad
-                                                                                ? 12.sp
-                                                                                : 16.sp,
-                                                                        color:
-                                                                            AppColors.blackColor,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-
-                                                                  SizedBox(
-                                                                    width: 4.w,
-                                                                  ),
-
-                                                                  // Increase
-                                                                  GestureDetector(
-                                                                    onTap: () {
-                                                                      setState(
-                                                                        () {},
-                                                                      );
-                                                                    },
-                                                                    child: Container(
-                                                                      padding:
-                                                                          EdgeInsets.all(
-                                                                            1.5.w,
-                                                                          ),
-                                                                      decoration: BoxDecoration(
-                                                                        color:
-                                                                            AppColors.cardBgColor,
-                                                                        shape:
-                                                                            BoxShape.circle,
-                                                                      ),
-                                                                      child: Icon(
-                                                                        Icons
-                                                                            .add,
-                                                                        size:
-                                                                            isIpad
-                                                                                ? 12.sp
-                                                                                : 16.sp,
-                                                                        color:
-                                                                            AppColors.blackColor,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
+                                                          // SizedBox(height: 1.h),
+                                                          // IntrinsicWidth(
+                                                          //   child: Container(
+                                                          //     padding:
+                                                          //         EdgeInsets.symmetric(
+                                                          //           horizontal:
+                                                          //               isIpad
+                                                          //                   ? 0
+                                                          //                   : 2.w,
+                                                          //           vertical:
+                                                          //               0.5.h,
+                                                          //         ),
+                                                          //     decoration: BoxDecoration(
+                                                          //       color:
+                                                          //           AppColors
+                                                          //               .containerColor,
+                                                          //       borderRadius:
+                                                          //           BorderRadius.circular(
+                                                          //             30,
+                                                          //           ),
+                                                          //     ),
+                                                          //     child: Row(
+                                                          //       children: [
+                                                          //         // Decrease
+                                                          //         GestureDetector(
+                                                          //           onTap:
+                                                          //               () {},
+                                                          //           child: Container(
+                                                          //             padding:
+                                                          //                 EdgeInsets.all(
+                                                          //                   1.5.w,
+                                                          //                 ),
+                                                          //             decoration: BoxDecoration(
+                                                          //               color:
+                                                          //                   AppColors.cardBgColor,
+                                                          //               shape:
+                                                          //                   BoxShape.circle,
+                                                          //             ),
+                                                          //             child: Icon(
+                                                          //               Icons
+                                                          //                   .remove,
+                                                          //               size:
+                                                          //                   isIpad
+                                                          //                       ? 12.sp
+                                                          //                       : 16.sp,
+                                                          //               color:
+                                                          //                   AppColors.blackColor,
+                                                          //             ),
+                                                          //           ),
+                                                          //         ),
+                                                          //
+                                                          //         SizedBox(
+                                                          //           width: 4.w,
+                                                          //         ),
+                                                          //
+                                                          //         // Increase
+                                                          //         GestureDetector(
+                                                          //           onTap: () {
+                                                          //             setState(
+                                                          //               () {},
+                                                          //             );
+                                                          //           },
+                                                          //           child: Container(
+                                                          //             padding:
+                                                          //                 EdgeInsets.all(
+                                                          //                   1.5.w,
+                                                          //                 ),
+                                                          //             decoration: BoxDecoration(
+                                                          //               color:
+                                                          //                   AppColors.cardBgColor,
+                                                          //               shape:
+                                                          //                   BoxShape.circle,
+                                                          //             ),
+                                                          //             child: Icon(
+                                                          //               Icons
+                                                          //                   .add,
+                                                          //               size:
+                                                          //                   isIpad
+                                                          //                       ? 12.sp
+                                                          //                       : 16.sp,
+                                                          //               color:
+                                                          //                   AppColors.blackColor,
+                                                          //             ),
+                                                          //           ),
+                                                          //         ),
+                                                          //       ],
+                                                          //     ),
+                                                          //   ),
+                                                          // ),
                                                           // Quantity Selector + Cart Button
                                                           // Row(
                                                           //   mainAxisAlignment: MainAxisAlignment.spaceBetween,

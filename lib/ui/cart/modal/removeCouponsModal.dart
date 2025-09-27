@@ -6,13 +6,14 @@ class RemoveCouponsModal {
   String? cartSubtotal;
   String? message;
 
-  RemoveCouponsModal(
-      {this.success,
-        this.removed,
-        this.couponCode,
-        this.cartTotal,
-        this.cartSubtotal,
-        this.message});
+  RemoveCouponsModal({
+    this.success,
+    this.removed,
+    this.couponCode,
+    this.cartTotal,
+    this.cartSubtotal,
+    this.message,
+  });
 
   RemoveCouponsModal.fromJson(Map<String, dynamic> json) {
     success = json['success'];

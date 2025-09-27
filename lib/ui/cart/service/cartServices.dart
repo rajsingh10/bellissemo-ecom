@@ -1041,8 +1041,7 @@ class CartService {
     int? customerId,
     required List<Map<String, dynamic>> items,
     List<Map<String, dynamic>>? coupons,
-  }) async
-  {
+  }) async {
     final box = HiveService().getSubmitOrderBox();
     final cartBox = HiveService().getViewCartBox(); // 🔹 Cart Box Reference
 
@@ -1162,7 +1161,6 @@ class CartService {
     }
   }
 
-
   /// couponList ///
   Future<http.Response> couponsListApi() async {
     String url = apiEndpoints.couponsList;
@@ -1182,15 +1180,16 @@ class CartService {
     final response = await http
         .get(Uri.parse(url), headers: headers)
         .timeout(
-      const Duration(seconds: 60),
-      onTimeout: () {
-        throw const SocketException('Something went wrong');
-      },
-    );
+          const Duration(seconds: 60),
+          onTimeout: () {
+            throw const SocketException('Something went wrong');
+          },
+        );
     responseJson = responses(response);
 
     return responseJson;
   }
+
   Future<Response?> applyCoupon({
     required String couponCode,
     required Callback onSuccess,
@@ -1236,9 +1235,7 @@ class CartService {
         "Accept": "application/json",
       };
 
-      final body = {
-        "coupon_code": couponCode,
-      };
+      final body = {"coupon_code": couponCode};
 
       final response = await _dio.post(
         apiEndpoints.applyCoupons,
@@ -1267,6 +1264,7 @@ class CartService {
       return null;
     }
   }
+
   Future<void> syncAppliedCoupons() async {
     final box = HiveService().getAddCartBox();
 
@@ -1275,7 +1273,10 @@ class CartService {
       return;
     }
 
-    final keys = box.keys.where((k) => k.toString().startsWith("offline_apply_coupon_")).toList();
+    final keys =
+        box.keys
+            .where((k) => k.toString().startsWith("offline_apply_coupon_"))
+            .toList();
 
     if (keys.isEmpty) {
       print("✅ No offline coupons to sync.");
@@ -1289,11 +1290,14 @@ class CartService {
 
       if (data != null && data["coupon_code"] != null) {
         final couponCode = data["coupon_code"];
-        final response = await applyCoupon(couponCode: couponCode, isSync: true,onSuccess: () {
+        final response = await applyCoupon(
+          couponCode: couponCode,
+          isSync: true,
+          onSuccess: () {},
+        );
 
-        },);
-
-        if (response != null && (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response != null &&
+            (response.statusCode == 200 || response.statusCode == 201)) {
           await box.delete(key);
           print("☑️ Synced & removed → $couponCode");
         } else {
@@ -1307,8 +1311,7 @@ class CartService {
     required String couponCode,
     required Callback onSuccess,
     bool isSync = false,
-  }) async
-  {
+  }) async {
     final box = HiveService().getAddCartBox();
     final cacheBox = HiveService().getProductCartDataBox();
     if (!cacheBox.isOpen) await HiveService().init();
@@ -1348,9 +1351,7 @@ class CartService {
         "Accept": "application/json",
       };
 
-      final body = {
-        "coupon_code": couponCode,
-      };
+      final body = {"coupon_code": couponCode};
 
       final response = await _dio.post(
         apiEndpoints.removeCoupons, // <-- Your remove coupon API endpoint
@@ -1388,7 +1389,10 @@ class CartService {
       return;
     }
 
-    final keys = box.keys.where((k) => k.toString().startsWith("offline_remove_coupon_")).toList();
+    final keys =
+        box.keys
+            .where((k) => k.toString().startsWith("offline_remove_coupon_"))
+            .toList();
 
     if (keys.isEmpty) {
       print("✅ No offline coupon removals to sync.");
@@ -1408,7 +1412,8 @@ class CartService {
           onSuccess: () {},
         );
 
-        if (response != null && (response.statusCode == 200 || response.statusCode == 201)) {
+        if (response != null &&
+            (response.statusCode == 200 || response.statusCode == 201)) {
           await box.delete(key);
           print("☑️ Removal synced & removed → $couponCode");
         } else {
@@ -1417,5 +1422,4 @@ class CartService {
       }
     }
   }
-
 }

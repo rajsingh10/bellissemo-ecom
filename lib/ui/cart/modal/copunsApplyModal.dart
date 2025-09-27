@@ -10,25 +10,27 @@ class CopunsApplyModal {
   List<String>? appliedCoupons;
   String? message;
 
-  CopunsApplyModal(
-      {this.success,
-        this.applied,
-        this.couponCode,
-        this.couponData,
-        this.discountTotal,
-        this.discountTax,
-        this.cartTotal,
-        this.cartSubtotal,
-        this.appliedCoupons,
-        this.message});
+  CopunsApplyModal({
+    this.success,
+    this.applied,
+    this.couponCode,
+    this.couponData,
+    this.discountTotal,
+    this.discountTax,
+    this.cartTotal,
+    this.cartSubtotal,
+    this.appliedCoupons,
+    this.message,
+  });
 
   CopunsApplyModal.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     applied = json['applied'];
     couponCode = json['coupon_code'];
-    couponData = json['coupon_data'] != null
-        ? new CouponData.fromJson(json['coupon_data'])
-        : null;
+    couponData =
+        json['coupon_data'] != null
+            ? new CouponData.fromJson(json['coupon_data'])
+            : null;
     discountTotal = json['discount_total'];
     discountTax = json['discount_tax'];
     cartTotal = json['cart_total'];
@@ -64,14 +66,15 @@ class CouponData {
   String? minimumAmount;
   String? maximumAmount;
 
-  CouponData(
-      {this.code,
-        this.amount,
-        this.discountType,
-        this.description,
-        this.dateExpires,
-        this.minimumAmount,
-        this.maximumAmount});
+  CouponData({
+    this.code,
+    this.amount,
+    this.discountType,
+    this.description,
+    this.dateExpires,
+    this.minimumAmount,
+    this.maximumAmount,
+  });
 
   CouponData.fromJson(Map<String, dynamic> json) {
     code = json['code'];
