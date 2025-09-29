@@ -742,13 +742,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             productDetails?.images?.map((e) => e.src.toString()).toList() ?? [];
         await box.put('productDetails${widget.productId}', response.body);
       } else {
-        print("❌ Server Error → statusCode: ${response.statusCode}, body: ${response.body}");
+        print(
+          "❌ Server Error → statusCode: ${response.statusCode}, body: ${response.body}",
+        );
         final cachedData = box.get('productDetails${widget.productId}');
         if (cachedData != null) {
           final data = json.decode(cachedData);
           productDetails = ProductDetailsModal.fromJson(data);
           currentImages =
-              productDetails?.images?.map((e) => e.src.toString()).toList() ?? [];
+              productDetails?.images?.map((e) => e.src.toString()).toList() ??
+              [];
         }
         showCustomErrorSnackbar(
           title: 'Server Error',

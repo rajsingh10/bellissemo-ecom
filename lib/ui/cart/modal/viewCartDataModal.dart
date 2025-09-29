@@ -29,24 +29,23 @@ class ViewCartDataModal {
     if (json['items'] != null) {
       items = <Items>[];
       json['items'].forEach((v) {
-        items!.add(new Items.fromJson(v));
+        items!.add(Items.fromJson(v));
       });
     }
     if (json['coupons'] != null) {
       coupons = <Coupons>[];
       json['coupons'].forEach((v) {
-        coupons!.add(new Coupons.fromJson(v));
+        coupons!.add(Coupons.fromJson(v));
       });
     }
-    totals =
-        json['totals'] != null ? new Totals.fromJson(json['totals']) : null;
+    totals = json['totals'] != null ? Totals.fromJson(json['totals']) : null;
     shippingAddress =
         json['shipping_address'] != null
-            ? new ShippingAddress.fromJson(json['shipping_address'])
+            ? ShippingAddress.fromJson(json['shipping_address'])
             : null;
     billingAddress =
         json['billing_address'] != null
-            ? new BillingAddress.fromJson(json['billing_address'])
+            ? BillingAddress.fromJson(json['billing_address'])
             : null;
     needsPayment = json['needs_payment'];
     needsShipping = json['needs_shipping'];
@@ -57,28 +56,28 @@ class ViewCartDataModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.items != null) {
-      data['items'] = this.items!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (items != null) {
+      data['items'] = items!.map((v) => v.toJson()).toList();
     }
-    if (this.coupons != null) {
-      data['coupons'] = this.coupons!.map((v) => v.toJson()).toList();
+    if (coupons != null) {
+      data['coupons'] = coupons!.map((v) => v.toJson()).toList();
     }
-    if (this.totals != null) {
-      data['totals'] = this.totals!.toJson();
+    if (totals != null) {
+      data['totals'] = totals!.toJson();
     }
-    if (this.shippingAddress != null) {
-      data['shipping_address'] = this.shippingAddress!.toJson();
+    if (shippingAddress != null) {
+      data['shipping_address'] = shippingAddress!.toJson();
     }
-    if (this.billingAddress != null) {
-      data['billing_address'] = this.billingAddress!.toJson();
+    if (billingAddress != null) {
+      data['billing_address'] = billingAddress!.toJson();
     }
-    data['needs_payment'] = this.needsPayment;
-    data['needs_shipping'] = this.needsShipping;
-    data['payment_requirements'] = this.paymentRequirements;
-    data['has_calculated_shipping'] = this.hasCalculatedShipping;
-    data['items_count'] = this.itemsCount;
-    data['items_weight'] = this.itemsWeight;
+    data['needs_payment'] = needsPayment;
+    data['needs_shipping'] = needsShipping;
+    data['payment_requirements'] = paymentRequirements;
+    data['has_calculated_shipping'] = hasCalculatedShipping;
+    data['items_count'] = itemsCount;
+    data['items_weight'] = itemsWeight;
     return data;
   }
 }
@@ -127,7 +126,7 @@ class Items {
     quantity = json['quantity'];
     quantityLimits =
         json['quantity_limits'] != null
-            ? new QuantityLimits.fromJson(json['quantity_limits'])
+            ? QuantityLimits.fromJson(json['quantity_limits'])
             : null;
     name = json['name'];
     shortDescription = json['short_description'];
@@ -140,38 +139,37 @@ class Items {
     if (json['images'] != null) {
       images = <Images>[];
       json['images'].forEach((v) {
-        images!.add(new Images.fromJson(v));
+        images!.add(Images.fromJson(v));
       });
     }
-    prices =
-        json['prices'] != null ? new Prices.fromJson(json['prices']) : null;
+    prices = json['prices'] != null ? Prices.fromJson(json['prices']) : null;
     catalogVisibility = json['catalog_visibility'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['key'] = this.key;
-    data['id'] = this.id;
-    data['type'] = this.type;
-    data['quantity'] = this.quantity;
-    if (this.quantityLimits != null) {
-      data['quantity_limits'] = this.quantityLimits!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['key'] = key;
+    data['id'] = id;
+    data['type'] = type;
+    data['quantity'] = quantity;
+    if (quantityLimits != null) {
+      data['quantity_limits'] = quantityLimits!.toJson();
     }
-    data['name'] = this.name;
-    data['short_description'] = this.shortDescription;
-    data['description'] = this.description;
-    data['sku'] = this.sku;
-    data['backorders_allowed'] = this.backordersAllowed;
-    data['show_backorder_badge'] = this.showBackorderBadge;
-    data['sold_individually'] = this.soldIndividually;
-    data['permalink'] = this.permalink;
-    if (this.images != null) {
-      data['images'] = this.images!.map((v) => v.toJson()).toList();
+    data['name'] = name;
+    data['short_description'] = shortDescription;
+    data['description'] = description;
+    data['sku'] = sku;
+    data['backorders_allowed'] = backordersAllowed;
+    data['show_backorder_badge'] = showBackorderBadge;
+    data['sold_individually'] = soldIndividually;
+    data['permalink'] = permalink;
+    if (images != null) {
+      data['images'] = images!.map((v) => v.toJson()).toList();
     }
-    if (this.prices != null) {
-      data['prices'] = this.prices!.toJson();
+    if (prices != null) {
+      data['prices'] = prices!.toJson();
     }
-    data['catalog_visibility'] = this.catalogVisibility;
+    data['catalog_visibility'] = catalogVisibility;
     return data;
   }
 }
@@ -192,11 +190,11 @@ class QuantityLimits {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['minimum'] = this.minimum;
-    data['maximum'] = this.maximum;
-    data['multiple_of'] = this.multipleOf;
-    data['editable'] = this.editable;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['minimum'] = minimum;
+    data['maximum'] = maximum;
+    data['multiple_of'] = multipleOf;
+    data['editable'] = editable;
     return data;
   }
 }
@@ -231,14 +229,14 @@ class Images {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['src'] = this.src;
-    data['thumbnail'] = this.thumbnail;
-    data['srcset'] = this.srcset;
-    data['sizes'] = this.sizes;
-    data['name'] = this.name;
-    data['alt'] = this.alt;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['src'] = src;
+    data['thumbnail'] = thumbnail;
+    data['srcset'] = srcset;
+    data['sizes'] = sizes;
+    data['name'] = name;
+    data['alt'] = alt;
     return data;
   }
 }
@@ -286,25 +284,25 @@ class Prices {
     currencySuffix = json['currency_suffix'];
     rawPrices =
         json['raw_prices'] != null
-            ? new RawPrices.fromJson(json['raw_prices'])
+            ? RawPrices.fromJson(json['raw_prices'])
             : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['price'] = this.price;
-    data['regular_price'] = this.regularPrice;
-    data['sale_price'] = this.salePrice;
-    data['price_range'] = this.priceRange;
-    data['currency_code'] = this.currencyCode;
-    data['currency_symbol'] = this.currencySymbol;
-    data['currency_minor_unit'] = this.currencyMinorUnit;
-    data['currency_decimal_separator'] = this.currencyDecimalSeparator;
-    data['currency_thousand_separator'] = this.currencyThousandSeparator;
-    data['currency_prefix'] = this.currencyPrefix;
-    data['currency_suffix'] = this.currencySuffix;
-    if (this.rawPrices != null) {
-      data['raw_prices'] = this.rawPrices!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['price'] = price;
+    data['regular_price'] = regularPrice;
+    data['sale_price'] = salePrice;
+    data['price_range'] = priceRange;
+    data['currency_code'] = currencyCode;
+    data['currency_symbol'] = currencySymbol;
+    data['currency_minor_unit'] = currencyMinorUnit;
+    data['currency_decimal_separator'] = currencyDecimalSeparator;
+    data['currency_thousand_separator'] = currencyThousandSeparator;
+    data['currency_prefix'] = currencyPrefix;
+    data['currency_suffix'] = currencySuffix;
+    if (rawPrices != null) {
+      data['raw_prices'] = rawPrices!.toJson();
     }
     return data;
   }
@@ -326,11 +324,11 @@ class RawPrices {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['precision'] = this.precision;
-    data['price'] = this.price;
-    data['regular_price'] = this.regularPrice;
-    data['sale_price'] = this.salePrice;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['precision'] = precision;
+    data['price'] = price;
+    data['regular_price'] = regularPrice;
+    data['sale_price'] = salePrice;
     return data;
   }
 }
@@ -347,16 +345,16 @@ class Coupons {
     discountType = json['discount_type'];
     couponstotal =
         json['couponstotal'] != null
-            ? new Couponstotal.fromJson(json['couponstotal'])
+            ? Couponstotal.fromJson(json['couponstotal'])
             : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['code'] = this.code;
-    data['discount_type'] = this.discountType;
-    if (this.couponstotal != null) {
-      data['couponstotal'] = this.couponstotal!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['code'] = code;
+    data['discount_type'] = discountType;
+    if (couponstotal != null) {
+      data['couponstotal'] = couponstotal!.toJson();
     }
     return data;
   }
@@ -398,16 +396,16 @@ class Couponstotal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['total_discount'] = this.totalDiscount;
-    data['total_discount_tax'] = this.totalDiscountTax;
-    data['currency_code'] = this.currencyCode;
-    data['currency_symbol'] = this.currencySymbol;
-    data['currency_minor_unit'] = this.currencyMinorUnit;
-    data['currency_decimal_separator'] = this.currencyDecimalSeparator;
-    data['currency_thousand_separator'] = this.currencyThousandSeparator;
-    data['currency_prefix'] = this.currencyPrefix;
-    data['currency_suffix'] = this.currencySuffix;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['total_discount'] = totalDiscount;
+    data['total_discount_tax'] = totalDiscountTax;
+    data['currency_code'] = currencyCode;
+    data['currency_symbol'] = currencySymbol;
+    data['currency_minor_unit'] = currencyMinorUnit;
+    data['currency_decimal_separator'] = currencyDecimalSeparator;
+    data['currency_thousand_separator'] = currencyThousandSeparator;
+    data['currency_prefix'] = currencyPrefix;
+    data['currency_suffix'] = currencySuffix;
     return data;
   }
 }
@@ -472,24 +470,24 @@ class Totals {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['total_items'] = this.totalItems;
-    data['total_items_tax'] = this.totalItemsTax;
-    data['total_fees'] = this.totalFees;
-    data['total_fees_tax'] = this.totalFeesTax;
-    data['total_discount'] = this.totalDiscount;
-    data['total_discount_tax'] = this.totalDiscountTax;
-    data['total_shipping'] = this.totalShipping;
-    data['total_shipping_tax'] = this.totalShippingTax;
-    data['total_price'] = this.totalPrice;
-    data['total_tax'] = this.totalTax;
-    data['currency_code'] = this.currencyCode;
-    data['currency_symbol'] = this.currencySymbol;
-    data['currency_minor_unit'] = this.currencyMinorUnit;
-    data['currency_decimal_separator'] = this.currencyDecimalSeparator;
-    data['currency_thousand_separator'] = this.currencyThousandSeparator;
-    data['currency_prefix'] = this.currencyPrefix;
-    data['currency_suffix'] = this.currencySuffix;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['total_items'] = totalItems;
+    data['total_items_tax'] = totalItemsTax;
+    data['total_fees'] = totalFees;
+    data['total_fees_tax'] = totalFeesTax;
+    data['total_discount'] = totalDiscount;
+    data['total_discount_tax'] = totalDiscountTax;
+    data['total_shipping'] = totalShipping;
+    data['total_shipping_tax'] = totalShippingTax;
+    data['total_price'] = totalPrice;
+    data['total_tax'] = totalTax;
+    data['currency_code'] = currencyCode;
+    data['currency_symbol'] = currencySymbol;
+    data['currency_minor_unit'] = currencyMinorUnit;
+    data['currency_decimal_separator'] = currencyDecimalSeparator;
+    data['currency_thousand_separator'] = currencyThousandSeparator;
+    data['currency_prefix'] = currencyPrefix;
+    data['currency_suffix'] = currencySuffix;
     return data;
   }
 }
@@ -533,17 +531,17 @@ class ShippingAddress {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['first_name'] = this.firstName;
-    data['last_name'] = this.lastName;
-    data['company'] = this.company;
-    data['address_1'] = this.address1;
-    data['address_2'] = this.address2;
-    data['city'] = this.city;
-    data['postcode'] = this.postcode;
-    data['country'] = this.country;
-    data['state'] = this.state;
-    data['phone'] = this.phone;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['first_name'] = firstName;
+    data['last_name'] = lastName;
+    data['company'] = company;
+    data['address_1'] = address1;
+    data['address_2'] = address2;
+    data['city'] = city;
+    data['postcode'] = postcode;
+    data['country'] = country;
+    data['state'] = state;
+    data['phone'] = phone;
     return data;
   }
 }
@@ -590,18 +588,18 @@ class BillingAddress {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['first_name'] = this.firstName;
-    data['last_name'] = this.lastName;
-    data['company'] = this.company;
-    data['address_1'] = this.address1;
-    data['address_2'] = this.address2;
-    data['city'] = this.city;
-    data['postcode'] = this.postcode;
-    data['country'] = this.country;
-    data['state'] = this.state;
-    data['email'] = this.email;
-    data['phone'] = this.phone;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['first_name'] = firstName;
+    data['last_name'] = lastName;
+    data['company'] = company;
+    data['address_1'] = address1;
+    data['address_2'] = address2;
+    data['city'] = city;
+    data['postcode'] = postcode;
+    data['country'] = country;
+    data['state'] = state;
+    data['email'] = email;
+    data['phone'] = phone;
     return data;
   }
 }

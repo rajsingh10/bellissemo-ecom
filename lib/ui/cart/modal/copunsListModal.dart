@@ -37,17 +37,17 @@ class CouponListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['code'] = this.code;
-    data['amount'] = this.amount;
-    data['discount_type'] = this.discountType;
-    data['date_expires'] = this.dateExpires;
-    data['usage_limit'] = this.usageLimit;
-    data['usage_count'] = this.usageCount;
-    data['individual_use'] = this.individualUse;
-    data['minimum_amount'] = this.minimumAmount;
-    data['maximum_amount'] = this.maximumAmount;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['code'] = code;
+    data['amount'] = amount;
+    data['discount_type'] = discountType;
+    data['date_expires'] = dateExpires;
+    data['usage_limit'] = usageLimit;
+    data['usage_count'] = usageCount;
+    data['individual_use'] = individualUse;
+    data['minimum_amount'] = minimumAmount;
+    data['maximum_amount'] = maximumAmount;
     return data;
   }
 }

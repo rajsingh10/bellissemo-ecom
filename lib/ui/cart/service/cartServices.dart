@@ -1194,8 +1194,7 @@ class CartService {
     required String couponCode,
     required Callback onSuccess,
     bool isSync = false,
-  })
-  async {
+  }) async {
     final box = HiveService().getAddCartBox();
     final cacheBox = HiveService().getProductCartDataBox();
     if (!cacheBox.isOpen) await HiveService().init();

@@ -6,7 +6,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-
 import '../../../../ApiCalling/response.dart';
 import '../../../apiCalling/apiEndpoints.dart';
 import '../../../apiCalling/checkInternetModule.dart';
@@ -15,6 +14,7 @@ import '../../../services/hiveServices.dart';
 
 class OrderHistoryProvider extends ChangeNotifier {
   static final Dio _dio = Dio();
+
   Future<http.Response> fetchOrders(id) async {
     String url = "${apiEndpoints.orderHistory}$id";
     LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
@@ -42,6 +42,7 @@ class OrderHistoryProvider extends ChangeNotifier {
 
     return responseJson;
   }
+
   // 🔹 ReOrder Function
   static Future<Response?> reOrder({
     required int orderId,
@@ -55,15 +56,13 @@ class OrderHistoryProvider extends ChangeNotifier {
     // ---------------- OFFLINE ----------------
     if (!await checkInternet()) {
       if (!isSync) {
-        await box.put(
-          "offline_reorder_${DateTime.now().millisecondsSinceEpoch}",
-          {
-            "action": "reorder",
-            "order_id": orderId,
-            "item_id": itemId,
-            "timestamp": DateTime.now().toIso8601String(),
-          },
-        );
+        await box
+            .put("offline_reorder_${DateTime.now().millisecondsSinceEpoch}", {
+              "action": "reorder",
+              "order_id": orderId,
+              "item_id": itemId,
+              "timestamp": DateTime.now().toIso8601String(),
+            });
         print("⚠️ Offline: queued reorder → order:$orderId item:$itemId");
       }
       return null;
@@ -81,10 +80,7 @@ class OrderHistoryProvider extends ChangeNotifier {
         "Accept": "application/json",
       };
 
-      final body = {
-        "order_id": orderId,
-        "item_id": itemId,
-      };
+      final body = {"order_id": orderId, "item_id": itemId};
 
       final response = await _dio.post(
         apiEndpoints.reorderApi,
@@ -94,28 +90,27 @@ class OrderHistoryProvider extends ChangeNotifier {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("✅ ReOrder success → order:$orderId item:$itemId");
-
       }
 
       return response;
     } catch (e) {
       if (!isSync) {
-        await box.put(
-          "offline_reorder_${DateTime.now().millisecondsSinceEpoch}",
-          {
-            "action": "reorder",
-            "order_id": orderId,
-            "item_id": itemId,
-            "timestamp": DateTime.now().toIso8601String(),
-          },
+        await box
+            .put("offline_reorder_${DateTime.now().millisecondsSinceEpoch}", {
+              "action": "reorder",
+              "order_id": orderId,
+              "item_id": itemId,
+              "timestamp": DateTime.now().toIso8601String(),
+            });
+        print(
+          "⚠️ Failed online, saved reorder offline → order:$orderId item:$itemId",
         );
-        print("⚠️ Failed online, saved reorder offline → order:$orderId item:$itemId");
       }
       return null;
     }
   }
 
-// 🔹 Sync Offline ReOrders
+  // 🔹 Sync Offline ReOrders
   Future<void> syncReOrders() async {
     final box = HiveService().getreOrderBox();
 
@@ -124,9 +119,10 @@ class OrderHistoryProvider extends ChangeNotifier {
       return;
     }
 
-    final keys = box.keys
-        .where((k) => k.toString().startsWith("offline_reorder_"))
-        .toList();
+    final keys =
+        box.keys
+            .where((k) => k.toString().startsWith("offline_reorder_"))
+            .toList();
 
     if (keys.isEmpty) {
       print("✅ No offline reorders to sync.");
@@ -146,7 +142,6 @@ class OrderHistoryProvider extends ChangeNotifier {
           orderId: orderId,
           itemId: itemId,
           isSync: true,
-
         );
 
         if (response != null &&
@@ -159,5 +154,4 @@ class OrderHistoryProvider extends ChangeNotifier {
       }
     }
   }
-
 }

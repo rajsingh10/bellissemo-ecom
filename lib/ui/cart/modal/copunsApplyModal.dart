@@ -29,7 +29,7 @@ class CopunsApplyModal {
     couponCode = json['coupon_code'];
     couponData =
         json['coupon_data'] != null
-            ? new CouponData.fromJson(json['coupon_data'])
+            ? CouponData.fromJson(json['coupon_data'])
             : null;
     discountTotal = json['discount_total'];
     discountTax = json['discount_tax'];
@@ -40,19 +40,19 @@ class CopunsApplyModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['success'] = this.success;
-    data['applied'] = this.applied;
-    data['coupon_code'] = this.couponCode;
-    if (this.couponData != null) {
-      data['coupon_data'] = this.couponData!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['success'] = success;
+    data['applied'] = applied;
+    data['coupon_code'] = couponCode;
+    if (couponData != null) {
+      data['coupon_data'] = couponData!.toJson();
     }
-    data['discount_total'] = this.discountTotal;
-    data['discount_tax'] = this.discountTax;
-    data['cart_total'] = this.cartTotal;
-    data['cart_subtotal'] = this.cartSubtotal;
-    data['applied_coupons'] = this.appliedCoupons;
-    data['message'] = this.message;
+    data['discount_total'] = discountTotal;
+    data['discount_tax'] = discountTax;
+    data['cart_total'] = cartTotal;
+    data['cart_subtotal'] = cartSubtotal;
+    data['applied_coupons'] = appliedCoupons;
+    data['message'] = message;
     return data;
   }
 }
@@ -62,7 +62,7 @@ class CouponData {
   String? amount;
   String? discountType;
   String? description;
-  Null? dateExpires;
+  Null dateExpires;
   String? minimumAmount;
   String? maximumAmount;
 
@@ -87,14 +87,14 @@ class CouponData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['code'] = this.code;
-    data['amount'] = this.amount;
-    data['discount_type'] = this.discountType;
-    data['description'] = this.description;
-    data['date_expires'] = this.dateExpires;
-    data['minimum_amount'] = this.minimumAmount;
-    data['maximum_amount'] = this.maximumAmount;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['code'] = code;
+    data['amount'] = amount;
+    data['discount_type'] = discountType;
+    data['description'] = description;
+    data['date_expires'] = dateExpires;
+    data['minimum_amount'] = minimumAmount;
+    data['maximum_amount'] = maximumAmount;
     return data;
   }
 }

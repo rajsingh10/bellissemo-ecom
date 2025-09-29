@@ -25,13 +25,13 @@ class OrderCheckOutModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['number'] = this.number;
-    data['status'] = this.status;
-    data['total'] = this.total;
-    data['subtotal'] = this.subtotal;
-    data['discount_total'] = this.discountTotal;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['number'] = number;
+    data['status'] = status;
+    data['total'] = total;
+    data['subtotal'] = subtotal;
+    data['discount_total'] = discountTotal;
     return data;
   }
 }

@@ -25,13 +25,13 @@ class RemoveCouponsModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['success'] = this.success;
-    data['removed'] = this.removed;
-    data['coupon_code'] = this.couponCode;
-    data['cart_total'] = this.cartTotal;
-    data['cart_subtotal'] = this.cartSubtotal;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['success'] = success;
+    data['removed'] = removed;
+    data['coupon_code'] = couponCode;
+    data['cart_total'] = cartTotal;
+    data['cart_subtotal'] = cartSubtotal;
+    data['message'] = message;
     return data;
   }
 }

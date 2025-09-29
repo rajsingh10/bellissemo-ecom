@@ -138,10 +138,12 @@ class _CustomerAddressScreenState extends State<CustomerAddressScreen> {
                           isTextavailable: true,
                           textInputType: TextInputType.emailAddress,
                           validator: (value) {
-                            if (value == null || value.isEmpty)
+                            if (value == null || value.isEmpty) {
                               return "Email is required";
-                            if (!GetUtils.isEmail(value))
+                            }
+                            if (!GetUtils.isEmail(value)) {
                               return "Enter a valid email";
+                            }
                             return null;
                           },
                         ),

@@ -619,7 +619,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                                           context,
                                                           setState,
                                                         ) {
-                                                          final _formKey =
+                                                          final formKey =
                                                               GlobalKey<
                                                                 FormState
                                                               >();
@@ -667,7 +667,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                                                     ),
                                                                     Form(
                                                                       key:
-                                                                          _formKey,
+                                                                          formKey,
                                                                       child: AppTextField(
                                                                         controller:
                                                                             dialogController,
@@ -729,8 +729,9 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                                                           title:
                                                                               "Confirm",
                                                                           route: () {
-                                                                            if (!_formKey.currentState!.validate())
+                                                                            if (!formKey.currentState!.validate()) {
                                                                               return;
+                                                                            }
 
                                                                             final charge =
                                                                                 dialogController.text.trim().isEmpty
@@ -880,7 +881,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                       String? errorText;
                       DateTime? selectedDate;
 
-                      final _formKey = GlobalKey<FormState>();
+                      final formKey = GlobalKey<FormState>();
 
                       return StatefulBuilder(
                         builder: (context, setState) {
@@ -900,7 +901,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                             content: SingleChildScrollView(
                               // ✅ Prevents keyboard render overflow
                               child: Form(
-                                key: _formKey,
+                                key: formKey,
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -1028,7 +1029,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                 title: "Confirm",
                                 route: () {
                                   final isValid =
-                                      _formKey.currentState!.validate();
+                                      formKey.currentState!.validate();
 
                                   if (!isValid || selectedDate == null) {
                                     setState(() {

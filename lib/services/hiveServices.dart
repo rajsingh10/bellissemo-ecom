@@ -88,6 +88,7 @@ class HiveService {
   Box getSubmitOrderBox() => submitOrderBox;
 
   Box getAddressBox() => addressBox;
+
   Box getreOrderBox() => reOrderBox;
 
   Box getCouponListBox() => couponListBox;

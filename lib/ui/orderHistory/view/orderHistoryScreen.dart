@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'dart:developer';
 
@@ -107,721 +106,752 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       key: _scaffoldKeyOrder,
       drawer: CustomDrawer(),
       body:
-      isLoading
-          ? Loader()
-          : Column(
-        children: [
-          TitleBar(
-            title: 'Order History',
-            isDrawerEnabled: true,
-            isSearchEnabled: true,
-            drawerCallback: () {
-              _scaffoldKeyOrder.currentState?.openDrawer();
-            },
-            onSearch: () {
-              setState(() {
-                isSearchEnabled = !isSearchEnabled;
-              });
-            },
-          ),
-          if (isSearchEnabled)
-            SearchField(controller: searchController),
-          SizedBox(height: 1.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 3.w,
-                  vertical: 2.h,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 6,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "Showing", // Show total items dynamically
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontFamily: FontFamily.semiBold,
-                        color: AppColors.blackColor,
-                      ),
-                    ),
-                    SizedBox(width: 2.w),
-                    Icon(
-                      Icons.shopping_bag,
-                      color: AppColors.mainColor,
-                      size: 20.sp,
-                    ),
-
-                    Text(
-                      "${ordersList.length} Items",
-                      // Show total items dynamically
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontFamily: FontFamily.semiBold,
-                        color: AppColors.mainColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 3.w),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 6,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Text(
-                      "Sort By ",
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontFamily: FontFamily.semiBold,
-                        color: AppColors.blackColor,
-                      ),
-                    ),
-                    SizedBox(width: 3.w),
-                    DropdownButtonHideUnderline(
-                      // <-- Wrap to remove underline
-                      child: DropdownButton<String>(
-                        value: selectedSort,
-                        icon: Icon(
-                          Icons.sort,
-                          color: AppColors.mainColor,
+          isLoading
+              ? Loader()
+              : Column(
+                children: [
+                  TitleBar(
+                    title: 'Order History',
+                    isDrawerEnabled: true,
+                    isSearchEnabled: true,
+                    drawerCallback: () {
+                      _scaffoldKeyOrder.currentState?.openDrawer();
+                    },
+                    onSearch: () {
+                      setState(() {
+                        isSearchEnabled = !isSearchEnabled;
+                      });
+                    },
+                  ),
+                  if (isSearchEnabled)
+                    SearchField(controller: searchController),
+                  SizedBox(height: 1.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 3.w,
+                          vertical: 2.h,
                         ),
-                        items:
-                        sortOptions
-                            .map(
-                              (option) => DropdownMenuItem(
-                            value: option,
-                            child: Text(
-                              option,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(30),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 6,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Showing", // Show total items dynamically
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                fontFamily: FontFamily.semiBold,
+                                color: AppColors.blackColor,
+                              ),
+                            ),
+                            SizedBox(width: 2.w),
+                            Icon(
+                              Icons.shopping_bag,
+                              color: AppColors.mainColor,
+                              size: 20.sp,
+                            ),
+
+                            Text(
+                              "${ordersList.length} Items",
+                              // Show total items dynamically
                               style: TextStyle(
                                 fontSize: 15.sp,
                                 fontFamily: FontFamily.semiBold,
                                 color: AppColors.mainColor,
                               ),
                             ),
-                          ),
-                        )
-                            .toList(),
-                        onChanged: (value) {
-                          if (value != null) sortOrders(value);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          SizedBox(height: 1.h),
-          ordersList.isEmpty || ordersList.isEmpty
-              ? Padding(
-            padding: EdgeInsets.symmetric(vertical: 15.h),
-            child: emptyWidget(
-              icon: Icons.shopping_cart_outlined,
-              text: 'Order History',
-            ),
-          )
-              : Expanded(
-            child: SingleChildScrollView(
-              physics: ClampingScrollPhysics(),
-              child: Column(
-                children: [
-                  for (var order in ordersList)
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 12),
-                      child: Card(
-                        elevation: 2,
-                        shadowColor: AppColors.containerColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          ],
                         ),
-                        color: AppColors.whiteColor,
-                        child: ExpansionTile(
-                          tilePadding: EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 4,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          backgroundColor: AppColors.whiteColor,
-                          // collapsedBackgroundColor: AppColors.whiteColor,
-                          title: Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Order No #${order.id}",
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.w600,
-                                  fontFamily: FontFamily.bold,
-                                  color: AppColors.blackColor,
-                                ),
-                              ),
-                              SizedBox(height: 0.5.h),
-                              Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.greenColor
-                                          .withOpacity(0.1),
-                                      borderRadius:
-                                      BorderRadius.circular(8),
-                                    ),
-                                    child: Text(
-                                      order
-                                          .status
-                                          ?.capitalizeFirst ??
-                                          '',
-                                      style: TextStyle(
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: FontFamily.bold,
-                                        color: AppColors.greenColor,
-                                      ),
-                                    ),
-                                  ),
-                                  Text(
-                                    order.dateCreated ?? "",
-                                    style: TextStyle(
-                                      fontSize: 16.sp,
-                                      color: AppColors.gray,
-                                      fontFamily: FontFamily.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 3.w),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(30),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 6,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Row(
                           children: [
-                            Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    SizedBox(width: 3.w),
-                                    RichText(
-                                      text: TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text:
-                                            "Customer : ", // label
-                                            style: TextStyle(
-                                              fontSize: 16.sp,
-                                              color:
-                                              AppColors
-                                                  .blackColor,
-                                              fontFamily:
-                                              FontFamily
-                                                  .bold, // bold for label
+                            Text(
+                              "Sort By ",
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                fontFamily: FontFamily.semiBold,
+                                color: AppColors.blackColor,
+                              ),
+                            ),
+                            SizedBox(width: 3.w),
+                            DropdownButtonHideUnderline(
+                              // <-- Wrap to remove underline
+                              child: DropdownButton<String>(
+                                value: selectedSort,
+                                icon: Icon(
+                                  Icons.sort,
+                                  color: AppColors.mainColor,
+                                ),
+                                items:
+                                    sortOptions
+                                        .map(
+                                          (option) => DropdownMenuItem(
+                                            value: option,
+                                            child: Text(
+                                              option,
+                                              style: TextStyle(
+                                                fontSize: 15.sp,
+                                                fontFamily: FontFamily.semiBold,
+                                                color: AppColors.mainColor,
+                                              ),
                                             ),
                                           ),
-                                          TextSpan(
-                                            text:
-                                            customerName ?? "",
-                                            // dynamic name
-                                            style: TextStyle(
-                                              fontSize: 16.sp,
-                                              color:
-                                              AppColors
-                                                  .blackColor,
-                                              fontFamily:
-                                              FontFamily
-                                                  .regular, // normal for value
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                for (var item in order.lineItems!)
-                                  Padding(
-                                    padding:
-                                    const EdgeInsets.symmetric(
-                                      vertical: 6,
-                                      horizontal: 12,
-                                    ),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        // Product Image
-                                        ClipRRect(
-                                          borderRadius:
-                                          BorderRadius.circular(
-                                            8,
-                                          ),
-                                          child: CustomNetworkImage(
-                                            imageUrl:
-                                            item.image?.src ??
-                                                "",
-                                            height: 100,
-                                            width: 100,
-                                            isCircle: true,
-                                            isFit: true,
-                                            isProfile: false,
-                                          ),
-                                        ),
-                                        SizedBox(width: 2.w),
-
-                                        // Product Details + Quantity & Cart Button
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                            CrossAxisAlignment
-                                                .start,
-                                            children: [
-                                              // Product Name
-                                              Text(
-                                                item.name ?? "",
-                                                style: TextStyle(
-                                                  fontSize: 16.sp,
-                                                  fontFamily:
-                                                  FontFamily
-                                                      .semiBold,
-                                                  color:
-                                                  AppColors
-                                                      .blackColor,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 0.5.h,
-                                              ),
-
-                                              // Qty + Price
-                                              Text(
-                                                "Qty: ${item.quantity}  •  ${order.currencySymbol} ${item.price ?? ""}",
-                                                style: TextStyle(
-                                                  fontSize: 16.sp,
-                                                  color:
-                                                  AppColors
-                                                      .gray,
-                                                  fontFamily:
-                                                  FontFamily
-                                                      .semiBold,
-                                                ),
-                                              ),
-                                              SizedBox(height: 1.h),
-                                              InkWell(
-                                                onTap: ()async{
-                                                  // await OrderHistoryProvider.reOrder(
-                                                  //  itemId:item.id,
-                                                  //   orderId:order.id,
-                                                  //
-                                                  //
-                                                  //
-                                                  // );
-                                                  final response = await OrderHistoryProvider.reOrder(
-                                                    orderId: order.id,
-                                                    itemId: item.id,
-                                                  );
-
-                                                  if (response != null && (response.statusCode == 200 || response.statusCode == 201)) {
-                                                    // ✅ Online success
-                                                    showCustomSuccessSnackbar(
-                                                      title: "Reorder",
-                                                      message: "Reorder has been successfully added to your cart.",
-                                                    );
-                                                  } else {
-                                                    // ⚠️ Offline queued (or failed but saved offline)
-                                                    showCustomSuccessSnackbar(
-                                                      title: "Reorder",
-                                                      message: "Reorder has been successfully added to your cart.",
-                                                    );
-                                                  }
-                                                },
-                                                child: Container(
-                                                  padding: EdgeInsets.symmetric(horizontal: 2.w,vertical: 1.h),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(10),
-                                                    color: AppColors.mainColor
-                                                  ),
-                                                    child: Text("Reorder",style: TextStyle(
-                                                      fontSize: 14.sp,
-                                                      fontFamily: FontFamily.semiBold,
-                                                      color: AppColors.whiteColor,
-                                                    ),)),
-                                              ),
-                                              // IntrinsicWidth(
-                                              //   child: Container(
-                                              //     padding:
-                                              //         EdgeInsets.symmetric(
-                                              //           horizontal:
-                                              //               isIpad
-                                              //                   ? 0
-                                              //                   : 2.w,
-                                              //           vertical:
-                                              //               0.5.h,
-                                              //         ),
-                                              //     decoration: BoxDecoration(
-                                              //       color:
-                                              //           AppColors
-                                              //               .containerColor,
-                                              //       borderRadius:
-                                              //           BorderRadius.circular(
-                                              //             30,
-                                              //           ),
-                                              //     ),
-                                              //     child: Row(
-                                              //       children: [
-                                              //         // Decrease
-                                              //         GestureDetector(
-                                              //           onTap:
-                                              //               () {},
-                                              //           child: Container(
-                                              //             padding:
-                                              //                 EdgeInsets.all(
-                                              //                   1.5.w,
-                                              //                 ),
-                                              //             decoration: BoxDecoration(
-                                              //               color:
-                                              //                   AppColors.cardBgColor,
-                                              //               shape:
-                                              //                   BoxShape.circle,
-                                              //             ),
-                                              //             child: Icon(
-                                              //               Icons
-                                              //                   .remove,
-                                              //               size:
-                                              //                   isIpad
-                                              //                       ? 12.sp
-                                              //                       : 16.sp,
-                                              //               color:
-                                              //                   AppColors.blackColor,
-                                              //             ),
-                                              //           ),
-                                              //         ),
-                                              //
-                                              //         SizedBox(
-                                              //           width: 4.w,
-                                              //         ),
-                                              //
-                                              //         // Increase
-                                              //         GestureDetector(
-                                              //           onTap: () {
-                                              //             setState(
-                                              //               () {},
-                                              //             );
-                                              //           },
-                                              //           child: Container(
-                                              //             padding:
-                                              //                 EdgeInsets.all(
-                                              //                   1.5.w,
-                                              //                 ),
-                                              //             decoration: BoxDecoration(
-                                              //               color:
-                                              //                   AppColors.cardBgColor,
-                                              //               shape:
-                                              //                   BoxShape.circle,
-                                              //             ),
-                                              //             child: Icon(
-                                              //               Icons
-                                              //                   .add,
-                                              //               size:
-                                              //                   isIpad
-                                              //                       ? 12.sp
-                                              //                       : 16.sp,
-                                              //               color:
-                                              //                   AppColors.blackColor,
-                                              //             ),
-                                              //           ),
-                                              //         ),
-                                              //       ],
-                                              //     ),
-                                              //   ),
-                                              // ),
-                                              // Quantity Selector + Cart Button
-                                              // Row(
-                                              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              //   children: [
-                                              //     // Quantity Selector
-                                              //     Container(
-                                              //       padding: EdgeInsets.symmetric(
-                                              //         horizontal: isIpad ? 0 : 2.w,
-                                              //         vertical: 0.5.h,
-                                              //       ),
-                                              //       decoration: BoxDecoration(
-                                              //         color: AppColors.containerColor,
-                                              //         borderRadius: BorderRadius.circular(30),
-                                              //       ),
-                                              //       child: Row(
-                                              //         children: [
-                                              //           // Decrease Button
-                                              //           GestureDetector(
-                                              //             onTap: product.inStock && product.quantity > 0
-                                              //                 ? () => setState(() => product.quantity--)
-                                              //                 : null,
-                                              //             child: Container(
-                                              //               padding: EdgeInsets.all(1.5.w),
-                                              //               decoration: BoxDecoration(
-                                              //                 color: AppColors.cardBgColor,
-                                              //                 shape: BoxShape.circle,
-                                              //               ),
-                                              //               child: Icon(
-                                              //                 Icons.remove,
-                                              //                 size: isIpad ? 12.sp : 16.sp,
-                                              //                 color: AppColors.blackColor,
-                                              //               ),
-                                              //             ),
-                                              //           ),
-                                              //           SizedBox(width: 1.w),
-                                              //
-                                              //           // Quantity Text
-                                              //           Text(
-                                              //             product.quantity.toString(),
-                                              //             style: TextStyle(
-                                              //               fontSize: 14.sp,
-                                              //               fontFamily: FontFamily.semiBold,
-                                              //               color: AppColors.blackColor,
-                                              //             ),
-                                              //           ),
-                                              //           SizedBox(width: 1.w),
-                                              //
-                                              //           // Increase Button
-                                              //           GestureDetector(
-                                              //             onTap: product.inStock
-                                              //                 ? () => setState(() => product.quantity++)
-                                              //                 : null,
-                                              //             child: Container(
-                                              //               padding: EdgeInsets.all(1.5.w),
-                                              //               decoration: BoxDecoration(
-                                              //                 color: AppColors.cardBgColor,
-                                              //                 shape: BoxShape.circle,
-                                              //               ),
-                                              //               child: Icon(
-                                              //                 Icons.add,
-                                              //                 size: isIpad ? 12.sp : 16.sp,
-                                              //                 color: AppColors.blackColor,
-                                              //               ),
-                                              //             ),
-                                              //           ),
-                                              //         ],
-                                              //       ),
-                                              //     ),
-                                              //
-                                              //     // Add to Cart Button
-                                              //     InkWell(
-                                              //       onTap: product.inStock
-                                              //           ? () {
-                                              //         // handle add to cart
-                                              //       }
-                                              //           : null,
-                                              //       borderRadius: BorderRadius.circular(30),
-                                              //       child: Container(
-                                              //         padding: EdgeInsets.all(1.5.w),
-                                              //         decoration: BoxDecoration(
-                                              //           color: AppColors.mainColor,
-                                              //           shape: BoxShape.circle,
-                                              //         ),
-                                              //         child: Icon(
-                                              //           Icons.shopping_cart_outlined,
-                                              //           color: Colors.white,
-                                              //           size: isIpad ? 15.sp : 18.sp,
-                                              //         ),
-                                              //       ),
-                                              //     ),
-                                              //   ],
-                                              // ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                Divider(),
-                                // SizedBox(height: 0.5.h),
-                                // Padding(
-                                //   padding:
-                                //       const EdgeInsets.symmetric(
-                                //         horizontal: 12,
-                                //       ),
-                                //   child: Row(
-                                //     mainAxisAlignment:
-                                //         MainAxisAlignment
-                                //             .spaceBetween,
-                                //     children: [
-                                //       Text(
-                                //         "Sub Total:",
-                                //         style: TextStyle(
-                                //           fontSize: 16.sp,
-                                //           fontWeight:
-                                //               FontWeight.bold,
-                                //           fontFamily:
-                                //               FontFamily.bold,
-                                //         ),
-                                //       ),
-                                //       Text(
-                                //         "${order.currencySymbol} ${order.total ?? ""}",
-                                //         style: TextStyle(
-                                //           fontSize: 16.sp,
-                                //           fontWeight:
-                                //               FontWeight.bold,
-                                //           fontFamily:
-                                //               FontFamily.bold,
-                                //           color:
-                                //               AppColors.blackColor,
-                                //         ),
-                                //       ),
-                                //     ],
-                                //   ),
-                                // ),
-                                SizedBox(height: 0.5.h),
-                                Padding(
-                                  padding:
-                                  const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment
-                                        .spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Shipping :",
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight:
-                                          FontWeight.bold,
-                                          fontFamily:
-                                          FontFamily.bold,
-                                        ),
-                                      ),
-                                      Text(
-                                        "${order.currencySymbol} ${order.shippingTotal ?? ""}",
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight:
-                                          FontWeight.bold,
-                                          fontFamily:
-                                          FontFamily.bold,
-                                          color:
-                                          AppColors.blackColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(height: 0.5.h),
-                                Padding(
-                                  padding:
-                                  const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment
-                                        .spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Discount :",
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight:
-                                          FontWeight.bold,
-                                          fontFamily:
-                                          FontFamily.bold,
-                                        ),
-                                      ),
-                                      Text(
-                                        "${order.currencySymbol} ${((double.tryParse(order.discountTotal?.toString() ?? "0") ?? 0) / 100).toStringAsFixed(2)}",
-
-
-
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight:
-                                          FontWeight.bold,
-                                          fontFamily:
-                                          FontFamily.bold,
-                                          color:
-                                          AppColors.blackColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(height: 0.5.h),
-                                Padding(
-                                  padding:
-                                  const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment
-                                        .spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Total:",
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight:
-                                          FontWeight.bold,
-                                          fontFamily:
-                                          FontFamily.bold,
-                                        ),
-                                      ),
-                                      Text(
-                                        "${order.currencySymbol} ${((double.tryParse(order.total?.toString() ?? "0") ?? 0) / 100).toStringAsFixed(2)}",
-
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight:
-                                          FontWeight.bold,
-                                          fontFamily:
-                                          FontFamily.bold,
-                                          color:
-                                          AppColors.blackColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(height: 1.5.h),
-                              ],
+                                        )
+                                        .toList(),
+                                onChanged: (value) {
+                                  if (value != null) sortOrders(value);
+                                },
+                              ),
                             ),
                           ],
                         ),
                       ),
-                    ),
+                    ],
+                  ),
+
+                  SizedBox(height: 1.h),
+                  ordersList.isEmpty || ordersList.isEmpty
+                      ? Padding(
+                        padding: EdgeInsets.symmetric(vertical: 15.h),
+                        child: emptyWidget(
+                          icon: Icons.shopping_cart_outlined,
+                          text: 'Order History',
+                        ),
+                      )
+                      : Expanded(
+                        child: SingleChildScrollView(
+                          physics: ClampingScrollPhysics(),
+                          child: Column(
+                            children: [
+                              for (var order in ordersList)
+                                Padding(
+                                  padding: EdgeInsets.only(bottom: 12),
+                                  child: Card(
+                                    elevation: 2,
+                                    shadowColor: AppColors.containerColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    color: AppColors.whiteColor,
+                                    child: ExpansionTile(
+                                      tilePadding: EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 4,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      backgroundColor: AppColors.whiteColor,
+                                      // collapsedBackgroundColor: AppColors.whiteColor,
+                                      title: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Order No #${order.id}",
+                                            style: TextStyle(
+                                              fontSize: 16.sp,
+                                              fontWeight: FontWeight.w600,
+                                              fontFamily: FontFamily.bold,
+                                              color: AppColors.blackColor,
+                                            ),
+                                          ),
+                                          SizedBox(height: 0.5.h),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: 10,
+                                                  vertical: 4,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: AppColors.greenColor
+                                                      .withOpacity(0.1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: Text(
+                                                  order
+                                                          .status
+                                                          ?.capitalizeFirst ??
+                                                      '',
+                                                  style: TextStyle(
+                                                    fontSize: 16.sp,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: FontFamily.bold,
+                                                    color: AppColors.greenColor,
+                                                  ),
+                                                ),
+                                              ),
+                                              Text(
+                                                order.dateCreated ?? "",
+                                                style: TextStyle(
+                                                  fontSize: 16.sp,
+                                                  color: AppColors.gray,
+                                                  fontFamily: FontFamily.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      children: [
+                                        Column(
+                                          children: [
+                                            Row(
+                                              children: [
+                                                SizedBox(width: 3.w),
+                                                RichText(
+                                                  text: TextSpan(
+                                                    children: [
+                                                      TextSpan(
+                                                        text:
+                                                            "Customer : ", // label
+                                                        style: TextStyle(
+                                                          fontSize: 16.sp,
+                                                          color:
+                                                              AppColors
+                                                                  .blackColor,
+                                                          fontFamily:
+                                                              FontFamily
+                                                                  .bold, // bold for label
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text:
+                                                            customerName ?? "",
+                                                        // dynamic name
+                                                        style: TextStyle(
+                                                          fontSize: 16.sp,
+                                                          color:
+                                                              AppColors
+                                                                  .blackColor,
+                                                          fontFamily:
+                                                              FontFamily
+                                                                  .regular, // normal for value
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+
+                                            for (var item in order.lineItems!)
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      vertical: 6,
+                                                      horizontal: 12,
+                                                    ),
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    // Product Image
+                                                    ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            8,
+                                                          ),
+                                                      child: CustomNetworkImage(
+                                                        imageUrl:
+                                                            item.image?.src ??
+                                                            "",
+                                                        height: 100,
+                                                        width: 100,
+                                                        isCircle: true,
+                                                        isFit: true,
+                                                        isProfile: false,
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 2.w),
+
+                                                    // Product Details + Quantity & Cart Button
+                                                    Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          // Product Name
+                                                          Text(
+                                                            item.name ?? "",
+                                                            style: TextStyle(
+                                                              fontSize: 16.sp,
+                                                              fontFamily:
+                                                                  FontFamily
+                                                                      .semiBold,
+                                                              color:
+                                                                  AppColors
+                                                                      .blackColor,
+                                                            ),
+                                                          ),
+                                                          SizedBox(
+                                                            height: 0.5.h,
+                                                          ),
+
+                                                          // Qty + Price
+                                                          Text(
+                                                            "Qty: ${item.quantity}  •  ${order.currencySymbol} ${item.price ?? ""}",
+                                                            style: TextStyle(
+                                                              fontSize: 16.sp,
+                                                              color:
+                                                                  AppColors
+                                                                      .gray,
+                                                              fontFamily:
+                                                                  FontFamily
+                                                                      .semiBold,
+                                                            ),
+                                                          ),
+                                                          SizedBox(height: 1.h),
+                                                          InkWell(
+                                                            onTap: () async {
+                                                              // await OrderHistoryProvider.reOrder(
+                                                              //  itemId:item.id,
+                                                              //   orderId:order.id,
+                                                              //
+                                                              //
+                                                              //
+                                                              // );
+                                                              final response =
+                                                                  await OrderHistoryProvider.reOrder(
+                                                                    orderId:
+                                                                        order
+                                                                            .id,
+                                                                    itemId:
+                                                                        item.id,
+                                                                  );
+
+                                                              if (response !=
+                                                                      null &&
+                                                                  (response.statusCode ==
+                                                                          200 ||
+                                                                      response.statusCode ==
+                                                                          201)) {
+                                                                // ✅ Online success
+                                                                showCustomSuccessSnackbar(
+                                                                  title:
+                                                                      "Reorder",
+                                                                  message:
+                                                                      "Reorder has been successfully added to your cart.",
+                                                                );
+                                                              } else {
+                                                                // ⚠️ Offline queued (or failed but saved offline)
+                                                                showCustomSuccessSnackbar(
+                                                                  title:
+                                                                      "Reorder",
+                                                                  message:
+                                                                      "Reorder has been successfully added to your cart.",
+                                                                );
+                                                              }
+                                                            },
+                                                            child: Container(
+                                                              padding:
+                                                                  EdgeInsets.symmetric(
+                                                                    horizontal:
+                                                                        2.w,
+                                                                    vertical:
+                                                                        1.h,
+                                                                  ),
+                                                              decoration: BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      10,
+                                                                    ),
+                                                                color:
+                                                                    AppColors
+                                                                        .mainColor,
+                                                              ),
+                                                              child: Text(
+                                                                "Reorder",
+                                                                style: TextStyle(
+                                                                  fontSize:
+                                                                      14.sp,
+                                                                  fontFamily:
+                                                                      FontFamily
+                                                                          .semiBold,
+                                                                  color:
+                                                                      AppColors
+                                                                          .whiteColor,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          // IntrinsicWidth(
+                                                          //   child: Container(
+                                                          //     padding:
+                                                          //         EdgeInsets.symmetric(
+                                                          //           horizontal:
+                                                          //               isIpad
+                                                          //                   ? 0
+                                                          //                   : 2.w,
+                                                          //           vertical:
+                                                          //               0.5.h,
+                                                          //         ),
+                                                          //     decoration: BoxDecoration(
+                                                          //       color:
+                                                          //           AppColors
+                                                          //               .containerColor,
+                                                          //       borderRadius:
+                                                          //           BorderRadius.circular(
+                                                          //             30,
+                                                          //           ),
+                                                          //     ),
+                                                          //     child: Row(
+                                                          //       children: [
+                                                          //         // Decrease
+                                                          //         GestureDetector(
+                                                          //           onTap:
+                                                          //               () {},
+                                                          //           child: Container(
+                                                          //             padding:
+                                                          //                 EdgeInsets.all(
+                                                          //                   1.5.w,
+                                                          //                 ),
+                                                          //             decoration: BoxDecoration(
+                                                          //               color:
+                                                          //                   AppColors.cardBgColor,
+                                                          //               shape:
+                                                          //                   BoxShape.circle,
+                                                          //             ),
+                                                          //             child: Icon(
+                                                          //               Icons
+                                                          //                   .remove,
+                                                          //               size:
+                                                          //                   isIpad
+                                                          //                       ? 12.sp
+                                                          //                       : 16.sp,
+                                                          //               color:
+                                                          //                   AppColors.blackColor,
+                                                          //             ),
+                                                          //           ),
+                                                          //         ),
+                                                          //
+                                                          //         SizedBox(
+                                                          //           width: 4.w,
+                                                          //         ),
+                                                          //
+                                                          //         // Increase
+                                                          //         GestureDetector(
+                                                          //           onTap: () {
+                                                          //             setState(
+                                                          //               () {},
+                                                          //             );
+                                                          //           },
+                                                          //           child: Container(
+                                                          //             padding:
+                                                          //                 EdgeInsets.all(
+                                                          //                   1.5.w,
+                                                          //                 ),
+                                                          //             decoration: BoxDecoration(
+                                                          //               color:
+                                                          //                   AppColors.cardBgColor,
+                                                          //               shape:
+                                                          //                   BoxShape.circle,
+                                                          //             ),
+                                                          //             child: Icon(
+                                                          //               Icons
+                                                          //                   .add,
+                                                          //               size:
+                                                          //                   isIpad
+                                                          //                       ? 12.sp
+                                                          //                       : 16.sp,
+                                                          //               color:
+                                                          //                   AppColors.blackColor,
+                                                          //             ),
+                                                          //           ),
+                                                          //         ),
+                                                          //       ],
+                                                          //     ),
+                                                          //   ),
+                                                          // ),
+                                                          // Quantity Selector + Cart Button
+                                                          // Row(
+                                                          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          //   children: [
+                                                          //     // Quantity Selector
+                                                          //     Container(
+                                                          //       padding: EdgeInsets.symmetric(
+                                                          //         horizontal: isIpad ? 0 : 2.w,
+                                                          //         vertical: 0.5.h,
+                                                          //       ),
+                                                          //       decoration: BoxDecoration(
+                                                          //         color: AppColors.containerColor,
+                                                          //         borderRadius: BorderRadius.circular(30),
+                                                          //       ),
+                                                          //       child: Row(
+                                                          //         children: [
+                                                          //           // Decrease Button
+                                                          //           GestureDetector(
+                                                          //             onTap: product.inStock && product.quantity > 0
+                                                          //                 ? () => setState(() => product.quantity--)
+                                                          //                 : null,
+                                                          //             child: Container(
+                                                          //               padding: EdgeInsets.all(1.5.w),
+                                                          //               decoration: BoxDecoration(
+                                                          //                 color: AppColors.cardBgColor,
+                                                          //                 shape: BoxShape.circle,
+                                                          //               ),
+                                                          //               child: Icon(
+                                                          //                 Icons.remove,
+                                                          //                 size: isIpad ? 12.sp : 16.sp,
+                                                          //                 color: AppColors.blackColor,
+                                                          //               ),
+                                                          //             ),
+                                                          //           ),
+                                                          //           SizedBox(width: 1.w),
+                                                          //
+                                                          //           // Quantity Text
+                                                          //           Text(
+                                                          //             product.quantity.toString(),
+                                                          //             style: TextStyle(
+                                                          //               fontSize: 14.sp,
+                                                          //               fontFamily: FontFamily.semiBold,
+                                                          //               color: AppColors.blackColor,
+                                                          //             ),
+                                                          //           ),
+                                                          //           SizedBox(width: 1.w),
+                                                          //
+                                                          //           // Increase Button
+                                                          //           GestureDetector(
+                                                          //             onTap: product.inStock
+                                                          //                 ? () => setState(() => product.quantity++)
+                                                          //                 : null,
+                                                          //             child: Container(
+                                                          //               padding: EdgeInsets.all(1.5.w),
+                                                          //               decoration: BoxDecoration(
+                                                          //                 color: AppColors.cardBgColor,
+                                                          //                 shape: BoxShape.circle,
+                                                          //               ),
+                                                          //               child: Icon(
+                                                          //                 Icons.add,
+                                                          //                 size: isIpad ? 12.sp : 16.sp,
+                                                          //                 color: AppColors.blackColor,
+                                                          //               ),
+                                                          //             ),
+                                                          //           ),
+                                                          //         ],
+                                                          //       ),
+                                                          //     ),
+                                                          //
+                                                          //     // Add to Cart Button
+                                                          //     InkWell(
+                                                          //       onTap: product.inStock
+                                                          //           ? () {
+                                                          //         // handle add to cart
+                                                          //       }
+                                                          //           : null,
+                                                          //       borderRadius: BorderRadius.circular(30),
+                                                          //       child: Container(
+                                                          //         padding: EdgeInsets.all(1.5.w),
+                                                          //         decoration: BoxDecoration(
+                                                          //           color: AppColors.mainColor,
+                                                          //           shape: BoxShape.circle,
+                                                          //         ),
+                                                          //         child: Icon(
+                                                          //           Icons.shopping_cart_outlined,
+                                                          //           color: Colors.white,
+                                                          //           size: isIpad ? 15.sp : 18.sp,
+                                                          //         ),
+                                                          //       ),
+                                                          //     ),
+                                                          //   ],
+                                                          // ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            Divider(),
+                                            // SizedBox(height: 0.5.h),
+                                            // Padding(
+                                            //   padding:
+                                            //       const EdgeInsets.symmetric(
+                                            //         horizontal: 12,
+                                            //       ),
+                                            //   child: Row(
+                                            //     mainAxisAlignment:
+                                            //         MainAxisAlignment
+                                            //             .spaceBetween,
+                                            //     children: [
+                                            //       Text(
+                                            //         "Sub Total:",
+                                            //         style: TextStyle(
+                                            //           fontSize: 16.sp,
+                                            //           fontWeight:
+                                            //               FontWeight.bold,
+                                            //           fontFamily:
+                                            //               FontFamily.bold,
+                                            //         ),
+                                            //       ),
+                                            //       Text(
+                                            //         "${order.currencySymbol} ${order.total ?? ""}",
+                                            //         style: TextStyle(
+                                            //           fontSize: 16.sp,
+                                            //           fontWeight:
+                                            //               FontWeight.bold,
+                                            //           fontFamily:
+                                            //               FontFamily.bold,
+                                            //           color:
+                                            //               AppColors.blackColor,
+                                            //         ),
+                                            //       ),
+                                            //     ],
+                                            //   ),
+                                            // ),
+                                            SizedBox(height: 0.5.h),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 12,
+                                                  ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "Shipping :",
+                                                    style: TextStyle(
+                                                      fontSize: 16.sp,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontFamily:
+                                                          FontFamily.bold,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    "${order.currencySymbol} ${order.shippingTotal ?? ""}",
+                                                    style: TextStyle(
+                                                      fontSize: 16.sp,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontFamily:
+                                                          FontFamily.bold,
+                                                      color:
+                                                          AppColors.blackColor,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(height: 0.5.h),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 12,
+                                                  ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "Discount :",
+                                                    style: TextStyle(
+                                                      fontSize: 16.sp,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontFamily:
+                                                          FontFamily.bold,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    "${order.currencySymbol} ${((double.tryParse(order.discountTotal?.toString() ?? "0") ?? 0) / 100).toStringAsFixed(2)}",
+
+                                                    style: TextStyle(
+                                                      fontSize: 16.sp,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontFamily:
+                                                          FontFamily.bold,
+                                                      color:
+                                                          AppColors.blackColor,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(height: 0.5.h),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 12,
+                                                  ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "Total:",
+                                                    style: TextStyle(
+                                                      fontSize: 16.sp,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontFamily:
+                                                          FontFamily.bold,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    "${order.currencySymbol} ${((double.tryParse(order.total?.toString() ?? "0") ?? 0) / 100).toStringAsFixed(2)}",
+
+                                                    style: TextStyle(
+                                                      fontSize: 16.sp,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontFamily:
+                                                          FontFamily.bold,
+                                                      color:
+                                                          AppColors.blackColor,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(height: 1.5.h),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
                 ],
-              ),
-            ),
-          ),
-        ],
-      ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
+              ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
       bottomNavigationBar: SizedBox(
         height: isIpad ? 14.h : 10.h,
         child: CustomBar(selected: 2),

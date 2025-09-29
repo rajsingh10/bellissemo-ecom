@@ -350,8 +350,9 @@ class _CartScreenState extends State<CartScreen> {
                                                                             final item =
                                                                                 viewCartData?.items?[i];
                                                                             if (item ==
-                                                                                null)
+                                                                                null) {
                                                                               return;
+                                                                            }
 
                                                                             final currentQty =
                                                                                 item.quantity ??
@@ -610,8 +611,9 @@ class _CartScreenState extends State<CartScreen> {
                                                                             final item =
                                                                                 viewCartData?.items?[i];
                                                                             if (item ==
-                                                                                null)
+                                                                                null) {
                                                                               return;
+                                                                            }
 
                                                                             final currentQty =
                                                                                 item.quantity ??
@@ -726,8 +728,9 @@ class _CartScreenState extends State<CartScreen> {
                                                                       viewCartData
                                                                           ?.items?[i];
                                                                   if (item ==
-                                                                      null)
+                                                                      null) {
                                                                     return;
+                                                                  }
 
                                                                   final cartService =
                                                                       CartService();
@@ -984,7 +987,7 @@ class _CartScreenState extends State<CartScreen> {
                                                     );
                                                   });
                                                   print(
-                                                    "discount1=====>>>>>${discount1}",
+                                                    "discount1=====>>>>>$discount1",
                                                   );
 
                                                   final cartService =
@@ -1479,11 +1482,12 @@ class _CartScreenState extends State<CartScreen> {
         } else {
           viewCartData = null;
         }
-        if (mounted)
+        if (mounted) {
           showCustomErrorSnackbar(
             title: 'Server Error',
             message: 'Something went wrong. Please try again later.',
           );
+        }
       }
     } catch (e, stackTrace) {
       print("Error fetching cart: $stackTrace");
@@ -1502,12 +1506,13 @@ class _CartScreenState extends State<CartScreen> {
         viewCartData = null;
       }
 
-      if (mounted)
+      if (mounted) {
         showCustomErrorSnackbar(
           title: 'Network Error',
           message:
               'Unable to connect. Please check your internet and try again.',
         );
+      }
     }
   }
 
@@ -1622,9 +1627,7 @@ class _CartScreenState extends State<CartScreen> {
                                             offlineDiscount: discount1,
                                           );
                                         });
-                                        print(
-                                          "discount1=====>>>>>${discount1}",
-                                        );
+                                        print("discount1=====>>>>>$discount1");
 
                                         final cartService = CartService();
 
