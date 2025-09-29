@@ -725,21 +725,35 @@ class _CartScreenState extends State<CartScreen> {
                                             return ElevatedButton(
                                               onPressed: () async {
                                                 if (hasText) {
+                                                  // setState(() {
+                                                  //   couponController.text =
+                                                  //       viewCartData
+                                                  //           ?.coupons?[0]
+                                                  //           .code ??
+                                                  //       "";
+                                                  //   discount1 = double.parse(
+                                                  //     (viewCartData
+                                                  //             ?.totals
+                                                  //             ?.totalDiscount)
+                                                  //         .toString(),
+                                                  //   );
+                                                  //   updateCartTotalsLocally(
+                                                  //     offlineDiscount: 0,
+                                                  //   );
+                                                  // });
                                                   setState(() {
-                                                    couponController.text =
-                                                        viewCartData
-                                                            ?.coupons?[0]
-                                                            .code ??
-                                                        "";
-                                                    discount1 = double.parse(
-                                                      (viewCartData
-                                                              ?.totals
-                                                              ?.totalDiscount)
-                                                          .toString(),
-                                                    );
-                                                    updateCartTotalsLocally(
-                                                      offlineDiscount: 0,
-                                                    );
+                                                    if ((viewCartData?.coupons?.isNotEmpty ?? false)) {
+                                                      couponController.text = viewCartData!.coupons![0].code ?? "";
+                                                    } else {
+                                                      couponController.clear();
+                                                    }
+
+                                                    discount1 = double.tryParse(
+                                                      (viewCartData?.totals?.totalDiscount ?? "0").toString(),
+                                                    ) ??
+                                                        0.0;
+
+                                                    updateCartTotalsLocally(offlineDiscount: 0);
                                                   });
                                                   print(
                                                     "discount1=====>>>>>${discount1}",
@@ -1016,6 +1030,7 @@ class _CartScreenState extends State<CartScreen> {
     }
 
     double totalPrice = subtotal + tax + shipping - discount;
+    print("discount=======>>>>>>${discount}");
     print("totalPrice======>>>>>>${totalPrice}");
     setState(() {
       viewCartData!.totals = Totals(
