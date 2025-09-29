@@ -299,7 +299,7 @@ class AllVariations {
   String? salePrice;
   Attributes? attributes;
   String? stockStatus;
-  String? stockQuantity;
+  var stockQuantity;
   String? sku;
   String? weight;
   Dimensions? dimensions;

@@ -653,6 +653,63 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     );
   }
 
+  // Future<void> _fetchProductDetails() async {
+  //   var box = HiveService().getProductDetailsBox();
+  //
+  //   if (!await checkInternet()) {
+  //     final cachedData = box.get('productDetails${widget.productId}');
+  //     if (cachedData != null) {
+  //       final data = json.decode(cachedData);
+  //       productDetails = ProductDetailsModal.fromJson(data);
+  //       currentImages =
+  //           productDetails?.images?.map((e) => e.src.toString()).toList() ?? [];
+  //     } else {
+  //       showCustomErrorSnackbar(
+  //         title: 'No Internet',
+  //         message: 'Please check your connection and try again.',
+  //       );
+  //     }
+  //     return;
+  //   }
+  //
+  //   try {
+  //     final response = await ProductsProvider().productDetailsApi(
+  //       widget.productId,
+  //     );
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.body);
+  //       productDetails = ProductDetailsModal.fromJson(data);
+  //       currentImages =
+  //           productDetails?.images?.map((e) => e.src.toString()).toList() ?? [];
+  //       await box.put('productDetails${widget.productId}', response.body);
+  //     } else {
+  //       final cachedData = box.get('productDetails${widget.productId}');
+  //       if (cachedData != null) {
+  //         final data = json.decode(cachedData);
+  //         productDetails = ProductDetailsModal.fromJson(data);
+  //         currentImages =
+  //             productDetails?.images?.map((e) => e.src.toString()).toList() ??
+  //             [];
+  //       }
+  //       showCustomErrorSnackbar(
+  //         title: 'Server Error',
+  //         message: 'Something went wrong. Please try again later.',
+  //       );
+  //     }
+  //   } catch (_) {
+  //     final cachedData = box.get('productDetails${widget.productId}');
+  //     if (cachedData != null) {
+  //       final data = json.decode(cachedData);
+  //       productDetails = ProductDetailsModal.fromJson(data);
+  //       currentImages =
+  //           productDetails?.images?.map((e) => e.src.toString()).toList() ?? [];
+  //     }
+  //     showCustomErrorSnackbar(
+  //       title: 'Network Error',
+  //       message: 'Unable to connect. Please check your internet and try again.',
+  //     );
+  //   }
+  // }
   Future<void> _fetchProductDetails() async {
     var box = HiveService().getProductDetailsBox();
 
@@ -664,6 +721,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         currentImages =
             productDetails?.images?.map((e) => e.src.toString()).toList() ?? [];
       } else {
+        print("❌ No internet and no cached data found");
         showCustomErrorSnackbar(
           title: 'No Internet',
           message: 'Please check your connection and try again.',
@@ -676,6 +734,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       final response = await ProductsProvider().productDetailsApi(
         widget.productId,
       );
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         productDetails = ProductDetailsModal.fromJson(data);
@@ -683,20 +742,23 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             productDetails?.images?.map((e) => e.src.toString()).toList() ?? [];
         await box.put('productDetails${widget.productId}', response.body);
       } else {
+        print("❌ Server Error → statusCode: ${response.statusCode}, body: ${response.body}");
         final cachedData = box.get('productDetails${widget.productId}');
         if (cachedData != null) {
           final data = json.decode(cachedData);
           productDetails = ProductDetailsModal.fromJson(data);
           currentImages =
-              productDetails?.images?.map((e) => e.src.toString()).toList() ??
-              [];
+              productDetails?.images?.map((e) => e.src.toString()).toList() ?? [];
         }
         showCustomErrorSnackbar(
           title: 'Server Error',
           message: 'Something went wrong. Please try again later.',
         );
       }
-    } catch (_) {
+    } catch (e, stack) {
+      print("❌ Exception in _fetchProductDetails: $e");
+      print("📌 Stacktrace:\n$stack");
+
       final cachedData = box.get('productDetails${widget.productId}');
       if (cachedData != null) {
         final data = json.decode(cachedData);
