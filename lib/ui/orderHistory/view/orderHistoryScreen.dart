@@ -421,7 +421,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
                                                           // Qty + Price
                                                           Text(
-                                                            "Qty: ${item.quantity}  •  \$${item.price ?? ""}",
+                                                            "Qty: ${item.quantity}  •  ${order.currencySymbol} ${item.price ?? ""}",
                                                             style: TextStyle(
                                                               fontSize: 16.sp,
                                                               color:
@@ -642,7 +642,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    "\$${order.totalTax ?? ""}",
+                                                    "${order.currencySymbol} ${order.totalTax ?? ""}",
                                                     style: TextStyle(
                                                       fontSize: 16.sp,
                                                       fontWeight:
@@ -678,7 +678,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    "\$${order.shippingTotal ?? ""}",
+                                                    "${order.currencySymbol} ${order.shippingTotal ?? ""}",
                                                     style: TextStyle(
                                                       fontSize: 16.sp,
                                                       fontWeight:
@@ -714,7 +714,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    "\$${order.discountTotal ?? ""}",
+                                                    "${order.currencySymbol} ${order.discountTotal ?? ""}",
                                                     style: TextStyle(
                                                       fontSize: 16.sp,
                                                       fontWeight:
@@ -750,7 +750,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    "\$${order.total ?? ""}",
+                                                    "${order.currencySymbol} ${order.total ?? ""}",
                                                     style: TextStyle(
                                                       fontSize: 16.sp,
                                                       fontWeight:
