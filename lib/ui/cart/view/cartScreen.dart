@@ -295,6 +295,57 @@ class _CartScreenState extends State<CartScreen> {
                                                                       children: [
                                                                         // Decrease
                                                                         GestureDetector(
+                                                                          // onTap: () async {
+                                                                          //   final item =
+                                                                          //       viewCartData?.items?[i];
+                                                                          //   if (item ==
+                                                                          //       null)
+                                                                          //     return;
+                                                                          //
+                                                                          //   final cartService =
+                                                                          //       CartService();
+                                                                          //   final currentQty =
+                                                                          //       item.quantity ??
+                                                                          //       1;
+                                                                          //
+                                                                          //   try {
+                                                                          //     // 🔹 Offline/Online increase
+                                                                          //     await cartService.decreaseCart(
+                                                                          //       cartItemKey:
+                                                                          //           item.key ??
+                                                                          //           "",
+                                                                          //       currentQuantity:
+                                                                          //           currentQty,
+                                                                          //     );
+                                                                          //
+                                                                          //     // 🔹 Immediately update UI
+                                                                          //     setState(
+                                                                          //       () {
+                                                                          //         item.quantity =
+                                                                          //             currentQty -
+                                                                          //             1;
+                                                                          //         updateCartTotalsLocally();
+                                                                          //       },
+                                                                          //     );
+                                                                          //
+                                                                          //     // 🔹 Only fetch cart from server if online
+                                                                          //     if (await checkInternet()) {
+                                                                          //       await _fetchCart(); // just call it
+                                                                          //       setState(
+                                                                          //         () {},
+                                                                          //       ); // refresh UI after _fetchCart updates viewCartData
+                                                                          //     }
+                                                                          //   } catch (
+                                                                          //     e
+                                                                          //   ) {
+                                                                          //     showCustomErrorSnackbar(
+                                                                          //       title:
+                                                                          //           "Error",
+                                                                          //       message:
+                                                                          //           "Failed to update cart\n$e",
+                                                                          //     );
+                                                                          //   }
+                                                                          // },
                                                                           onTap: () async {
                                                                             final item =
                                                                                 viewCartData?.items?[i];
@@ -302,47 +353,146 @@ class _CartScreenState extends State<CartScreen> {
                                                                                 null)
                                                                               return;
 
-                                                                            final cartService =
-                                                                                CartService();
                                                                             final currentQty =
                                                                                 item.quantity ??
                                                                                 1;
+                                                                            final cartService =
+                                                                                CartService();
 
                                                                             try {
-                                                                              // 🔹 Offline/Online increase
-                                                                              await cartService.decreaseCart(
-                                                                                cartItemKey:
-                                                                                    item.key ??
-                                                                                    "",
-                                                                                currentQuantity:
-                                                                                    currentQty,
-                                                                              );
-
-                                                                              // 🔹 Immediately update UI
-                                                                              setState(
-                                                                                () {
-                                                                                  item.quantity =
-                                                                                      currentQty -
-                                                                                      1;
-                                                                                  updateCartTotalsLocally();
-                                                                                },
-                                                                              );
-
-                                                                              // 🔹 Only fetch cart from server if online
-                                                                              if (await checkInternet()) {
-                                                                                await _fetchCart(); // just call it
+                                                                              if (currentQty >
+                                                                                  1) {
+                                                                                // 🔹 Just decrease quantity
                                                                                 setState(
-                                                                                  () {},
-                                                                                ); // refresh UI after _fetchCart updates viewCartData
+                                                                                  () {
+                                                                                    item.quantity =
+                                                                                        currentQty -
+                                                                                        1;
+                                                                                    updateCartTotalsLocally();
+                                                                                  },
+                                                                                );
+
+                                                                                // 🔹 Update Hive cache
+                                                                                var box =
+                                                                                    HiveService().getViewCartBox();
+                                                                                final cachedData = box.get(
+                                                                                  'cart_$customerId',
+                                                                                );
+                                                                                if (cachedData !=
+                                                                                        null &&
+                                                                                    cachedData.toString().isNotEmpty) {
+                                                                                  try {
+                                                                                    final data = json.decode(
+                                                                                      cachedData,
+                                                                                    );
+                                                                                    final cachedCart = ViewCartDataModal.fromJson(
+                                                                                      data,
+                                                                                    );
+                                                                                    cachedCart.items?[i].quantity =
+                                                                                        currentQty -
+                                                                                        1;
+                                                                                    await box.put(
+                                                                                      'cart_$customerId',
+                                                                                      json.encode(
+                                                                                        cachedCart.toJson(),
+                                                                                      ),
+                                                                                    );
+                                                                                  } catch (
+                                                                                    e
+                                                                                  ) {
+                                                                                    print(
+                                                                                      "Error updating offline cache: $e",
+                                                                                    );
+                                                                                  }
+                                                                                }
+
+                                                                                // 🔹 Sync with server if online
+                                                                                if (await checkInternet()) {
+                                                                                  await cartService.decreaseCart(
+                                                                                    cartItemKey:
+                                                                                        item.key ??
+                                                                                        "",
+                                                                                    currentQuantity:
+                                                                                        currentQty,
+                                                                                  );
+                                                                                  await _fetchCart();
+                                                                                  setState(
+                                                                                    () {},
+                                                                                  );
+                                                                                }
+                                                                              } else {
+                                                                                // 🔹 Quantity is 1, remove item
+                                                                                setState(
+                                                                                  () {
+                                                                                    viewCartData?.items?.removeAt(
+                                                                                      i,
+                                                                                    );
+                                                                                    updateCartTotalsLocally();
+                                                                                  },
+                                                                                );
+
+                                                                                // 🔹 Update Hive cache
+                                                                                var box =
+                                                                                    HiveService().getViewCartBox();
+                                                                                final cachedData = box.get(
+                                                                                  'cart_$customerId',
+                                                                                );
+                                                                                if (cachedData !=
+                                                                                        null &&
+                                                                                    cachedData.toString().isNotEmpty) {
+                                                                                  try {
+                                                                                    final data = json.decode(
+                                                                                      cachedData,
+                                                                                    );
+                                                                                    final cachedCart = ViewCartDataModal.fromJson(
+                                                                                      data,
+                                                                                    );
+                                                                                    cachedCart.items?.removeAt(
+                                                                                      i,
+                                                                                    );
+                                                                                    await box.put(
+                                                                                      'cart_$customerId',
+                                                                                      json.encode(
+                                                                                        cachedCart.toJson(),
+                                                                                      ),
+                                                                                    );
+                                                                                  } catch (
+                                                                                    e
+                                                                                  ) {
+                                                                                    print(
+                                                                                      "Error updating offline cache: $e",
+                                                                                    );
+                                                                                  }
+                                                                                }
+
+                                                                                // 🔹 Remove from server if online
+                                                                                if (await checkInternet()) {
+                                                                                  await cartService.removeFromCart(
+                                                                                    cartItemKey:
+                                                                                        item.key ??
+                                                                                        "",
+                                                                                  );
+                                                                                  await _fetchCart();
+                                                                                  setState(
+                                                                                    () {},
+                                                                                  );
+                                                                                }
                                                                               }
                                                                             } catch (
-                                                                              e
+                                                                              e,
+                                                                              stackTrace
                                                                             ) {
                                                                               showCustomErrorSnackbar(
                                                                                 title:
                                                                                     "Error",
                                                                                 message:
                                                                                     "Failed to update cart\n$e",
+                                                                              );
+                                                                              print(
+                                                                                "Error========>>>>>>$e",
+                                                                              );
+                                                                              print(
+                                                                                "StackTrace========>>>>>>$stackTrace",
                                                                               );
                                                                             }
                                                                           },
@@ -395,6 +545,67 @@ class _CartScreenState extends State<CartScreen> {
 
                                                                         // Increase
                                                                         GestureDetector(
+                                                                          // onTap: () async {
+                                                                          //   final item =
+                                                                          //       viewCartData?.items?[i];
+                                                                          //   if (item ==
+                                                                          //       null)
+                                                                          //     return;
+                                                                          //
+                                                                          //   final cartService =
+                                                                          //       CartService();
+                                                                          //   final currentQty =
+                                                                          //       item.quantity ??
+                                                                          //       1;
+                                                                          //
+                                                                          //   try {
+                                                                          //     // 🔹 Offline/Online increase
+                                                                          //     await cartService.increaseCart(
+                                                                          //       cartItemKey:
+                                                                          //           item.key ??
+                                                                          //           "",
+                                                                          //       currentQuantity:
+                                                                          //           currentQty,
+                                                                          //     );
+                                                                          //
+                                                                          //     // 🔹 Immediately update UI
+                                                                          //     setState(
+                                                                          //       () {
+                                                                          //         item.quantity =
+                                                                          //             currentQty +
+                                                                          //             1;
+                                                                          //         updateCartTotalsLocally();
+                                                                          //       },
+                                                                          //     );
+                                                                          //
+                                                                          //     // 🔹 Only fetch cart from server if online
+                                                                          //     if (await checkInternet()) {
+                                                                          //       await _fetchCart(); // just call it
+                                                                          //       setState(
+                                                                          //         () {},
+                                                                          //       ); // refresh UI after _fetchCart updates viewCartData
+                                                                          //     }
+                                                                          //   } catch (
+                                                                          //     e,
+                                                                          //     stackTrace
+                                                                          //   ) {
+                                                                          //     showCustomErrorSnackbar(
+                                                                          //       title:
+                                                                          //           "Error",
+                                                                          //       message:
+                                                                          //           "Failed to update cart\n$e",
+                                                                          //     );
+                                                                          //     print(
+                                                                          //       "e========>>>>>>$e",
+                                                                          //     );
+                                                                          //     print(
+                                                                          //       "e========>>>>>>$stackTrace",
+                                                                          //     );
+                                                                          //     print(
+                                                                          //       "e========>>>>>>$stackTrace",
+                                                                          //     );
+                                                                          //   }
+                                                                          // },
                                                                           onTap: () async {
                                                                             final item =
                                                                                 viewCartData?.items?[i];
@@ -402,58 +613,76 @@ class _CartScreenState extends State<CartScreen> {
                                                                                 null)
                                                                               return;
 
-                                                                            final cartService =
-                                                                                CartService();
                                                                             final currentQty =
                                                                                 item.quantity ??
                                                                                 1;
 
-                                                                            try {
-                                                                              // 🔹 Offline/Online increase
-                                                                              await cartService.increaseCart(
-                                                                                cartItemKey:
-                                                                                    item.key ??
-                                                                                    "",
-                                                                                currentQuantity:
-                                                                                    currentQty,
-                                                                              );
+                                                                            // update local UI
+                                                                            setState(() {
+                                                                              item.quantity =
+                                                                                  currentQty +
+                                                                                  1;
+                                                                              updateCartTotalsLocally();
+                                                                            });
 
-                                                                              // 🔹 Immediately update UI
-                                                                              setState(
-                                                                                () {
-                                                                                  item.quantity =
-                                                                                      currentQty +
-                                                                                      1;
-                                                                                  updateCartTotalsLocally();
-                                                                                },
-                                                                              );
+                                                                            // update Hive cache immediately
+                                                                            var box =
+                                                                                HiveService().getViewCartBox();
+                                                                            final cachedData = box.get(
+                                                                              'cart_$customerId',
+                                                                            );
+                                                                            if (cachedData !=
+                                                                                    null &&
+                                                                                cachedData.toString().isNotEmpty) {
+                                                                              try {
+                                                                                final data = json.decode(
+                                                                                  cachedData,
+                                                                                );
+                                                                                final cachedCart = ViewCartDataModal.fromJson(
+                                                                                  data,
+                                                                                );
+                                                                                cachedCart.items?[i].quantity =
+                                                                                    currentQty +
+                                                                                    1;
+                                                                                await box.put(
+                                                                                  'cart_$customerId',
+                                                                                  json.encode(
+                                                                                    cachedCart.toJson(),
+                                                                                  ),
+                                                                                );
+                                                                              } catch (
+                                                                                e
+                                                                              ) {
+                                                                                print(
+                                                                                  "Error updating offline cache: $e",
+                                                                                );
+                                                                              }
+                                                                            }
 
-                                                                              // 🔹 Only fetch cart from server if online
-                                                                              if (await checkInternet()) {
-                                                                                await _fetchCart(); // just call it
+                                                                            // then only call server if online
+                                                                            if (await checkInternet()) {
+                                                                              try {
+                                                                                await CartService().increaseCart(
+                                                                                  cartItemKey:
+                                                                                      item.key ??
+                                                                                      "",
+                                                                                  currentQuantity:
+                                                                                      currentQty,
+                                                                                );
+                                                                                await _fetchCart(); // refresh from server
                                                                                 setState(
                                                                                   () {},
-                                                                                ); // refresh UI after _fetchCart updates viewCartData
+                                                                                ); // refresh UI after fetch
+                                                                              } catch (
+                                                                                e
+                                                                              ) {
+                                                                                showCustomErrorSnackbar(
+                                                                                  title:
+                                                                                      "Error",
+                                                                                  message:
+                                                                                      "Failed to update cart\n$e",
+                                                                                );
                                                                               }
-                                                                            } catch (
-                                                                              e,
-                                                                              stackTrace
-                                                                            ) {
-                                                                              showCustomErrorSnackbar(
-                                                                                title:
-                                                                                    "Error",
-                                                                                message:
-                                                                                    "Failed to update cart\n$e",
-                                                                              );
-                                                                              print(
-                                                                                "e========>>>>>>$e",
-                                                                              );
-                                                                              print(
-                                                                                "e========>>>>>>$stackTrace",
-                                                                              );
-                                                                              print(
-                                                                                "e========>>>>>>$stackTrace",
-                                                                              );
                                                                             }
                                                                           },
                                                                           child: Container(
@@ -725,35 +954,34 @@ class _CartScreenState extends State<CartScreen> {
                                             return ElevatedButton(
                                               onPressed: () async {
                                                 if (hasText) {
-                                                  // setState(() {
-                                                  //   couponController.text =
-                                                  //       viewCartData
-                                                  //           ?.coupons?[0]
-                                                  //           .code ??
-                                                  //       "";
-                                                  //   discount1 = double.parse(
-                                                  //     (viewCartData
-                                                  //             ?.totals
-                                                  //             ?.totalDiscount)
-                                                  //         .toString(),
-                                                  //   );
-                                                  //   updateCartTotalsLocally(
-                                                  //     offlineDiscount: 0,
-                                                  //   );
-                                                  // });
                                                   setState(() {
-                                                    if ((viewCartData?.coupons?.isNotEmpty ?? false)) {
-                                                      couponController.text = viewCartData!.coupons![0].code ?? "";
+                                                    if ((viewCartData
+                                                            ?.coupons
+                                                            ?.isNotEmpty ??
+                                                        false)) {
+                                                      couponController.text =
+                                                          viewCartData!
+                                                              .coupons![0]
+                                                              .code ??
+                                                          "";
                                                     } else {
                                                       couponController.clear();
                                                     }
 
-                                                    discount1 = double.tryParse(
-                                                      (viewCartData?.totals?.totalDiscount ?? "0").toString(),
-                                                    ) ??
+                                                    discount1 =
+                                                        double.tryParse(
+                                                          (viewCartData
+                                                                      ?.totals
+                                                                      ?.totalDiscount ??
+                                                                  "0")
+                                                              .toString(),
+                                                        ) ??
                                                         0.0;
 
-                                                    updateCartTotalsLocally(offlineDiscount: 0);
+                                                    updateCartTotalsLocally(
+                                                      offlineDiscount: 0,
+                                                      removeCoupon: true,
+                                                    );
                                                   });
                                                   print(
                                                     "discount1=====>>>>>${discount1}",
@@ -773,6 +1001,7 @@ class _CartScreenState extends State<CartScreen> {
                                                       Get.offAll(
                                                         () => CartScreen(),
                                                       );
+
                                                       _fetchCart();
                                                     },
                                                   );
@@ -999,8 +1228,54 @@ class _CartScreenState extends State<CartScreen> {
 
   double discount1 = 0.0;
 
-  void updateCartTotalsLocally({double? offlineDiscount}) {
-    print("offlineDiscount=====>>>>>>>>${offlineDiscount}");
+  // void updateCartTotalsLocally({double? offlineDiscount}) {
+  //   print("offlineDiscount=====>>>>>>>>${offlineDiscount}");
+  //   if (viewCartData == null) return;
+  //
+  //   double subtotal = 0.0;
+  //   double tax = 0.0;
+  //   double shipping =
+  //       double.tryParse(viewCartData?.totals?.totalShipping ?? '0') ?? 0.0;
+  //
+  //   // Start with existing discount
+  //   double discount =
+  //       double.tryParse(viewCartData?.totals?.totalDiscount ?? '0') ?? 0.0;
+  //
+  //   // Add any new offline discount
+  //   if (offlineDiscount != null) {
+  //     discount += offlineDiscount;
+  //   }
+  //
+  //   for (var item in viewCartData!.items ?? []) {
+  //     if (item.prices != null) {
+  //       double itemPrice = double.tryParse(item.prices!.price ?? '0') ?? 0.0;
+  //       int quantity = item.quantity ?? 0;
+  //
+  //       subtotal += itemPrice * quantity;
+  //
+  //       double itemTax = 0.0; // Temporary
+  //       tax += itemTax * quantity;
+  //     }
+  //   }
+  //
+  //   double totalPrice = subtotal + tax + shipping - discount;
+  //   print("discount=======>>>>>>${discount}");
+  //   print("totalPrice======>>>>>>${totalPrice}");
+  //   setState(() {
+  //     viewCartData!.totals = Totals(
+  //       currencySymbol: viewCartData!.totals?.currencySymbol ?? "\$",
+  //       totalItems: subtotal.round().toString(),
+  //       totalTax: tax.round().toString(),
+  //       totalShipping: shipping.round().toString(),
+  //       totalDiscount: discount.round().toString(),
+  //       totalPrice: totalPrice.round().toString(),
+  //     );
+  //   });
+  // }
+  updateCartTotalsLocally({
+    double? offlineDiscount,
+    bool removeCoupon = false,
+  }) async {
     if (viewCartData == null) return;
 
     double subtotal = 0.0;
@@ -1008,12 +1283,12 @@ class _CartScreenState extends State<CartScreen> {
     double shipping =
         double.tryParse(viewCartData?.totals?.totalShipping ?? '0') ?? 0.0;
 
-    // Start with existing discount
     double discount =
         double.tryParse(viewCartData?.totals?.totalDiscount ?? '0') ?? 0.0;
 
-    // Add any new offline discount
-    if (offlineDiscount != null) {
+    if (removeCoupon) {
+      discount = 0.0;
+    } else if (offlineDiscount != null) {
       discount += offlineDiscount;
     }
 
@@ -1024,15 +1299,15 @@ class _CartScreenState extends State<CartScreen> {
 
         subtotal += itemPrice * quantity;
 
-        double itemTax = 0.0; // Temporary
+        double itemTax = 0.0;
         tax += itemTax * quantity;
       }
     }
+    double discountPrice = subtotal - discount;
+    double totalPrice = discountPrice;
 
-    double totalPrice = subtotal + tax + shipping - discount;
-    print("discount=======>>>>>>${discount}");
-    print("totalPrice======>>>>>>${totalPrice}");
     setState(() {
+      // 🔹 Update totals
       viewCartData!.totals = Totals(
         currencySymbol: viewCartData!.totals?.currencySymbol ?? "\$",
         totalItems: subtotal.round().toString(),
@@ -1041,7 +1316,15 @@ class _CartScreenState extends State<CartScreen> {
         totalDiscount: discount.round().toString(),
         totalPrice: totalPrice.round().toString(),
       );
+
+      // 🔹 Remove coupon locally also
+      if (removeCoupon) {
+        viewCartData!.coupons = [];
+      }
     });
+    var box = HiveService().getViewCartBox();
+    await box.put('cart_$customerId', json.encode(viewCartData!.toJson()));
+    print("UI refreshed → discount=$discount totalPrice=$totalPrice");
   }
 
   //   Future<void> _fetchCart() async {

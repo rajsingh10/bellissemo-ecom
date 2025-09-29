@@ -1321,6 +1321,7 @@ class CartService {
     if (appliedCoupon != null && appliedCoupon["couponCode"] == couponCode) {
       await cacheBox.delete("applied_coupon");
       print("🗑️ Local coupon removed → $couponCode");
+      onSuccess();
     }
 
     // ---------------- OFFLINE ----------------
