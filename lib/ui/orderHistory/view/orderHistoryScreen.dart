@@ -433,7 +433,47 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                       .semiBold,
                                                 ),
                                               ),
-                                              // SizedBox(height: 1.h),
+                                              SizedBox(height: 1.h),
+                                              InkWell(
+                                                onTap: ()async{
+                                                  // await OrderHistoryProvider.reOrder(
+                                                  //  itemId:item.id,
+                                                  //   orderId:order.id,
+                                                  //
+                                                  //
+                                                  //
+                                                  // );
+                                                  final response = await OrderHistoryProvider.reOrder(
+                                                    orderId: order.id,
+                                                    itemId: item.id,
+                                                  );
+
+                                                  if (response != null && (response.statusCode == 200 || response.statusCode == 201)) {
+                                                    // ✅ Online success
+                                                    showCustomSuccessSnackbar(
+                                                      title: "Reorder",
+                                                      message: "Reorder has been successfully added to your cart.",
+                                                    );
+                                                  } else {
+                                                    // ⚠️ Offline queued (or failed but saved offline)
+                                                    showCustomSuccessSnackbar(
+                                                      title: "Reorder",
+                                                      message: "Reorder has been successfully added to your cart.",
+                                                    );
+                                                  }
+                                                },
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(horizontal: 2.w,vertical: 1.h),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    color: AppColors.mainColor
+                                                  ),
+                                                    child: Text("Reorder",style: TextStyle(
+                                                      fontSize: 14.sp,
+                                                      fontFamily: FontFamily.semiBold,
+                                                      color: AppColors.whiteColor,
+                                                    ),)),
+                                              ),
                                               // IntrinsicWidth(
                                               //   child: Container(
                                               //     padding:

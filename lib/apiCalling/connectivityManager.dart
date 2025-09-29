@@ -4,6 +4,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 import '../ui/cart/service/cartServices.dart';
 import '../ui/customers/services/addressService.dart';
+import '../ui/orderHistory/provider/orderHistoryProvider.dart';
 import 'checkInternetModule.dart';
 
 class ConnectivityManager {
@@ -25,6 +26,7 @@ class ConnectivityManager {
           await CartService().syncOfflineOrders();
           await CartService().syncAppliedCoupons();
           await UpdateAddressService().syncOfflineAddress();
+          await OrderHistoryProvider().syncReOrders();
         }
       });
     });

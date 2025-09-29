@@ -25,6 +25,7 @@ class HiveService {
   late Box pdfFileBox;
   late Box submitOrderBox;
   late Box addressBox;
+  late Box reOrderBox;
   late Box couponListBox;
 
   // Initialize Hive and open all boxes
@@ -49,6 +50,7 @@ class HiveService {
     pdfFileBox = await Hive.openBox('pdfFileBox');
     submitOrderBox = await Hive.openBox('submitOrderBox');
     addressBox = await Hive.openBox('addressBox');
+    reOrderBox = await Hive.openBox('reOrderBox');
     couponListBox = await Hive.openBox('couponListBox');
   }
 
@@ -86,6 +88,7 @@ class HiveService {
   Box getSubmitOrderBox() => submitOrderBox;
 
   Box getAddressBox() => addressBox;
+  Box getreOrderBox() => reOrderBox;
 
   Box getCouponListBox() => couponListBox;
 }
