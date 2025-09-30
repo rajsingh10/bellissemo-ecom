@@ -3,6 +3,7 @@ class CouponListModal {
   String? code;
   String? amount;
   String? discountType;
+  String? description;
   var dateExpires;
   int? usageLimit;
   int? usageCount;
@@ -15,6 +16,7 @@ class CouponListModal {
     this.code,
     this.amount,
     this.discountType,
+    this.description,
     this.dateExpires,
     this.usageLimit,
     this.usageCount,
@@ -31,6 +33,7 @@ class CouponListModal {
     dateExpires = json['date_expires'];
     usageLimit = json['usage_limit'];
     usageCount = json['usage_count'];
+    description = json['description'];
     individualUse = json['individual_use'];
     minimumAmount = json['minimum_amount'];
     maximumAmount = json['maximum_amount'];
@@ -45,6 +48,7 @@ class CouponListModal {
     data['date_expires'] = dateExpires;
     data['usage_limit'] = usageLimit;
     data['usage_count'] = usageCount;
+    data['description'] = description;
     data['individual_use'] = individualUse;
     data['minimum_amount'] = minimumAmount;
     data['maximum_amount'] = maximumAmount;

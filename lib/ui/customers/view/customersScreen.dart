@@ -174,7 +174,9 @@ class _CustomersScreenState extends State<CustomersScreen> {
                     child:
                         filteredCustomers.isEmpty
                             ? Padding(
-                              padding: EdgeInsets.symmetric(vertical: 15.h),
+                              padding: EdgeInsets.symmetric(
+                                vertical: isIpad ? 2.h : 15.h,
+                              ),
                               child: emptyWidget(
                                 icon: Icons.people,
                                 text: 'Customers',

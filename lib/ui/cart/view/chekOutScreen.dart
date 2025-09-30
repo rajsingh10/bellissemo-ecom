@@ -439,64 +439,6 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                                                     ],
                                                                   ),
                                                                 ),
-
-                                                                // Price + Delete
-                                                                Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .end,
-                                                                  children: [
-                                                                    InkWell(
-                                                                      onTap: () {
-                                                                        setState(
-                                                                          () {
-                                                                            // cartItems.removeAt(i);
-                                                                          },
-                                                                        );
-                                                                      },
-                                                                      child: Container(
-                                                                        height:
-                                                                            isIpad
-                                                                                ? 24.sp
-                                                                                : 0.sp,
-                                                                        padding: EdgeInsets.all(
-                                                                          isIpad
-                                                                              ? 1.w
-                                                                              : 1.5.w,
-                                                                        ),
-                                                                        decoration: BoxDecoration(
-                                                                          color:
-                                                                              AppColors.mainColor,
-                                                                          shape:
-                                                                              BoxShape.circle,
-                                                                        ),
-                                                                        child: Icon(
-                                                                          Icons
-                                                                              .delete_outline_rounded,
-                                                                          color:
-                                                                              AppColors.whiteColor,
-                                                                          size:
-                                                                              isIpad
-                                                                                  ? 16.sp
-                                                                                  : 0,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    SizedBox(
-                                                                      height:
-                                                                          2.h,
-                                                                    ),
-                                                                    // Text(
-                                                                    //   "\$ ${  viewCartData?.items?[i].prices?.price ?? ""}",
-                                                                    //   style: TextStyle(
-                                                                    //     color: AppColors.blackColor,
-                                                                    //     fontSize: 14.sp,
-                                                                    //     fontFamily:
-                                                                    //         FontFamily.semiBold,
-                                                                    //   ),
-                                                                    // ),
-                                                                  ],
-                                                                ),
                                                               ],
                                                             ),
                                                           ),
@@ -791,7 +733,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                                 ),
                                               )
                                               : Text(
-                                                " ${viewCartData?.totals?.currencySymbol} ${totalController.text.trim().toString()}",
+                                                "+ ${viewCartData?.totals?.currencySymbol} ${totalController.text.trim().toString()}.00",
                                                 style: TextStyle(
                                                   color: AppColors.gray,
                                                   fontSize: 16.sp,
@@ -815,7 +757,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                             ),
                                           ),
                                           Text(
-                                            "${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.totalDiscount ?? '0')! / 100).toStringAsFixed(2)}",
+                                            "- ${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.totalDiscount ?? '0')! / 100).toStringAsFixed(2)}",
                                             // "\$ ${tax.toStringAsFixed(2)}",
                                             style: TextStyle(
                                               color: AppColors.gray,
@@ -1142,7 +1084,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
           return {
             "product_id": item.id,
             "quantity": item.quantity,
-            "override_price": item.prices?.price ?? 0,
+            "override_price":
+                (int.tryParse(item.prices?.price ?? '0') ?? 0) ~/ 100,
             "note": item.description ?? "",
           };
         }).toList() ??

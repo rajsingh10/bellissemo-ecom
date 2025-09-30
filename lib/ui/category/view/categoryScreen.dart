@@ -238,7 +238,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
                           filteredCategories.isEmpty
                               ? Padding(
-                                padding: EdgeInsets.symmetric(vertical: 15.h),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isIpad ? 2.h : 15.h,
+                                ),
                                 child: emptyWidget(
                                   icon: Icons.category,
                                   text: 'Categories',

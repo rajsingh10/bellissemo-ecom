@@ -25,6 +25,9 @@ class CustomerOrderWiseModal {
   String? customerUserAgent;
   String? createdVia;
   String? customerNote;
+  String? deliveryDate;
+  String? orderNote;
+  String? signatureUrl;
   String? dateCompleted;
   String? datePaid;
   String? cartHash;
@@ -51,12 +54,15 @@ class CustomerOrderWiseModal {
     this.dateCreated,
     this.dateModified,
     this.discountTotal,
+    this.signatureUrl,
+    this.orderNote,
     this.discountTax,
     this.shippingTotal,
     this.shippingTax,
     this.cartTax,
     this.total,
     this.totalTax,
+    this.deliveryDate,
     this.customerId,
     this.orderKey,
     this.billing,
@@ -93,12 +99,15 @@ class CustomerOrderWiseModal {
     version = json['version'];
     pricesIncludeTax = json['prices_include_tax'];
     dateCreated = json['date_created'];
+    deliveryDate = json['delivery_date'];
     dateModified = json['date_modified'];
     discountTotal = json['discount_total'];
     discountTax = json['discount_tax'];
     shippingTotal = json['shipping_total'];
+    signatureUrl = json['signature_url'];
     shippingTax = json['shipping_tax'];
     cartTax = json['cart_tax'];
+    orderNote = json['order_note'];
     total = json['total'];
     totalTax = json['total_tax'];
     customerId = json['customer_id'];
@@ -152,10 +161,13 @@ class CustomerOrderWiseModal {
     data['date_created'] = dateCreated;
     data['date_modified'] = dateModified;
     data['discount_total'] = discountTotal;
+    data['delivery_date'] = deliveryDate;
     data['discount_tax'] = discountTax;
     data['shipping_total'] = shippingTotal;
     data['shipping_tax'] = shippingTax;
+    data['signature_url'] = signatureUrl;
     data['cart_tax'] = cartTax;
+    data['order_note'] = orderNote;
     data['total'] = total;
     data['total_tax'] = totalTax;
     data['customer_id'] = customerId;

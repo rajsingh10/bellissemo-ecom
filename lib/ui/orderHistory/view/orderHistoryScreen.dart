@@ -7,6 +7,7 @@ import 'package:bellissemo_ecom/utils/customMenuDrawer.dart';
 import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
@@ -32,20 +33,101 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   bool isSearchEnabled = false;
   TextEditingController searchController = TextEditingController();
 
-  String selectedSort = "Newest First";
+  String selectedSort = "All";
   bool isIpad = 100.w >= 800;
 
-  final List<String> sortOptions = ["Newest First", "Oldest First"];
+  final List<String> sortOptions = [
+    "All",
+    "Newest First",
+    "Oldest First",
+    "Yesterday",
+    "Today",
+    "This Week",
+    "This Month",
+  ];
+
+  DateTime parseDate(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) return DateTime(1900);
+    return DateTime.tryParse(dateStr) ?? DateTime(1900);
+  }
+
+  List<CustomerOrderWiseModal> _allOrdersList = [];
 
   void sortOrders(String option) {
     setState(() {
       selectedSort = option;
-      if (option == "Newest First") {
-        ordersList.sort((a, b) => b.dateCreated!.compareTo(a.dateCreated!));
+      final now = DateTime.now();
+
+      // Reset to all orders first before applying filters
+      ordersList = List.from(_allOrdersList);
+
+      if (option == "All") {
+        ordersList.sort(
+          (a, b) =>
+              parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
+        );
+      } else if (option == "Newest First") {
+        ordersList.sort(
+          (a, b) =>
+              parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
+        );
       } else if (option == "Oldest First") {
-        ordersList.sort((a, b) => a.dateCreated!.compareTo(b.dateCreated!));
+        ordersList.sort(
+          (a, b) =>
+              parseDate(a.dateCreated).compareTo(parseDate(b.dateCreated)),
+        );
+      } else if (option == "Yesterday") {
+        final yesterday = now.subtract(const Duration(days: 1));
+        ordersList =
+            ordersList.where((order) {
+              final date = parseDate(order.dateCreated);
+              return date.year == yesterday.year &&
+                  date.month == yesterday.month &&
+                  date.day == yesterday.day;
+            }).toList();
+      } else if (option == "Today") {
+        ordersList =
+            ordersList.where((order) {
+              final date = parseDate(order.dateCreated);
+              return date.year == now.year &&
+                  date.month == now.month &&
+                  date.day == now.day;
+            }).toList();
+      } else if (option == "This Week") {
+        final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+        final endOfWeek = startOfWeek.add(const Duration(days: 6));
+        ordersList =
+            ordersList.where((order) {
+              final date = parseDate(order.dateCreated);
+              return date.isAfter(
+                    startOfWeek.subtract(const Duration(seconds: 1)),
+                  ) &&
+                  date.isBefore(endOfWeek.add(const Duration(days: 1)));
+            }).toList();
+      } else if (option == "This Month") {
+        final startOfMonth = DateTime(now.year, now.month, 1);
+        final endOfMonth = DateTime(now.year, now.month + 1, 0);
+        ordersList =
+            ordersList.where((order) {
+              final date = parseDate(order.dateCreated);
+              return date.isAfter(
+                    startOfMonth.subtract(const Duration(seconds: 1)),
+                  ) &&
+                  date.isBefore(endOfMonth.add(const Duration(days: 1)));
+            }).toList();
       }
     });
+  }
+
+  String formatDate(String? rawDate) {
+    if (rawDate == null || rawDate.isEmpty) return "";
+
+    try {
+      final dateTime = DateTime.parse(rawDate); // parse ISO8601 string
+      return DateFormat("dd MMM yyyy").format(dateTime);
+    } catch (e) {
+      return rawDate; // fallback if parsing fails
+    }
   }
 
   List<CustomerOrderWiseModal> ordersList = [];
@@ -238,7 +320,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   SizedBox(height: 1.h),
                   ordersList.isEmpty || ordersList.isEmpty
                       ? Padding(
-                        padding: EdgeInsets.symmetric(vertical: 15.h),
+                        padding: EdgeInsets.symmetric(
+                          vertical: isIpad ? 2.h : 15.h,
+                        ),
                         child: emptyWidget(
                           icon: Icons.shopping_cart_outlined,
                           text: 'Order History',
@@ -294,7 +378,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                 ),
                                                 decoration: BoxDecoration(
                                                   color: AppColors.greenColor
-                                                      .withOpacity(0.1),
+                                                      .withValues(alpha: 0.1),
                                                   borderRadius:
                                                       BorderRadius.circular(8),
                                                 ),
@@ -312,7 +396,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                 ),
                                               ),
                                               Text(
-                                                order.dateCreated ?? "",
+                                                formatDate(order.dateCreated),
                                                 style: TextStyle(
                                                   fontSize: 16.sp,
                                                   color: AppColors.gray,
@@ -365,370 +449,292 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                               ],
                                             ),
 
-                                            for (var item in order.lineItems!)
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      vertical: 6,
-                                                      horizontal: 12,
-                                                    ),
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    // Product Image
-                                                    ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            8,
-                                                          ),
-                                                      child: CustomNetworkImage(
-                                                        imageUrl:
-                                                            item.image?.src ??
-                                                            "",
-                                                        height: 100,
-                                                        width: 100,
-                                                        isCircle: true,
-                                                        isFit: true,
-                                                        isProfile: false,
-                                                      ),
-                                                    ),
-                                                    SizedBox(width: 2.w),
+                                            Builder(
+                                              builder: (context) {
+                                                double subtotal = 0.0;
+                                                for (var item
+                                                    in order.lineItems ?? []) {
+                                                  // Convert subtotal to double safely
+                                                  final double price =
+                                                      double.tryParse(
+                                                        item.subtotal
+                                                                ?.toString() ??
+                                                            "0",
+                                                      ) ??
+                                                      0.0;
 
-                                                    // Product Details + Quantity & Cart Button
-                                                    Expanded(
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
+                                                  final int qty =
+                                                      item.quantity ?? 0;
+
+                                                  subtotal += price * qty;
+                                                }
+
+                                                return Column(
+                                                  children: [
+                                                    for (var item
+                                                        in order.lineItems!)
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                              vertical: 6,
+                                                              horizontal: 12,
+                                                            ),
+                                                        child: Row(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            // Product Image
+                                                            ClipRRect(
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    8,
+                                                                  ),
+                                                              child: CustomNetworkImage(
+                                                                imageUrl:
+                                                                    item
+                                                                        .image
+                                                                        ?.src ??
+                                                                    "",
+                                                                height: 100,
+                                                                width: 100,
+                                                                isCircle: true,
+                                                                isFit: true,
+                                                                isProfile:
+                                                                    false,
+                                                              ),
+                                                            ),
+                                                            SizedBox(
+                                                              width: 2.w,
+                                                            ),
+
+                                                            // Product Details + Quantity & Cart Button
+                                                            Expanded(
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  // Product Name
+                                                                  Text(
+                                                                    item.name ??
+                                                                        "",
+                                                                    style: TextStyle(
+                                                                      fontSize:
+                                                                          16.sp,
+                                                                      fontFamily:
+                                                                          FontFamily
+                                                                              .semiBold,
+                                                                      color:
+                                                                          AppColors
+                                                                              .blackColor,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height:
+                                                                        0.5.h,
+                                                                  ),
+
+                                                                  // Qty + Price
+                                                                  Text(
+                                                                    "Qty: ${item.quantity}  •  ${order.currencySymbol} ${(item.subtotal ?? 0)}",
+                                                                    style: TextStyle(
+                                                                      fontSize:
+                                                                          16.sp,
+                                                                      color:
+                                                                          AppColors
+                                                                              .gray,
+                                                                      fontFamily:
+                                                                          FontFamily
+                                                                              .semiBold,
+                                                                    ),
+                                                                  ),
+
+                                                                  SizedBox(
+                                                                    height: 1.h,
+                                                                  ),
+                                                                  InkWell(
+                                                                    onTap: () async {
+                                                                      final response = await OrderHistoryProvider.reOrder(
+                                                                        orderId:
+                                                                            order.id,
+                                                                        itemId:
+                                                                            item.id,
+                                                                      );
+
+                                                                      if (response !=
+                                                                              null &&
+                                                                          (response.statusCode ==
+                                                                                  200 ||
+                                                                              response.statusCode ==
+                                                                                  201)) {
+                                                                        // ✅ Online success
+                                                                        showCustomSuccessSnackbar(
+                                                                          title:
+                                                                              "Reorder",
+                                                                          message:
+                                                                              "Reorder has been successfully added to your cart.",
+                                                                        );
+                                                                      } else {
+                                                                        // ⚠️ Offline queued (or failed but saved offline)
+                                                                        showCustomSuccessSnackbar(
+                                                                          title:
+                                                                              "Reorder",
+                                                                          message:
+                                                                              "Reorder has been successfully added to your cart.",
+                                                                        );
+                                                                      }
+                                                                    },
+                                                                    child: Container(
+                                                                      padding: EdgeInsets.symmetric(
+                                                                        horizontal:
+                                                                            2.w,
+                                                                        vertical:
+                                                                            1.h,
+                                                                      ),
+                                                                      decoration: BoxDecoration(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                              10,
+                                                                            ),
+                                                                        color:
+                                                                            AppColors.mainColor,
+                                                                      ),
+                                                                      child: Text(
+                                                                        "Reorder",
+                                                                        style: TextStyle(
+                                                                          fontSize:
+                                                                              14.sp,
+                                                                          fontFamily:
+                                                                              FontFamily.semiBold,
+                                                                          color:
+                                                                              AppColors.whiteColor,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    Divider(),
+
+                                                    SizedBox(height: 0.5.h),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 12,
+                                                          ),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
                                                         children: [
-                                                          // Product Name
                                                           Text(
-                                                            item.name ?? "",
+                                                            "Delivery Note: ${order.orderNote}",
                                                             style: TextStyle(
                                                               fontSize: 16.sp,
+
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
                                                               fontFamily:
                                                                   FontFamily
-                                                                      .semiBold,
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 0.5.h),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 12,
+                                                          ),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                            "Delivery Date:",
+                                                            style: TextStyle(
+                                                              fontSize: 16.sp,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontFamily:
+                                                                  FontFamily
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            "${order.deliveryDate}",
+                                                            style: TextStyle(
+                                                              fontSize: 16.sp,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontFamily:
+                                                                  FontFamily
+                                                                      .bold,
                                                               color:
                                                                   AppColors
                                                                       .blackColor,
                                                             ),
                                                           ),
-                                                          SizedBox(
-                                                            height: 0.5.h,
-                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
 
-                                                          // Qty + Price
+                                                    SizedBox(height: 0.5.h),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 12,
+                                                          ),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
                                                           Text(
-                                                            "Qty: ${item.quantity}  •  ${order.currencySymbol} ${item.price ?? ""}",
+                                                            "Sub Total:",
                                                             style: TextStyle(
                                                               fontSize: 16.sp,
-                                                              color:
-                                                                  AppColors
-                                                                      .gray,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
                                                               fontFamily:
                                                                   FontFamily
-                                                                      .semiBold,
+                                                                      .bold,
                                                             ),
                                                           ),
-                                                          SizedBox(height: 1.h),
-                                                          InkWell(
-                                                            onTap: () async {
-                                                              // await OrderHistoryProvider.reOrder(
-                                                              //  itemId:item.id,
-                                                              //   orderId:order.id,
-                                                              //
-                                                              //
-                                                              //
-                                                              // );
-                                                              final response =
-                                                                  await OrderHistoryProvider.reOrder(
-                                                                    orderId:
-                                                                        order
-                                                                            .id,
-                                                                    itemId:
-                                                                        item.id,
-                                                                  );
-
-                                                              if (response !=
-                                                                      null &&
-                                                                  (response.statusCode ==
-                                                                          200 ||
-                                                                      response.statusCode ==
-                                                                          201)) {
-                                                                // ✅ Online success
-                                                                showCustomSuccessSnackbar(
-                                                                  title:
-                                                                      "Reorder",
-                                                                  message:
-                                                                      "Reorder has been successfully added to your cart.",
-                                                                );
-                                                              } else {
-                                                                // ⚠️ Offline queued (or failed but saved offline)
-                                                                showCustomSuccessSnackbar(
-                                                                  title:
-                                                                      "Reorder",
-                                                                  message:
-                                                                      "Reorder has been successfully added to your cart.",
-                                                                );
-                                                              }
-                                                            },
-                                                            child: Container(
-                                                              padding:
-                                                                  EdgeInsets.symmetric(
-                                                                    horizontal:
-                                                                        2.w,
-                                                                    vertical:
-                                                                        1.h,
-                                                                  ),
-                                                              decoration: BoxDecoration(
-                                                                borderRadius:
-                                                                    BorderRadius.circular(
-                                                                      10,
-                                                                    ),
-                                                                color:
-                                                                    AppColors
-                                                                        .mainColor,
-                                                              ),
-                                                              child: Text(
-                                                                "Reorder",
-                                                                style: TextStyle(
-                                                                  fontSize:
-                                                                      14.sp,
-                                                                  fontFamily:
-                                                                      FontFamily
-                                                                          .semiBold,
-                                                                  color:
-                                                                      AppColors
-                                                                          .whiteColor,
-                                                                ),
-                                                              ),
+                                                          Text(
+                                                            "${order.currencySymbol} ${subtotal.toStringAsFixed(2)}",
+                                                            style: TextStyle(
+                                                              fontSize: 16.sp,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontFamily:
+                                                                  FontFamily
+                                                                      .bold,
+                                                              color:
+                                                                  AppColors
+                                                                      .blackColor,
                                                             ),
                                                           ),
-                                                          // IntrinsicWidth(
-                                                          //   child: Container(
-                                                          //     padding:
-                                                          //         EdgeInsets.symmetric(
-                                                          //           horizontal:
-                                                          //               isIpad
-                                                          //                   ? 0
-                                                          //                   : 2.w,
-                                                          //           vertical:
-                                                          //               0.5.h,
-                                                          //         ),
-                                                          //     decoration: BoxDecoration(
-                                                          //       color:
-                                                          //           AppColors
-                                                          //               .containerColor,
-                                                          //       borderRadius:
-                                                          //           BorderRadius.circular(
-                                                          //             30,
-                                                          //           ),
-                                                          //     ),
-                                                          //     child: Row(
-                                                          //       children: [
-                                                          //         // Decrease
-                                                          //         GestureDetector(
-                                                          //           onTap:
-                                                          //               () {},
-                                                          //           child: Container(
-                                                          //             padding:
-                                                          //                 EdgeInsets.all(
-                                                          //                   1.5.w,
-                                                          //                 ),
-                                                          //             decoration: BoxDecoration(
-                                                          //               color:
-                                                          //                   AppColors.cardBgColor,
-                                                          //               shape:
-                                                          //                   BoxShape.circle,
-                                                          //             ),
-                                                          //             child: Icon(
-                                                          //               Icons
-                                                          //                   .remove,
-                                                          //               size:
-                                                          //                   isIpad
-                                                          //                       ? 12.sp
-                                                          //                       : 16.sp,
-                                                          //               color:
-                                                          //                   AppColors.blackColor,
-                                                          //             ),
-                                                          //           ),
-                                                          //         ),
-                                                          //
-                                                          //         SizedBox(
-                                                          //           width: 4.w,
-                                                          //         ),
-                                                          //
-                                                          //         // Increase
-                                                          //         GestureDetector(
-                                                          //           onTap: () {
-                                                          //             setState(
-                                                          //               () {},
-                                                          //             );
-                                                          //           },
-                                                          //           child: Container(
-                                                          //             padding:
-                                                          //                 EdgeInsets.all(
-                                                          //                   1.5.w,
-                                                          //                 ),
-                                                          //             decoration: BoxDecoration(
-                                                          //               color:
-                                                          //                   AppColors.cardBgColor,
-                                                          //               shape:
-                                                          //                   BoxShape.circle,
-                                                          //             ),
-                                                          //             child: Icon(
-                                                          //               Icons
-                                                          //                   .add,
-                                                          //               size:
-                                                          //                   isIpad
-                                                          //                       ? 12.sp
-                                                          //                       : 16.sp,
-                                                          //               color:
-                                                          //                   AppColors.blackColor,
-                                                          //             ),
-                                                          //           ),
-                                                          //         ),
-                                                          //       ],
-                                                          //     ),
-                                                          //   ),
-                                                          // ),
-                                                          // Quantity Selector + Cart Button
-                                                          // Row(
-                                                          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                          //   children: [
-                                                          //     // Quantity Selector
-                                                          //     Container(
-                                                          //       padding: EdgeInsets.symmetric(
-                                                          //         horizontal: isIpad ? 0 : 2.w,
-                                                          //         vertical: 0.5.h,
-                                                          //       ),
-                                                          //       decoration: BoxDecoration(
-                                                          //         color: AppColors.containerColor,
-                                                          //         borderRadius: BorderRadius.circular(30),
-                                                          //       ),
-                                                          //       child: Row(
-                                                          //         children: [
-                                                          //           // Decrease Button
-                                                          //           GestureDetector(
-                                                          //             onTap: product.inStock && product.quantity > 0
-                                                          //                 ? () => setState(() => product.quantity--)
-                                                          //                 : null,
-                                                          //             child: Container(
-                                                          //               padding: EdgeInsets.all(1.5.w),
-                                                          //               decoration: BoxDecoration(
-                                                          //                 color: AppColors.cardBgColor,
-                                                          //                 shape: BoxShape.circle,
-                                                          //               ),
-                                                          //               child: Icon(
-                                                          //                 Icons.remove,
-                                                          //                 size: isIpad ? 12.sp : 16.sp,
-                                                          //                 color: AppColors.blackColor,
-                                                          //               ),
-                                                          //             ),
-                                                          //           ),
-                                                          //           SizedBox(width: 1.w),
-                                                          //
-                                                          //           // Quantity Text
-                                                          //           Text(
-                                                          //             product.quantity.toString(),
-                                                          //             style: TextStyle(
-                                                          //               fontSize: 14.sp,
-                                                          //               fontFamily: FontFamily.semiBold,
-                                                          //               color: AppColors.blackColor,
-                                                          //             ),
-                                                          //           ),
-                                                          //           SizedBox(width: 1.w),
-                                                          //
-                                                          //           // Increase Button
-                                                          //           GestureDetector(
-                                                          //             onTap: product.inStock
-                                                          //                 ? () => setState(() => product.quantity++)
-                                                          //                 : null,
-                                                          //             child: Container(
-                                                          //               padding: EdgeInsets.all(1.5.w),
-                                                          //               decoration: BoxDecoration(
-                                                          //                 color: AppColors.cardBgColor,
-                                                          //                 shape: BoxShape.circle,
-                                                          //               ),
-                                                          //               child: Icon(
-                                                          //                 Icons.add,
-                                                          //                 size: isIpad ? 12.sp : 16.sp,
-                                                          //                 color: AppColors.blackColor,
-                                                          //               ),
-                                                          //             ),
-                                                          //           ),
-                                                          //         ],
-                                                          //       ),
-                                                          //     ),
-                                                          //
-                                                          //     // Add to Cart Button
-                                                          //     InkWell(
-                                                          //       onTap: product.inStock
-                                                          //           ? () {
-                                                          //         // handle add to cart
-                                                          //       }
-                                                          //           : null,
-                                                          //       borderRadius: BorderRadius.circular(30),
-                                                          //       child: Container(
-                                                          //         padding: EdgeInsets.all(1.5.w),
-                                                          //         decoration: BoxDecoration(
-                                                          //           color: AppColors.mainColor,
-                                                          //           shape: BoxShape.circle,
-                                                          //         ),
-                                                          //         child: Icon(
-                                                          //           Icons.shopping_cart_outlined,
-                                                          //           color: Colors.white,
-                                                          //           size: isIpad ? 15.sp : 18.sp,
-                                                          //         ),
-                                                          //       ),
-                                                          //     ),
-                                                          //   ],
-                                                          // ),
                                                         ],
                                                       ),
                                                     ),
                                                   ],
-                                                ),
-                                              ),
-                                            Divider(),
-                                            // SizedBox(height: 0.5.h),
-                                            // Padding(
-                                            //   padding:
-                                            //       const EdgeInsets.symmetric(
-                                            //         horizontal: 12,
-                                            //       ),
-                                            //   child: Row(
-                                            //     mainAxisAlignment:
-                                            //         MainAxisAlignment
-                                            //             .spaceBetween,
-                                            //     children: [
-                                            //       Text(
-                                            //         "Sub Total:",
-                                            //         style: TextStyle(
-                                            //           fontSize: 16.sp,
-                                            //           fontWeight:
-                                            //               FontWeight.bold,
-                                            //           fontFamily:
-                                            //               FontFamily.bold,
-                                            //         ),
-                                            //       ),
-                                            //       Text(
-                                            //         "${order.currencySymbol} ${order.total ?? ""}",
-                                            //         style: TextStyle(
-                                            //           fontSize: 16.sp,
-                                            //           fontWeight:
-                                            //               FontWeight.bold,
-                                            //           fontFamily:
-                                            //               FontFamily.bold,
-                                            //           color:
-                                            //               AppColors.blackColor,
-                                            //         ),
-                                            //       ),
-                                            //     ],
-                                            //   ),
-                                            // ),
+                                                );
+                                              },
+                                            ),
                                             SizedBox(height: 0.5.h),
                                             Padding(
                                               padding:
@@ -751,7 +757,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    "${order.currencySymbol} ${order.shippingTotal ?? ""}",
+                                                    " + ${order.currencySymbol} ${order.shippingTotal ?? ""}",
                                                     style: TextStyle(
                                                       fontSize: 16.sp,
                                                       fontWeight:
@@ -787,7 +793,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    "${order.currencySymbol} ${((double.tryParse(order.discountTotal?.toString() ?? "0") ?? 0) / 100).toStringAsFixed(2)}",
+                                                    "- ${order.currencySymbol} ${((double.tryParse(order.discountTotal?.toString() ?? "0") ?? 0)).toStringAsFixed(2)}",
 
                                                     style: TextStyle(
                                                       fontSize: 16.sp,
@@ -824,7 +830,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    "${order.currencySymbol} ${((double.tryParse(order.total?.toString() ?? "0") ?? 0) / 100).toStringAsFixed(2)}",
+                                                    "${order.currencySymbol} ${((double.tryParse(order.total?.toString() ?? "0") ?? 0)).toStringAsFixed(2)}",
 
                                                     style: TextStyle(
                                                       fontSize: 16.sp,
@@ -859,6 +865,60 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     );
   }
 
+  // Future<void> _fetchOrders() async {
+  //   var box = HiveService().getOrdersBox();
+  //
+  //   if (!await checkInternet()) {
+  //     final cachedData = box.get('orders_$customerId');
+  //     if (cachedData != null) {
+  //       final List data = json.decode(cachedData);
+  //       ordersList =
+  //           data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
+  //     } else {
+  //       showCustomErrorSnackbar(
+  //         title: 'No Internet',
+  //         message: 'Please check your connection and try again.',
+  //       );
+  //     }
+  //     return;
+  //   }
+  //
+  //   try {
+  //     final response = await OrderHistoryProvider().fetchOrders(customerId);
+  //     if (response.statusCode == 200) {
+  //       final List data = json.decode(response.body);
+  //       ordersList =
+  //           data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
+  //
+  //       // Save banner to Hive
+  //       await box.put('orders_$customerId', response.body);
+  //     } else {
+  //       // Fallback: load cache if server fails
+  //       final cachedData = box.get('orders_$customerId');
+  //       if (cachedData != null) {
+  //         final List data = json.decode(cachedData);
+  //         ordersList =
+  //             data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
+  //       }
+  //       showCustomErrorSnackbar(
+  //         title: 'Server Error',
+  //         message: 'Something went wrong. Please try again later.',
+  //       );
+  //     }
+  //   } catch (_) {
+  //     // Fallback: load cache on network error
+  //     final cachedData = box.get('orders_$customerId');
+  //     if (cachedData != null) {
+  //       final List data = json.decode(cachedData);
+  //       ordersList =
+  //           data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
+  //     }
+  //     showCustomErrorSnackbar(
+  //       title: 'Network Error',
+  //       message: 'Unable to connect. Please check your internet and try again.',
+  //     );
+  //   }
+  // }
   Future<void> _fetchOrders() async {
     var box = HiveService().getOrdersBox();
 
@@ -866,8 +926,23 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       final cachedData = box.get('orders_$customerId');
       if (cachedData != null) {
         final List data = json.decode(cachedData);
-        ordersList =
+        final fetchedOrders =
             data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
+
+        setState(() {
+          _allOrdersList = fetchedOrders;
+          ordersList = List.from(_allOrdersList);
+          // Apply current sort option after fetching
+          if (selectedSort.isNotEmpty && selectedSort != "All") {
+            sortOrders(selectedSort);
+          } else {
+            // Default to newest first
+            ordersList.sort(
+              (a, b) =>
+                  parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
+            );
+          }
+        });
       } else {
         showCustomErrorSnackbar(
           title: 'No Internet',
@@ -881,18 +956,41 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       final response = await OrderHistoryProvider().fetchOrders(customerId);
       if (response.statusCode == 200) {
         final List data = json.decode(response.body);
-        ordersList =
+        final fetchedOrders =
             data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
 
-        // Save banner to Hive
+        setState(() {
+          _allOrdersList = fetchedOrders;
+          ordersList = List.from(_allOrdersList);
+          // Apply current sort option after fetching
+          if (selectedSort.isNotEmpty && selectedSort != "All") {
+            sortOrders(selectedSort);
+          } else {
+            // Default to newest first
+            ordersList.sort(
+              (a, b) =>
+                  parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
+            );
+          }
+        });
+
+        // Save to Hive
         await box.put('orders_$customerId', response.body);
       } else {
         // Fallback: load cache if server fails
         final cachedData = box.get('orders_$customerId');
         if (cachedData != null) {
           final List data = json.decode(cachedData);
-          ordersList =
+          final fetchedOrders =
               data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
+
+          setState(() {
+            _allOrdersList = fetchedOrders;
+            ordersList = List.from(_allOrdersList);
+            if (selectedSort.isNotEmpty && selectedSort != "All") {
+              sortOrders(selectedSort);
+            }
+          });
         }
         showCustomErrorSnackbar(
           title: 'Server Error',
@@ -904,13 +1002,44 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       final cachedData = box.get('orders_$customerId');
       if (cachedData != null) {
         final List data = json.decode(cachedData);
-        ordersList =
+        final fetchedOrders =
             data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
+
+        setState(() {
+          _allOrdersList = fetchedOrders;
+          ordersList = List.from(_allOrdersList);
+          if (selectedSort.isNotEmpty && selectedSort != "All") {
+            sortOrders(selectedSort);
+          }
+        });
       }
       showCustomErrorSnackbar(
         title: 'Network Error',
         message: 'Unable to connect. Please check your internet and try again.',
       );
     }
+  }
+
+  // Add a refresh method
+  Future<void> refreshOrders() async {
+    setState(() {
+      ordersList = List.from(_allOrdersList);
+      selectedSort = "All";
+      // Reset to default sort (newest first)
+      ordersList.sort(
+        (a, b) => parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
+      );
+    });
+  }
+
+  // Or if you want a simple reset method
+  void resetOrders() {
+    setState(() {
+      ordersList = List.from(_allOrdersList);
+      selectedSort = "All";
+      ordersList.sort(
+        (a, b) => parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
+      );
+    });
   }
 }

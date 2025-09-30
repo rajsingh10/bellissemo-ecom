@@ -798,7 +798,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               filteredProducts.isEmpty
                                   ? Padding(
                                     padding: EdgeInsets.symmetric(
-                                      vertical: 15.h,
+                                      vertical: isIpad ? 2.h : 15.h,
                                     ),
                                     child: emptyWidget(
                                       icon: Icons.production_quantity_limits,

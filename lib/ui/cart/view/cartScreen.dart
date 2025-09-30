@@ -140,7 +140,9 @@ class _CartScreenState extends State<CartScreen> {
                           viewCartData?.items?.length == null ||
                           viewCartData?.items?.length == []
                       ? Padding(
-                        padding: EdgeInsets.symmetric(vertical: 15.h),
+                        padding: EdgeInsets.symmetric(
+                          vertical: isIpad ? 2.h : 15.h,
+                        ),
                         child: emptyWidget(
                           icon: Icons.shopping_cart_outlined,
                           text: 'Cart',
@@ -1108,7 +1110,7 @@ class _CartScreenState extends State<CartScreen> {
                                           ),
                                         ),
                                         Text(
-                                          "${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.totalDiscount ?? '0')! / 100).toStringAsFixed(2)}",
+                                          "- ${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.totalDiscount ?? '0')! / 100).toStringAsFixed(2)}",
 
                                           // "\$ ${tax.toStringAsFixed(2)}",
                                           style: TextStyle(
@@ -1610,6 +1612,12 @@ class _CartScreenState extends State<CartScreen> {
                                   child: ListTile(
                                     title: Text(
                                       coupon.code ?? "",
+                                      style: TextStyle(
+                                        fontFamily: FontFamily.semiBold,
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      coupon.description ?? "",
                                       style: TextStyle(
                                         fontFamily: FontFamily.semiBold,
                                       ),

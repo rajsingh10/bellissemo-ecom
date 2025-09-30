@@ -1033,6 +1033,10 @@ class CartService {
   //     return null;
   //   }
   // }
+  String prettyPrintDynamicJson(dynamic json) {
+    const encoder = JsonEncoder.withIndent('  ');
+    return encoder.convert(json);
+  }
 
   Future<Response?> submitOrderApi({
     required String note,
@@ -1063,8 +1067,16 @@ class CartService {
       "status": "completed",
     };
 
-    print("📦 Cart Body:\n${prettyPrintJson(body)}");
+    log("📦 Cart Body (Payload Sent to API):\n${prettyPrintJson(body)}");
 
+    final couponLines = body["coupon_lines"];
+    if (couponLines != null && couponLines is List && couponLines.isNotEmpty) {
+      print(
+        "🎟️ Coupon Lines:\n${prettyPrintJson({"coupon_lines": couponLines})}",
+      );
+    } else {
+      print("🎟️ No Coupon Lines Applied.");
+    }
     // 🔹 Check Internet
     if (!await checkInternet()) {
       await _saveOfflineOrder(box, body);

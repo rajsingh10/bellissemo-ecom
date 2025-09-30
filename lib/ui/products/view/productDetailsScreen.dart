@@ -141,7 +141,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
                     SizedBox(height: 2.h),
                     Padding(
-                      padding: EdgeInsets.symmetric(vertical: 15.h),
+                      padding: EdgeInsets.symmetric(
+                        vertical: isIpad ? 2.h : 15.h,
+                      ),
                       child: emptyWidget(
                         icon: Icons.shopping_cart_outlined,
                         text: 'Product Details',
