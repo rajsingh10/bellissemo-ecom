@@ -14,6 +14,7 @@ import '../services/addressService.dart';
 
 class CustomerAddressScreen extends StatefulWidget {
   String? fName,
+
       lName,
       email,
       address1,
@@ -22,7 +23,9 @@ class CustomerAddressScreen extends StatefulWidget {
       postcode,
       state,
       country,
-      id;
+      id
+  ;
+  String? crdit;
 
   CustomerAddressScreen({
     super.key,
@@ -31,6 +34,7 @@ class CustomerAddressScreen extends StatefulWidget {
     required this.email,
     required this.address1,
     required this.address2,
+    required this.crdit,
     required this.city,
     required this.postcode,
     required this.state,
@@ -261,7 +265,7 @@ class _CustomerAddressScreenState extends State<CustomerAddressScreen> {
                           isAdding = false;
                         });
                         Get.offAll(CartScreen());
-                        Get.to(CheckOutScreen());
+                        Get.to(CheckOutScreen(cridit:widget.crdit ?? "",));
                       } else if (response != null) {
                         showCustomErrorSnackbar(
                           title: "Update Failed",

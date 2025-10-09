@@ -23,10 +23,12 @@ class ConnectivityManager {
           await CartService().syncOfflineCart();
           await CartService().syncOfflineActions();
           await CartService().syncOfflineUpdate();
-          await CartService().syncOfflineOrders();
-          await CartService().syncAppliedCoupons();
+
+          // await CartService().syncAppliedCoupons();
+          await CartService().syncAppliedDiscounts();
           await UpdateAddressService().syncOfflineAddress();
           await OrderHistoryProvider().syncReOrders();
+          await CartService().syncOfflineOrders();
         }
       });
     });

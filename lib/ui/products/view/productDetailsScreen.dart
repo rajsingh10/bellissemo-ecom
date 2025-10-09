@@ -779,8 +779,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   Future<void> _addVariationProductsToCart() async {
+
     setState(() {
       isAddingToCart = true;
+
     });
     final cartService = CartService();
 
@@ -829,6 +831,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   Future<void> _addSimpleProductsToCart() async {
     setState(() {
       isAddingToCart = true;
+
     });
     final cartService = CartService();
 

@@ -569,20 +569,20 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                                               response.statusCode ==
                                                                                   201)) {
                                                                         // ✅ Online success
-                                                                        showCustomSuccessSnackbar(
-                                                                          title:
-                                                                              "Reorder",
-                                                                          message:
-                                                                              "Reorder has been successfully added to your cart.",
-                                                                        );
+                                                                        // showCustomSuccessSnackbar(
+                                                                        //   title:
+                                                                        //       "Reorder",
+                                                                        //   message:
+                                                                        //       "Reorder has been successfully added to your cart.",
+                                                                        // );
                                                                       } else {
                                                                         // ⚠️ Offline queued (or failed but saved offline)
-                                                                        showCustomSuccessSnackbar(
-                                                                          title:
-                                                                              "Reorder",
-                                                                          message:
-                                                                              "Reorder has been successfully added to your cart.",
-                                                                        );
+                                                                        // showCustomSuccessSnackbar(
+                                                                        //   title:
+                                                                        //       "Reorder",
+                                                                        //   message:
+                                                                        //       "Reorder has been successfully added to your cart.",
+                                                                        // );
                                                                       }
                                                                     },
                                                                     child: Container(

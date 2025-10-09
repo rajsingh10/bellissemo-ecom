@@ -1149,8 +1149,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             isIpad
                                 ? Text(
                                   product.packSize == ""
-                                      ? 'Pack : 1 Item'
-                                      : 'Pack : ${product.packSize} Items',
+                                      ? 'MOQ : 1'
+                                      : 'MOQ : ${product.packSize}',
                                   style: TextStyle(
                                     fontSize: 14.sp,
                                     fontFamily: FontFamily.regular,
@@ -1159,8 +1159,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                 )
                                 : Text(
                                   product.packSize == ""
-                                      ? 'Pack size : 1 Item'
-                                      : 'Pack size : ${product.packSize} Items',
+                                      ? 'MOQ : 1'
+                                      : 'MOQ : ${product.packSize}',
                                   style: TextStyle(
                                     fontSize: 14.sp,
                                     fontFamily: FontFamily.regular,
@@ -1168,7 +1168,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                   ),
                                 ),
                             Text(
-                              "${product.cartQuantity} Qty",
+                              "${product.cartQuantity==0||product.cartQuantity==null||product.cartQuantity==""||product.cartQuantity=="0"?"":product.cartQuantity} Qty",
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontFamily: FontFamily.semiBold,
@@ -1181,7 +1181,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Pack size : ${product.firstVariation?.packSize} Items',
+                              'MOQ : ${product.firstVariation?.packSize}',
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontFamily: FontFamily.regular,
@@ -1189,7 +1189,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               ),
                             ),
                             Text(
-                              "${product.cartQuantity} Qty",
+                              "${product.cartQuantity==0||product.cartQuantity==null||product.cartQuantity==""||product.cartQuantity=="0"?"":product.cartQuantity} Qty",
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontFamily: FontFamily.semiBold,
@@ -1311,11 +1311,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
         message = "Product added offline. It will sync once internet is back.";
       }
 
-      showCustomSuccessSnackbar(
-        title:
-            message.contains("update") ? "Quantity Updated" : "Added to Cart",
-        message: message,
-      );
+      // showCustomSuccessSnackbar(
+      //   title:
+      //       message.contains("update") ? "Quantity Updated" : "Added to Cart",
+      //   message: message,
+      // );
     } catch (e) {
       showCustomErrorSnackbar(
         title: "Error",
@@ -1358,11 +1358,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
         message = "Product added offline. It will sync once internet is back.";
       }
 
-      showCustomSuccessSnackbar(
-        title:
-            message.contains("update") ? "Quantity Updated" : "Added to Cart",
-        message: message,
-      );
+      // showCustomSuccessSnackbar(
+      //   title:
+      //       message.contains("update") ? "Quantity Updated" : "Added to Cart",
+      //   message: message,
+      // );
     } catch (e) {
       showCustomErrorSnackbar(
         title: "Error",
@@ -1413,10 +1413,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
         if (response.statusCode == 200 || response.statusCode == 201) {
           final message =
               response.data?["message"] ?? "Product quantity removed.";
-          showCustomSuccessSnackbar(
-            title: "Quantity Updated",
-            message: message,
-          );
+          // showCustomSuccessSnackbar(
+          //   title: "Quantity Updated",
+          //   message: message,
+          // );
         } else if (response.statusCode == 204) {
           showCustomErrorSnackbar(
             title: "Cart Empty",

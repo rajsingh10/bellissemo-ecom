@@ -1012,8 +1012,8 @@ class _HomescreenState extends State<Homescreen> {
                             isIpad
                                 ? Text(
                                   product.packSize == ""
-                                      ? 'Pack : 1 Item'
-                                      : 'Pack : ${product.packSize} Items',
+                                      ? 'MOQ : 1'
+                                      : 'MOQ : ${product.packSize}',
                                   style: TextStyle(
                                     fontSize: 14.sp,
                                     fontFamily: FontFamily.regular,
@@ -1022,8 +1022,8 @@ class _HomescreenState extends State<Homescreen> {
                                 )
                                 : Text(
                                   product.packSize == ""
-                                      ? 'Pack size : 1 Item'
-                                      : 'Pack size : ${product.packSize} Items',
+                                      ? 'MOQ : 1 Item'
+                                      : 'MOQ :${product.packSize}',
                                   style: TextStyle(
                                     fontSize: 14.sp,
                                     fontFamily: FontFamily.regular,
@@ -1031,7 +1031,7 @@ class _HomescreenState extends State<Homescreen> {
                                   ),
                                 ),
                             Text(
-                              "${product.cartQuantity} Qty",
+                              "${product.cartQuantity==0||product.cartQuantity==null||product.cartQuantity==""||product.cartQuantity=="0"?"":product.cartQuantity} Qty",
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontFamily: FontFamily.semiBold,
@@ -1044,7 +1044,7 @@ class _HomescreenState extends State<Homescreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Pack size : ${product.firstVariation?.packSize} Items',
+                              'MOQ : ${product.firstVariation?.packSize}',
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontFamily: FontFamily.regular,
@@ -1052,7 +1052,7 @@ class _HomescreenState extends State<Homescreen> {
                               ),
                             ),
                             Text(
-                              "${product.cartQuantity} Qty",
+                              "${product.cartQuantity==0||product.cartQuantity==null||product.cartQuantity==""||product.cartQuantity=="0"?"":product.cartQuantity} Qty",
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontFamily: FontFamily.semiBold,

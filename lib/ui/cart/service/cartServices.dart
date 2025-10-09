@@ -129,7 +129,8 @@ class CartService {
           );
           await box.delete(key);
         }
-      } catch (e) {
+      } catch (e, stackTrack) {
+        print("stackTrack======>>>>>>>${stackTrack}");
         log(
           "⚠️ Failed to sync offline cart item: ${body["product_id"]}, Error: $e",
         );
@@ -220,20 +221,56 @@ class CartService {
       if (data == null) continue;
 
       try {
+        final quantity = (data['quantity'] ?? 1) as int;
+        final overridePrice = (data['override_price'] ?? 0) as int;
+        final cartItemKey = data['cart_item_key']?.toString() ?? "";
+
         await increaseCart(
-          cartItemKey: data['cart_item_key'],
-          currentQuantity: data['quantity'] - 1, // because increaseCart adds 1
-          isSync: true, // important: prevent infinite loop
+          overrideprice: overridePrice,
+          cartItemKey: cartItemKey,
+          currentQuantity: quantity - 1, // safe
+          isSync: true,
         );
+
         await box.delete(key); // remove from offline queue on success
-        print(
-          "✅ Synced offline cart → ${data['cart_item_key']} : ${data['quantity']}",
-        );
-      } catch (e) {
+        print("✅ Synced offline cart → $cartItemKey : $quantity");
+      } catch (e, stackTrace) {
         print("⚠️ Failed to sync offline cart → ${data['cart_item_key']}: $e");
+        print(stackTrace);
       }
     }
   }
+
+  // Future<void> syncOfflineUpdate() async {
+  //   final box = HiveService().getAddCartBox();
+  //   if (!await checkInternet()) return; // only sync when online
+  //
+  //   final keys =
+  //       box.keys
+  //           .where((k) => k.toString().startsWith("offline_update_cart_"))
+  //           .toList();
+  //
+  //   for (var key in keys) {
+  //     final data = box.get(key);
+  //     if (data == null) continue;
+  //
+  //     try {
+  //       await increaseCart(
+  //         overrideprice: data['override_price'] as int,
+  //         cartItemKey: data['cart_item_key'],
+  //         currentQuantity: data['quantity'] - 1, // because increaseCart adds 1
+  //         isSync: true, // important: prevent infinite loop
+  //       );
+  //       await box.delete(key); // remove from offline queue on success
+  //       print(
+  //         "✅ Synced offline cart → ${data['cart_item_key']} : ${data['quantity']}",
+  //       );
+  //     } catch (e,stackTrace) {
+  //       print("shu ave he arun bafat  ${stackTrace}");
+  //       print("⚠️ Failed to sync offline cart → ${data['cart_item_key']}: $e");
+  //     }
+  //   }
+  // }
 
   // ----------------- Get Product Cart Data -----------------
   Future<Map<String, dynamic>> getProductCartData({
@@ -574,9 +611,20 @@ class CartService {
   Future<Response?> increaseCart({
     required String cartItemKey,
     required int currentQuantity,
+    required int overrideprice,
+    bool online=false,
     bool isSync = false, // prevent infinite loop during sync
   }) async {
-    final newQuantity = currentQuantity + 1;
+    final newQuantity;
+    print("false shu ave che ${online}");
+    if(online==true){
+       newQuantity = currentQuantity;
+       print("a call thay che ho ${newQuantity}");
+    }else{
+       newQuantity = currentQuantity + 1;
+       print("a call thay che ${newQuantity}");
+    }
+
 
     final box = HiveService().getAddCartBox();
     final cacheBox = HiveService().getProductCartDataBox();
@@ -586,6 +634,7 @@ class CartService {
     await cacheBox.put("cartData_$cartItemKey", {
       "totalQuantity": newQuantity,
       "cartItemKey": cartItemKey,
+      "override_price": overrideprice,
     });
 
     print("🛒 Local cache updated → $cartItemKey : $newQuantity");
@@ -599,6 +648,7 @@ class CartService {
             "action": "update_qty",
             "cart_item_key": cartItemKey,
             "quantity": newQuantity,
+            "override_price": overrideprice,
             "timestamp": DateTime.now().toIso8601String(),
           },
         );
@@ -619,7 +669,11 @@ class CartService {
         "Accept": "application/json",
       };
 
-      final body = {"cart_item_key": cartItemKey, "quantity": newQuantity};
+      final body = {
+        "cart_item_key": cartItemKey,
+        "quantity": newQuantity,
+        "override_price": overrideprice,
+      };
 
       final response = await _dio.post(
         apiEndpoints.updateCart,
@@ -640,6 +694,7 @@ class CartService {
             "action": "update_qty",
             "cart_item_key": cartItemKey,
             "quantity": newQuantity,
+            "override_price": overrideprice,
             "timestamp": DateTime.now().toIso8601String(),
           },
         );
@@ -1043,6 +1098,7 @@ class CartService {
     required String deliveryDate,
     required var shippingCharge,
     int? customerId,
+    required String crdit,
     required List<Map<String, dynamic>> items,
     List<Map<String, dynamic>>? coupons,
   }) async {
@@ -1065,6 +1121,7 @@ class CartService {
       "delivery_date": deliveryDate,
       "hide_prices_by_default": false,
       "status": "completed",
+      "payment_term": crdit,
     };
 
     log("📦 Cart Body (Payload Sent to API):\n${prettyPrintJson(body)}");
@@ -1258,6 +1315,7 @@ class CartService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("✅ Coupon applied online → $couponCode");
         onSuccess();
+
       }
 
       return response;
@@ -1374,6 +1432,7 @@ class CartService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("✅ Coupon removed online → $couponCode");
+        print("✅ Coupon removed online → $response");
         onSuccess();
       }
 
@@ -1435,4 +1494,189 @@ class CartService {
       }
     }
   }
+
+
+
+
+  /// dicount api
+
+  Future<Response?> applyDiscount({
+    required int customerId,
+    required bool enabled,
+    required String discountType,
+    required double discountValue,
+    required Callback onSuccess,
+    bool isSync = false,
+  })
+  async {
+    final box = HiveService().getAddCartBox();
+    final cacheBox = HiveService().getProductCartDataBox();
+    if (!cacheBox.isOpen) await HiveService().init();
+
+    await cacheBox.put("applied_discount", {
+      "customerId": customerId,
+      "enabled": enabled,
+      "discountType": discountType,
+      "discountValue": discountValue,
+      "appliedAt": DateTime.now().toIso8601String(),
+    });
+
+    print("💸 Local discount cache updated → $discountValue");
+
+    if (!await checkInternet()) {
+      if (!isSync) {
+        await box.put(
+          "offline_apply_discount_${DateTime.now().millisecondsSinceEpoch}",
+          {
+            "action": "apply_discount",
+            "customer_id": customerId,
+            "enabled": enabled,
+            "discount_type": discountType,
+            "discount_value": discountValue,
+            "timestamp": DateTime.now().toIso8601String(),
+          },
+        );
+        print("⚠️ Offline: queued discount apply → $discountValue");
+      }
+      return null;
+    }
+
+    try {
+      final loginData = await SaveDataLocal.getDataFromLocal();
+      final token = loginData?.token ?? '';
+      if (token.isEmpty) throw Exception("Token not found");
+
+      final headers = {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      };
+
+      final body = {
+        "customer_id": customerId,
+        "enabled": enabled,
+        "discount_type": discountType,
+        "discount_value": discountValue,
+      };
+
+      print("Sending body: $body");
+      print("Endpoint: ${apiEndpoints.updatediscount}");
+
+      final response = await _dio.post(
+        apiEndpoints.updatediscount,
+        data: jsonEncode(body),
+        options: Options(
+          headers: headers,
+          validateStatus: (status) {
+            // accept also error codes so Dio won't throw automatically for some statuses
+            return status != null && status < 500;
+          },
+        ),
+      );
+
+      print("Response status: ${response.statusCode}");
+      print("Response data: ${response.data}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("✅ Discount applied online → $discountValue");
+        onSuccess();
+      } else {
+        // handle non‑success statuses
+        print("❌ API responded with non-success code");
+        // you may throw or handle differently
+      }
+
+      return response;
+    } on DioException catch (dioErr) {
+      print("DioException caught!");
+      print("Type: ${dioErr.type}");
+      print("RequestOptions: ${dioErr.requestOptions}");
+      if (dioErr.response != null) {
+        print("Error response status: ${dioErr.response?.statusCode}");
+        print("Error response data: ${dioErr.response?.data}");
+      } else {
+        print("No response received, error: ${dioErr.message}");
+      }
+
+      if (!isSync) {
+        await box.put(
+          "offline_apply_discount_${DateTime.now().millisecondsSinceEpoch}",
+          {
+            "action": "apply_discount",
+            "customer_id": customerId,
+            "enabled": enabled,
+            "discount_type": discountType,
+            "discount_value": discountValue,
+            "timestamp": DateTime.now().toIso8601String(),
+          },
+        );
+        print("⚠️ Failed online, saved offline → $discountValue");
+      }
+
+      return null;
+    } catch (e) {
+      // generic catch
+      print("Unknown error: $e");
+      if (!isSync) {
+        await box.put(
+          "offline_apply_discount_${DateTime.now().millisecondsSinceEpoch}",
+          {
+            "action": "apply_discount",
+            "customer_id": customerId,
+            "enabled": enabled,
+            "discount_type": discountType,
+            "discount_value": discountValue,
+            "timestamp": DateTime.now().toIso8601String(),
+          },
+        );
+        print("⚠️ Failed (generic), saved offline → $discountValue");
+      }
+      return null;
+    }
+  }
+
+
+  Future<void> syncAppliedDiscounts() async {
+    final box = HiveService().getAddCartBox();
+
+    if (!await checkInternet()) {
+      print("🚫 No internet, sync skipped.");
+      return;
+    }
+
+    final keys = box.keys
+        .where((k) => k.toString().startsWith("offline_apply_discount_"))
+        .toList();
+
+    if (keys.isEmpty) {
+      print("✅ No offline discounts to sync.");
+      return;
+    }
+
+    print("🔄 Syncing ${keys.length} offline discounts...");
+
+    for (final key in keys) {
+      final data = box.get(key);
+
+      if (data != null && data["customer_id"] != null) {
+        final response = await applyDiscount(
+          customerId: data["customer_id"],
+          enabled: data["enabled"],
+          discountType: data["discount_type"],
+          discountValue: data["discount_value"],
+          isSync: true,
+          onSuccess: () {},
+        );
+
+        if (response != null &&
+            (response.statusCode == 200 || response.statusCode == 201)) {
+          await box.delete(key);
+          print("☑️ Synced & removed → ${data["discount_value"]}");
+        } else {
+          print("⚠️ Sync failed for → ${data["discount_value"]}");
+        }
+      }
+    }
+  }
+
 }

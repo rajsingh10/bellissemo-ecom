@@ -19,6 +19,7 @@ import '../../../utils/customBottombar.dart';
 import '../../../utils/customButton.dart';
 import '../../../utils/emptyWidget.dart';
 import '../../../utils/snackBars.dart';
+import '../../../utils/textFields.dart';
 import '../../../utils/titlebarWidget.dart';
 import '../modal/copunsListModal.dart';
 import '../service/cartServices.dart';
@@ -118,6 +119,9 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // print("🔄 build() called — totalamount: $totalamount1");
+    //
+    //  totalamount = totalamount ?? '0';
     return Scaffold(
       backgroundColor: AppColors.bgColor,
       body:
@@ -667,9 +671,12 @@ class _CartScreenState extends State<CartScreen> {
                                                                             if (await checkInternet()) {
                                                                               try {
                                                                                 await CartService().increaseCart(
+                                                                                  overrideprice: (double.parse(viewCartData?.items?[i].prices?.price ?? "0") / 100).toInt(),
+
                                                                                   cartItemKey:
                                                                                       item.key ??
                                                                                       "",
+                                                                                  online: false,
                                                                                   currentQuantity:
                                                                                       currentQty,
                                                                                 );
@@ -678,7 +685,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                                   () {},
                                                                                 ); // refresh UI after fetch
                                                                               } catch (
-                                                                                e
+                                                                                e,trackTrace
                                                                               ) {
                                                                                 showCustomErrorSnackbar(
                                                                                   title:
@@ -686,6 +693,9 @@ class _CartScreenState extends State<CartScreen> {
                                                                                   message:
                                                                                       "Failed to update cart\n$e",
                                                                                 );
+                                                                                print("sdsdfsfsf=====>>>>>>${e}");
+                                                                                print("sdsdfsfsf=====>>>>>>${e}");
+                                                                                print("sdsdfsfsf=====>>>>>>${trackTrace}");
                                                                               }
                                                                             }
                                                                           },
@@ -802,7 +812,8 @@ class _CartScreenState extends State<CartScreen> {
                                                                 height: 2.h,
                                                               ),
                                                               // Text(
-                                                              //   "\$ ${  viewCartData?.items?[i].prices?.price ?? ""}",
+                                                              //     // ${(double.tryParse(viewCartData?.totals?.totalItems ?? '0')! / 100).toStringAsFixed(2)
+                                                              //   "\$ ${(double.parse(viewCartData?.items?[i].prices?.price ?? "")! /100).toStringAsFixed(2) }",
                                                               //   style: TextStyle(
                                                               //     color: AppColors.blackColor,
                                                               //     fontSize: 14.sp,
@@ -810,6 +821,261 @@ class _CartScreenState extends State<CartScreen> {
                                                               //         FontFamily.semiBold,
                                                               //   ),
                                                               // ),
+                                                              InkWell(
+                                                                onTap: () async {
+                                                                  final discountResult = await Get.dialog<
+                                                                    Map<
+                                                                      String,
+                                                                      String
+                                                                    >
+                                                                  >(
+                                                                    Dialog(
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .transparent,
+                                                                      child: StatefulBuilder(
+                                                                        builder: (
+                                                                          context,
+                                                                          setState,
+                                                                        ) {
+                                                                          final formKey =
+                                                                              GlobalKey<
+                                                                                FormState
+                                                                              >();
+                                                                          TextEditingController
+                                                                          dialogController =
+                                                                              TextEditingController();
+                                                                          String
+                                                                          selectedType =
+                                                                              "Amount"; // 👈 default dropdown value
+
+                                                                          return IntrinsicWidth(
+                                                                            stepWidth:
+                                                                                300,
+                                                                            child: IntrinsicHeight(
+                                                                              child: Container(
+                                                                                padding: EdgeInsets.all(
+                                                                                  16,
+                                                                                ),
+                                                                                decoration: BoxDecoration(
+                                                                                  color:
+                                                                                      AppColors.whiteColor,
+                                                                                  borderRadius: BorderRadius.circular(
+                                                                                    15,
+                                                                                  ),
+                                                                                ),
+                                                                                child: Column(
+                                                                                  mainAxisSize:
+                                                                                      MainAxisSize.min,
+                                                                                  children: [
+                                                                                    Form(
+                                                                                      key:
+                                                                                          formKey,
+                                                                                      child: AppTextField(
+                                                                                        key: ValueKey(
+                                                                                          selectedType,
+                                                                                        ),
+                                                                                        controller:
+                                                                                            dialogController,
+                                                                                        hintText:
+                                                                                            "Increase",
+                                                                                        text:
+                                                                                            "Increase",
+                                                                                        isTextavailable:
+                                                                                            true,
+                                                                                        textInputType:
+                                                                                            TextInputType.number,
+                                                                                        maxline:
+                                                                                            1,
+                                                                                        validator: (
+                                                                                          value,
+                                                                                        ) {
+                                                                                          if (value !=
+                                                                                                  null &&
+                                                                                              value.isNotEmpty &&
+                                                                                              double.tryParse(
+                                                                                                    value,
+                                                                                                  ) ==
+                                                                                                  null) {
+                                                                                            return "Enter a valid number";
+                                                                                          }
+                                                                                          return null;
+                                                                                        },
+                                                                                      ),
+                                                                                    ),
+
+                                                                                    SizedBox(
+                                                                                      height:
+                                                                                          24,
+                                                                                    ),
+                                                                                    Row(
+                                                                                      mainAxisAlignment:
+                                                                                          MainAxisAlignment.spaceBetween,
+                                                                                      children: [
+                                                                                        CustomButton(
+                                                                                          title:
+                                                                                              "Cancel",
+                                                                                          route:
+                                                                                              () =>
+                                                                                                  Get.back(),
+                                                                                          color:
+                                                                                              AppColors.containerColor,
+                                                                                          fontcolor:
+                                                                                              AppColors.blackColor,
+                                                                                          height:
+                                                                                              5.h,
+                                                                                          width:
+                                                                                              27.w,
+                                                                                          fontsize:
+                                                                                              15.sp,
+                                                                                          radius:
+                                                                                              12.0,
+                                                                                        ),
+                                                                                        CustomButton(
+                                                                                          title:
+                                                                                              "Increase Price",
+                                                                                          route: () async {
+bool increseprice =true;
+                                                                                            final item =
+                                                                                                viewCartData?.items?[i];
+                                                                                            if (item ==
+                                                                                                null) {
+                                                                                              Navigator.pop(
+                                                                                                context,
+                                                                                              );
+                                                                                              return;
+                                                                                            }
+
+                                                                                            final currentQty =
+                                                                                                item.quantity ??
+                                                                                                1;
+                                                                                            final newPrice = double.tryParse(dialogController.text) ?? 0;
+                                                                                            // update local UI
+                                                                                            setState(
+                                                                                              () {
+                                                                                                // item.quantity =
+                                                                                                //     currentQty + int.parse(item.quantity.toString())
+                                                                                                //     ;
+                                                                                                increseprice=true;
+                                                                                                updateCartTotalsLocally(offlineitemamount:newPrice * 100,itemIndex:i);
+                                                                                                Get.back();
+                                                                                              },
+                                                                                            );
+
+                                                                                            // update Hive cache immediately
+                                                                                            var box =
+                                                                                                HiveService().getViewCartBox();
+                                                                                            final cachedData = box.get(
+                                                                                              'cart_$customerId',
+                                                                                            );
+                                                                                            if (cachedData !=
+                                                                                                    null &&
+                                                                                                cachedData.toString().isNotEmpty) {
+                                                                                              try {
+                                                                                                final data = json.decode(
+                                                                                                  cachedData,
+                                                                                                );
+                                                                                                final cachedCart = ViewCartDataModal.fromJson(
+                                                                                                  data,
+                                                                                                );
+                                                                                                cachedCart.items?[i].quantity =
+
+                                                                                                        int.parse(item.quantity.toString());
+                                                                                                await box.put(
+                                                                                                  'cart_$customerId',
+                                                                                                  json.encode(
+                                                                                                    cachedCart.toJson(),
+                                                                                                  ),
+                                                                                                );
+                                                                                              } catch (
+                                                                                                e
+                                                                                              ) {
+                                                                                                print(
+                                                                                                  "Error updating offline cache: $e",
+                                                                                                );
+                                                                                              }
+                                                                                            }
+
+                                                                                            // update server if online
+                                                                                            if (await checkInternet()) {
+                                                                                              try {
+                                                                                                await CartService().increaseCart(
+                                                                                                  overrideprice: int.parse(
+                                                                                                      dialogController.text.toString(),
+
+                                                                                                  ),
+                                                                                                  cartItemKey:
+                                                                                                      item.key ??
+                                                                                                      "",
+                                                                                                  online:increseprice,
+                                                                                                  currentQuantity:
+                                                                                                      currentQty,
+                                                                                                );
+                                                                                                await _fetchCart();
+                                                                                                Get.back();
+                                                                                                Get.offAll(CartScreen());
+
+
+                                                                                              } catch (
+                                                                                                e,trackTrace
+                                                                                              ) {
+                                                                                                showCustomErrorSnackbar(
+                                                                                                  title:
+                                                                                                      "Error",
+                                                                                                  message:
+                                                                                                      "Failed to update cart\n$e",
+                                                                                                );
+                                                                                                print("shu errro ave che =====>>>>${trackTrace}");
+                                                                                              }
+                                                                                            }
+
+
+                                                                                          },
+                                                                                          color:
+                                                                                              AppColors.mainColor,
+                                                                                          fontcolor:
+                                                                                              AppColors.whiteColor,
+                                                                                          height:
+                                                                                              5.h,
+                                                                                          width:
+                                                                                              40.w,
+                                                                                          fontsize:
+                                                                                              15.sp,
+                                                                                          radius:
+                                                                                              12.0,
+                                                                                          iconData:
+                                                                                              Icons.check,
+                                                                                          iconsize:
+                                                                                              17.sp,
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          );
+                                                                        },
+                                                                      ),
+                                                                    ),
+                                                                    barrierDismissible:
+                                                                        true,
+                                                                  );
+                                                                },
+                                                                child: Text(
+                                                                  "${(double.parse(viewCartData?.items?[i].prices?.price ?? "0") / 100).toStringAsFixed(2)}",
+                                                                  style: TextStyle(
+                                                                    color:
+                                                                        AppColors
+                                                                            .blackColor,
+                                                                    fontSize:
+                                                                        14.sp,
+                                                                    fontFamily:
+                                                                        FontFamily
+                                                                            .semiBold,
+                                                                  ),
+                                                                ),
+                                                              ),
                                                             ],
                                                           ),
                                                         ],
@@ -853,201 +1119,7 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: 1.5.h),
-                                    // Row(
-                                    //   children: [
-                                    //     Expanded(
-                                    //       child: TextField(
-                                    //         onTap: (){
-                                    //           _showCouponDialog(context);
-                                    //         },
-                                    //         controller: couponController,
-                                    //         decoration: InputDecoration(
-                                    //
-                                    //           hintText: "Enter Discount Code",
-                                    //           hintStyle: TextStyle(
-                                    //             fontSize: 16.sp,
-                                    //             fontFamily: FontFamily.semiBold,
-                                    //           ),
-                                    //           contentPadding:
-                                    //               EdgeInsets.symmetric(
-                                    //                 vertical: 12,
-                                    //                 horizontal: 12,
-                                    //               ),
-                                    //           border: OutlineInputBorder(
-                                    //             borderRadius:
-                                    //                 BorderRadius.circular(8),
-                                    //             borderSide: BorderSide(
-                                    //               color: Colors.grey.shade400,
-                                    //             ),
-                                    //           ),
-                                    //           filled: true,
-                                    //           fillColor:
-                                    //               AppColors.containerColor,
-                                    //         ),
-                                    //       ),
-                                    //     ),
-                                    //     SizedBox(width: 2.w),
-                                    //     ElevatedButton(
-                                    //       onPressed: () {
-                                    //         _showCouponDialog(context);
-                                    //
-                                    //       },
-                                    //       style: ElevatedButton.styleFrom(
-                                    //         backgroundColor:
-                                    //             AppColors.mainColor,
-                                    //         padding: EdgeInsets.symmetric(
-                                    //           vertical: 12,
-                                    //           horizontal: 16,
-                                    //         ),
-                                    //         shape: RoundedRectangleBorder(
-                                    //           borderRadius:
-                                    //               BorderRadius.circular(8),
-                                    //         ),
-                                    //       ),
-                                    //       child: Text(
-                                    //         "Apply",
-                                    //         style: TextStyle(
-                                    //           color: AppColors.whiteColor,
-                                    //           fontSize: 16.sp,
-                                    //           fontFamily: FontFamily.semiBold,
-                                    //         ),
-                                    //       ),
-                                    //     ),
-                                    //   ],
-                                    // ),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: TextField(
-                                            onTap: () {
-                                              _showCouponDialog(context);
-                                            },
-                                            controller: couponController,
-                                            decoration: InputDecoration(
-                                              hintText: "Enter Discount Code",
-                                              hintStyle: TextStyle(
-                                                fontSize: 16.sp,
-                                                fontFamily: FontFamily.semiBold,
-                                              ),
-                                              contentPadding:
-                                                  EdgeInsets.symmetric(
-                                                    vertical: 12,
-                                                    horizontal: 12,
-                                                  ),
-                                              border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                borderSide: BorderSide(
-                                                  color: Colors.grey.shade400,
-                                                ),
-                                              ),
-                                              filled: true,
-                                              fillColor:
-                                                  AppColors.containerColor,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(width: 2.w),
-                                        ValueListenableBuilder<
-                                          TextEditingValue
-                                        >(
-                                          valueListenable: couponController,
-                                          builder: (context, value, child) {
-                                            final hasText =
-                                                value.text.isNotEmpty;
-                                            return ElevatedButton(
-                                              onPressed: () async {
-                                                if (hasText) {
-                                                  setState(() {
-                                                    if ((viewCartData
-                                                            ?.coupons
-                                                            ?.isNotEmpty ??
-                                                        false)) {
-                                                      couponController.text =
-                                                          viewCartData!
-                                                              .coupons![0]
-                                                              .code ??
-                                                          "";
-                                                    } else {
-                                                      couponController.clear();
-                                                    }
 
-                                                    discount1 =
-                                                        double.tryParse(
-                                                          (viewCartData
-                                                                      ?.totals
-                                                                      ?.totalDiscount ??
-                                                                  "0")
-                                                              .toString(),
-                                                        ) ??
-                                                        0.0;
-
-                                                    updateCartTotalsLocally(
-                                                      offlineDiscount: 0,
-                                                      removeCoupon: true,
-                                                    );
-                                                  });
-                                                  print(
-                                                    "discount1=====>>>>>$discount1",
-                                                  );
-
-                                                  final cartService =
-                                                      CartService();
-
-                                                  await cartService.removeCoupon(
-                                                    couponCode:
-                                                        couponController.text,
-                                                    onSuccess: () {
-                                                      print(
-                                                        "API call successful",
-                                                      );
-
-                                                      Get.offAll(
-                                                        () => CartScreen(),
-                                                      );
-
-                                                      _fetchCart();
-                                                    },
-                                                  );
-                                                  // Remove coupon logic
-                                                  // removeCoupon(
-                                                  //   couponCode: couponController.text,
-                                                  //   onSuccess: () {
-                                                  //     couponController.clear(); // Clear field after removing
-                                                  //   },
-                                                  // );
-                                                } else {
-                                                  // Show coupon dialog or apply logic
-                                                  _showCouponDialog(context);
-                                                }
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    AppColors.mainColor,
-                                                padding: EdgeInsets.symmetric(
-                                                  vertical: 12,
-                                                  horizontal: 16,
-                                                ),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                              ),
-                                              child: Text(
-                                                hasText ? "Remove" : "Apply",
-                                                style: TextStyle(
-                                                  color: AppColors.whiteColor,
-                                                  fontSize: 16.sp,
-                                                  fontFamily:
-                                                      FontFamily.semiBold,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ],
-                                    ),
 
                                     SizedBox(height: 2.h),
                                     Row(
@@ -1101,16 +1173,243 @@ class _CartScreenState extends State<CartScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
-                                          "Discount",
-                                          style: TextStyle(
-                                            color: AppColors.gray,
-                                            fontSize: 16.sp,
-                                            fontFamily: FontFamily.semiBold,
-                                          ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              "Discount",
+                                              style: TextStyle(
+                                                color: AppColors.gray,
+                                                fontSize: 16.sp,
+                                                fontFamily: FontFamily.semiBold,
+                                              ),
+                                            ),
+                                            SizedBox(width: 2.w),
+
+                                            InkWell(
+
+                                              onTap: () async {
+                                              
+                                                final formKey = GlobalKey<FormState>();
+                                                TextEditingController dialogController = TextEditingController();
+                                                String selectedType = "fixed"; // default
+
+                                                final discountResult = await Get.dialog<Map<String, String>>(
+                                                  Dialog(
+                                                    backgroundColor: Colors.transparent,
+                                                    child: StatefulBuilder(
+                                                      builder: (context, setState) {
+                                                        return IntrinsicWidth(
+                                                          stepWidth: 300,
+                                                          child: IntrinsicHeight(
+                                                            child: Container(
+                                                              padding: EdgeInsets.all(16),
+                                                              decoration: BoxDecoration(
+                                                                color: AppColors.whiteColor,
+                                                                borderRadius: BorderRadius.circular(15),
+                                                              ),
+                                                              child: Column(
+                                                                mainAxisSize: MainAxisSize.min,
+                                                                children: [
+                                                                  Text(
+                                                                    "Apply Discount",
+                                                                    style: TextStyle(
+                                                                      fontSize: 18.sp,
+                                                                      fontFamily: FontFamily.bold,
+                                                                      color: AppColors.blackColor,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(height: 16),
+
+                                                                  // 👇 Dropdown for Amount / Percentage
+                                                                  Row(
+                                                                    children: [
+                                                                      Expanded(
+                                                                        child: DropdownButtonFormField<String>(
+                                                                          value: selectedType,
+                                                                          items: ["fixed", "percentage"]
+                                                                              .map(
+                                                                                (e) => DropdownMenuItem(
+                                                                              value: e,
+                                                                              child: Text(e),
+                                                                            ),
+                                                                          )
+                                                                              .toList(),
+                                                                          onChanged: (val) {
+                                                                            setState(() {
+                                                                              selectedType = val!;
+                                                                              print("selectedType====>>>>> $selectedType");
+                                                                            });
+                                                                          },
+                                                                          decoration: InputDecoration(
+                                                                            labelText: "Discount Type",
+                                                                            border: OutlineInputBorder(
+                                                                              borderRadius: BorderRadius.circular(8),
+                                                                            ),
+                                                                            contentPadding: EdgeInsets.symmetric(
+                                                                              vertical: 10,
+                                                                              horizontal: 12,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  SizedBox(height: 16),
+
+                                                                  Form(
+                                                                    key: formKey,
+                                                                    child: AppTextField(
+                                                                      key: ValueKey(selectedType),
+                                                                      controller: dialogController,
+                                                                      hintText: selectedType == "fixed"
+                                                                          ? "Enter Discount Fixed"
+                                                                          : "Enter Discount percentage",
+                                                                      text: selectedType == "fixed"
+                                                                          ? "Discount Fixed"
+                                                                          : "Discount percentage",
+                                                                      isTextavailable: true,
+                                                                      textInputType: TextInputType.number,
+                                                                      maxline: 1,
+                                                                        validator: (value) {
+                                                                          if (value == null || value.isEmpty) {
+                                                                            return "Please enter a discount";
+                                                                          }
+
+                                                                          final parsed = double.tryParse(value);
+                                                                          if (parsed == null) {
+                                                                            return "Enter a valid number";
+                                                                          }
+
+                                                                          if (parsed <= 0) {
+                                                                            return "Value must be greater than 0";
+                                                                          }
+
+                                                                          // 💡 Get subtotal from cart
+                                                                          final subtotalInCents = double.tryParse(viewCartData?.totals?.totalItems ?? '0') ?? 0.0;
+                                                                          final subtotal = subtotalInCents / 100;
+
+                                                                          // 🔹 Percentage should not exceed 100
+                                                                          if (selectedType == "percentage" && parsed > 100) {
+                                                                            return "percentage can't be more than 100";
+                                                                          }
+
+                                                                          // 🔹 Amount should not exceed subtotal
+                                                                          if (selectedType == "fixed" && parsed > subtotal) {
+                                                                            return "Discount can't exceed${viewCartData?.totals?.currencySymbol} ${subtotal.toStringAsFixed(2)}";
+                                                                          }
+
+                                                                          return null;
+                                                                        }
+
+
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(height: 24),
+
+                                                                  Row(
+                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                    children: [
+                                                                      CustomButton(
+                                                                        title: "Cancel",
+                                                                        route: () => Get.back(),
+                                                                        color: AppColors.containerColor,
+                                                                        fontcolor: AppColors.blackColor,
+                                                                        height: 5.h,
+                                                                        width: 27.w,
+                                                                        fontsize: 15.sp,
+                                                                        radius: 12.0,
+                                                                      ),
+                                                                      CustomButton(
+                                                                        title: "Apply Discount",
+                                                                        route: () {
+                                                                          if (!formKey.currentState!.validate()) return;
+
+                                                                          final charge = dialogController.text.trim();
+                                                                          print("=========>>>>>>>>>>>>> $selectedType");
+
+                                                                          // 👇 Return result to parent
+                                                                          Get.back(result: {
+                                                                            "type": selectedType,
+                                                                            "value": charge,
+                                                                          });
+                                                                        },
+                                                                        color: AppColors.mainColor,
+                                                                        fontcolor: AppColors.whiteColor,
+                                                                        height: 5.h,
+                                                                        width: 40.w,
+                                                                        fontsize: 15.sp,
+                                                                        radius: 12.0,
+                                                                        iconData: Icons.check,
+                                                                        iconsize: 17.sp,
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                                  barrierDismissible: true,
+                                                );
+
+                                                if (discountResult != null) {
+                                                  setState(() {
+                                                    print("✅ Discount Selected: $discountResult");
+                                                    print("=========>>>>>>>>>>>>>${selectedType.toString()}");
+                                                    final cartService = CartService();
+
+                                                     cartService.applyDiscount(
+                                                      customerId: int.parse(customerId.toString()),
+                                                      discountType:selectedType ,
+                                                      discountValue: double.parse(dialogController.text.trim()),
+                                                      enabled: true,
+                                                      onSuccess: () {
+                                                        print("API call successful");
+
+                                                        WidgetsBinding.instance
+                                                            .addPostFrameCallback((_) {
+                                                          Get.offAll(
+                                                                () => CartScreen(),
+                                                          );
+                                                          _fetchCart();
+                                                        });
+                                                      },
+                                                    );
+                                                    if(selectedType=="percentage"){
+                                                      updateCartTotalsLocally(offlineDiscount:double.parse(dialogController.text.trim()),discounttype: selectedType);
+                                                    }else{
+                                                      updateCartTotalsLocally(offlineDiscount:double.parse(dialogController.text.trim()) * 100,discounttype: selectedType);
+                                                    }
+
+                                                    // Apply your discount here using discountResult["type"] and ["value"]
+                                                  });
+                                                  WidgetsBinding.instance
+                                                      .addPostFrameCallback((_) {
+                                                    Get.offAll(
+                                                          () => CartScreen(),
+                                                    );
+                                                    // _fetchCart();
+                                                  });
+                                                }
+                                              },
+
+                                              child: Text(
+                                                'Apply Discount',
+                                                style: TextStyle(
+                                                  color: AppColors.mainColor,
+                                                  fontSize: 16.sp,
+                                                  fontFamily:
+                                                      FontFamily.semiBold,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                         Text(
-                                          "- ${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.totalDiscount ?? '0')! / 100).toStringAsFixed(2)}",
+                                          "- ${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.customerDiscountValue ?? '0')! / 100).toStringAsFixed(2)}",
 
                                           // "\$ ${tax.toStringAsFixed(2)}",
                                           style: TextStyle(
@@ -1134,19 +1433,98 @@ class _CartScreenState extends State<CartScreen> {
                                             fontFamily: FontFamily.semiBold,
                                           ),
                                         ),
+                                        // Text(
+                                        //   "${viewCartData?.totals?.currencySymbol}${(double.tryParse((totalamount?.tostring ?? 0)! / 100).toStringAsFixed(2)}",
+                                        //   // "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
+                                        //   style: TextStyle(
+                                        //     color: AppColors.blackColor,
+                                        //     fontSize: 17.sp,
+                                        //     fontFamily: FontFamily.semiBold,
+                                        //   ),
+                                        // ),
                                         Text(
-                                          "${viewCartData?.totals?.currencySymbol}${(double.tryParse(viewCartData?.totals?.totalPrice ?? '0')! / 100).toStringAsFixed(2)}",
-                                          // "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
+                                          "${viewCartData?.totals?.currencySymbol}${((double.tryParse(totalamount==""||totalamount==null?(viewCartData?.totals?.totalPrice).toString():totalamount ?? '0') ?? 0) / 100).toStringAsFixed(2)}",
                                           style: TextStyle(
                                             color: AppColors.blackColor,
                                             fontSize: 17.sp,
                                             fontFamily: FontFamily.semiBold,
                                           ),
                                         ),
+
                                       ],
                                     ),
                                   ],
                                 ),
+                              ),
+                              SizedBox(height: 1.h),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  // 👇 Shipping Checkbox
+                                  Row(
+                                    children: [
+                                      Transform.scale(
+                                        scale: 0.9,
+                                        child: Checkbox(
+                                          activeColor: AppColors.mainColor,
+                                          value: credit,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              credit = value ?? false;
+                                              print("=====>>>>>>>>${credit}");
+                                              proforma = false;
+                                            });
+                                          },
+                                          materialTapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                          visualDensity: VisualDensity.compact,
+                                        ),
+                                      ),
+                                      Text(
+                                        "Credit",
+                                        style: TextStyle(
+                                          color: AppColors.gray,
+                                          fontSize: 16.sp,
+                                          fontFamily: FontFamily.semiBold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  SizedBox(
+                                    width: 20,
+                                  ), // spacing between two checkboxes
+                                  // 👇 Discount Checkbox
+                                  Row(
+                                    children: [
+                                      Transform.scale(
+                                        scale: 0.9,
+                                        child: Checkbox(
+                                          activeColor: AppColors.mainColor,
+                                          value: proforma,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              proforma = value ?? false;
+                                              print("=====>>>>>>>>${proforma}");
+                                              credit = false;
+                                            });
+                                          },
+                                          materialTapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                          visualDensity: VisualDensity.compact,
+                                        ),
+                                      ),
+                                      Text(
+                                        "Proforma",
+                                        style: TextStyle(
+                                          color: AppColors.gray,
+                                          fontSize: 16.sp,
+                                          fontFamily: FontFamily.semiBold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -1191,7 +1569,7 @@ class _CartScreenState extends State<CartScreen> {
                         ),
                         SizedBox(height: 0.5.h),
                         Text(
-                          "${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.totalPrice ?? '0')! / 100).toStringAsFixed(2)}",
+                          "${viewCartData?.totals?.currencySymbol}${((double.tryParse(totalamount==""||totalamount==null?(viewCartData?.totals?.totalPrice).toString():totalamount ?? '0') ?? 0) / 100).toStringAsFixed(2)}",
                           // "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
                           style: TextStyle(
                             color: AppColors.blackColor,
@@ -1207,11 +1585,20 @@ class _CartScreenState extends State<CartScreen> {
                       child: CustomButton(
                         title: 'Checkout',
                         route: () {
-                          Get.to(
-                            () => CheckOutScreen(),
-                            transition: Transition.fade,
-                            duration: const Duration(milliseconds: 450),
-                          );
+                          if (!credit && !proforma) {
+                            showCustomErrorSnackbar(
+                              title: "Credit or Proforma",
+                              message: "Please Select Credit or Proforma",
+                            );
+                          } else {
+                            Get.to(
+                              CheckOutScreen(
+                                cridit: credit == true ? "credit" : "proforma",
+                              ),
+                              transition: Transition.fade,
+                              duration: const Duration(milliseconds: 450),
+                            );
+                          }
                         },
                         color: AppColors.mainColor,
                         fontcolor: AppColors.whiteColor,
@@ -1232,195 +1619,101 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   double discount1 = 0.0;
+  bool isShippingEnabled = false;
 
-  // void updateCartTotalsLocally({double? offlineDiscount}) {
-  //   print("offlineDiscount=====>>>>>>>>${offlineDiscount}");
-  //   if (viewCartData == null) return;
-  //
-  //   double subtotal = 0.0;
-  //   double tax = 0.0;
-  //   double shipping =
-  //       double.tryParse(viewCartData?.totals?.totalShipping ?? '0') ?? 0.0;
-  //
-  //   // Start with existing discount
-  //   double discount =
-  //       double.tryParse(viewCartData?.totals?.totalDiscount ?? '0') ?? 0.0;
-  //
-  //   // Add any new offline discount
-  //   if (offlineDiscount != null) {
-  //     discount += offlineDiscount;
-  //   }
-  //
-  //   for (var item in viewCartData!.items ?? []) {
-  //     if (item.prices != null) {
-  //       double itemPrice = double.tryParse(item.prices!.price ?? '0') ?? 0.0;
-  //       int quantity = item.quantity ?? 0;
-  //
-  //       subtotal += itemPrice * quantity;
-  //
-  //       double itemTax = 0.0; // Temporary
-  //       tax += itemTax * quantity;
-  //     }
-  //   }
-  //
-  //   double totalPrice = subtotal + tax + shipping - discount;
-  //   print("discount=======>>>>>>${discount}");
-  //   print("totalPrice======>>>>>>${totalPrice}");
-  //   setState(() {
-  //     viewCartData!.totals = Totals(
-  //       currencySymbol: viewCartData!.totals?.currencySymbol ?? "\$",
-  //       totalItems: subtotal.round().toString(),
-  //       totalTax: tax.round().toString(),
-  //       totalShipping: shipping.round().toString(),
-  //       totalDiscount: discount.round().toString(),
-  //       totalPrice: totalPrice.round().toString(),
-  //     );
-  //   });
-  // }
-  updateCartTotalsLocally({
+
+  Future<void> updateCartTotalsLocally({
+
+    String? discounttype,
     double? offlineDiscount,
+    double? offlineitemamount,
+    int? itemIndex,
     bool removeCoupon = false,
   }) async {
+    print("discounttype shu ave che =====>>>.${discounttype}");
     if (viewCartData == null) return;
+
+    print("offlineDiscount======>>>>>>> $offlineDiscount");
 
     double subtotal = 0.0;
     double tax = 0.0;
-    double shipping =
-        double.tryParse(viewCartData?.totals?.totalShipping ?? '0') ?? 0.0;
+    double shipping = double.tryParse(viewCartData?.totals?.totalShipping ?? '0') ?? 0.0;
+    double discount = double.tryParse(viewCartData?.totals?.customerDiscountValue ?? '0') ?? 0.0;
 
-    double discount =
-        double.tryParse(viewCartData?.totals?.totalDiscount ?? '0') ?? 0.0;
+    // 🛒 Loop through items to calculate subtotal
+    for (int i = 0; i < (viewCartData!.items?.length ?? 0); i++) {
+      var item = viewCartData!.items![i];
 
-    if (removeCoupon) {
-      discount = 0.0;
-    } else if (offlineDiscount != null) {
-      discount += offlineDiscount;
-    }
-
-    for (var item in viewCartData!.items ?? []) {
       if (item.prices != null) {
-        double itemPrice = double.tryParse(item.prices!.price ?? '0') ?? 0.0;
+        double itemPrice;
+
+        // 🎯 If specific item needs to be updated
+        if (itemIndex != null && i == itemIndex && offlineitemamount != null) {
+          itemPrice = offlineitemamount;
+          item.prices!.price = itemPrice.toString(); // Update item's price
+          print("Updated item price =========>>>> ${item.prices!.price}");
+        } else {
+          itemPrice = double.tryParse(item.prices?.price ?? '0') ?? 0.0;
+        }
+
         int quantity = item.quantity ?? 0;
+        print("quantity====>>>> $quantity");
 
         subtotal += itemPrice * quantity;
 
+        // Add tax per item if needed (currently zero)
         double itemTax = 0.0;
         tax += itemTax * quantity;
       }
     }
-    double discountPrice = subtotal - discount;
-    double totalPrice = discountPrice;
 
+    // 💸 Apply discount logic
+    if (removeCoupon) {
+      discount = 0.0;
+    } else if (offlineDiscount != null) {
+      if (discounttype == "percentage") {
+        discount = (offlineDiscount / 100) * subtotal;
+        print("discount=====>>>>>${discount}");
+      } else {
+        discount = offlineDiscount;
+      }
+    }
+
+    // 🧮 Final total price after discount
+    double totalPrice = subtotal - discount;
+    print("totalPrice====>>>>>>>${totalPrice}");
+    if (totalPrice < 0) totalPrice = 0;
+
+    // 🧾 Update the totals in viewCartData
     setState(() {
-      // 🔹 Update totals
       viewCartData!.totals = Totals(
         currencySymbol: viewCartData!.totals?.currencySymbol ?? "\$",
         totalItems: subtotal.round().toString(),
         totalTax: tax.round().toString(),
         totalShipping: shipping.round().toString(),
-        totalDiscount: discount.round().toString(),
+        customerDiscountValue: discount.round().toString(),
         totalPrice: totalPrice.round().toString(),
       );
 
-      // 🔹 Remove coupon locally also
-      if (removeCoupon) {
-        viewCartData!.coupons = [];
-      }
+
+      if (removeCoupon) viewCartData!.coupons = [];
     });
+    setState(() {
+      totalamount1=totalPrice.toString();
+
+      print("totalamounttotalamounttotalamounttotalamounttotalamount${totalamount}");
+    });
+
+    // 🗃️ Save updated cart in Hive
     var box = HiveService().getViewCartBox();
     await box.put('cart_$customerId', json.encode(viewCartData!.toJson()));
-    print("UI refreshed → discount=$discount totalPrice=$totalPrice");
+
+    print("✅ Cart updated → subtotal=$subtotal discount=$discount totalPrice=$totalPrice");
   }
 
-  //   Future<void> _fetchCart() async {
-  //     var box = HiveService().getViewCartBox();
-  //
-  //     // ✅ Offline mode
-  //     if (!await checkInternet()) {
-  //       final cachedData = box.get('cart_$customerId');
-  //
-  //       if (cachedData != null && cachedData.toString().isNotEmpty) {
-  //         try {
-  //           final data = json.decode(cachedData);
-  //           viewCartData = ViewCartDataModal.fromJson(data);
-  //           setState(() {
-  //             couponController.text =viewCartData?.coupons?.length==0||viewCartData?.coupons?.length==[]?"":viewCartData?.coupons?[0].code ?? "";
-  //           });
-  //         } catch (e) {
-  //           log("Error decoding cached cart: $e");
-  //           viewCartData = null;
-  //         }
-  //       } else {
-  //         viewCartData = null;
-  //         showCustomErrorSnackbar(
-  //           title: 'No Internet',
-  //           message: 'Your cart is empty or offline data not found.',
-  //         );
-  //       }
-  //       return;
-  //     }
-  //
-  //     // ✅ Online mode
-  //     try {
-  //       final response = await CartService().fetchCart(customerId);
-  //
-  //       if (response.statusCode == 200) {
-  //         final data = json.decode(response.body);
-  //
-  // print("=======>>>>> ave che ");
-  //         if (data == null || (data['items'] as List).isEmpty) {
-  //           viewCartData = null;
-  //           await box.delete('cart_$customerId'); // clear cache
-  //         } else {
-  //           viewCartData = ViewCartDataModal.fromJson(data);
-  //           setState(() {
-  //             couponController.text =viewCartData?.coupons?.length==0||viewCartData?.coupons?.length==[]?"":viewCartData?.coupons?[0].code ?? "";
-  //           });
-  //           await box.put(
-  //             'cart_$customerId',
-  //             response.body,
-  //           ); // save raw JSON string
-  //         }
-  //       } else {
-  //         // fallback to cache
-  //         final cachedData = box.get('cart_$customerId');
-  //         if (cachedData != null && cachedData.toString().isNotEmpty) {
-  //           final data = json.decode(cachedData);
-  //           viewCartData = ViewCartDataModal.fromJson(data);
-  //           setState(() {
-  //             couponController.text =viewCartData?.coupons?.length==0||viewCartData?.coupons?.length==[]?"":viewCartData?.coupons?[0].code ?? "";
-  //           });
-  //         } else {
-  //           viewCartData = null;
-  //         }
-  //         showCustomErrorSnackbar(
-  //           title: 'Server Error',
-  //           message: 'Something went wrong. Please try again later.',
-  //         );
-  //       }
-  //     } catch (e,stackTrace) {
-  //       print("=====>>>>>>>${stackTrace}");
-  //       // fallback to cache
-  //       final cachedData = box.get('cart_$customerId');
-  //       if (cachedData != null && cachedData.toString().isNotEmpty) {
-  //         try {
-  //           final data = json.decode(cachedData);
-  //           viewCartData = ViewCartDataModal.fromJson(data);
-  //           setState(() {
-  //             couponController.text =viewCartData?.coupons?.length==0||viewCartData?.coupons?.length==[]?"":viewCartData?.coupons?[0].code ?? "";
-  //           });
-  //         } catch (_) {
-  //           viewCartData = null;
-  //         }
-  //       } else {
-  //         viewCartData = null;
-  //       }
-  //       showCustomErrorSnackbar(
-  //         title: 'Network Error',
-  //         message: 'Unable to connect. Please check your internet and try again.',
-  //       );
-  //     }
-  //   }
+ String? totalamount;
+ String? totalamount1;
+
   Future<void> _fetchCart() async {
     var box = HiveService().getViewCartBox();
 
@@ -1471,6 +1764,27 @@ class _CartScreenState extends State<CartScreen> {
           await box.delete('cart_$customerId'); // clear cache
         } else {
           viewCartData = ViewCartDataModal.fromJson(data);
+          setState(() {
+            final rawTotalItems = viewCartData?.totals?.totalItems;
+            final rawDiscount = viewCartData?.totals?.customerDiscountValue;
+
+            final totalItems = ((rawTotalItems is num)
+                ? rawTotalItems
+                : num.tryParse(rawTotalItems?.toString() ?? '')) ?? 0;
+
+            final discount = ((rawDiscount is num)
+                ? rawDiscount
+                : num.tryParse(rawDiscount?.toString() ?? '')) ?? 0;
+
+            final total = (totalItems as num) - (discount as num); // ✅ type-safe
+            totalamount = total.toString();
+          });
+
+
+
+
+
+
           if (mounted) updateCouponText();
           await box.put('cart_$customerId', response.body); // save raw JSON
         }
@@ -1480,6 +1794,21 @@ class _CartScreenState extends State<CartScreen> {
         if (cachedData != null && cachedData.toString().isNotEmpty) {
           final data = json.decode(cachedData);
           viewCartData = ViewCartDataModal.fromJson(data);
+          setState(() {
+            final rawTotalItems = viewCartData?.totals?.totalItems;
+            final rawDiscount = viewCartData?.totals?.customerDiscountValue;
+
+            final totalItems = ((rawTotalItems is num)
+                ? rawTotalItems
+                : num.tryParse(rawTotalItems?.toString() ?? '')) ?? 0;
+
+            final discount = ((rawDiscount is num)
+                ? rawDiscount
+                : num.tryParse(rawDiscount?.toString() ?? '')) ?? 0;
+
+            final total = (totalItems as num) - (discount as num); // ✅ type-safe
+            totalamount = total.toString();
+          });
           if (mounted) updateCouponText();
         } else {
           viewCartData = null;
@@ -1500,6 +1829,21 @@ class _CartScreenState extends State<CartScreen> {
         try {
           final data = json.decode(cachedData);
           viewCartData = ViewCartDataModal.fromJson(data);
+          setState(() {
+            final rawTotalItems = viewCartData?.totals?.totalItems;
+            final rawDiscount = viewCartData?.totals?.customerDiscountValue;
+
+            final totalItems = ((rawTotalItems is num)
+                ? rawTotalItems
+                : num.tryParse(rawTotalItems?.toString() ?? '')) ?? 0;
+
+            final discount = ((rawDiscount is num)
+                ? rawDiscount
+                : num.tryParse(rawDiscount?.toString() ?? '')) ?? 0;
+
+            final total = (totalItems as num) - (discount as num); // ✅ type-safe
+            totalamount = total.toString();
+          });
           if (mounted) updateCouponText();
         } catch (_) {
           viewCartData = null;
@@ -1571,133 +1915,135 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
-  void _showCouponDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              title: Text(
-                "Available Coupons",
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  fontFamily: FontFamily.semiBold,
-                ),
-              ),
-              content: SizedBox(
-                width: double.maxFinite,
-                child:
-                    couponslist.isEmpty
-                        ? Center(
-                          child: Text(
-                            "No Coupons Available",
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        )
-                        : SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              for (var coupon in couponslist)
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: ListTile(
-                                    title: Text(
-                                      coupon.code ?? "",
-                                      style: TextStyle(
-                                        fontFamily: FontFamily.semiBold,
-                                      ),
-                                    ),
-                                    subtitle: Text(
-                                      coupon.description ?? "",
-                                      style: TextStyle(
-                                        fontFamily: FontFamily.semiBold,
-                                      ),
-                                    ),
-                                    trailing: TextButton(
-                                      onPressed: () async {
-                                        // set selected coupon into textfield
-                                        setState(() {
-                                          couponController.text =
-                                              coupon.code ?? "";
-                                          discount1 = double.parse(
-                                            coupon.amount ?? "",
-                                          );
-                                          updateCartTotalsLocally(
-                                            offlineDiscount: discount1,
-                                          );
-                                        });
-                                        print("discount1=====>>>>>$discount1");
-
-                                        final cartService = CartService();
-
-                                        await cartService.applyCoupon(
-                                          couponCode: couponController.text,
-                                          onSuccess: () {
-                                            print("API call successful");
-
-                                            WidgetsBinding.instance
-                                                .addPostFrameCallback((_) {
-                                                  Get.offAll(
-                                                    () => CartScreen(),
-                                                  );
-                                                  _fetchCart();
-                                                });
-                                          },
-                                        );
-
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text(
-                                        "Apply",
-                                        style: TextStyle(
-                                          color: AppColors.mainColor,
-                                          fontFamily: FontFamily.semiBold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-              ),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.mainColor,
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: Text(
-                    "Cancel",
-                    style: TextStyle(
-                      color: AppColors.whiteColor,
-                      fontSize: 16.sp,
-                      fontFamily: FontFamily.semiBold,
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
+  // void _showCouponDialog(BuildContext context) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return StatefulBuilder(
+  //         builder: (context, setState) {
+  //           return AlertDialog(
+  //             shape: RoundedRectangleBorder(
+  //               borderRadius: BorderRadius.circular(16),
+  //             ),
+  //             title: Text(
+  //               "Available Coupons",
+  //               style: TextStyle(
+  //                 fontSize: 18.sp,
+  //                 fontFamily: FontFamily.semiBold,
+  //               ),
+  //             ),
+  //             content: SizedBox(
+  //               width: double.maxFinite,
+  //               child:
+  //                   couponslist.isEmpty
+  //                       ? Center(
+  //                         child: Text(
+  //                           "No Coupons Available",
+  //                           style: TextStyle(
+  //                             fontSize: 14.sp,
+  //                             color: Colors.grey,
+  //                           ),
+  //                         ),
+  //                       )
+  //                       : SingleChildScrollView(
+  //                         child: Column(
+  //                           children: [
+  //                             for (var coupon in couponslist)
+  //                               Card(
+  //                                 shape: RoundedRectangleBorder(
+  //                                   borderRadius: BorderRadius.circular(12),
+  //                                 ),
+  //                                 child: ListTile(
+  //                                   title: Text(
+  //                                     coupon.code ?? "",
+  //                                     style: TextStyle(
+  //                                       fontFamily: FontFamily.semiBold,
+  //                                     ),
+  //                                   ),
+  //                                   subtitle: Text(
+  //                                     coupon.description ?? "",
+  //                                     style: TextStyle(
+  //                                       fontFamily: FontFamily.semiBold,
+  //                                     ),
+  //                                   ),
+  //                                   trailing: TextButton(
+  //                                     onPressed: () async {
+  //                                       // set selected coupon into textfield
+  //                                       setState(() {
+  //                                         couponController.text =
+  //                                             coupon.code ?? "";
+  //                                         discount1 = double.parse(
+  //                                           coupon.amount ?? "",
+  //                                         );
+  //                                         updateCartTotalsLocally(
+  //                                           offlineDiscount: discount1,
+  //                                         );
+  //                                       });
+  //                                       print("discount1=====>>>>>$discount1");
+  //
+  //                                       final cartService = CartService();
+  //
+  //                                       await cartService.applyCoupon(
+  //                                         couponCode: couponController.text,
+  //                                         onSuccess: () {
+  //                                           print("API call successful");
+  //
+  //                                           WidgetsBinding.instance
+  //                                               .addPostFrameCallback((_) {
+  //                                                 Get.offAll(
+  //                                                   () => CartScreen(),
+  //                                                 );
+  //                                                 _fetchCart();
+  //                                               });
+  //                                         },
+  //                                       );
+  //
+  //                                       Navigator.pop(context);
+  //                                     },
+  //                                     child: Text(
+  //                                       "Apply",
+  //                                       style: TextStyle(
+  //                                         color: AppColors.mainColor,
+  //                                         fontFamily: FontFamily.semiBold,
+  //                                       ),
+  //                                     ),
+  //                                   ),
+  //                                 ),
+  //                               ),
+  //                           ],
+  //                         ),
+  //                       ),
+  //             ),
+  //             actions: [
+  //               ElevatedButton(
+  //                 onPressed: () {
+  //                   Navigator.pop(context);
+  //                 },
+  //                 style: ElevatedButton.styleFrom(
+  //                   backgroundColor: AppColors.mainColor,
+  //                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+  //                   shape: RoundedRectangleBorder(
+  //                     borderRadius: BorderRadius.circular(8),
+  //                   ),
+  //                 ),
+  //                 child: Text(
+  //                   "Cancel",
+  //                   style: TextStyle(
+  //                     color: AppColors.whiteColor,
+  //                     fontSize: 16.sp,
+  //                     fontFamily: FontFamily.semiBold,
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 
   TextEditingController couponController = TextEditingController();
+  bool credit = false;
+  bool proforma = false;
 }
