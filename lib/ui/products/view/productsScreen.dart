@@ -1168,7 +1168,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                   ),
                                 ),
                             Text(
-                              "${product.cartQuantity==0||product.cartQuantity==null||product.cartQuantity==""||product.cartQuantity=="0"?"":product.cartQuantity} Qty",
+                              "${product.cartQuantity == 0 || product.cartQuantity == null || product.cartQuantity == "" || product.cartQuantity == "0" ? "" : product.cartQuantity} Qty",
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontFamily: FontFamily.semiBold,
@@ -1189,7 +1189,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               ),
                             ),
                             Text(
-                              "${product.cartQuantity==0||product.cartQuantity==null||product.cartQuantity==""||product.cartQuantity=="0"?"":product.cartQuantity} Qty",
+                              "${product.cartQuantity == 0 || product.cartQuantity == null || product.cartQuantity == "" || product.cartQuantity == "0" ? "" : product.cartQuantity} Qty",
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontFamily: FontFamily.semiBold,

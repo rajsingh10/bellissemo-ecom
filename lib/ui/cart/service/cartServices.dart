@@ -130,7 +130,7 @@ class CartService {
           await box.delete(key);
         }
       } catch (e, stackTrack) {
-        print("stackTrack======>>>>>>>${stackTrack}");
+        print("stackTrack======>>>>>>>$stackTrack");
         log(
           "⚠️ Failed to sync offline cart item: ${body["product_id"]}, Error: $e",
         );
@@ -612,19 +612,18 @@ class CartService {
     required String cartItemKey,
     required int currentQuantity,
     required int overrideprice,
-    bool online=false,
+    bool online = false,
     bool isSync = false, // prevent infinite loop during sync
   }) async {
-    final newQuantity;
-    print("false shu ave che ${online}");
-    if(online==true){
-       newQuantity = currentQuantity;
-       print("a call thay che ho ${newQuantity}");
-    }else{
-       newQuantity = currentQuantity + 1;
-       print("a call thay che ${newQuantity}");
+    final int newQuantity;
+    print("false shu ave che $online");
+    if (online == true) {
+      newQuantity = currentQuantity;
+      print("a call thay che ho $newQuantity");
+    } else {
+      newQuantity = currentQuantity + 1;
+      print("a call thay che $newQuantity");
     }
-
 
     final box = HiveService().getAddCartBox();
     final cacheBox = HiveService().getProductCartDataBox();
@@ -1315,7 +1314,6 @@ class CartService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("✅ Coupon applied online → $couponCode");
         onSuccess();
-
       }
 
       return response;
@@ -1495,9 +1493,6 @@ class CartService {
     }
   }
 
-
-
-
   /// dicount api
 
   Future<Response?> applyDiscount({
@@ -1507,8 +1502,7 @@ class CartService {
     required double discountValue,
     required Callback onSuccess,
     bool isSync = false,
-  })
-  async {
+  }) async {
     final box = HiveService().getAddCartBox();
     final cacheBox = HiveService().getProductCartDataBox();
     if (!cacheBox.isOpen) await HiveService().init();
@@ -1635,7 +1629,6 @@ class CartService {
     }
   }
 
-
   Future<void> syncAppliedDiscounts() async {
     final box = HiveService().getAddCartBox();
 
@@ -1644,9 +1637,10 @@ class CartService {
       return;
     }
 
-    final keys = box.keys
-        .where((k) => k.toString().startsWith("offline_apply_discount_"))
-        .toList();
+    final keys =
+        box.keys
+            .where((k) => k.toString().startsWith("offline_apply_discount_"))
+            .toList();
 
     if (keys.isEmpty) {
       print("✅ No offline discounts to sync.");
@@ -1678,5 +1672,4 @@ class CartService {
       }
     }
   }
-
 }

@@ -30,5 +30,6 @@ class apiEndpoints {
   static String applyCoupons = "$baseUrl/wp-json/bellissemo/v1/apply-coupon";
   static String removeCoupons = "$baseUrl/wp-json/bellissemo/v1/remove-coupon";
   static String reorderApi = "$baseUrl/wp-json/bellissemo/v1/reorder";
-  static String updatediscount = "$baseUrl/wp-json/bellissemo/v1/update-discount";
+  static String updatediscount =
+      "$baseUrl/wp-json/bellissemo/v1/update-discount";
 }

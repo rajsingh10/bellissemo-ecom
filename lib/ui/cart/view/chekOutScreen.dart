@@ -25,7 +25,8 @@ import '../../customers/view/customerAddressScreen.dart';
 
 class CheckOutScreen extends StatefulWidget {
   String cridit;
-  CheckOutScreen({super.key,required this.cridit});
+
+  CheckOutScreen({super.key, required this.cridit});
 
   @override
   State<CheckOutScreen> createState() => _CheckOutScreenState();
@@ -745,171 +746,251 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                       //         ),
                                       //   ],
                                       // ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
 
-                                      children: [
-                                        Row(
-                                          children: [
-
-                                            Checkbox(
-                                              activeColor: AppColors.mainColor,
-                                              value: isShippingEnabled,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  isShippingEnabled = value ?? false;
-                                                });
-                                              },
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // 👈 default padding remove
-                                              visualDensity: VisualDensity.compact, // 👈 reduce overall space
-                                            ),
-
-                                            Text(
-                                              "Shipping",
-                                              style: TextStyle(
-                                                color: AppColors.gray,
-                                                fontSize: 16.sp,
-                                                fontFamily: FontFamily.semiBold,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Checkbox(
+                                                activeColor:
+                                                    AppColors.mainColor,
+                                                value: isShippingEnabled,
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    isShippingEnabled =
+                                                        value ?? false;
+                                                  });
+                                                },
+                                                materialTapTargetSize:
+                                                    MaterialTapTargetSize
+                                                        .shrinkWrap,
+                                                // 👈 default padding remove
+                                                visualDensity:
+                                                    VisualDensity
+                                                        .compact, // 👈 reduce overall space
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        totalController.text == ''
-                                            ? InkWell(
-                                          onTap: isShippingEnabled // 👈 check whether checkbox is true
-                                              ? () async {
-                                            final shippingCharge = await Get.dialog<String>(
-                                              Dialog(
-                                                backgroundColor: Colors.transparent,
-                                                child: StatefulBuilder(
-                                                  builder: (context, setState) {
-                                                    final formKey = GlobalKey<FormState>();
-                                                    TextEditingController dialogController =
-                                                    TextEditingController();
 
-                                                    return IntrinsicWidth(
-                                                      stepWidth: 300,
-                                                      child: IntrinsicHeight(
-                                                        child: Container(
-                                                          padding: EdgeInsets.all(16),
-                                                          decoration: BoxDecoration(
-                                                            color: AppColors.whiteColor,
-                                                            borderRadius: BorderRadius.circular(15),
-                                                          ),
-                                                          child: Column(
-                                                            mainAxisSize: MainAxisSize.min,
-                                                            children: [
-                                                              Text(
-                                                                "Apply Shipping Charges",
-                                                                style: TextStyle(
-                                                                  fontSize: 18.sp,
-                                                                  fontFamily: FontFamily.bold,
-                                                                  color: AppColors.blackColor,
-                                                                ),
-                                                              ),
-                                                              SizedBox(height: 16),
-                                                              Form(
-                                                                key: formKey,
-                                                                child: AppTextField(
-                                                                  controller: dialogController,
-                                                                  hintText: "Enter Shipping Charge",
-                                                                  text: "Shipping Charge",
-                                                                  isTextavailable: true,
-                                                                  textInputType: TextInputType.number,
-                                                                  maxline: 1,
-                                                                  validator: (value) {
-                                                                    if (value != null &&
-                                                                        value.isNotEmpty &&
-                                                                        double.tryParse(value) == null) {
-                                                                      return "Enter a valid number";
-                                                                    }
-                                                                    return null;
-                                                                  },
-                                                                ),
-                                                              ),
-                                                              SizedBox(height: 24),
-                                                              Row(
-                                                                mainAxisAlignment:
-                                                                MainAxisAlignment.spaceBetween,
-                                                                children: [
-                                                                  CustomButton(
-                                                                    title: "Cancel",
-                                                                    route: () => Get.back(),
-                                                                    color: AppColors.containerColor,
-                                                                    fontcolor: AppColors.blackColor,
-                                                                    height: 5.h,
-                                                                    width: 27.w,
-                                                                    fontsize: 15.sp,
-                                                                    radius: 12.0,
-                                                                  ),
-                                                                  CustomButton(
-                                                                    title: "Confirm",
-                                                                    route: () {
-                                                                      if (!formKey.currentState!
-                                                                          .validate()) {
-                                                                        return;
-                                                                      }
-
-                                                                      final charge =
-                                                                      dialogController.text
-                                                                          .trim()
-                                                                          .isEmpty
-                                                                          ? "0"
-                                                                          : dialogController.text
-                                                                          .trim();
-
-                                                                      Get.back(result: charge);
-                                                                    },
-                                                                    color: AppColors.mainColor,
-                                                                    fontcolor: AppColors.whiteColor,
-                                                                    height: 5.h,
-                                                                    width: 27.w,
-                                                                    fontsize: 15.sp,
-                                                                    radius: 12.0,
-                                                                    iconData: Icons.check,
-                                                                    iconsize: 17.sp,
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
+                                              Text(
+                                                "Shipping",
+                                                style: TextStyle(
+                                                  color: AppColors.gray,
+                                                  fontSize: 16.sp,
+                                                  fontFamily:
+                                                      FontFamily.semiBold,
                                                 ),
                                               ),
-                                              barrierDismissible: true,
-                                            );
+                                            ],
+                                          ),
+                                          totalController.text == ''
+                                              ? InkWell(
+                                                onTap:
+                                                    isShippingEnabled // 👈 check whether checkbox is true
+                                                        ? () async {
+                                                          final shippingCharge = await Get.dialog<
+                                                            String
+                                                          >(
+                                                            Dialog(
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .transparent,
+                                                              child: StatefulBuilder(
+                                                                builder: (
+                                                                  context,
+                                                                  setState,
+                                                                ) {
+                                                                  final formKey =
+                                                                      GlobalKey<
+                                                                        FormState
+                                                                      >();
+                                                                  TextEditingController
+                                                                  dialogController =
+                                                                      TextEditingController();
 
-                                            if (shippingCharge != null) {
-                                              setState(() {
-                                                totalController.text = shippingCharge;
-                                              });
-                                            }
-                                          }
-                                              : null, // 👈 disabled if checkbox not checked
-                                          child: Text(
-                                            'Apply Shipping',
-                                            style: TextStyle(
-                                              color: isShippingEnabled
-                                                  ? AppColors.mainColor
-                                                  : AppColors.gray.withOpacity(0.5), // dim when disabled
-                                              fontSize: 16.sp,
-                                              fontFamily: FontFamily.semiBold,
-                                            ),
-                                          ),
-                                        )
-                                            : Text(
-                                          "+ ${viewCartData?.totals?.currencySymbol} ${totalController.text.trim().toString()}.00",
-                                          style: TextStyle(
-                                            color: AppColors.gray,
-                                            fontSize: 16.sp,
-                                            fontFamily: FontFamily.semiBold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                                                  return IntrinsicWidth(
+                                                                    stepWidth:
+                                                                        300,
+                                                                    child: IntrinsicHeight(
+                                                                      child: Container(
+                                                                        padding:
+                                                                            EdgeInsets.all(
+                                                                              16,
+                                                                            ),
+                                                                        decoration: BoxDecoration(
+                                                                          color:
+                                                                              AppColors.whiteColor,
+                                                                          borderRadius: BorderRadius.circular(
+                                                                            15,
+                                                                          ),
+                                                                        ),
+                                                                        child: Column(
+                                                                          mainAxisSize:
+                                                                              MainAxisSize.min,
+                                                                          children: [
+                                                                            Text(
+                                                                              "Apply Shipping Charges",
+                                                                              style: TextStyle(
+                                                                                fontSize:
+                                                                                    18.sp,
+                                                                                fontFamily:
+                                                                                    FontFamily.bold,
+                                                                                color:
+                                                                                    AppColors.blackColor,
+                                                                              ),
+                                                                            ),
+                                                                            SizedBox(
+                                                                              height:
+                                                                                  16,
+                                                                            ),
+                                                                            Form(
+                                                                              key:
+                                                                                  formKey,
+                                                                              child: AppTextField(
+                                                                                controller:
+                                                                                    dialogController,
+                                                                                hintText:
+                                                                                    "Enter Shipping Charge",
+                                                                                text:
+                                                                                    "Shipping Charge",
+                                                                                isTextavailable:
+                                                                                    true,
+                                                                                textInputType:
+                                                                                    TextInputType.number,
+                                                                                maxline:
+                                                                                    1,
+                                                                                validator: (
+                                                                                  value,
+                                                                                ) {
+                                                                                  if (value !=
+                                                                                          null &&
+                                                                                      value.isNotEmpty &&
+                                                                                      double.tryParse(
+                                                                                            value,
+                                                                                          ) ==
+                                                                                          null) {
+                                                                                    return "Enter a valid number";
+                                                                                  }
+                                                                                  return null;
+                                                                                },
+                                                                              ),
+                                                                            ),
+                                                                            SizedBox(
+                                                                              height:
+                                                                                  24,
+                                                                            ),
+                                                                            Row(
+                                                                              mainAxisAlignment:
+                                                                                  MainAxisAlignment.spaceBetween,
+                                                                              children: [
+                                                                                CustomButton(
+                                                                                  title:
+                                                                                      "Cancel",
+                                                                                  route:
+                                                                                      () =>
+                                                                                          Get.back(),
+                                                                                  color:
+                                                                                      AppColors.containerColor,
+                                                                                  fontcolor:
+                                                                                      AppColors.blackColor,
+                                                                                  height:
+                                                                                      5.h,
+                                                                                  width:
+                                                                                      27.w,
+                                                                                  fontsize:
+                                                                                      15.sp,
+                                                                                  radius:
+                                                                                      12.0,
+                                                                                ),
+                                                                                CustomButton(
+                                                                                  title:
+                                                                                      "Confirm",
+                                                                                  route: () {
+                                                                                    if (!formKey.currentState!.validate()) {
+                                                                                      return;
+                                                                                    }
+
+                                                                                    final charge =
+                                                                                        dialogController.text.trim().isEmpty
+                                                                                            ? "0"
+                                                                                            : dialogController.text.trim();
+
+                                                                                    Get.back(
+                                                                                      result:
+                                                                                          charge,
+                                                                                    );
+                                                                                  },
+                                                                                  color:
+                                                                                      AppColors.mainColor,
+                                                                                  fontcolor:
+                                                                                      AppColors.whiteColor,
+                                                                                  height:
+                                                                                      5.h,
+                                                                                  width:
+                                                                                      27.w,
+                                                                                  fontsize:
+                                                                                      15.sp,
+                                                                                  radius:
+                                                                                      12.0,
+                                                                                  iconData:
+                                                                                      Icons.check,
+                                                                                  iconsize:
+                                                                                      17.sp,
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              ),
+                                                            ),
+                                                            barrierDismissible:
+                                                                true,
+                                                          );
+
+                                                          if (shippingCharge !=
+                                                              null) {
+                                                            setState(() {
+                                                              totalController
+                                                                      .text =
+                                                                  shippingCharge;
+                                                            });
+                                                          }
+                                                        }
+                                                        : null,
+                                                // 👈 disabled if checkbox not checked
+                                                child: Text(
+                                                  'Apply Shipping',
+                                                  style: TextStyle(
+                                                    color:
+                                                        isShippingEnabled
+                                                            ? AppColors
+                                                                .mainColor
+                                                            : AppColors.gray
+                                                                .withOpacity(
+                                                                  0.5,
+                                                                ),
+                                                    // dim when disabled
+                                                    fontSize: 16.sp,
+                                                    fontFamily:
+                                                        FontFamily.semiBold,
+                                                  ),
+                                                ),
+                                              )
+                                              : Text(
+                                                "+ ${viewCartData?.totals?.currencySymbol} ${totalController.text.trim().toString()}.00",
+                                                style: TextStyle(
+                                                  color: AppColors.gray,
+                                                  fontSize: 16.sp,
+                                                  fontFamily:
+                                                      FontFamily.semiBold,
+                                                ),
+                                              ),
+                                        ],
+                                      ),
                                       SizedBox(height: 1.h),
                                       Row(
                                         mainAxisAlignment:
@@ -1219,7 +1300,6 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         if (cachedData != null) {
           final data = json.decode(cachedData);
           viewCartData = ViewCartDataModal.fromJson(data);
-
         }
         showCustomErrorSnackbar(
           title: 'Server Error',

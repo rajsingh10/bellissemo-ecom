@@ -20,9 +20,7 @@ void main() async {
   if (await checkInternet()) {
     await CartService().syncOfflineCart();
     await CartService().syncOfflineActions();
-
     await CartService().syncOfflineUpdate();
-    // await CartService().syncAppliedCoupons();
     await CartService().syncAppliedDiscounts();
     await OrderHistoryProvider().syncReOrders();
     await UpdateAddressService().syncOfflineAddress();

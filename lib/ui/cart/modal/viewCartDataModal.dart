@@ -409,6 +409,7 @@ class Couponstotal {
     return data;
   }
 }
+
 class Totals {
   String? totalItems;
   String? totalItemsTax;
@@ -420,6 +421,7 @@ class Totals {
   var totalShippingTax;
   String? totalPrice;
   String? totalTax;
+
   // List<Null>? taxLines;
   String? currencyCode;
   String? currencySymbol;
@@ -428,30 +430,32 @@ class Totals {
   String? currencyThousandSeparator;
   String? currencyPrefix;
   String? currencySuffix;
+
   // CustomerDiscount? customerDiscount;
   var customerDiscountValue;
 
-  Totals(
-      {this.totalItems,
-        this.totalItemsTax,
-        this.totalFees,
-        this.totalFeesTax,
-        this.totalDiscount,
-        this.totalDiscountTax,
-        this.totalShipping,
-        this.totalShippingTax,
-        this.totalPrice,
-        this.totalTax,
-        // this.taxLines,
-        this.currencyCode,
-        this.currencySymbol,
-        this.currencyMinorUnit,
-        this.currencyDecimalSeparator,
-        this.currencyThousandSeparator,
-        this.currencyPrefix,
-        this.currencySuffix,
-        // this.customerDiscount,
-        this.customerDiscountValue});
+  Totals({
+    this.totalItems,
+    this.totalItemsTax,
+    this.totalFees,
+    this.totalFeesTax,
+    this.totalDiscount,
+    this.totalDiscountTax,
+    this.totalShipping,
+    this.totalShippingTax,
+    this.totalPrice,
+    this.totalTax,
+    // this.taxLines,
+    this.currencyCode,
+    this.currencySymbol,
+    this.currencyMinorUnit,
+    this.currencyDecimalSeparator,
+    this.currencyThousandSeparator,
+    this.currencyPrefix,
+    this.currencySuffix,
+    // this.customerDiscount,
+    this.customerDiscountValue,
+  });
 
   Totals.fromJson(Map<String, dynamic> json) {
     totalItems = json['total_items'];
@@ -484,31 +488,31 @@ class Totals {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['total_items'] = this.totalItems;
-    data['total_items_tax'] = this.totalItemsTax;
-    data['total_fees'] = this.totalFees;
-    data['total_fees_tax'] = this.totalFeesTax;
-    data['total_discount'] = this.totalDiscount;
-    data['total_discount_tax'] = this.totalDiscountTax;
-    data['total_shipping'] = this.totalShipping;
-    data['total_shipping_tax'] = this.totalShippingTax;
-    data['total_price'] = this.totalPrice;
-    data['total_tax'] = this.totalTax;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['total_items'] = totalItems;
+    data['total_items_tax'] = totalItemsTax;
+    data['total_fees'] = totalFees;
+    data['total_fees_tax'] = totalFeesTax;
+    data['total_discount'] = totalDiscount;
+    data['total_discount_tax'] = totalDiscountTax;
+    data['total_shipping'] = totalShipping;
+    data['total_shipping_tax'] = totalShippingTax;
+    data['total_price'] = totalPrice;
+    data['total_tax'] = totalTax;
     // if (this.taxLines != null) {
     //   data['tax_lines'] = this.taxLines!.map((v) => v.toJson()).toList();
     // }
-    data['currency_code'] = this.currencyCode;
-    data['currency_symbol'] = this.currencySymbol;
-    data['currency_minor_unit'] = this.currencyMinorUnit;
-    data['currency_decimal_separator'] = this.currencyDecimalSeparator;
-    data['currency_thousand_separator'] = this.currencyThousandSeparator;
-    data['currency_prefix'] = this.currencyPrefix;
-    data['currency_suffix'] = this.currencySuffix;
+    data['currency_code'] = currencyCode;
+    data['currency_symbol'] = currencySymbol;
+    data['currency_minor_unit'] = currencyMinorUnit;
+    data['currency_decimal_separator'] = currencyDecimalSeparator;
+    data['currency_thousand_separator'] = currencyThousandSeparator;
+    data['currency_prefix'] = currencyPrefix;
+    data['currency_suffix'] = currencySuffix;
     // if (this.customerDiscount != null) {
     //   data['customer_discount'] = this.customerDiscount!.toJson();
     // }
-    data['customer_discount_value'] = this.customerDiscountValue;
+    data['customer_discount_value'] = customerDiscountValue;
     return data;
   }
 }
@@ -527,10 +531,10 @@ class CustomerDiscount {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['enabled'] = this.enabled;
-    data['type'] = this.type;
-    data['value'] = this.value;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['enabled'] = enabled;
+    data['type'] = type;
+    data['value'] = value;
     return data;
   }
 }
