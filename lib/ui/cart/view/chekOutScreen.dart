@@ -1029,7 +1029,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                             ),
                                           ),
                                           Text(
-                                            "${viewCartData?.totals?.currencySymbol} ${((int.tryParse(viewCartData?.totals?.totalPrice ?? "0") ?? 0) / 100 + (int.tryParse(totalController.text.trim()) ?? 0))}",
+                                            // "${viewCartData?.totals?.currencySymbol} ${((int.tryParse(viewCartData?.totals?.totalPrice ?? "0") ?? 0) / 100 + (int.tryParse(totalController.text.trim()) ?? 0))}",
+                                            "${viewCartData?.totals?.currencySymbol}${((double.tryParse(totalamount == "" || totalamount == null ? (viewCartData?.totals?.totalPrice).toString() : totalamount ?? '0') ?? 0) / 100).toStringAsFixed(2)}",
                                             style: TextStyle(
                                               color: AppColors.blackColor,
                                               fontSize: 17.sp,
@@ -1271,7 +1272,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
               ).paddingSymmetric(horizontal: 3.w, vertical: 1.5.h),
     );
   }
-
+String? totalamount;
   Future<void> _fetchCart() async {
     var box = HiveService().getViewCartBox();
 
@@ -1294,12 +1295,50 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         viewCartData = ViewCartDataModal.fromJson(data);
+        setState(() {
+          final rawTotalItems = viewCartData?.totals?.totalItems;
+          final rawDiscount = viewCartData?.totals?.customerDiscountValue;
+
+          final totalItems =
+              ((rawTotalItems is num)
+                  ? rawTotalItems
+                  : num.tryParse(rawTotalItems?.toString() ?? '')) ??
+                  0;
+
+          final discount =
+              ((rawDiscount is num)
+                  ? rawDiscount
+                  : num.tryParse(rawDiscount?.toString() ?? '')) ??
+                  0;
+
+          final total = (totalItems as num) - (discount); // ✅ type-safe
+          totalamount = total.toString();
+        });
         await box.put("cart_$customerId", response.body);
       } else {
         final cachedData = box.get('cart_$customerId');
         if (cachedData != null) {
           final data = json.decode(cachedData);
           viewCartData = ViewCartDataModal.fromJson(data);
+          setState(() {
+            final rawTotalItems = viewCartData?.totals?.totalItems;
+            final rawDiscount = viewCartData?.totals?.customerDiscountValue;
+
+            final totalItems =
+                ((rawTotalItems is num)
+                    ? rawTotalItems
+                    : num.tryParse(rawTotalItems?.toString() ?? '')) ??
+                    0;
+
+            final discount =
+                ((rawDiscount is num)
+                    ? rawDiscount
+                    : num.tryParse(rawDiscount?.toString() ?? '')) ??
+                    0;
+
+            final total = (totalItems as num) - (discount); // ✅ type-safe
+            totalamount = total.toString();
+          });
         }
         showCustomErrorSnackbar(
           title: 'Server Error',
@@ -1311,6 +1350,25 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
       if (cachedData != null) {
         final data = json.decode(cachedData);
         viewCartData = ViewCartDataModal.fromJson(data);
+        setState(() {
+          final rawTotalItems = viewCartData?.totals?.totalItems;
+          final rawDiscount = viewCartData?.totals?.customerDiscountValue;
+
+          final totalItems =
+              ((rawTotalItems is num)
+                  ? rawTotalItems
+                  : num.tryParse(rawTotalItems?.toString() ?? '')) ??
+                  0;
+
+          final discount =
+              ((rawDiscount is num)
+                  ? rawDiscount
+                  : num.tryParse(rawDiscount?.toString() ?? '')) ??
+                  0;
+
+          final total = (totalItems as num) - (discount); // ✅ type-safe
+          totalamount = total.toString();
+        });
       }
       showCustomErrorSnackbar(
         title: 'Network Error',

@@ -797,19 +797,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       );
 
       if (response != null && response.statusCode == 200) {
-        showCustomSuccessSnackbar(
-          title: "Added to Cart",
-          message: "This product has been successfully added to your cart.",
-        );
+        // showCustomSuccessSnackbar(
+        //   title: "Added to Cart",
+        //   message: "This product has been successfully added to your cart.",
+        // );
         setState(() {
           isAddingToCart = false;
           quantity = 1;
         });
       } else {
-        showCustomSuccessSnackbar(
-          title: "Offline Mode",
-          message: "Product added offline. It will sync once internet is back.",
-        );
+        // showCustomSuccessSnackbar(
+        //   title: "Offline Mode",
+        //   message: "Product added offline. It will sync once internet is back.",
+        // );
         setState(() {
           isAddingToCart = false;
           quantity = 1;
@@ -840,19 +840,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       );
 
       if (response != null && response.statusCode == 200) {
-        showCustomSuccessSnackbar(
-          title: "Added to Cart",
-          message: "This product has been successfully added to your cart.",
-        );
+        // showCustomSuccessSnackbar(
+        //   title: "Added to Cart",
+        //   message: "This product has been successfully added to your cart.",
+        // );
         setState(() {
           isAddingToCart = false;
           quantity = 1;
         });
       } else {
-        showCustomSuccessSnackbar(
-          title: "Offline Mode",
-          message: "Product added offline. It will sync once internet is back.",
-        );
+        // showCustomSuccessSnackbar(
+        //   title: "Offline Mode",
+        //   message: "Product added offline. It will sync once internet is back.",
+        // );
         setState(() {
           isAddingToCart = false;
           quantity = 1;
