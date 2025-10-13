@@ -1291,6 +1291,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
       isAddingToCart = true;
       // 🔹 update UI immediately
       product.cartQuantity = (product.cartQuantity ?? 0) + 1;
+      /// pelu chu ave che
     });
 
     final cartService = CartService();

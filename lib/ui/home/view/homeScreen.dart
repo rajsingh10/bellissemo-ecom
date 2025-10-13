@@ -16,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../apiCalling/Loader.dart';
+import '../../../apiCalling/buildErrorDialog.dart';
 import '../../../apiCalling/checkInternetModule.dart';
 import '../../../services/hiveServices.dart';
 import '../../../utils/cachedNetworkImage.dart';
@@ -25,10 +26,12 @@ import '../../../utils/customMenuDrawer.dart';
 import '../../../utils/fontFamily.dart';
 import '../../../utils/searchFields.dart';
 import '../../../utils/snackBars.dart';
+import '../../../utils/snackBars.dart' as apiConfig;
 import '../../cart/service/cartServices.dart';
 import '../../category/modal/fetchCategoriesModal.dart';
 import '../../category/provider/categoriesProvider.dart';
 import '../../category/view/categoryScreen.dart';
+import '../../login/modal/freshTokenModal.dart';
 import '../../products/view/productDetailsScreen.dart';
 import '../../products/view/productsScreen.dart';
 import '../../profile/modal/profileModal.dart';
@@ -69,9 +72,30 @@ class _HomescreenState extends State<Homescreen> {
   @override
   void initState() {
     super.initState();
-    loadInitialData();
+    initStartupSequence();
   }
+  Future<void> initStartupSequence() async {
+    // Start stopwatch for performance tracking
+    final stopwatch = Stopwatch()..start();
 
+    try {
+      setState(() => isLoading = true);
+
+      // 1️⃣ First: Refresh token
+      await getTokenApi();
+
+      // 2️⃣ Then: Load initial data (in parallel)
+      await loadInitialData();
+
+    } catch (e, st) {
+      log("❌ Startup Error: $e");
+      log("Stacktrace: $st");
+    } finally {
+      stopwatch.stop();
+      log("✅ All startup tasks done in ${stopwatch.elapsedMilliseconds} ms");
+      setState(() => isLoading = false);
+    }
+  }
   Future<void> checkCustomer() async {
     final prefs = await SharedPreferences.getInstance();
     final customerId = prefs.getInt("customerId");
@@ -1732,5 +1756,60 @@ class _HomescreenState extends State<Homescreen> {
         );
       },
     );
+  }
+  Future<String?> getSavedLoginToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('login_token');
+  }
+  getTokenApi() async {
+    print("a call tha che");
+    String? token = await getSavedLoginToken();
+
+    print("my token shu ave che :: $token");
+    if (token == null || token.isEmpty) {
+      throw Exception('Token not found');
+    }
+    final Map<String, String> data = {
+      "refresh_token":token ?? ""
+    };
+
+    print("ram na data${data}");
+    final hasInternet = await checkInternet();
+    print("Internet status: $hasInternet");
+    checkInternet().then((internet) async {
+      if (internet) {
+        HomeProvider()
+            .refreshToken(data)
+            .then((response) async {
+          freshToken = FreshTokenModal.fromJson(
+            json.decode(response.body),
+          );
+          if (response.statusCode == 200) {
+            log("✅ All data loaded in token ave che ms");
+           await saveLoginToken(freshToken?.refreshToken ?? "");
+          } else if (response.statusCode == 422) {
+
+          } else {
+
+          }
+        })
+            .catchError((error, stackTrace) {
+          apiConfig.showCustomErrorSnackbar(
+            title: 'Change Password Error',
+            message: error.toString(),
+          );
+          print("error=====>>>>>>${stackTrace}");
+          print("Catch Error ===>>> ${error.toString()}");
+        });
+      } else {
+        // buildErrorDialog(context, 'Error', "Internet Required");
+      }
+    });
+  }
+  Future<void> saveLoginToken(String? token) async {
+    if (token == null || token.isEmpty) return;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('login_token', token);
+    log("✅ All data loaded in token ave che ms  ${token}");
   }
 }

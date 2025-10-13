@@ -5,6 +5,7 @@ import 'package:bellissemo_ecom/ui/login/modal/loginModal.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../ApiCalling/response.dart';
 import '../../../apiCalling/apiEndpoints.dart';
@@ -14,13 +15,17 @@ import '../../../services/hiveServices.dart';
 
 class OrderHistoryProvider extends ChangeNotifier {
   static final Dio _dio = Dio();
-
+  Future<String?> getSavedLoginToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('login_token');
+  }
   Future<http.Response> fetchOrders(id) async {
     String url = "${apiEndpoints.orderHistory}$id";
-    LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
-    String token = loginData?.token ?? '';
+    // LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
+    String? token = await getSavedLoginToken();
+
     print("my token :: $token");
-    if (token.isEmpty) {
+    if (token == null || token.isEmpty) {
       throw Exception('Token not found');
     }
     Map<String, String> headers = {
@@ -70,9 +75,14 @@ class OrderHistoryProvider extends ChangeNotifier {
 
     // ---------------- ONLINE ----------------
     try {
-      final loginData = await SaveDataLocal.getDataFromLocal();
-      final token = loginData?.token ?? '';
-      if (token.isEmpty) throw Exception("Token not found");
+      // final loginData = await SaveDataLocal.getDataFromLocal();
+      String? token = await SaveDataLocal1.getSavedLoginToken();
+
+
+      print("my token :: $token");
+      if (token == null || token.isEmpty) {
+        throw Exception('Token not found');
+      }
 
       final headers = {
         "Authorization": "Bearer $token",
@@ -155,3 +165,11 @@ class OrderHistoryProvider extends ChangeNotifier {
     }
   }
 }
+class SaveDataLocal1 {
+  static Future<String?> getSavedLoginToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('login_token');
+  }
+}
+
+

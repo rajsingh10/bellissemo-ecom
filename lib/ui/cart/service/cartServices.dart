@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../ApiCalling/response.dart';
 import '../../../Apicalling/sharedpreferance.dart';
@@ -22,6 +23,10 @@ String prettyPrintJson(Map<String, dynamic> json) {
 }
 
 class CartService {
+  Future<String?> getSavedLoginToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('login_token');
+  }
   final Dio _dio = Dio();
 
   // ----------------- Add to Cart -----------------
@@ -62,8 +67,12 @@ class CartService {
 
     try {
       final loginData = await SaveDataLocal.getDataFromLocal();
-      final token = loginData?.token ?? '';
-      if (token.isEmpty) throw Exception("Token not found");
+      String? token = await getSavedLoginToken();
+
+      print("my token :: $token");
+      if (token == null || token.isEmpty) {
+        throw Exception('Token not found');
+      }
 
       final headers = {
         "Authorization": "Bearer $token",
@@ -301,7 +310,12 @@ class CartService {
     if (await checkInternet()) {
       try {
         final loginData = await SaveDataLocal.getDataFromLocal();
-        final token = loginData?.token ?? '';
+        String? token = await getSavedLoginToken();
+
+        print("my token :: $token");
+        if (token == null || token.isEmpty) {
+          throw Exception('Token not found');
+        }
         if (token.isNotEmpty) {
           final headers = {
             "Authorization": "Bearer $token",
@@ -408,8 +422,12 @@ class CartService {
     // ---------------- ONLINE ----------------
     try {
       final loginData = await SaveDataLocal.getDataFromLocal();
-      final token = loginData?.token ?? '';
-      if (token.isEmpty) throw Exception("Token not found");
+      String? token = await getSavedLoginToken();
+
+      print("my token :: $token");
+      if (token == null || token.isEmpty) {
+        throw Exception('Token not found');
+      }
 
       final headers = {
         "Authorization": "Bearer $token",
@@ -503,9 +521,10 @@ class CartService {
     final cartData = await getProductCartData(productId: productId);
 
     num totalQuantity = cartData["totalQuantity"] ?? 0;
+    print("totalQuantity====shu ave che${totalQuantity}");
     String? cartItemKey = cartData["cartItemKey"];
     int quantityToSend = (totalQuantity + 1).toInt();
-
+print("quantityToSend====>>>>>>>>>${quantityToSend}");
     Map<String, dynamic> body =
         cartItemKey != null
             ? {"cart_item_key": cartItemKey, "quantity": quantityToSend}
@@ -562,8 +581,12 @@ class CartService {
     // Online handling
     try {
       final loginData = await SaveDataLocal.getDataFromLocal();
-      final token = loginData?.token ?? '';
-      if (token.isEmpty) throw Exception("Token not found");
+      String? token = await getSavedLoginToken();
+
+      print("my token :: $token");
+      if (token == null || token.isEmpty) {
+        throw Exception('Token not found');
+      }
 
       final headers = {
         "Authorization": "Bearer $token",
@@ -659,8 +682,12 @@ class CartService {
     // ---------------- ONLINE ----------------
     try {
       final loginData = await SaveDataLocal.getDataFromLocal();
-      final token = loginData?.token ?? '';
-      if (token.isEmpty) throw Exception("Token not found");
+      String? token = await getSavedLoginToken();
+
+      print("my token :: $token");
+      if (token == null || token.isEmpty) {
+        throw Exception('Token not found');
+      }
 
       final headers = {
         "Authorization": "Bearer $token",
@@ -745,8 +772,12 @@ class CartService {
     // ---------------- ONLINE ----------------
     try {
       final loginData = await SaveDataLocal.getDataFromLocal();
-      final token = loginData?.token ?? '';
-      if (token.isEmpty) throw Exception("Token not found");
+      String? token = await getSavedLoginToken();
+
+      print("my token :: $token");
+      if (token == null || token.isEmpty) {
+        throw Exception('Token not found');
+      }
 
       final headers = {
         "Authorization": "Bearer $token",
@@ -823,8 +854,12 @@ class CartService {
     // ---------------- ONLINE ----------------
     try {
       final loginData = await SaveDataLocal.getDataFromLocal();
-      final token = loginData?.token ?? '';
-      if (token.isEmpty) throw Exception("Token not found");
+      String? token = await getSavedLoginToken();
+
+      print("my token :: $token");
+      if (token == null || token.isEmpty) {
+        throw Exception('Token not found');
+      }
 
       final headers = {
         "Authorization": "Bearer $token",
@@ -881,8 +916,12 @@ class CartService {
 
     try {
       final loginData = await SaveDataLocal.getDataFromLocal();
-      final token = loginData?.token ?? '';
-      if (token.isEmpty) throw Exception("Token not found");
+      String? token = await getSavedLoginToken();
+
+      print("my token :: $token");
+      if (token == null || token.isEmpty) {
+        throw Exception('Token not found');
+      }
 
       final headers = {
         "Authorization": "Bearer $token",
@@ -925,9 +964,10 @@ class CartService {
   Future<http.Response> fetchCart(id) async {
     String url = "${apiEndpoints.viewCart}$id";
     LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
-    String token = loginData?.token ?? '';
+    String? token = await getSavedLoginToken();
+
     print("my token :: $token");
-    if (token.isEmpty) {
+    if (token == null || token.isEmpty) {
       throw Exception('Token not found');
     }
     Map<String, String> headers = {
@@ -1143,8 +1183,12 @@ class CartService {
 
     try {
       final loginData = await SaveDataLocal.getDataFromLocal();
-      final token = loginData?.token ?? '';
-      if (token.isEmpty) throw Exception("Token not found");
+      String? token = await getSavedLoginToken();
+
+      print("my token :: $token");
+      if (token == null || token.isEmpty) {
+        throw Exception('Token not found');
+      }
 
       final headers = {
         "Authorization": "Bearer $token",
@@ -1199,8 +1243,12 @@ class CartService {
     if (keys.isEmpty) return;
 
     final loginData = await SaveDataLocal.getDataFromLocal();
-    final token = loginData?.token ?? '';
-    if (token.isEmpty) return;
+    String? token = await getSavedLoginToken();
+
+    print("my token :: $token");
+    if (token == null || token.isEmpty) {
+      throw Exception('Token not found');
+    }
 
     final headers = {
       "Authorization": "Bearer $token",
@@ -1233,9 +1281,10 @@ class CartService {
   Future<http.Response> couponsListApi() async {
     String url = apiEndpoints.couponsList;
     LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
-    String token = loginData?.token ?? '';
+    String? token = await getSavedLoginToken();
+
     print("my token :: $token");
-    if (token.isEmpty) {
+    if (token == null || token.isEmpty) {
       throw Exception('Token not found');
     }
     Map<String, String> headers = {
@@ -1294,9 +1343,12 @@ class CartService {
     // ---------------- ONLINE ----------------
     try {
       final loginData = await SaveDataLocal.getDataFromLocal();
-      final token = loginData?.token ?? '';
-      if (token.isEmpty) throw Exception("Token not found");
+      String? token = await getSavedLoginToken();
 
+      print("my token :: $token");
+      if (token == null || token.isEmpty) {
+        throw Exception('Token not found');
+      }
       final headers = {
         "Authorization": "Bearer $token",
         "Content-Type": "application/json",
@@ -1411,8 +1463,12 @@ class CartService {
     // ---------------- ONLINE ----------------
     try {
       final loginData = await SaveDataLocal.getDataFromLocal();
-      final token = loginData?.token ?? '';
-      if (token.isEmpty) throw Exception("Token not found");
+      String? token = await getSavedLoginToken();
+
+      print("my token :: $token");
+      if (token == null || token.isEmpty) {
+        throw Exception('Token not found');
+      }
 
       final headers = {
         "Authorization": "Bearer $token",
@@ -1510,7 +1566,7 @@ class CartService {
     await cacheBox.put("applied_discount", {
       "customerId": customerId,
       "enabled": enabled,
-      "discountType": discountType,
+      "discountType":discountType=="Percentage"?"percentage" :"fixed",
       "discountValue": discountValue,
       "appliedAt": DateTime.now().toIso8601String(),
     });
@@ -1525,7 +1581,7 @@ class CartService {
             "action": "apply_discount",
             "customer_id": customerId,
             "enabled": enabled,
-            "discount_type": discountType,
+            "discount_type": discountType=="Percentage"?"percentage" :"fixed",
             "discount_value": discountValue,
             "timestamp": DateTime.now().toIso8601String(),
           },
@@ -1537,8 +1593,12 @@ class CartService {
 
     try {
       final loginData = await SaveDataLocal.getDataFromLocal();
-      final token = loginData?.token ?? '';
-      if (token.isEmpty) throw Exception("Token not found");
+      String? token = await getSavedLoginToken();
+
+      print("my token :: $token");
+      if (token == null || token.isEmpty) {
+        throw Exception('Token not found');
+      }
 
       final headers = {
         "Authorization": "Bearer $token",
@@ -1549,7 +1609,7 @@ class CartService {
       final body = {
         "customer_id": customerId,
         "enabled": enabled,
-        "discount_type": discountType,
+        "discount_type":discountType=="Percentage"?"percentage" :"fixed",
         "discount_value": discountValue,
       };
 

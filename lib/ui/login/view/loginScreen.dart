@@ -5,6 +5,7 @@ import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:bellissemo_ecom/utils/images.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../apiCalling/apiConfigs.dart';
@@ -348,7 +349,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Save in SharedPreferences
         SaveDataLocal.saveLogInData(loginData!);
-
+        await saveLoginToken(loginData?.token);
         showCustomSuccessSnackbar(
           title: 'Login Successful',
           message:
@@ -433,5 +434,11 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() => isLogin = false);
       }
     });
+  }
+  Future<void> saveLoginToken(String? token) async {
+    if (token == null || token.isEmpty) return;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('login_token', token);
+    print("✅ Token saved locally: $token");
   }
 }

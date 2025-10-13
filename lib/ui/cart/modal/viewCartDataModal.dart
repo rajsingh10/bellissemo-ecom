@@ -422,7 +422,7 @@ class Totals {
   String? totalPrice;
   String? totalTax;
 
-  // List<Null>? taxLines;
+
   String? currencyCode;
   String? currencySymbol;
   int? currencyMinorUnit;
@@ -431,7 +431,7 @@ class Totals {
   String? currencyPrefix;
   String? currencySuffix;
 
-  // CustomerDiscount? customerDiscount;
+  CustomerDiscount? customerDiscount;
   var customerDiscountValue;
 
   Totals({
@@ -445,7 +445,6 @@ class Totals {
     this.totalShippingTax,
     this.totalPrice,
     this.totalTax,
-    // this.taxLines,
     this.currencyCode,
     this.currencySymbol,
     this.currencyMinorUnit,
@@ -453,10 +452,38 @@ class Totals {
     this.currencyThousandSeparator,
     this.currencyPrefix,
     this.currencySuffix,
-    // this.customerDiscount,
+    this.customerDiscount,
     this.customerDiscountValue,
   });
 
+  // Totals.fromJson(Map<String, dynamic> json) {
+  //   totalItems = json['total_items'];
+  //   totalItemsTax = json['total_items_tax'];
+  //   totalFees = json['total_fees'];
+  //   totalFeesTax = json['total_fees_tax'];
+  //   totalDiscount = json['total_discount'];
+  //   totalDiscountTax = json['total_discount_tax'];
+  //   totalShipping = json['total_shipping'];
+  //   totalShippingTax = json['total_shipping_tax'];
+  //   totalPrice = json['total_price'];
+  //   totalTax = json['total_tax'];
+  //   currencyCode = json['currency_code'];
+  //   currencySymbol = json['currency_symbol'];
+  //   currencyMinorUnit = json['currency_minor_unit'];
+  //   currencyDecimalSeparator = json['currency_decimal_separator'];
+  //   currencyThousandSeparator = json['currency_thousand_separator'];
+  //   currencyPrefix = json['currency_prefix'];
+  //   currencySuffix = json['currency_suffix'];
+  //   // customerDiscount = json['customer_discount'] != null
+  //   //     ? new CustomerDiscount.fromJson(json['customer_discount'])
+  //   //     : null;
+  //   if (json['customer_discount'] is Map<String, dynamic>) {
+  //     customerDiscount = CustomerDiscount.fromJson(json['customer_discount']);
+  //   } else {
+  //     customerDiscount = null;
+  //   }
+  //   customerDiscountValue = json['customer_discount_value'];
+  // }
   Totals.fromJson(Map<String, dynamic> json) {
     totalItems = json['total_items'];
     totalItemsTax = json['total_items_tax'];
@@ -468,12 +495,6 @@ class Totals {
     totalShippingTax = json['total_shipping_tax'];
     totalPrice = json['total_price'];
     totalTax = json['total_tax'];
-    // if (json['tax_lines'] != null) {
-    //   taxLines = <Null>[];
-    //   json['tax_lines'].forEach((v) {
-    //     taxLines!.add(new Null.fromJson(v));
-    //   });
-    // }
     currencyCode = json['currency_code'];
     currencySymbol = json['currency_symbol'];
     currencyMinorUnit = json['currency_minor_unit'];
@@ -481,9 +502,16 @@ class Totals {
     currencyThousandSeparator = json['currency_thousand_separator'];
     currencyPrefix = json['currency_prefix'];
     currencySuffix = json['currency_suffix'];
-    // customerDiscount = json['customer_discount'] != null
-    //     ? new CustomerDiscount.fromJson(json['customer_discount'])
-    //     : null;
+
+    // ✅ Debug log
+    print("⚠️ customer_discount: ${json['customer_discount']}");
+
+    if (json['customer_discount'] is Map<String, dynamic>) {
+      customerDiscount = CustomerDiscount.fromJson(json['customer_discount']);
+    } else {
+      customerDiscount = null;
+    }
+
     customerDiscountValue = json['customer_discount_value'];
   }
 
@@ -499,9 +527,7 @@ class Totals {
     data['total_shipping_tax'] = totalShippingTax;
     data['total_price'] = totalPrice;
     data['total_tax'] = totalTax;
-    // if (this.taxLines != null) {
-    //   data['tax_lines'] = this.taxLines!.map((v) => v.toJson()).toList();
-    // }
+
     data['currency_code'] = currencyCode;
     data['currency_symbol'] = currencySymbol;
     data['currency_minor_unit'] = currencyMinorUnit;
@@ -509,14 +535,35 @@ class Totals {
     data['currency_thousand_separator'] = currencyThousandSeparator;
     data['currency_prefix'] = currencyPrefix;
     data['currency_suffix'] = currencySuffix;
-    // if (this.customerDiscount != null) {
-    //   data['customer_discount'] = this.customerDiscount!.toJson();
-    // }
+    if (this.customerDiscount != null) {
+      data['customer_discount'] = this.customerDiscount!.toJson();
+    }
     data['customer_discount_value'] = customerDiscountValue;
     return data;
   }
 }
 
+// class CustomerDiscount {
+//   bool? enabled;
+//   String? type;
+//   double? value;
+//
+//   CustomerDiscount({this.enabled, this.type, this.value});
+//
+//   CustomerDiscount.fromJson(Map<String, dynamic> json) {
+//     enabled = json['enabled'];
+//     type = json['type'];
+//     value = json['value'];
+//   }
+//
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = <String, dynamic>{};
+//     data['enabled'] = enabled;
+//     data['type'] = type;
+//     data['value'] = value;
+//     return data;
+//   }
+// }
 class CustomerDiscount {
   bool? enabled;
   String? type;
@@ -525,9 +572,11 @@ class CustomerDiscount {
   CustomerDiscount({this.enabled, this.type, this.value});
 
   CustomerDiscount.fromJson(Map<String, dynamic> json) {
-    enabled = json['enabled'];
-    type = json['type'];
-    value = json['value'];
+    enabled = json['enabled'] == true;
+    type = json['type']?.toString();
+
+    // ✅ Safely handle both int and double
+    value = (json['value'] is num) ? (json['value'] as num).toDouble() : null;
   }
 
   Map<String, dynamic> toJson() {

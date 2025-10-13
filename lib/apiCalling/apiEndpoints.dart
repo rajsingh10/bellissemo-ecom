@@ -32,4 +32,6 @@ class apiEndpoints {
   static String reorderApi = "$baseUrl/wp-json/bellissemo/v1/reorder";
   static String updatediscount =
       "$baseUrl/wp-json/bellissemo/v1/update-discount";
+  static String refreshToken =
+      "$baseUrl/wp-json/jwt-auth/v1/token/refresh";
 }

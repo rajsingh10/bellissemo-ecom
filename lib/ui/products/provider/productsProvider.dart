@@ -4,18 +4,24 @@ import 'dart:io';
 import 'package:bellissemo_ecom/ui/login/modal/loginModal.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../ApiCalling/response.dart';
 import '../../../apiCalling/apiEndpoints.dart';
 import '../../../apiCalling/sharedpreferance.dart';
 
 class ProductsProvider extends ChangeNotifier {
+  Future<String?> getSavedLoginToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('login_token');
+  }
   Future<http.Response> fetchProducts() async {
     String url = apiEndpoints.fetchProducts;
     LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
-    String token = loginData?.token ?? '';
+    String? token = await getSavedLoginToken();
+
     print("my token :: $token");
-    if (token.isEmpty) {
+    if (token == null || token.isEmpty) {
       throw Exception('Token not found');
     }
     Map<String, String> headers = {
@@ -42,9 +48,10 @@ class ProductsProvider extends ChangeNotifier {
     String url = "${apiEndpoints.fetchProducts}/$id";
     log('Variation Url :: $url');
     LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
-    String token = loginData?.token ?? '';
-    log("my token :: $token");
-    if (token.isEmpty) {
+    String? token = await getSavedLoginToken();
+
+    print("my token :: $token");
+    if (token == null || token.isEmpty) {
       throw Exception('Token not found');
     }
     Map<String, String> headers = {
@@ -71,9 +78,10 @@ class ProductsProvider extends ChangeNotifier {
     String url = apiEndpoints.fetchCategoryWiseProducts + id;
     log('Category Wise Products Url :: $url');
     LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
-    String token = loginData?.token ?? '';
+    String? token = await getSavedLoginToken();
+
     print("my token :: $token");
-    if (token.isEmpty) {
+    if (token == null || token.isEmpty) {
       throw Exception('Token not found');
     }
     Map<String, String> headers = {

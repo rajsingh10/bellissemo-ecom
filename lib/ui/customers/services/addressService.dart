@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../Apicalling/sharedpreferance.dart';
 import '../../../apiCalling/apiEndpoints.dart';
@@ -9,6 +10,10 @@ import '../../../apiCalling/checkInternetModule.dart';
 import '../../../services/hiveServices.dart';
 
 class UpdateAddressService {
+  Future<String?> getSavedLoginToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('login_token');
+  }
   final Dio _dio = Dio();
 
   // ----------------- Update Address -----------------
@@ -39,9 +44,12 @@ class UpdateAddressService {
 
     try {
       final loginData = await SaveDataLocal.getDataFromLocal();
-      final token = loginData?.token ?? '';
-      if (token.isEmpty) throw Exception("Token not found");
-      log('Token : $token');
+      String? token = await getSavedLoginToken();
+
+      print("my token :: $token");
+      if (token == null || token.isEmpty) {
+        throw Exception('Token not found');
+      }
       final headers = {
         "Authorization": "Bearer $token",
         "Content-Type": "application/json",

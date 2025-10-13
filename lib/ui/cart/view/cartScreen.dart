@@ -737,6 +737,9 @@ class _CartScreenState extends State<CartScreen> {
                                                             children: [
                                                               InkWell(
                                                                 onTap: () async {
+                                                                  setState(() {
+                                                                    isLoading=true;
+                                                                  });
                                                                   final item =
                                                                       viewCartData
                                                                           ?.items?[i];
@@ -770,7 +773,9 @@ class _CartScreenState extends State<CartScreen> {
                                                                     if (await checkInternet()) {
                                                                       await _fetchCart(); // just call it
                                                                       setState(
-                                                                        () {},
+                                                                        () {
+                                                                          isLoading=false;
+                                                                        },
                                                                       ); // refresh UI after _fetchCart updates viewCartData
                                                                     }
                                                                   } catch (
@@ -942,9 +947,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                                                 viewCartData?.items?[i];
                                                                                             if (item ==
                                                                                                 null) {
-                                                                                              Navigator.pop(
-                                                                                                context,
-                                                                                              );
+
                                                                                               return;
                                                                                             }
 
@@ -971,7 +974,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                                                   itemIndex:
                                                                                                       i,
                                                                                                 );
-                                                                                                Get.back();
+                                                                                                // Get.back();
                                                                                               },
                                                                                             );
 
@@ -1025,7 +1028,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                                                       currentQty,
                                                                                                 );
                                                                                                 await _fetchCart();
-                                                                                                Get.back();
+                                                                                                // Get.back();
                                                                                                 Get.offAll(
                                                                                                   CartScreen(),
                                                                                                 );
@@ -1076,24 +1079,32 @@ class _CartScreenState extends State<CartScreen> {
                                                                         true,
                                                                   );
                                                                 },
-                                                                child: Text(
-                                                                  (double.parse(
-                                                                            viewCartData?.items?[i].prices?.price ??
-                                                                                "0",
-                                                                          ) /
-                                                                          100)
-                                                                      .toStringAsFixed(
-                                                                        2,
+                                                                child: Container(
+                                                                  child: Row(
+                                                                    children: [
+                                                                      Icon(Icons.edit,color: AppColors.mainColor,),
+                                                                      SizedBox(width: 2.w,),
+                                                                      Text(
+                                                                        (double.parse(
+                                                                                  viewCartData?.items?[i].prices?.price ??
+                                                                                      "0",
+                                                                                ) /
+                                                                                100)
+                                                                            .toStringAsFixed(
+                                                                              2,
+                                                                            ),
+                                                                        style: TextStyle(
+                                                                          color:
+                                                                              AppColors
+                                                                                  .blackColor,
+                                                                          fontSize:
+                                                                              14.sp,
+                                                                          fontFamily:
+                                                                              FontFamily
+                                                                                  .semiBold,
+                                                                        ),
                                                                       ),
-                                                                  style: TextStyle(
-                                                                    color:
-                                                                        AppColors
-                                                                            .blackColor,
-                                                                    fontSize:
-                                                                        14.sp,
-                                                                    fontFamily:
-                                                                        FontFamily
-                                                                            .semiBold,
+                                                                    ],
                                                                   ),
                                                                 ),
                                                               ),
@@ -1213,7 +1224,7 @@ class _CartScreenState extends State<CartScreen> {
                                                 dialogController =
                                                     TextEditingController();
                                                 String selectedType =
-                                                    "fixed"; // default
+                                                    "Fixed"; // default
 
                                                 final discountResult = await Get.dialog<
                                                   Map<String, String>
@@ -1268,7 +1279,8 @@ class _CartScreenState extends State<CartScreen> {
                                                                   // 👇 Dropdown for Amount / Percentage
                                                                   Row(
                                                                     children: [
-                                                                      Expanded(
+                                                                      Container(
+                                                                        width: 65.w,
                                                                         child: DropdownButtonFormField<
                                                                           String
                                                                         >(
@@ -1276,8 +1288,8 @@ class _CartScreenState extends State<CartScreen> {
                                                                               selectedType,
                                                                           items:
                                                                               [
-                                                                                    "fixed",
-                                                                                    "percentage",
+                                                                                    "Fixed",
+                                                                                    "Percentage",
                                                                                   ]
                                                                                   .map(
                                                                                     (
@@ -1303,6 +1315,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                             });
                                                                           },
                                                                           decoration: InputDecoration(
+                                                                            disabledBorder: OutlineInputBorder(),
                                                                             labelText:
                                                                                 "Discount Type",
                                                                             border: OutlineInputBorder(
@@ -1310,15 +1323,11 @@ class _CartScreenState extends State<CartScreen> {
                                                                                 8,
                                                                               ),
                                                                             ),
-                                                                            contentPadding: EdgeInsets.symmetric(
-                                                                              vertical:
-                                                                                  10,
-                                                                              horizontal:
-                                                                                  12,
-                                                                            ),
+
                                                                           ),
                                                                         ),
                                                                       ),
+
                                                                     ],
                                                                   ),
                                                                   SizedBox(
@@ -1336,12 +1345,12 @@ class _CartScreenState extends State<CartScreen> {
                                                                           dialogController,
                                                                       hintText:
                                                                           selectedType ==
-                                                                                  "fixed"
+                                                                                  "Fixed"
                                                                               ? "Enter Discount Fixed"
                                                                               : "Enter Discount percentage",
                                                                       text:
                                                                           selectedType ==
-                                                                                  "fixed"
+                                                                                  "Fixed"
                                                                               ? "Discount Fixed"
                                                                               : "Discount percentage",
                                                                       isTextavailable:
@@ -1387,7 +1396,7 @@ class _CartScreenState extends State<CartScreen> {
 
                                                                         // 🔹 Percentage should not exceed 100
                                                                         if (selectedType ==
-                                                                                "percentage" &&
+                                                                                "Percentage" &&
                                                                             parsed >
                                                                                 100) {
                                                                           return "percentage can't be more than 100";
@@ -1395,7 +1404,7 @@ class _CartScreenState extends State<CartScreen> {
 
                                                                         // 🔹 Amount should not exceed subtotal
                                                                         if (selectedType ==
-                                                                                "fixed" &&
+                                                                                "Fixed" &&
                                                                             parsed >
                                                                                 subtotal) {
                                                                           return "Discount can't exceed${viewCartData?.totals?.currencySymbol} ${subtotal.toStringAsFixed(2)}";
@@ -1531,7 +1540,7 @@ class _CartScreenState extends State<CartScreen> {
                                                       },
                                                     );
                                                     if (selectedType ==
-                                                        "percentage") {
+                                                        "Percentage") {
                                                       updateCartTotalsLocally(
                                                         offlineDiscount:
                                                             double.parse(
@@ -1626,6 +1635,38 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                       ],
                                     ),
+                                    SizedBox(height: 2.h),
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.start,
+                                      children: [
+
+                                        // Text(
+                                        //   "${viewCartData?.totals?.currencySymbol}${(double.tryParse((totalamount?.tostring ?? 0)! / 100).toStringAsFixed(2)}",
+                                        //   // "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
+                                        //   style: TextStyle(
+                                        //     color: AppColors.blackColor,
+                                        //     fontSize: 17.sp,
+                                        //     fontFamily: FontFamily.semiBold,
+                                        //   ),
+                                        // ),
+                                        viewCartData?.totals?.customerDiscount?.enabled==false?Container() : viewCartData?.totals?.customerDiscount?.type=="percentage"  ? Text(
+                                    "*${viewCartData?.totals?.customerDiscount?.value}% Discount",
+                                      style: TextStyle(
+                                        color: AppColors.redColor,
+                                        fontSize: 17.sp,
+                                        fontFamily: FontFamily.semiBold,
+                                      ),
+                                    ):Text(
+                                          "*${viewCartData?.totals?.currencySymbol}${viewCartData?.totals?.customerDiscount?.value} Discount",
+                                          style: TextStyle(
+                                            color: AppColors.redColor,
+                                            fontSize: 17.sp,
+                                            fontFamily: FontFamily.semiBold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ],
                                 ),
                               ),
@@ -1653,12 +1694,21 @@ class _CartScreenState extends State<CartScreen> {
                                           visualDensity: VisualDensity.compact,
                                         ),
                                       ),
-                                      Text(
-                                        "Credit",
-                                        style: TextStyle(
-                                          color: AppColors.gray,
-                                          fontSize: 16.sp,
-                                          fontFamily: FontFamily.semiBold,
+                                      InkWell(
+                                        onTap: (){
+                                          setState(() {
+                                            credit = true;
+                                            log("=====>>>>>>>>$credit");
+                                            proforma = false;
+                                          });
+                                        },
+                                        child: Text(
+                                          "Credit",
+                                          style: TextStyle(
+                                            color: AppColors.gray,
+                                            fontSize: 16.sp,
+                                            fontFamily: FontFamily.semiBold,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -1687,12 +1737,21 @@ class _CartScreenState extends State<CartScreen> {
                                           visualDensity: VisualDensity.compact,
                                         ),
                                       ),
-                                      Text(
-                                        "Proforma",
-                                        style: TextStyle(
-                                          color: AppColors.gray,
-                                          fontSize: 16.sp,
-                                          fontFamily: FontFamily.semiBold,
+                                      InkWell(
+                                        onTap: (){
+                                          setState(() {
+                                            proforma = true;
+                                            log("=====>>>>>>>>$proforma");
+                                            credit = false;
+                                          });
+                                        },
+                                        child: Text(
+                                          "Proforma",
+                                          style: TextStyle(
+                                            color: AppColors.gray,
+                                            fontSize: 16.sp,
+                                            fontFamily: FontFamily.semiBold,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -1708,7 +1767,7 @@ class _CartScreenState extends State<CartScreen> {
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          viewCartData?.items?.length == 0 ||
+         isLoading|| viewCartData?.items?.length == 0 ||
                   viewCartData?.items?.length == null ||
                   viewCartData?.items?.length == []
               ? Container()
