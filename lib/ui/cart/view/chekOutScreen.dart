@@ -71,6 +71,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     setState(() {});
   }
 
+  String? shiping;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -772,13 +774,21 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                                         .compact, // 👈 reduce overall space
                                               ),
 
-                                              Text(
-                                                "Shipping",
-                                                style: TextStyle(
-                                                  color: AppColors.gray,
-                                                  fontSize: 16.sp,
-                                                  fontFamily:
-                                                      FontFamily.semiBold,
+                                              InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    isShippingEnabled =
+                                                        !isShippingEnabled;
+                                                  });
+                                                },
+                                                child: Text(
+                                                  "Shipping",
+                                                  style: TextStyle(
+                                                    color: AppColors.gray,
+                                                    fontSize: 16.sp,
+                                                    fontFamily:
+                                                        FontFamily.semiBold,
+                                                  ),
                                                 ),
                                               ),
                                             ],
@@ -914,7 +924,12 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                                                                         dialogController.text.trim().isEmpty
                                                                                             ? "0"
                                                                                             : dialogController.text.trim();
-
+                                                                                    setState(
+                                                                                      () {
+                                                                                        shiping =
+                                                                                            charge;
+                                                                                      },
+                                                                                    );
                                                                                     Get.back(
                                                                                       result:
                                                                                           charge,
@@ -1030,7 +1045,10 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                           ),
                                           Text(
                                             // "${viewCartData?.totals?.currencySymbol} ${((int.tryParse(viewCartData?.totals?.totalPrice ?? "0") ?? 0) / 100 + (int.tryParse(totalController.text.trim()) ?? 0))}",
-                                            "${viewCartData?.totals?.currencySymbol}${((double.tryParse(totalamount == "" || totalamount == null ? (viewCartData?.totals?.totalPrice).toString() : totalamount ?? '0') ?? 0) / 100).toStringAsFixed(2)}",
+                                            isShippingEnabled
+                                                ? "${viewCartData?.totals?.currencySymbol}${(((double.tryParse(totalamount == "" || totalamount == null ? (viewCartData?.totals?.totalPrice).toString() : totalamount ?? '0') ?? 0) / 100) + (double.tryParse(shiping.toString()) ?? 0)).toStringAsFixed(2)}"
+                                                : "${viewCartData?.totals?.currencySymbol}${(((double.tryParse(totalamount == "" || totalamount == null ? (viewCartData?.totals?.totalPrice).toString() : totalamount ?? '0') ?? 0) / 100)).toStringAsFixed(2)}",
+
                                             style: TextStyle(
                                               color: AppColors.blackColor,
                                               fontSize: 17.sp,
@@ -1272,7 +1290,9 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
               ).paddingSymmetric(horizontal: 3.w, vertical: 1.5.h),
     );
   }
-String? totalamount;
+
+  String? totalamount;
+
   Future<void> _fetchCart() async {
     var box = HiveService().getViewCartBox();
 
@@ -1303,13 +1323,13 @@ String? totalamount;
               ((rawTotalItems is num)
                   ? rawTotalItems
                   : num.tryParse(rawTotalItems?.toString() ?? '')) ??
-                  0;
+              0;
 
           final discount =
               ((rawDiscount is num)
                   ? rawDiscount
                   : num.tryParse(rawDiscount?.toString() ?? '')) ??
-                  0;
+              0;
 
           final total = (totalItems as num) - (discount); // ✅ type-safe
           totalamount = total.toString();
@@ -1328,13 +1348,13 @@ String? totalamount;
                 ((rawTotalItems is num)
                     ? rawTotalItems
                     : num.tryParse(rawTotalItems?.toString() ?? '')) ??
-                    0;
+                0;
 
             final discount =
                 ((rawDiscount is num)
                     ? rawDiscount
                     : num.tryParse(rawDiscount?.toString() ?? '')) ??
-                    0;
+                0;
 
             final total = (totalItems as num) - (discount); // ✅ type-safe
             totalamount = total.toString();
@@ -1358,13 +1378,13 @@ String? totalamount;
               ((rawTotalItems is num)
                   ? rawTotalItems
                   : num.tryParse(rawTotalItems?.toString() ?? '')) ??
-                  0;
+              0;
 
           final discount =
               ((rawDiscount is num)
                   ? rawDiscount
                   : num.tryParse(rawDiscount?.toString() ?? '')) ??
-                  0;
+              0;
 
           final total = (totalItems as num) - (discount); // ✅ type-safe
           totalamount = total.toString();
@@ -1406,9 +1426,11 @@ String? totalamount;
         deliveryDate: date,
         note: notesController.text.trim().toString(),
         shippingCharge:
-            totalController.text == ''
-                ? "0"
-                : totalController.text.trim().toString(),
+            isShippingEnabled
+                ? totalController.text == ''
+                    ? "0"
+                    : totalController.text.trim().toString()
+                : "0",
         customerId: customerId,
         items: items,
         // coupons: coupons,
