@@ -158,9 +158,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   _drawerItem(Icons.home_outlined, "Home", () {
                     Get.offAll(HomeMenuScreen());
                   }),
-                  _drawerItem(Icons.home_outlined, "Home 2", () {
-                    Get.offAll(() => Homescreen());
-                  }),
+                  // _drawerItem(Icons.home_outlined, "Home 2", () {
+                  //   Get.offAll(() => Homescreen());
+                  // }),
                   _drawerItem(Icons.shopping_bag_outlined, "Orders", () {
                     Get.offAll(() => OrderHistoryScreen());
                   }),

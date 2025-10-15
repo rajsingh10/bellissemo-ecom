@@ -1085,10 +1085,10 @@ class _CartScreenState extends State<CartScreen> {
                                                                 child: Container(
                                                                   child: Row(
                                                                     children: [
-                                                                      Icon(Icons.edit,color: AppColors.mainColor,),
-                                                                      SizedBox(width: 2.w,),
+                                                                      // Icon(Icons.edit,color: AppColors.mainColor,),
+                                                                      // SizedBox(width: 2.w,),
                                                                       Text(
-                                                                        (double.parse(
+                                                                        '${viewCartData?.totals?.currencySymbol ?? ''} '+ (double.parse(
                                                                                   viewCartData?.items?[i].lineTotal?.lineTotal ??
                                                                                       "0",
                                                                                 ) /

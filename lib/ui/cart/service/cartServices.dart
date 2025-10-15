@@ -647,7 +647,8 @@ print("body shu ave che incerment ni ${body}");
     required int packsize,
     bool online = false,
     bool isSync = false, // prevent infinite loop during sync
-  }) async {
+  })
+  async {
     final int newQuantity;
     print("false shu ave che $online");
     if (online == true) {
@@ -1743,4 +1744,111 @@ print("body shu ave che incerment ni ${body}");
       }
     }
   }
+  Future<Response?> updateProductPrice({
+    required var userId,
+    required var productId,
+    required var price,
+    bool isSync = false,
+  }) async {
+    final box = HiveService().getAddCartBox();
+
+    // 🔹 OFFLINE mode: store in Hive queue
+    if (!await checkInternet()) {
+      if (!isSync) {
+        await box.put(
+          "offline_price_update_${DateTime.now().millisecondsSinceEpoch}",
+          {
+            "action": "update_price",
+            "user_id": userId,
+            "product_id": productId,
+            "price": price,
+            "timestamp": DateTime.now().toIso8601String(),
+          },
+        );
+        print("⚠️ Offline: queued price update → productId: $productId → ₹$price");
+      }
+      return null;
+    }
+
+    // 🔹 ONLINE mode: send to server
+    try {
+      String? token = await getSavedLoginToken();
+      if (token == null || token.isEmpty) {
+        throw Exception("Token not found");
+      }
+
+      final headers = {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      };
+
+      final body = {
+        "user_id": userId,
+        "product_id": productId,
+        "price": price,
+      };
+
+      final response = await _dio.post(
+        apiEndpoints.setprice, // 🔸 define your API endpoint
+        data: jsonEncode(body),
+        options: Options(headers: headers),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("✅ Price updated online → productId: $productId → ₹$price");
+      }
+
+      return response;
+    } catch (e) {
+      if (!isSync) {
+        await box.put(
+          "offline_price_update_${DateTime.now().millisecondsSinceEpoch}",
+          {
+            "action": "update_price",
+            "user_id": userId,
+            "product_id": productId,
+            "price": price,
+            "timestamp": DateTime.now().toIso8601String(),
+          },
+        );
+        print("⚠️ Failed online, saved offline → productId: $productId → ₹$price");
+      }
+      return null;
+    }
+  }
+  Future<void> syncOfflinePriceUpdate() async {
+    final box = HiveService().getAddCartBox();
+    if (!await checkInternet()) return; // only sync when online
+
+    final keys = box.keys
+        .where((k) => k.toString().startsWith("offline_price_update_"))
+        .toList();
+
+    for (var key in keys) {
+      final data = box.get(key);
+      if (data == null) continue;
+
+      try {
+        final userId = data['user_id'] ?? 0;
+        final productId = data['product_id'] ?? 0;
+        final price = data['price'] ?? 0;
+
+        await updateProductPrice(
+          userId: userId,
+          productId: productId,
+          price: price,
+          isSync: true,
+        );
+
+        await box.delete(key); // remove from offline queue on success
+        print("✅ Synced offline price → productId: $productId → ₹$price");
+      } catch (e, stackTrace) {
+        print("⚠️ Failed to sync offline price → ${data['product_id']}: $e");
+        print(stackTrace);
+      }
+    }
+  }
+
+
 }

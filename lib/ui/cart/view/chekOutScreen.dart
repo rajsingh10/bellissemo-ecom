@@ -22,6 +22,7 @@ import '../../../utils/fontFamily.dart';
 import '../../../utils/textFields.dart';
 import '../../../utils/titlebarWidget.dart';
 import '../../customers/view/customerAddressScreen.dart';
+import '../../home/view/homeMenuScreen.dart';
 
 class CheckOutScreen extends StatefulWidget {
   String cridit;
@@ -1451,7 +1452,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         setState(() {
           isAddingToCart = false;
         });
-        Get.offAll(Homescreen());
+        Get.offAll(HomeMenuScreen());
       } else {
         await box.delete("cart_$customerId");
         await box.flush();
@@ -1466,7 +1467,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         setState(() {
           isAddingToCart = false;
         });
-        Get.offAll(Homescreen());
+        Get.offAll(HomeMenuScreen());
       }
     } catch (e,stackTrace) {
       showCustomErrorSnackbar(

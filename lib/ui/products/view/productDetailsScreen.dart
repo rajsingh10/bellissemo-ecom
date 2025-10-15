@@ -10,6 +10,7 @@ import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../ApiCalling/apiConfigs.dart';
@@ -113,13 +114,22 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
     setState(() {});
   }
-
+  int? customerId;
+  String? customerName;
+  Future<void> _loadCustomer() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      customerId = prefs.getInt("customerId");
+      customerName = prefs.getString("customerName");
+    });
+    loadInitialData();
+  }
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    loadInitialData();
+    _loadCustomer();
   }
 
   @override
@@ -403,20 +413,428 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           // ),
                           // SizedBox(height: 1.h),
                           productDetails?.variations?.length == 0
-                              ? Text(
-                                "${productDetails?.currencySymbol ?? ''}${productDetails?.price ?? ''}",
-                                style: TextStyle(
-                                  fontSize: 20.sp,
-                                  fontFamily: FontFamily.bold,
-                                  color: AppColors.mainColor,
+                              ? InkWell(
+                            onTap: () async {
+                              final discountResult = await Get.dialog<
+                                  Map<
+                                      String,
+                                      String
+                                  >
+                              >(
+                                Dialog(
+                                  backgroundColor:
+                                  Colors
+                                      .transparent,
+                                  child: StatefulBuilder(
+                                    builder: (
+                                        context,
+                                        setState,
+                                        ) {
+                                      final formKey =
+                                      GlobalKey<
+                                          FormState
+                                      >();
+                                      TextEditingController
+                                      dialogController =
+                                      TextEditingController();
+                                      String
+                                      selectedType =
+                                          "Amount"; // 👈 default dropdown value
+
+                                      return IntrinsicWidth(
+                                        stepWidth:
+                                        300,
+                                        child: IntrinsicHeight(
+                                          child: Container(
+                                            padding: EdgeInsets.all(
+                                              16,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color:
+                                              AppColors.whiteColor,
+                                              borderRadius: BorderRadius.circular(
+                                                15,
+                                              ),
+                                            ),
+                                            child: Column(
+                                              mainAxisSize:
+                                              MainAxisSize.min,
+                                              children: [
+                                                Form(
+                                                  key:
+                                                  formKey,
+                                                  child: AppTextField(
+                                                    key: ValueKey(
+                                                      selectedType,
+                                                    ),
+                                                    controller:
+                                                    dialogController,
+                                                    hintText:
+                                                    "Increase",
+                                                    text:
+                                                    "Increase",
+                                                    isTextavailable:
+                                                    true,
+                                                    textInputType:
+                                                    TextInputType.number,
+                                                    maxline:
+                                                    1,
+                                                    validator: (
+                                                        value,
+                                                        ) {
+                                                      if (value !=
+                                                          null &&
+                                                          value.isNotEmpty &&
+                                                          double.tryParse(
+                                                            value,
+                                                          ) ==
+                                                              null) {
+                                                        return "Enter a valid number";
+                                                      }
+                                                      return null;
+                                                    },
+                                                  ),
+                                                ),
+
+                                                SizedBox(
+                                                  height:
+                                                  24,
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                  MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    CustomButton(
+                                                      title:
+                                                      "Cancel",
+                                                      route:
+                                                          () =>
+                                                          Get.back(),
+                                                      color:
+                                                      AppColors.containerColor,
+                                                      fontcolor:
+                                                      AppColors.blackColor,
+                                                      height:
+                                                      5.h,
+                                                      width:
+                                                      27.w,
+                                                      fontsize:
+                                                      15.sp,
+                                                      radius:
+                                                      12.0,
+                                                    ),
+                                                    CustomButton(
+                                                      title:
+                                                      "Increase Price",
+                                                      route: () async {
+                                                        bool increseprice =
+                                                        true;
+
+
+                                                        // update server if online
+                                                        // if (await checkInternet()) {
+                                                        //   try {
+                                                        //     await CartService().updateProductPrice(
+                                                        //       price:int.parse(dialogController.text.trim()) ,
+                                                        //       productId:int.parse(widget.productId.toString()) ,
+                                                        //       userId:int.parse(customerId.toString()) ,
+                                                        //
+                                                        //     );
+                                                        //
+                                                        //     Get.back();
+                                                        //     Get.back();
+                                                        //
+                                                        //     Get.offAll(() =>
+                                                        //     ProductDetailsScreen(productId: widget.productId,),
+                                                        //     );
+                                                        //     _fetchProductDetails();
+                                                        //   } catch (
+                                                        //   e,
+                                                        //   trackTrace
+                                                        //   ) {
+                                                        //     showCustomErrorSnackbar(
+                                                        //       title:
+                                                        //       "Error",
+                                                        //       message:
+                                                        //       "Failed to update cart\n$e",
+                                                        //     );
+                                                        //     log(
+                                                        //       "shu errro ave che =====>>>>$trackTrace",
+                                                        //     );
+                                                        //   }
+                                                        // }
+                                                        await CartService().updateProductPrice(
+                                                          price:int.parse(dialogController.text.trim()) ,
+                                                          productId:int.parse(widget.productId.toString()) ,
+                                                          userId:int.parse(customerId.toString()) ,
+
+                                                        );
+
+                                                        Get.back();
+                                                        Get.back();
+
+                                                        Get.offAll(() =>
+                                                            ProductDetailsScreen(productId: widget.productId,),
+                                                        );
+                                                        _fetchProductDetails();
+                                                      },
+                                                      color:
+                                                      AppColors.mainColor,
+                                                      fontcolor:
+                                                      AppColors.whiteColor,
+                                                      height:
+                                                      5.h,
+                                                      width:
+                                                      40.w,
+                                                      fontsize:
+                                                      15.sp,
+                                                      radius:
+                                                      12.0,
+                                                      iconData:
+                                                      Icons.check,
+                                                      iconsize:
+                                                      17.sp,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                barrierDismissible:
+                                true,
+                              );
+                            },
+                                child: Container(
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.edit,color: AppColors.mainColor),
+                                      Text(
+                                        "${productDetails?.currencySymbol ?? ''}${productDetails?.price ?? ''}",
+                                        style: TextStyle(
+                                          fontSize: 20.sp,
+                                          fontFamily: FontFamily.bold,
+                                          color: AppColors.mainColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               )
-                              : Text(
-                                "${productDetails?.currencySymbol ?? ''}${currentPrice.toStringAsFixed(2)}",
-                                style: TextStyle(
-                                  fontSize: 20.sp,
-                                  fontFamily: FontFamily.bold,
-                                  color: AppColors.mainColor,
+                              : InkWell(
+                            onTap: () async {
+                              final discountResult = await Get.dialog<
+                                  Map<
+                                      String,
+                                      String
+                                  >
+                              >(
+                                Dialog(
+                                  backgroundColor:
+                                  Colors
+                                      .transparent,
+                                  child: StatefulBuilder(
+                                    builder: (
+                                        context,
+                                        setState,
+                                        ) {
+                                      final formKey =
+                                      GlobalKey<
+                                          FormState
+                                      >();
+                                      TextEditingController
+                                      dialogController =
+                                      TextEditingController();
+                                      String
+                                      selectedType =
+                                          "Amount"; // 👈 default dropdown value
+
+                                      return IntrinsicWidth(
+                                        stepWidth:
+                                        300,
+                                        child: IntrinsicHeight(
+                                          child: Container(
+                                            padding: EdgeInsets.all(
+                                              16,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color:
+                                              AppColors.whiteColor,
+                                              borderRadius: BorderRadius.circular(
+                                                15,
+                                              ),
+                                            ),
+                                            child: Column(
+                                              mainAxisSize:
+                                              MainAxisSize.min,
+                                              children: [
+                                                Form(
+                                                  key:
+                                                  formKey,
+                                                  child: AppTextField(
+                                                    key: ValueKey(
+                                                      selectedType,
+                                                    ),
+                                                    controller:
+                                                    dialogController,
+                                                    hintText:
+                                                    "Increase",
+                                                    text:
+                                                    "Increase",
+                                                    isTextavailable:
+                                                    true,
+                                                    textInputType:
+                                                    TextInputType.number,
+                                                    maxline:
+                                                    1,
+                                                    validator: (
+                                                        value,
+                                                        ) {
+                                                      if (value !=
+                                                          null &&
+                                                          value.isNotEmpty &&
+                                                          double.tryParse(
+                                                            value,
+                                                          ) ==
+                                                              null) {
+                                                        return "Enter a valid number";
+                                                      }
+                                                      return null;
+                                                    },
+                                                  ),
+                                                ),
+
+                                                SizedBox(
+                                                  height:
+                                                  24,
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                  MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    CustomButton(
+                                                      title:
+                                                      "Cancel",
+                                                      route:
+                                                          () =>
+                                                          Get.back(),
+                                                      color:
+                                                      AppColors.containerColor,
+                                                      fontcolor:
+                                                      AppColors.blackColor,
+                                                      height:
+                                                      5.h,
+                                                      width:
+                                                      27.w,
+                                                      fontsize:
+                                                      15.sp,
+                                                      radius:
+                                                      12.0,
+                                                    ),
+                                                    CustomButton(
+                                                      title:
+                                                      "Increase Price",
+                                                      route: () async {
+                                                        bool increseprice =
+                                                        true;
+
+
+                                                        // update server if online
+                                                        // if (await checkInternet()) {
+                                                        //   try {
+                                                        //     await CartService().updateProductPrice(
+                                                        //       price:int.parse(dialogController.text.trim()) ,
+                                                        //       productId:selectedVariationId ,
+                                                        //       userId:int.parse(customerId.toString()) ,
+                                                        //
+                                                        //     );
+                                                        //
+                                                        //     Get.back();
+                                                        //     Get.back();
+                                                        //
+                                                        //     Get.offAll(() =>
+                                                        //         ProductDetailsScreen(productId: widget.productId,),
+                                                        //     );
+                                                        //     _fetchProductDetails();
+                                                        //   } catch (
+                                                        //   e,
+                                                        //   trackTrace
+                                                        //   ) {
+                                                        //     showCustomErrorSnackbar(
+                                                        //       title:
+                                                        //       "Error",
+                                                        //       message:
+                                                        //       "Failed to update cart\n$e",
+                                                        //     );
+                                                        //     log(
+                                                        //       "shu errro ave che =====>>>>$trackTrace",
+                                                        //     );
+                                                        //   }
+                                                        // }
+                                                        await CartService().updateProductPrice(
+                                                          price:int.parse(dialogController.text.trim()) ,
+                                                          productId:selectedVariationId ,
+                                                          userId:int.parse(customerId.toString()) ,
+
+                                                        );
+
+                                                        Get.back();
+                                                        Get.back();
+
+                                                        Get.offAll(() =>
+                                                            ProductDetailsScreen(productId: widget.productId,),
+                                                        );
+                                                        _fetchProductDetails();
+                                                      },
+                                                      color:
+                                                      AppColors.mainColor,
+                                                      fontcolor:
+                                                      AppColors.whiteColor,
+                                                      height:
+                                                      5.h,
+                                                      width:
+                                                      40.w,
+                                                      fontsize:
+                                                      15.sp,
+                                                      radius:
+                                                      12.0,
+                                                      iconData:
+                                                      Icons.check,
+                                                      iconsize:
+                                                      17.sp,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                barrierDismissible:
+                                true,
+                              );
+                            },
+                                child: Container(
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.edit,color: AppColors.mainColor),
+                                      Text(
+                                        "${productDetails?.currencySymbol ?? ''}${currentPrice.toStringAsFixed(2)}",
+                                        style: TextStyle(
+                                          fontSize: 20.sp,
+                                          fontFamily: FontFamily.bold,
+                                          color: AppColors.mainColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                           SizedBox(height: 1.h),
@@ -762,6 +1180,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     try {
       final response = await ProductsProvider().productDetailsApi(
         widget.productId,
+          customerId,
       );
 
       if (response.statusCode == 200) {

@@ -16,6 +16,7 @@ import 'package:bellissemo_ecom/utils/titlebarWidget.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../apiCalling/apiConfigs.dart';
@@ -68,12 +69,22 @@ class _ProductsScreenState extends State<ProductsScreen> {
   bool isSearchEnabled = false;
   TextEditingController searchController = TextEditingController();
   bool isAddingToCart = false;
+  String? customerName;
+  int? customerId;
 
+  Future<void> _loadCustomer() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      customerId = prefs.getInt("customerId");
+      customerName = prefs.getString("customerName");
+    });
+    loadInitialData();
+  }
   @override
   void initState() {
     super.initState();
     itemsPerPage = isIpad ? 8 : 4;
-    loadInitialData(); // instead of dummy products
+    _loadCustomer(); // instead of dummy products
     searchController.addListener(() {
       _filterProducts(searchController.text);
     });
@@ -1234,7 +1245,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
     try {
       final response = await ProductsProvider().categoryWiseProductsApi(
+
         widget.id,
+        customerId,
       );
       if (response.statusCode == 200) {
         final List data = json.decode(response.body);
