@@ -1237,32 +1237,38 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                               CustomButton(
                                 title: "Confirm",
                                 route: () {
-                                  final isValid =
-                                      formKey.currentState!.validate();
-
-                                  if (!isValid || selectedDate == null) {
-                                    setState(() {
-                                      if (selectedDate == null) {
-                                        errorText =
-                                            "Please select delivery date";
-                                      }
-                                    });
-                                    return;
-                                  }
-
+                                  // final isValid =
+                                  //     formKey.currentState!.validate();
+                                  //
+                                  // if (!isValid || selectedDate == null) {
+                                  //   setState(() {
+                                  //     if (selectedDate == null) {
+                                  //       errorText =
+                                  //           "Please select delivery date";
+                                  //     }
+                                  //   });
+                                  //   return;
+                                  // }
                                   if (viewCartData?.billingAddress?.address1 ==
                                       '') {
                                     showCustomErrorSnackbar(
                                       title: 'Address Required',
                                       message:
-                                          'Please add an address to continue',
+                                      'Please add an address to continue',
                                     );
                                   } else {
                                     Get.back();
+                                    // sumbitOrderapi(
+                                    //   "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}",
+                                    // );
                                     sumbitOrderapi(
-                                      "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}",
+                                      selectedDate != null
+                                          ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
+                                          : null, // send null if date not selected
                                     );
+
                                   }
+
                                 },
                                 color: AppColors.mainColor,
                                 fontcolor: AppColors.whiteColor,
@@ -1423,7 +1429,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     //     [];
     try {
       final response = await cartService.submitOrderApi(
-        deliveryDate: date,
+        deliveryDate:date==""|| date==null?"":date,
         note: notesController.text.trim().toString(),
         shippingCharge:
             isShippingEnabled
@@ -1462,11 +1468,12 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         });
         Get.offAll(Homescreen());
       }
-    } catch (e) {
+    } catch (e,stackTrace) {
       showCustomErrorSnackbar(
         title: "Error",
         message: "Something went wrong while adding product.\n$e",
       );
+      print("dssfsdf============>>>>>>>>${stackTrace}");
       setState(() {
         isAddingToCart = false;
       });

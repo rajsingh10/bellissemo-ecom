@@ -36,7 +36,8 @@ class CartService {
     required String? itemNote,
     int? variationId,
     Map<String, dynamic>? variation,
-  }) async {
+  })
+  async {
     final box = HiveService().getAddCartBox();
 
     Map<String, dynamic> body =
@@ -233,11 +234,14 @@ class CartService {
         final quantity = (data['quantity'] ?? 1) as int;
         final overridePrice = (data['override_price'] ?? 0) as int;
         final cartItemKey = data['cart_item_key']?.toString() ?? "";
+        final pakasiz = data['pack_size']?.toString() ?? "";
 
         await increaseCart(
           overrideprice: overridePrice,
           cartItemKey: cartItemKey,
-          currentQuantity: quantity - 1, // safe
+          packsize: int.tryParse(pakasiz) ?? 0, // safely convert to int
+          currentQuantity: quantity - (int.tryParse(pakasiz) ?? 0),
+
           isSync: true,
         );
 
@@ -380,7 +384,8 @@ class CartService {
   // ----------------- Decrease / Remove from Cart -----------------
   Future<Response?> decreaseCartItem({
     required int productId,
-    int decreaseBy = 1,
+    num? packsize,
+    // int decreaseBy = 1,
   }) async {
     final box = HiveService().getAddCartBox();
     final cacheBox = HiveService().getProductCartDataBox();
@@ -395,7 +400,8 @@ class CartService {
       totalQuantity = 0; // assume at least 1 to allow offline decrease
     }
 
-    int newQuantity = (totalQuantity - decreaseBy).clamp(0, totalQuantity);
+    // int newQuantity = (totalQuantity - packsize).clamp(0, totalQuantity);
+    int newQuantity = ((totalQuantity - (packsize ?? 0))).clamp(0, totalQuantity).toInt();
 
     final hasInternet = await checkInternet();
 
@@ -406,7 +412,7 @@ class CartService {
           .put("offline_remove_cart_${DateTime.now().millisecondsSinceEpoch}", {
             "action": "decrease",
             "product_id": productId,
-            "quantity": decreaseBy,
+            "quantity": packsize,
             "timestamp": DateTime.now().toIso8601String(),
           });
 
@@ -414,7 +420,7 @@ class CartService {
       await cacheBox.put("cartData_$productId", {"totalQuantity": newQuantity});
 
       print(
-        "🗑️ Offline cart decreased by $decreaseBy. New quantity: $newQuantity",
+        "🗑️ Offline cart decreased by $packsize. New quantity: $newQuantity",
       );
       return null;
     }
@@ -447,7 +453,7 @@ class CartService {
           {
             "action": "decrease",
             "product_id": productId,
-            "quantity": decreaseBy,
+            "quantity": packsize,
             "timestamp": DateTime.now().toIso8601String(),
           },
         );
@@ -457,7 +463,8 @@ class CartService {
 
       final body = {
         "cart_item_key": cartItemKey,
-        "quantity": (onlineQuantity - decreaseBy).clamp(0, onlineQuantity),
+        "quantity": ((onlineQuantity - (packsize ?? 0)).clamp(0, onlineQuantity)).toInt(),
+
       };
 
       final response = await _dio.post(
@@ -484,13 +491,14 @@ class CartService {
         }
 
         await cacheBox.put("cartData_$productId", {
-          "totalQuantity": (onlineQuantity - decreaseBy) + offlineQueuedQty,
+          "totalQuantity": ((onlineQuantity - (packsize ?? 0)) + (offlineQueuedQty ?? 0)).toInt(),
+
           "cartItemKey": cartItemKey,
         });
 
-        print(
-          "✅ Cart item decreased online. Online: ${onlineQuantity - decreaseBy}, Total with offline queued: ${(onlineQuantity - decreaseBy) + offlineQueuedQty}",
-        );
+        // print(
+        //   "✅ Cart item decreased online. Online: ${onlineQuantity - packsize}, Total with offline queued: ${(onlineQuantity - decreaseBy) + offlineQueuedQty}",
+        // );
       }
 
       return response;
@@ -500,7 +508,7 @@ class CartService {
           .put("offline_remove_cart_${DateTime.now().millisecondsSinceEpoch}", {
             "action": "decrease",
             "product_id": productId,
-            "quantity": decreaseBy,
+            "quantity": packsize,
             "timestamp": DateTime.now().toIso8601String(),
           });
 
@@ -516,6 +524,7 @@ class CartService {
     required int productId,
     String? itemNote,
     int? variationId,
+    num? packsize,
     Map<String, dynamic>? variation,
   }) async {
     final cartData = await getProductCartData(productId: productId);
@@ -523,7 +532,7 @@ class CartService {
     num totalQuantity = cartData["totalQuantity"] ?? 0;
     print("totalQuantity====shu ave che${totalQuantity}");
     String? cartItemKey = cartData["cartItemKey"];
-    int quantityToSend = (totalQuantity + 1).toInt();
+    int quantityToSend = (totalQuantity + num.parse(packsize.toString())).toInt();
 print("quantityToSend====>>>>>>>>>${quantityToSend}");
     Map<String, dynamic> body =
         cartItemKey != null
@@ -533,15 +542,15 @@ print("quantityToSend====>>>>>>>>>${quantityToSend}");
               "product_id": productId,
               "variation_id": variationId,
               "variation": variation,
-              "quantity": 1,
+              "quantity": quantityToSend,
               "item_note": itemNote ?? "",
             }
             : {
               "product_id": productId,
-              "quantity": 1,
+              "quantity": quantityToSend,
               "item_note": itemNote ?? "",
             };
-
+print("body shu ave che incerment ni ${body}");
     final box = HiveService().getAddCartBox();
     final cacheBox = HiveService().getProductCartDataBox();
     if (!cacheBox.isOpen) await HiveService().init();
@@ -635,6 +644,7 @@ print("quantityToSend====>>>>>>>>>${quantityToSend}");
     required String cartItemKey,
     required int currentQuantity,
     required int overrideprice,
+    required int packsize,
     bool online = false,
     bool isSync = false, // prevent infinite loop during sync
   }) async {
@@ -644,7 +654,7 @@ print("quantityToSend====>>>>>>>>>${quantityToSend}");
       newQuantity = currentQuantity;
       print("a call thay che ho $newQuantity");
     } else {
-      newQuantity = currentQuantity + 1;
+      newQuantity = currentQuantity + packsize;
       print("a call thay che $newQuantity");
     }
 
@@ -734,11 +744,12 @@ print("quantityToSend====>>>>>>>>>${quantityToSend}");
   Future<Response?> decreaseCart({
     required String cartItemKey,
     required int currentQuantity,
+    required int packsize,
     bool isSync = false,
   }) async {
     if (currentQuantity <= 1) return null; // optional: prevent < 1
 
-    final newQuantity = currentQuantity - 1;
+    final newQuantity = currentQuantity - packsize;
 
     final box = HiveService().getAddCartBox();
     final cacheBox = HiveService().getProductCartDataBox();

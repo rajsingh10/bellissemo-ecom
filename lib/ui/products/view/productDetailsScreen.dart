@@ -33,7 +33,7 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
-  int quantity = 1;
+  // int quantity = 1;
   TextEditingController notesController = TextEditingController();
   String? selectedColor;
   List<String> currentImages = [];
@@ -472,13 +472,29 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   children: [
                                     GestureDetector(
                                       onTap: () {
-                                        if (quantity > 1) {
-                                          setState(() => quantity--);
-                                        }
+                                        setState(() {
+                                          int currentPackSize = int.tryParse(productDetails?.packsize ?? '0') ?? 0;
+
+                                          // If first time, set the original pack size
+                                          originalPackSize ??= currentPackSize;
+
+                                          // Subtract the original pack size (e.g., 6 → 4 → 2)
+                                          currentPackSize -= originalPackSize!;
+
+                                          // Prevent going below 0
+                                          if (currentPackSize < originalPackSize!) {
+                                            currentPackSize = originalPackSize!;
+                                          }
+
+                                          // Update productDetails
+                                          productDetails?.packsize = currentPackSize.toString();
+
+                                          print("Decrement → currentPackSize = $currentPackSize");
+                                        });
                                       },
                                       child: CircleAvatar(
                                         radius: isIpad ? 15.sp : 16,
-                                        backgroundColor: AppColors.cardBgColor,
+                                        backgroundColor: Colors.transparent,
                                         child: Icon(
                                           Icons.remove,
                                           size: 18.sp,
@@ -488,7 +504,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     ),
                                     SizedBox(width: 2.w),
                                     Text(
-                                      quantity.toString(),
+                                      productDetails?.packsize ?? '',
                                       style: TextStyle(
                                         fontSize: 17.sp,
                                         fontFamily: FontFamily.semiBold,
@@ -496,10 +512,29 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     ),
                                     SizedBox(width: 2.w),
                                     GestureDetector(
-                                      onTap: () => setState(() => quantity++),
+                                      onTap: () {
+                                        setState(() {
+                                          print("Before: productDetails?.packsize = ${productDetails?.packsize}");
+
+                                          // Convert current pack size
+                                          int currentPackSize = int.tryParse(productDetails?.packsize ?? '0') ?? 0;
+
+                                          // If first time, save original pack size
+                                          originalPackSize ??= currentPackSize;
+
+                                          // Add only the original pack size (e.g., 2 + 2 = 4, then 4 + 2 = 6)
+                                          currentPackSize += originalPackSize!;
+
+                                          // Update
+                                          productDetails?.packsize = currentPackSize.toString();
+
+                                          print("After: currentPackSize = $currentPackSize");
+                                        });
+                                      },
+
                                       child: CircleAvatar(
                                         radius: isIpad ? 15.sp : 16,
-                                        backgroundColor: AppColors.cardBgColor,
+                                        backgroundColor: Colors.transparent,
                                         child: Icon(
                                           Icons.add,
                                           size: 18.sp,
@@ -587,22 +622,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                                 CustomButton(
                                                   title: "Confirm",
                                                   route: () async {
-                                                    if (notesController
-                                                        .text
-                                                        .isNotEmpty) {
-                                                      productDetails
-                                                                  ?.variations
-                                                                  ?.length ==
-                                                              0
-                                                          ? _addSimpleProductsToCart()
-                                                          : _addVariationProductsToCart();
-                                                      Get.back();
-                                                    } else {
-                                                      setState(() {
-                                                        errorText =
-                                                            "Please enter Item notes";
-                                                      });
-                                                    }
+                                                    productDetails
+                                                        ?.variations
+                                                        ?.length ==
+                                                        0
+                                                        ? _addSimpleProductsToCart()
+                                                        : _addVariationProductsToCart();
+                                                    Get.back();
                                                   },
                                                   color: AppColors.mainColor,
                                                   fontcolor:
@@ -712,6 +738,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   //     );
   //   }
   // }
+  int? originalPackSize;
   Future<void> _fetchProductDetails() async {
     var box = HiveService().getProductDetailsBox();
 
@@ -792,7 +819,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           "attribute_${selectedAttributeKey ?? ''}":
               selectedAttributeValue ?? '',
         },
-        quantity: quantity,
+        quantity: int.parse((productDetails?.packsize).toString()),
         itemNote: notesController.text.trim().toString(),
       );
 
@@ -803,7 +830,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         // );
         setState(() {
           isAddingToCart = false;
-          quantity = 1;
+          // quantity = 1;
         });
       } else {
         // showCustomSuccessSnackbar(
@@ -812,7 +839,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         // );
         setState(() {
           isAddingToCart = false;
-          quantity = 1;
+          // quantity = 1;
         });
       }
     } catch (e) {
@@ -835,7 +862,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     try {
       final response = await cartService.addToCart(
         productId: int.parse(widget.productId ?? ''),
-        quantity: quantity,
+        quantity: int.parse((productDetails?.packsize).toString()),
         itemNote: notesController.text.trim().toString(),
       );
 
@@ -846,7 +873,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         // );
         setState(() {
           isAddingToCart = false;
-          quantity = 1;
+          // quantity = 1;
         });
       } else {
         // showCustomSuccessSnackbar(
@@ -855,7 +882,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         // );
         setState(() {
           isAddingToCart = false;
-          quantity = 1;
+          // quantity = 1;
         });
       }
     } catch (e) {

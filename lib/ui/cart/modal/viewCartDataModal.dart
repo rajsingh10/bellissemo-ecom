@@ -98,7 +98,9 @@ class Items {
   String? permalink;
   List<Images>? images;
   Prices? prices;
+  LineTotal? lineTotal;
   String? catalogVisibility;
+  String? packsize;
 
   Items({
     this.key,
@@ -116,6 +118,8 @@ class Items {
     this.permalink,
     this.images,
     this.prices,
+    this.lineTotal,
+    this.packsize,
     this.catalogVisibility,
   });
 
@@ -135,6 +139,7 @@ class Items {
     backordersAllowed = json['backorders_allowed'];
     showBackorderBadge = json['show_backorder_badge'];
     soldIndividually = json['sold_individually'];
+    packsize = json['pack_size'];
     permalink = json['permalink'];
     if (json['images'] != null) {
       images = <Images>[];
@@ -143,6 +148,8 @@ class Items {
       });
     }
     prices = json['prices'] != null ? Prices.fromJson(json['prices']) : null;
+    lineTotal = json['totals'] != null ? LineTotal.fromJson(json['totals']) : null;
+
     catalogVisibility = json['catalog_visibility'];
   }
 
@@ -162,6 +169,7 @@ class Items {
     data['backorders_allowed'] = backordersAllowed;
     data['show_backorder_badge'] = showBackorderBadge;
     data['sold_individually'] = soldIndividually;
+    data['pack_size'] = packsize;
     data['permalink'] = permalink;
     if (images != null) {
       data['images'] = images!.map((v) => v.toJson()).toList();
@@ -169,7 +177,66 @@ class Items {
     if (prices != null) {
       data['prices'] = prices!.toJson();
     }
+    if (lineTotal != null) {
+      data['totals'] = lineTotal!.toJson();
+    }
     data['catalog_visibility'] = catalogVisibility;
+    return data;
+  }
+}
+class LineTotal {
+  String? lineSubtotal;
+  String? lineSubtotalTax;
+  String? lineTotal;
+  String? lineTotalTax;
+  String? currencyCode;
+  String? currencySymbol;
+  int? currencyMinorUnit;
+  String? currencyDecimalSeparator;
+  String? currencyThousandSeparator;
+  String? currencyPrefix;
+  String? currencySuffix;
+
+  LineTotal(
+      {this.lineSubtotal,
+        this.lineSubtotalTax,
+        this.lineTotal,
+        this.lineTotalTax,
+        this.currencyCode,
+        this.currencySymbol,
+        this.currencyMinorUnit,
+        this.currencyDecimalSeparator,
+        this.currencyThousandSeparator,
+        this.currencyPrefix,
+        this.currencySuffix});
+
+  LineTotal.fromJson(Map<String, dynamic> json) {
+    lineSubtotal = json['line_subtotal'];
+    lineSubtotalTax = json['line_subtotal_tax'];
+    lineTotal = json['line_total'];
+    lineTotalTax = json['line_total_tax'];
+    currencyCode = json['currency_code'];
+    currencySymbol = json['currency_symbol'];
+    currencyMinorUnit = json['currency_minor_unit'];
+    currencyDecimalSeparator = json['currency_decimal_separator'];
+    currencyThousandSeparator = json['currency_thousand_separator'];
+    currencyPrefix = json['currency_prefix'];
+    currencySuffix = json['currency_suffix'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['line_subtotal'] = this.lineSubtotal;
+    data['line_subtotal_tax'] = this.lineSubtotalTax;
+    data['line_total'] = this.lineTotal;
+    data['line_total_tax'] = this.lineTotalTax;
+    data['currency_code'] = this.currencyCode;
+    data['currency_symbol'] = this.currencySymbol;
+    data['currency_minor_unit'] = this.currencyMinorUnit;
+    data['currency_decimal_separator'] = this.currencyDecimalSeparator;
+    data['currency_thousand_separator'] = this.currencyThousandSeparator;
+    data['currency_prefix'] = this.currencyPrefix;
+    data['currency_suffix'] = this.currencySuffix;
     return data;
   }
 }

@@ -22,6 +22,7 @@ class ProductDetailsModal {
   String? buttonText;
   String? taxStatus;
   String? taxClass;
+  String? packsize;
   String? currencySymbol;
   bool? manageStock;
   var stockQuantity;
@@ -52,6 +53,7 @@ class ProductDetailsModal {
     this.dateModifiedGmt,
     this.type,
     this.status,
+    this.packsize,
     this.catalogVisibility,
     this.description,
     this.shortDescription,
@@ -93,6 +95,7 @@ class ProductDetailsModal {
     dateCreated = json['date_created'];
     dateCreatedGmt = json['date_created_gmt'];
     dateModified = json['date_modified'];
+    packsize = json['pack_size'];
     dateModifiedGmt = json['date_modified_gmt'];
     type = json['type'];
     status = json['status'];
@@ -156,6 +159,7 @@ class ProductDetailsModal {
     data['date_created'] = dateCreated;
     data['date_created_gmt'] = dateCreatedGmt;
     data['date_modified'] = dateModified;
+    data['pack_size'] = packsize;
     data['date_modified_gmt'] = dateModifiedGmt;
     data['type'] = type;
     data['status'] = status;

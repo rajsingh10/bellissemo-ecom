@@ -371,7 +371,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                                   () {
                                                                                     item.quantity =
                                                                                         currentQty -
-                                                                                        1;
+                                                                                            int.parse((viewCartData?.items?[i].packsize).toString()) ;
                                                                                     updateCartTotalsLocally();
                                                                                   },
                                                                                 );
@@ -394,7 +394,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                                     );
                                                                                     cachedCart.items?[i].quantity =
                                                                                         currentQty -
-                                                                                        1;
+                                                                                            int.parse((viewCartData?.items?[i].packsize).toString());
                                                                                     await box.put(
                                                                                       'cart_$customerId',
                                                                                       json.encode(
@@ -413,6 +413,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                                 // 🔹 Sync with server if online
                                                                                 if (await checkInternet()) {
                                                                                   await cartService.decreaseCart(
+                                                                                    packsize: int.parse((viewCartData?.items?[i].packsize).toString()) ,
                                                                                     cartItemKey:
                                                                                         item.key ??
                                                                                         "",
@@ -626,7 +627,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                             setState(() {
                                                                               item.quantity =
                                                                                   currentQty +
-                                                                                  1;
+                                                                                      int.parse((viewCartData?.items?[i].packsize).toString());
                                                                               updateCartTotalsLocally();
                                                                             });
 
@@ -668,6 +669,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                             if (await checkInternet()) {
                                                                               try {
                                                                                 await CartService().increaseCart(
+                                                                                  packsize: int.parse((viewCartData?.items?[i].packsize).toString()) ,
                                                                                   overrideprice:
                                                                                       (double.parse(
                                                                                                 viewCartData?.items?[i].prices?.price ??
@@ -1016,6 +1018,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                                             if (await checkInternet()) {
                                                                                               try {
                                                                                                 await CartService().increaseCart(
+                                                                                                  packsize: int.parse((viewCartData?.items?[i].packsize).toString()) ,
                                                                                                   overrideprice: int.parse(
                                                                                                     dialogController.text.toString(),
                                                                                                   ),
@@ -1086,7 +1089,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                       SizedBox(width: 2.w,),
                                                                       Text(
                                                                         (double.parse(
-                                                                                  viewCartData?.items?[i].prices?.price ??
+                                                                                  viewCartData?.items?[i].lineTotal?.lineTotal ??
                                                                                       "0",
                                                                                 ) /
                                                                                 100)
@@ -1891,6 +1894,7 @@ class _CartScreenState extends State<CartScreen> {
 
         int quantity = item.quantity ?? 0;
         log("quantity====>>>> $quantity");
+        item.lineTotal?.lineTotal= (itemPrice * quantity).toString();
 
         subtotal += itemPrice * quantity;
 

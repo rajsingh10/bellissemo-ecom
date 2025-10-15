@@ -1047,7 +1047,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                           ? EdgeInsets.all(1.w)
                                           : EdgeInsets.all(1.5.w),
                                   decoration: BoxDecoration(
-                                    color: AppColors.cardBgColor,
+                                    color: Colors.transparent,
                                     shape: BoxShape.circle,
                                   ),
                                   child: Icon(
@@ -1085,7 +1085,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                           ? EdgeInsets.all(1.w)
                                           : EdgeInsets.all(1.5.w),
                                   decoration: BoxDecoration(
-                                    color: AppColors.cardBgColor,
+                                    color: Colors.transparent,
                                     shape: BoxShape.circle,
                                   ),
                                   child: Icon(
@@ -1168,7 +1168,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                   ),
                                 ),
                             Text(
-                              "${product.cartQuantity == 0 || product.cartQuantity == null || product.cartQuantity == "" || product.cartQuantity == "0" ? "" : product.cartQuantity} Qty",
+                              "${product.cartQuantity == 0 || product.cartQuantity == null || product.cartQuantity == "" || product.cartQuantity == "0" ? "" : product.cartQuantity}",
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontFamily: FontFamily.semiBold,
@@ -1189,7 +1189,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               ),
                             ),
                             Text(
-                              "${product.cartQuantity == 0 || product.cartQuantity == null || product.cartQuantity == "" || product.cartQuantity == "0" ? "" : product.cartQuantity} Qty",
+                              "${product.cartQuantity == 0 || product.cartQuantity == null || product.cartQuantity == "" || product.cartQuantity == "0" ? "" : product.cartQuantity}",
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontFamily: FontFamily.semiBold,
@@ -1290,7 +1290,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
     setState(() {
       isAddingToCart = true;
       // 🔹 update UI immediately
-      product.cartQuantity = (product.cartQuantity ?? 0) + 1;
+      // product.cartQuantity = (product.cartQuantity ?? 0) + (product.packSize ?? 0);
+      product.cartQuantity =
+          (int.tryParse(product.cartQuantity?.toString() ?? '0') ?? 0) +
+              (int.tryParse(product.packSize?.toString() ?? '0') ?? 0);
+
       /// pelu chu ave che
     });
 
@@ -1300,6 +1304,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
       final response = await cartService.increaseCartItem(
         productId: int.parse(product.id.toString()),
         itemNote: '',
+        packsize: num.parse(product.packSize.toString()),
       );
 
       String message = "Added to Cart";
@@ -1336,7 +1341,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
   ) async {
     setState(() {
       isAddingToCart = true;
-      product.cartQuantity = (product.cartQuantity ?? 0) + 1;
+      product.cartQuantity =
+          (int.tryParse(product.cartQuantity?.toString() ?? '0') ?? 0) +
+              (int.tryParse(product.packSize?.toString() ?? '0') ?? 0);
+
     });
 
     final cartService = CartService();
@@ -1347,6 +1355,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         variationId: variationId,
         variation: {"attribute_${variationKey ?? ''}": variationValue ?? ''},
         itemNote: '',
+        packsize: num.parse(product.packSize.toString()),
       );
 
       String message = "Added to Cart";
@@ -1399,6 +1408,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
       // ----------------- Call CartService to decrease item -----------------
       final response = await cartService.decreaseCartItem(
         productId: product.id!,
+        packsize: num.parse(product.packSize.toString()),
       );
 
       // ----------------- Get updated quantity from cache -----------------
