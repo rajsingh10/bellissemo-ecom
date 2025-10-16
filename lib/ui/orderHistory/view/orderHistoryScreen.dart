@@ -457,7 +457,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                   // Convert subtotal to double safely
                                                   final double price =
                                                       double.tryParse(
-                                                        item.subtotal
+                                                        item.price
                                                                 ?.toString() ??
                                                             "0",
                                                       ) ??
@@ -632,17 +632,19 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                             MainAxisAlignment
                                                                 .spaceBetween,
                                                         children: [
-                                                          Text(
-                                                            "Delivery Note: ${order.orderNote}",
-                                                            style: TextStyle(
-                                                              fontSize: 16.sp,
+                                                          Expanded(
+                                                            child: Text(
+                                                              "Delivery Note: ${order.orderNote}",
+                                                              style: TextStyle(
+                                                                fontSize: 16.sp,
 
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontFamily:
-                                                                  FontFamily
-                                                                      .bold,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontFamily:
+                                                                    FontFamily
+                                                                        .bold,
+                                                              ),
                                                             ),
                                                           ),
                                                         ],

@@ -11,7 +11,7 @@ class apiEndpoints {
   static String fetchCustomers = "$baseUrl/wp-json/wc/v3/customers";
   static String fetchProducts = "$baseUrl/wp-json/wc/v3/products";
   static String fetchCategoryWiseProducts =
-      "$baseUrl/wp-json/wc/v3/products?category=";
+      "$baseUrl/wp-json/custom-wc/v1/all-products?category=";
   static String addToCart = "$baseUrl/wp-json/bellissemo/v1/add-to-cart";
   static String removeFromCart =
       "$baseUrl/wp-json/bellissemo/v1/update-cart-item";
