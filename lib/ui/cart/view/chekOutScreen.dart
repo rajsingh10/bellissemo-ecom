@@ -1414,6 +1414,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     final box = HiveService().getViewCartBox();
     List<Map<String, dynamic>> items =
         viewCartData?.items?.map((item) {
+          print("shu ave che price jay che ======>>>>>>>>>${item.prices?.price }");
           return {
             "product_id": item.id,
             "quantity": item.quantity,

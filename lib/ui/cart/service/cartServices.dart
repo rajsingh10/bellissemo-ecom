@@ -1749,7 +1749,8 @@ print("body shu ave che incerment ni ${body}");
     required var productId,
     required var price,
     bool isSync = false,
-  }) async {
+  })
+  async {
     final box = HiveService().getAddCartBox();
 
     // 🔹 OFFLINE mode: store in Hive queue

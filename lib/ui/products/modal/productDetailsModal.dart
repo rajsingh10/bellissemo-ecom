@@ -13,7 +13,7 @@ class ProductDetailsModal {
   String? description;
   String? shortDescription;
   String? sku;
-  String? price;
+  var price;
   String? regularPrice;
   String? salePrice;
   bool? onSale;

@@ -523,78 +523,126 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                                       radius:
                                                       12.0,
                                                     ),
-                                                    CustomButton(
-                                                      title:
-                                                      "Increase Price",
-                                                      route: () async {
-                                                        bool increseprice =
-                                                        true;
+                                                    // CustomButton(
+                                                    //   title:
+                                                    //   "Increase Price",
+                                                    //   route: () async {
+                                                    //     bool increseprice =
+                                                    //     true;
+                                                    //
+                                                    //
+                                                    //     // update server if online
+                                                    //     // if (await checkInternet()) {
+                                                    //     //   try {
+                                                    //     //     await CartService().updateProductPrice(
+                                                    //     //       price:int.parse(dialogController.text.trim()) ,
+                                                    //     //       productId:int.parse(widget.productId.toString()) ,
+                                                    //     //       userId:int.parse(customerId.toString()) ,
+                                                    //     //
+                                                    //     //     );
+                                                    //     //
+                                                    //     //     Get.back();
+                                                    //     //     Get.back();
+                                                    //     //
+                                                    //     //     Get.offAll(() =>
+                                                    //     //     ProductDetailsScreen(productId: widget.productId,),
+                                                    //     //     );
+                                                    //     //     _fetchProductDetails();
+                                                    //     //   } catch (
+                                                    //     //   e,
+                                                    //     //   trackTrace
+                                                    //     //   ) {
+                                                    //     //     showCustomErrorSnackbar(
+                                                    //     //       title:
+                                                    //     //       "Error",
+                                                    //     //       message:
+                                                    //     //       "Failed to update cart\n$e",
+                                                    //     //     );
+                                                    //     //     log(
+                                                    //     //       "shu errro ave che =====>>>>$trackTrace",
+                                                    //     //     );
+                                                    //     //   }
+                                                    //     // }
+                                                    //     // await CartService().updateProductPrice(
+                                                    //     //   price:int.parse(dialogController.text.trim()) ,
+                                                    //     //   productId:int.parse(widget.productId.toString()) ,
+                                                    //     //   userId:int.parse(customerId.toString()) ,
+                                                    //     //
+                                                    //     // );
+                                                    //     //
+                                                    //     // Get.back();
+                                                    //     // Get.back();
+                                                    //     //
+                                                    //     // Get.offAll(() =>
+                                                    //     //     ProductDetailsScreen(productId: widget.productId,),
+                                                    //     // );
+                                                    //     // _fetchProductDetails();
+                                                    //
+                                                    //
+                                                    //   },
+                                                    //   color:
+                                                    //   AppColors.mainColor,
+                                                    //   fontcolor:
+                                                    //   AppColors.whiteColor,
+                                                    //   height:
+                                                    //   5.h,
+                                                    //   width:
+                                                    //   40.w,
+                                                    //   fontsize:
+                                                    //   15.sp,
+                                                    //   radius:
+                                                    //   12.0,
+                                                    //   iconData:
+                                                    //   Icons.check,
+                                                    //   iconsize:
+                                                    //   17.sp,
+                                                    // ),
+                                            CustomButton(
+                                              title: "Increase Price",
+                                              route: () async {
+                                                if (dialogController.text.trim().isEmpty) return;
 
+                                                final enteredPrice = int.parse(dialogController.text.trim());
 
-                                                        // update server if online
-                                                        // if (await checkInternet()) {
-                                                        //   try {
-                                                        //     await CartService().updateProductPrice(
-                                                        //       price:int.parse(dialogController.text.trim()) ,
-                                                        //       productId:int.parse(widget.productId.toString()) ,
-                                                        //       userId:int.parse(customerId.toString()) ,
-                                                        //
-                                                        //     );
-                                                        //
-                                                        //     Get.back();
-                                                        //     Get.back();
-                                                        //
-                                                        //     Get.offAll(() =>
-                                                        //     ProductDetailsScreen(productId: widget.productId,),
-                                                        //     );
-                                                        //     _fetchProductDetails();
-                                                        //   } catch (
-                                                        //   e,
-                                                        //   trackTrace
-                                                        //   ) {
-                                                        //     showCustomErrorSnackbar(
-                                                        //       title:
-                                                        //       "Error",
-                                                        //       message:
-                                                        //       "Failed to update cart\n$e",
-                                                        //     );
-                                                        //     log(
-                                                        //       "shu errro ave che =====>>>>$trackTrace",
-                                                        //     );
-                                                        //   }
-                                                        // }
-                                                        await CartService().updateProductPrice(
-                                                          price:int.parse(dialogController.text.trim()) ,
-                                                          productId:int.parse(widget.productId.toString()) ,
-                                                          userId:int.parse(customerId.toString()) ,
+                                                // Immediately update locally so UI reflects new price
+                                                setState(() {
+                                                  productDetails?.price = enteredPrice.toString();
+                                                });
 
-                                                        );
+                                                // Save / Sync to backend or offline queue
+                                                await CartService().updateProductPrice(
+                                                  price: enteredPrice,
+                                                  productId: int.parse(widget.productId.toString()),
+                                                  userId: int.parse(customerId.toString()),
+                                                );
 
-                                                        Get.back();
-                                                        Get.back();
+                                                // Cache updated product details (for offline view)
+                                                var box = HiveService().getProductDetailsBox();
+                                                final cachedData = box.get('productDetails${widget.productId}');
+                                                if (cachedData != null) {
+                                                  final data = json.decode(cachedData);
+                                                  data['price'] = enteredPrice;
+                                                  await box.put('productDetails${widget.productId}', json.encode(data));
+                                                }
 
-                                                        Get.offAll(() =>
-                                                            ProductDetailsScreen(productId: widget.productId,),
-                                                        );
-                                                        _fetchProductDetails();
-                                                      },
-                                                      color:
-                                                      AppColors.mainColor,
-                                                      fontcolor:
-                                                      AppColors.whiteColor,
-                                                      height:
-                                                      5.h,
-                                                      width:
-                                                      40.w,
-                                                      fontsize:
-                                                      15.sp,
-                                                      radius:
-                                                      12.0,
-                                                      iconData:
-                                                      Icons.check,
-                                                      iconsize:
-                                                      17.sp,
-                                                    ),
+                                                // Close dialogs and refresh UI
+                                                Get.back();
+                                                Get.back();
+                                                Get.back();
+                                                Get.to(() =>
+                                                    ProductDetailsScreen(productId: widget.productId,),
+                                                );
+                                                _fetchProductDetails(); // will use cached data if offline
+                                              },
+                                              color: AppColors.mainColor,
+                                              fontcolor: AppColors.whiteColor,
+                                              height: 5.h,
+                                              width: 40.w,
+                                              fontsize: 15.sp,
+                                              radius: 12.0,
+                                              iconData: Icons.check,
+                                              iconsize: 17.sp,
+                                            ),
                                                   ],
                                                 ),
                                               ],
@@ -735,78 +783,142 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                                       radius:
                                                       12.0,
                                                     ),
+                                                    // CustomButton(
+                                                    //   title:
+                                                    //   "Increase Price",
+                                                    //   route: () async {
+                                                    //     bool increseprice =
+                                                    //     true;
+                                                    //     if (dialogController.text.trim().isEmpty) return;
+                                                    //
+                                                    //     final enteredPrice = int.parse(dialogController.text.trim());
+                                                    //
+                                                    //     // Immediately update locally so UI reflects new price
+                                                    //     setState(() {
+                                                    //       productDetails?.price = enteredPrice.toString();
+                                                    //     });
+                                                    //
+                                                    //     // Save / Sync to backend or offline queue
+                                                    //     await CartService().updateProductPrice(
+                                                    //       price: enteredPrice,
+                                                    //       productId: selectedVariationId,
+                                                    //       userId: int.parse(customerId.toString()),
+                                                    //     );
+                                                    //
+                                                    //     // Cache updated product details (for offline view)
+                                                    //     var box = HiveService().getProductDetailsBox();
+                                                    //     final cachedData = box.get('productDetails${widget.productId}');
+                                                    //     if (cachedData != null) {
+                                                    //       final data = json.decode(cachedData);
+                                                    //       data['price'] = enteredPrice;
+                                                    //       await box.put('productDetails${widget.productId}', json.encode(data));
+                                                    //     }
+                                                    //
+                                                    //     // Close dialogs and refresh UI
+                                                    //     Get.back();
+                                                    //     Get.back();
+                                                    //     Get.offAll(() =>
+                                                    //         ProductDetailsScreen(productId: widget.productId,),
+                                                    //     );
+                                                    //     _fetchProductDetails();
+                                                    //
+                                                    //
+                                                    //     // Get.back();
+                                                    //     // Get.back();
+                                                    //     //
+                                                        // Get.offAll(() =>
+                                                        //     ProductDetailsScreen(productId: widget.productId,),
+                                                        // );
+                                                    //     // _fetchProductDetails();
+                                                    //   },
+                                                    //   color:
+                                                    //   AppColors.mainColor,
+                                                    //   fontcolor:
+                                                    //   AppColors.whiteColor,
+                                                    //   height:
+                                                    //   5.h,
+                                                    //   width:
+                                                    //   40.w,
+                                                    //   fontsize:
+                                                    //   15.sp,
+                                                    //   radius:
+                                                    //   12.0,
+                                                    //   iconData:
+                                                    //   Icons.check,
+                                                    //   iconsize:
+                                                    //   17.sp,
+                                                    // ),
                                                     CustomButton(
-                                                      title:
-                                                      "Increase Price",
+                                                      title: "Increase Price",
                                                       route: () async {
-                                                        bool increseprice =
-                                                        true;
+                                                        if (dialogController.text.trim().isEmpty) return;
 
+                                                        final enteredPrice = double.tryParse(dialogController.text.trim());
+                                                        if (enteredPrice == null) {
+                                                          showCustomErrorSnackbar(
+                                                            title: "Invalid Input",
+                                                            message: "Please enter a valid price.",
+                                                          );
+                                                          return;
+                                                        }
 
-                                                        // update server if online
-                                                        // if (await checkInternet()) {
-                                                        //   try {
-                                                        //     await CartService().updateProductPrice(
-                                                        //       price:int.parse(dialogController.text.trim()) ,
-                                                        //       productId:selectedVariationId ,
-                                                        //       userId:int.parse(customerId.toString()) ,
-                                                        //
-                                                        //     );
-                                                        //
-                                                        //     Get.back();
-                                                        //     Get.back();
-                                                        //
-                                                        //     Get.offAll(() =>
-                                                        //         ProductDetailsScreen(productId: widget.productId,),
-                                                        //     );
-                                                        //     _fetchProductDetails();
-                                                        //   } catch (
-                                                        //   e,
-                                                        //   trackTrace
-                                                        //   ) {
-                                                        //     showCustomErrorSnackbar(
-                                                        //       title:
-                                                        //       "Error",
-                                                        //       message:
-                                                        //       "Failed to update cart\n$e",
-                                                        //     );
-                                                        //     log(
-                                                        //       "shu errro ave che =====>>>>$trackTrace",
-                                                        //     );
-                                                        //   }
-                                                        // }
+                                                        // ✅ Update local UI immediately
+                                                        setState(() {
+                                                          currentPrice = enteredPrice;
+                                                          if (selectedVariant != null) {
+                                                            selectedVariant!.price = enteredPrice.toString();
+                                                          } else {
+                                                            productDetails?.price = enteredPrice.toString();
+                                                          }
+                                                        });
+
+                                                        // ✅ Save / Sync (handles both online and offline)
                                                         await CartService().updateProductPrice(
-                                                          price:int.parse(dialogController.text.trim()) ,
-                                                          productId:selectedVariationId ,
-                                                          userId:int.parse(customerId.toString()) ,
-
+                                                          price: enteredPrice,
+                                                          productId: selectedVariationId ?? int.parse(widget.productId.toString()),
+                                                          userId: int.parse(customerId.toString()),
                                                         );
 
-                                                        Get.back();
-                                                        Get.back();
+                                                        // ✅ Update cached product details (for offline viewing)
+                                                        var box = HiveService().getProductDetailsBox();
+                                                        final cachedData = box.get('productDetails${widget.productId}');
+                                                        if (cachedData != null) {
+                                                          final data = json.decode(cachedData);
 
-                                                        Get.offAll(() =>
+                                                          // Update base price or variant price in cache
+                                                          if (selectedVariationId != null && data['all_variations'] != null) {
+                                                            for (var variant in data['all_variations']) {
+                                                              if (variant['id'] == selectedVariationId) {
+                                                                variant['price'] = enteredPrice.toString();
+                                                              }
+                                                            }
+                                                          } else {
+                                                            data['price'] = enteredPrice.toString();
+                                                          }
+
+                                                          await box.put('productDetails${widget.productId}', json.encode(data));
+                                                        }
+
+                                                        // ✅ Close dialogs and refresh product data
+                                                        Get.back();
+                                                        Get.back();
+                                                        Get.back();
+                                                        Get.to(() =>
                                                             ProductDetailsScreen(productId: widget.productId,),
                                                         );
+
                                                         _fetchProductDetails();
                                                       },
-                                                      color:
-                                                      AppColors.mainColor,
-                                                      fontcolor:
-                                                      AppColors.whiteColor,
-                                                      height:
-                                                      5.h,
-                                                      width:
-                                                      40.w,
-                                                      fontsize:
-                                                      15.sp,
-                                                      radius:
-                                                      12.0,
-                                                      iconData:
-                                                      Icons.check,
-                                                      iconsize:
-                                                      17.sp,
+                                                      color: AppColors.mainColor,
+                                                      fontcolor: AppColors.whiteColor,
+                                                      height: 5.h,
+                                                      width: 40.w,
+                                                      fontsize: 15.sp,
+                                                      radius: 12.0,
+                                                      iconData: Icons.check,
+                                                      iconsize: 17.sp,
                                                     ),
+
                                                   ],
                                                 ),
                                               ],

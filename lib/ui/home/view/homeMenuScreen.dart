@@ -557,10 +557,10 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                                   ),
                                 SizedBox(height: 1.h),
 
-                                ImageSlider(
-                                  imageUrls: bannersImagesList,
-                                  height: 18.h,
-                                ),
+                                // ImageSlider(
+                                //   imageUrls: bannersImagesList,
+                                //   height: 18.h,
+                                // ),
 
                                 SizedBox(height: 2.h),
                               ],
@@ -621,7 +621,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                                                 ),
                                               ],
                                             ),
-                                            SizedBox(height: 3.h),
+                                            SizedBox(height: 1.h),
                                             Wrap(
                                               spacing: 0.w,
                                               runSpacing: 3.h,
@@ -691,11 +691,11 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                                         left: 4.w,
                                       ),
                                       child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+
                                         crossAxisAlignment:
                                             CrossAxisAlignment.center,
                                         children: [
+
                                           Row(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.center,
@@ -722,6 +722,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                                               ),
                                             ],
                                           ),
+                                          SizedBox(height:3.h,),
                                           Wrap(
                                             spacing: 0.w,
                                             runSpacing: 3.h,
@@ -753,6 +754,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                                               ),
                                             ],
                                           ),
+                                          SizedBox(height: 5.h,),
                                           CustomButton(
                                             title: 'Explore More..',
                                             radius: isIpad ? 1.w : 3.w,
