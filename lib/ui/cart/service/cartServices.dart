@@ -1850,6 +1850,118 @@ print("body shu ave che incerment ni ${body}");
       }
     }
   }
+  Future<Response?> addCustomer({
+    required String email,
+    required String firstName,
+    required String lastName,
+    required String username,
+    required String password,
+    bool isSync = false,
+  }) async {
+    final box = HiveService().getCustomerBox(); // 👈 make sure to create this box
+
+    // 🔹 OFFLINE MODE → Save request locally
+    if (!await checkInternet()) {
+      if (!isSync) {
+        await box.put(
+          "offline_customer_add_${DateTime.now().millisecondsSinceEpoch}",
+          {
+            "action": "add_customer",
+            "email": email,
+            "first_name": firstName,
+            "last_name": lastName,
+            "username": username,
+            "password": password,
+            "timestamp": DateTime.now().toIso8601String(),
+          },
+        );
+        print("⚠️ Offline: queued new customer → $firstName $lastName");
+      }
+      return null;
+    }
+
+    // 🔹 ONLINE MODE → Call API
+    try {
+      String? token = await getSavedLoginToken();
+      if (token == null || token.isEmpty) {
+        throw Exception("Token not found");
+      }
+
+      final headers = {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      };
+
+      final body = {
+        "email": email,
+        "first_name": firstName,
+        "last_name": lastName,
+        "username": username,
+        "password": password,
+      };
+
+      final response = await _dio.post(
+        apiEndpoints.addcustomer, // 👈 your API endpoint here
+        data: jsonEncode(body),
+        options: Options(headers: headers),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("✅ Customer added online → $firstName $lastName");
+      }
+
+      return response;
+    } catch (e) {
+      // 🔹 If online fails → store locally
+      if (!isSync) {
+        await box.put(
+          "offline_customer_add_${DateTime.now().millisecondsSinceEpoch}",
+          {
+            "action": "add_customer",
+            "email": email,
+            "first_name": firstName,
+            "last_name": lastName,
+            "username": username,
+            "password": password,
+            "timestamp": DateTime.now().toIso8601String(),
+          },
+        );
+        print("⚠️ Failed online, saved offline → $firstName $lastName");
+      }
+      return null;
+    }
+  }
+  Future<void> syncOfflineAddCustomers() async {
+    final box = HiveService().getCustomerBox();
+    if (!await checkInternet()) return;
+
+    final keys = box.keys
+        .where((k) => k.toString().startsWith("offline_customer_add_"))
+        .toList();
+
+    for (var key in keys) {
+      final data = box.get(key);
+      if (data == null) continue;
+
+      try {
+        await addCustomer(
+          email: data['email'],
+          firstName: data['first_name'],
+          lastName: data['last_name'],
+          username: data['username'],
+          password: data['password'],
+          isSync: true,
+        );
+
+        await box.delete(key);
+        print("✅ Synced offline customer → ${data['first_name']} ${data['last_name']}");
+      } catch (e, stackTrace) {
+        print("⚠️ Failed to sync offline customer → ${data['email']}: $e");
+        print(stackTrace);
+      }
+    }
+  }
 
 
 }

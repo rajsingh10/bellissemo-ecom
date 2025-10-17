@@ -24,6 +24,7 @@ class ConnectivityManager {
           await CartService().syncOfflineActions();
           await CartService().syncOfflineUpdate();
           await CartService().syncOfflinePriceUpdate();
+          await CartService().syncOfflineAddCustomers();
           // await CartService().syncAppliedCoupons();
           await CartService().syncAppliedDiscounts();
           await UpdateAddressService().syncOfflineAddress();

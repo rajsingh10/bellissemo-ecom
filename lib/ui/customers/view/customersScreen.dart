@@ -18,6 +18,7 @@ import '../../../utils/snackBars.dart';
 import '../../../utils/titlebarWidget.dart';
 import '../modal/fetchCustomersModal.dart';
 import '../provider/customerProvider.dart';
+import 'AddCustomerScreen.dart';
 
 class CustomersScreen extends StatefulWidget {
   const CustomersScreen({super.key});
@@ -190,6 +191,45 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       // Sort Dropdown
+                                      InkWell(
+                                        onTap: (){
+                                          Get.to(CreateCustomerPage());
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 3.w,vertical: 0.5.h,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(
+                                              30,
+                                            ),
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Colors.black12,
+                                                blurRadius: 6,
+                                                offset: Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Row(
+                                            children: [
+                                        Icon(Icons.person,color: AppColors.mainColor,size: 17.sp,),
+                                              SizedBox(width: 2.w,),
+                                              Text(
+                                                "Add Customer",
+                                                style: TextStyle(
+                                                  fontSize: 15.sp,
+                                                  fontFamily: FontFamily.semiBold,
+                                                  color: AppColors.blackColor,
+                                                ),
+                                              ),
+
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 2.w,),
                                       Container(
                                         padding: EdgeInsets.symmetric(
                                           horizontal: 3.w,
@@ -209,6 +249,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                         ),
                                         child: Row(
                                           children: [
+
                                             Text(
                                               "Sort by",
                                               style: TextStyle(

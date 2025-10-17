@@ -249,170 +249,439 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
 
                                     Row(
                                       children: [
+                                        // GestureDetector(
+                                        //   onTap: () {
+                                        //     showDialog(
+                                        //       barrierDismissible: false,
+                                        //
+                                        //       context: context,
+                                        //       builder: (BuildContext context) {
+                                        //         int? selectedCustomerId;
+                                        //         String? selectedCustomerName;
+                                        //         String? errorText;
+                                        //
+                                        //         return FutureBuilder(
+                                        //           future:
+                                        //               SharedPreferences.getInstance(),
+                                        //           builder: (context, snapshot) {
+                                        //             if (!snapshot.hasData) {
+                                        //               return Center(
+                                        //                 child:
+                                        //                     CircularProgressIndicator(),
+                                        //               );
+                                        //             }
+                                        //
+                                        //             final prefs =
+                                        //                 snapshot.data!;
+                                        //             selectedCustomerId = prefs
+                                        //                 .getInt("customerId");
+                                        //             selectedCustomerName = prefs
+                                        //                 .getString(
+                                        //                   "customerName",
+                                        //                 );
+                                        //
+                                        //             return StatefulBuilder(
+                                        //               builder: (
+                                        //                 context,
+                                        //                 setState,
+                                        //               ) {
+                                        //                 return AlertDialog(
+                                        //                   backgroundColor:
+                                        //                       AppColors
+                                        //                           .whiteColor,
+                                        //                   shape: RoundedRectangleBorder(
+                                        //                     borderRadius:
+                                        //                         BorderRadius.circular(
+                                        //                           15,
+                                        //                         ),
+                                        //                   ),
+                                        //                   title: Text(
+                                        //                     "Select Customer",
+                                        //                     style: TextStyle(
+                                        //                       fontSize: 18.sp,
+                                        //                       fontFamily:
+                                        //                           FontFamily
+                                        //                               .bold,
+                                        //                       color:
+                                        //                           AppColors
+                                        //                               .blackColor,
+                                        //                     ),
+                                        //                   ),
+                                        //                   content: Column(
+                                        //                     mainAxisSize:
+                                        //                         MainAxisSize
+                                        //                             .min,
+                                        //                     children: [
+                                        //                       // List of customers
+                                        //                       ...customersList.map((
+                                        //                         customer,
+                                        //                       ) {
+                                        //                         bool
+                                        //                         isSelected =
+                                        //                             selectedCustomerId ==
+                                        //                             customer.id;
+                                        //                         return InkWell(
+                                        //                           onTap: () {
+                                        //                             setState(() {
+                                        //                               selectedCustomerId =
+                                        //                                   customer
+                                        //                                       .id;
+                                        //                               selectedCustomerName =
+                                        //                                   "${customer.firstName} ${customer.lastName}";
+                                        //                               errorText =
+                                        //                                   null; // clear error
+                                        //                             });
+                                        //                           },
+                                        //                           child: Container(
+                                        //                             padding: EdgeInsets.symmetric(
+                                        //                               vertical:
+                                        //                                   12,
+                                        //                               horizontal:
+                                        //                                   10,
+                                        //                             ),
+                                        //                             margin:
+                                        //                                 EdgeInsets.symmetric(
+                                        //                                   vertical:
+                                        //                                       5,
+                                        //                                 ),
+                                        //                             decoration: BoxDecoration(
+                                        //                               color:
+                                        //                                   isSelected
+                                        //                                       ? AppColors.mainColor.withValues(
+                                        //                                         alpha:
+                                        //                                             0.1,
+                                        //                                       )
+                                        //                                       : AppColors.whiteColor,
+                                        //                               border: Border.all(
+                                        //                                 color:
+                                        //                                     isSelected
+                                        //                                         ? AppColors.mainColor
+                                        //                                         : AppColors.gray,
+                                        //                                 width:
+                                        //                                     1,
+                                        //                               ),
+                                        //                               borderRadius:
+                                        //                                   BorderRadius.circular(
+                                        //                                     10,
+                                        //                                   ),
+                                        //                             ),
+                                        //                             child: Row(
+                                        //                               children: [
+                                        //                                 Icon(
+                                        //                                   isSelected
+                                        //                                       ? Icons.radio_button_checked
+                                        //                                       : Icons.radio_button_off,
+                                        //                                   color:
+                                        //                                       isSelected
+                                        //                                           ? AppColors.mainColor
+                                        //                                           : AppColors.gray,
+                                        //                                 ),
+                                        //                                 SizedBox(
+                                        //                                   width:
+                                        //                                       10,
+                                        //                                 ),
+                                        //                                 Text(
+                                        //                                   "${customer.firstName} ${customer.lastName}",
+                                        //                                   style: TextStyle(
+                                        //                                     fontSize:
+                                        //                                         16.sp,
+                                        //                                     fontFamily:
+                                        //                                         FontFamily.regular,
+                                        //                                     color:
+                                        //                                         AppColors.blackColor,
+                                        //                                   ),
+                                        //                                 ),
+                                        //                               ],
+                                        //                             ),
+                                        //                           ),
+                                        //                         );
+                                        //                       }),
+                                        //                       if (errorText !=
+                                        //                           null) ...[
+                                        //                         SizedBox(
+                                        //                           height: 8,
+                                        //                         ),
+                                        //                         Text(
+                                        //                           errorText!,
+                                        //                           style: TextStyle(
+                                        //                             color:
+                                        //                                 Colors
+                                        //                                     .red,
+                                        //                             fontSize:
+                                        //                                 14.sp,
+                                        //                           ),
+                                        //                         ),
+                                        //                       ],
+                                        //                     ],
+                                        //                   ),
+                                        //                   actions: [
+                                        //                     CustomButton(
+                                        //                       title: "Cancel",
+                                        //                       route: () {
+                                        //                         Get.back();
+                                        //                       },
+                                        //                       color:
+                                        //                           AppColors
+                                        //                               .containerColor,
+                                        //                       fontcolor:
+                                        //                           AppColors
+                                        //                               .blackColor,
+                                        //                       height: 5.h,
+                                        //                       width: 27.w,
+                                        //                       fontsize: 15.sp,
+                                        //                       radius: 12.0,
+                                        //                     ),
+                                        //                     CustomButton(
+                                        //                       title: "Confirm",
+                                        //                       route: () async {
+                                        //                         if (selectedCustomerId !=
+                                        //                                 null &&
+                                        //                             selectedCustomerName !=
+                                        //                                 null) {
+                                        //                           final prevCustomerId =
+                                        //                               prefs.getInt(
+                                        //                                 "customerId",
+                                        //                               );
+                                        //
+                                        //                           if (prevCustomerId !=
+                                        //                               selectedCustomerId) {
+                                        //                             // Customer changed -> save new values and clear cart
+                                        //                             await prefs.setInt(
+                                        //                               "customerId",
+                                        //                               selectedCustomerId!,
+                                        //                             );
+                                        //                             await prefs.setString(
+                                        //                               "customerName",
+                                        //                               selectedCustomerName!,
+                                        //                             );
+                                        //                             _clearCart();
+                                        //                           } else {
+                                        //                             // Customer did not change -> just close dialog
+                                        //                             Get.back();
+                                        //                           }
+                                        //                         } else {
+                                        //                           setState(() {
+                                        //                             errorText =
+                                        //                                 "Please select a customer!";
+                                        //                           });
+                                        //                         }
+                                        //                       },
+                                        //                       color:
+                                        //                           AppColors
+                                        //                               .mainColor,
+                                        //                       fontcolor:
+                                        //                           AppColors
+                                        //                               .whiteColor,
+                                        //                       height: 5.h,
+                                        //                       width: 27.w,
+                                        //                       fontsize: 15.sp,
+                                        //                       radius: 12.0,
+                                        //                       iconData:
+                                        //                           Icons.check,
+                                        //                       iconsize: 17.sp,
+                                        //                     ),
+                                        //                   ],
+                                        //                 );
+                                        //               },
+                                        //             );
+                                        //           },
+                                        //         );
+                                        //       },
+                                        //     );
+                                        //   },
+                                        //
+                                        //   child: CircleAvatar(
+                                        //     radius: isIpad ? 40 : 20,
+                                        //     backgroundColor:
+                                        //         AppColors.containerColor,
+                                        //     child: Icon(
+                                        //       Icons.person_outline_rounded,
+                                        //       color: AppColors.blackColor,
+                                        //       size: isIpad ? 35 : 25,
+                                        //     ),
+                                        //   ),
+                                        // ),
                                         GestureDetector(
                                           onTap: () {
                                             showDialog(
                                               barrierDismissible: false,
-
                                               context: context,
                                               builder: (BuildContext context) {
                                                 int? selectedCustomerId;
                                                 String? selectedCustomerName;
                                                 String? errorText;
+                                                TextEditingController searchController = TextEditingController();
 
                                                 return FutureBuilder(
-                                                  future:
-                                                      SharedPreferences.getInstance(),
+                                                  future: SharedPreferences.getInstance(),
                                                   builder: (context, snapshot) {
                                                     if (!snapshot.hasData) {
-                                                      return Center(
-                                                        child:
-                                                            CircularProgressIndicator(),
+                                                      return const Center(
+                                                        child: CircularProgressIndicator(),
                                                       );
                                                     }
 
-                                                    final prefs =
-                                                        snapshot.data!;
-                                                    selectedCustomerId = prefs
-                                                        .getInt("customerId");
-                                                    selectedCustomerName = prefs
-                                                        .getString(
-                                                          "customerName",
-                                                        );
+                                                    final prefs = snapshot.data!;
+                                                    selectedCustomerId = prefs.getInt("customerId");
+                                                    selectedCustomerName = prefs.getString("customerName");
+
+                                                    // Create a mutable list copy for filtering
+                                                    List<FetchCustomersModal> filteredList = List.from(customersList);
 
                                                     return StatefulBuilder(
-                                                      builder: (
-                                                        context,
-                                                        setState,
-                                                      ) {
+                                                      builder: (context, setState) {
+                                                        void filterCustomers(String query) {
+                                                          setState(() {
+                                                            if (query.isEmpty) {
+                                                              filteredList = List.from(customersList);
+                                                            } else {
+                                                              filteredList = customersList
+                                                                  .where((c) =>
+                                                                  ("${c.firstName} ${c.lastName}")
+                                                                      .toLowerCase()
+                                                                      .contains(query.toLowerCase()))
+                                                                  .toList();
+                                                            }
+                                                          });
+                                                        }
+
                                                         return AlertDialog(
-                                                          backgroundColor:
-                                                              AppColors
-                                                                  .whiteColor,
+                                                          backgroundColor: AppColors.whiteColor,
                                                           shape: RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                  15,
-                                                                ),
+                                                            borderRadius: BorderRadius.circular(15),
                                                           ),
                                                           title: Text(
                                                             "Select Customer",
                                                             style: TextStyle(
                                                               fontSize: 18.sp,
-                                                              fontFamily:
-                                                                  FontFamily
-                                                                      .bold,
-                                                              color:
-                                                                  AppColors
-                                                                      .blackColor,
+                                                              fontFamily: FontFamily.bold,
+                                                              color: AppColors.blackColor,
                                                             ),
                                                           ),
-                                                          content: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              // List of customers
-                                                              ...customersList.map((
-                                                                customer,
-                                                              ) {
-                                                                bool
-                                                                isSelected =
-                                                                    selectedCustomerId ==
-                                                                    customer.id;
-                                                                return InkWell(
-                                                                  onTap: () {
-                                                                    setState(() {
-                                                                      selectedCustomerId =
-                                                                          customer
-                                                                              .id;
-                                                                      selectedCustomerName =
-                                                                          "${customer.firstName} ${customer.lastName}";
-                                                                      errorText =
-                                                                          null; // clear error
-                                                                    });
-                                                                  },
-                                                                  child: Container(
-                                                                    padding: EdgeInsets.symmetric(
-                                                                      vertical:
-                                                                          12,
-                                                                      horizontal:
-                                                                          10,
+                                                          content: SizedBox(
+                                                            width: double.maxFinite,
+                                                            child: Column(
+                                                              mainAxisSize: MainAxisSize.min,
+                                                              children: [
+                                                                // 🔍 Search Bar
+
+                                                                TextField(
+                                                                  controller: searchController,
+                                                                  decoration: InputDecoration(
+                                                                    prefixIcon: Icon(Icons.search,
+                                                                        color: AppColors.mainColor),
+                                                                    hintText: "Search customer...",
+                                                                    hintStyle: TextStyle(
+                                                                      color: Colors.grey,
+                                                                      fontSize: 14.sp,
                                                                     ),
-                                                                    margin:
-                                                                        EdgeInsets.symmetric(
-                                                                          vertical:
-                                                                              5,
-                                                                        ),
-                                                                    decoration: BoxDecoration(
-                                                                      color:
-                                                                          isSelected
-                                                                              ? AppColors.mainColor.withValues(
-                                                                                alpha:
-                                                                                    0.1,
-                                                                              )
-                                                                              : AppColors.whiteColor,
-                                                                      border: Border.all(
-                                                                        color:
-                                                                            isSelected
+                                                                    enabledBorder: OutlineInputBorder(
+                                                                      borderRadius: BorderRadius.circular(10),
+                                                                      borderSide: BorderSide(
+                                                                          color: AppColors.gray, width: 1.0),
+                                                                    ),
+                                                                    focusedBorder: OutlineInputBorder(
+                                                                      borderRadius: BorderRadius.circular(10),
+                                                                      borderSide: BorderSide(
+                                                                          color: AppColors.mainColor, width: 1.2),
+                                                                    ),
+                                                                    contentPadding: const EdgeInsets.symmetric(
+                                                                        vertical: 10, horizontal: 15),
+                                                                  ),
+                                                                  onChanged: filterCustomers,
+                                                                ),
+                                                                const SizedBox(height: 10),
+
+                                                                // Customer List
+                                                                Flexible(
+                                                                  child: filteredList.isNotEmpty
+                                                                      ? ListView.builder(
+                                                                    shrinkWrap: true,
+                                                                    itemCount: filteredList.length,
+                                                                    itemBuilder: (context, index) {
+                                                                      final customer = filteredList[index];
+                                                                      bool isSelected =
+                                                                          selectedCustomerId == customer.id;
+
+                                                                      return InkWell(
+                                                                        onTap: () {
+                                                                          setState(() {
+                                                                            selectedCustomerId = customer.id;
+                                                                            selectedCustomerName =
+                                                                            "${customer.firstName} ${customer.lastName}";
+                                                                            errorText = null;
+                                                                          });
+                                                                        },
+                                                                        child: Container(
+                                                                          padding: const EdgeInsets.symmetric(
+                                                                              vertical: 12, horizontal: 10),
+                                                                          margin: const EdgeInsets.symmetric(
+                                                                              vertical: 5),
+                                                                          decoration: BoxDecoration(
+                                                                            color: isSelected
                                                                                 ? AppColors.mainColor
-                                                                                : AppColors.gray,
-                                                                        width:
-                                                                            1,
-                                                                      ),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                            10,
-                                                                          ),
-                                                                    ),
-                                                                    child: Row(
-                                                                      children: [
-                                                                        Icon(
-                                                                          isSelected
-                                                                              ? Icons.radio_button_checked
-                                                                              : Icons.radio_button_off,
-                                                                          color:
-                                                                              isSelected
+                                                                                .withValues(alpha: 0.1)
+                                                                                : AppColors.whiteColor,
+                                                                            border: Border.all(
+                                                                              color: isSelected
                                                                                   ? AppColors.mainColor
                                                                                   : AppColors.gray,
-                                                                        ),
-                                                                        SizedBox(
-                                                                          width:
-                                                                              10,
-                                                                        ),
-                                                                        Text(
-                                                                          "${customer.firstName} ${customer.lastName}",
-                                                                          style: TextStyle(
-                                                                            fontSize:
-                                                                                16.sp,
-                                                                            fontFamily:
-                                                                                FontFamily.regular,
-                                                                            color:
-                                                                                AppColors.blackColor,
+                                                                              width: 1,
+                                                                            ),
+                                                                            borderRadius:
+                                                                            BorderRadius.circular(10),
+                                                                          ),
+                                                                          child: Row(
+                                                                            children: [
+                                                                              Icon(
+                                                                                isSelected
+                                                                                    ? Icons.radio_button_checked
+                                                                                    : Icons.radio_button_off,
+                                                                                color: isSelected
+                                                                                    ? AppColors.mainColor
+                                                                                    : AppColors.gray,
+                                                                              ),
+                                                                              const SizedBox(width: 10),
+                                                                              Text(
+                                                                                "${customer.firstName} ${customer.lastName}",
+                                                                                style: TextStyle(
+                                                                                  fontSize: 16.sp,
+                                                                                  fontFamily: FontFamily.regular,
+                                                                                  color: AppColors.blackColor,
+                                                                                ),
+                                                                              ),
+                                                                            ],
                                                                           ),
                                                                         ),
-                                                                      ],
+                                                                      );
+                                                                    },
+                                                                  )
+                                                                      : Padding(
+                                                                    padding:
+                                                                    const EdgeInsets.symmetric(vertical: 20),
+                                                                    child: Text(
+                                                                      "No customers found.",
+                                                                      style: TextStyle(
+                                                                        fontSize: 16.sp,
+                                                                        fontFamily: FontFamily.regular,
+                                                                        color: AppColors.blackColor,
+                                                                      ),
                                                                     ),
                                                                   ),
-                                                                );
-                                                              }),
-                                                              if (errorText !=
-                                                                  null) ...[
-                                                                SizedBox(
-                                                                  height: 8,
                                                                 ),
-                                                                Text(
-                                                                  errorText!,
-                                                                  style: TextStyle(
-                                                                    color:
-                                                                        Colors
-                                                                            .red,
-                                                                    fontSize:
-                                                                        14.sp,
+
+                                                                if (errorText != null) ...[
+                                                                  const SizedBox(height: 8),
+                                                                  Text(
+                                                                    errorText!,
+                                                                    style: TextStyle(
+                                                                      color: Colors.red,
+                                                                      fontSize: 14.sp,
+                                                                    ),
                                                                   ),
-                                                                ),
+                                                                ],
                                                               ],
-                                                            ],
+                                                            ),
                                                           ),
                                                           actions: [
                                                             CustomButton(
@@ -420,12 +689,8 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                                                               route: () {
                                                                 Get.back();
                                                               },
-                                                              color:
-                                                                  AppColors
-                                                                      .containerColor,
-                                                              fontcolor:
-                                                                  AppColors
-                                                                      .blackColor,
+                                                              color: AppColors.containerColor,
+                                                              fontcolor: AppColors.blackColor,
                                                               height: 5.h,
                                                               width: 27.w,
                                                               fontsize: 15.sp,
@@ -434,50 +699,32 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                                                             CustomButton(
                                                               title: "Confirm",
                                                               route: () async {
-                                                                if (selectedCustomerId !=
-                                                                        null &&
-                                                                    selectedCustomerName !=
-                                                                        null) {
-                                                                  final prevCustomerId =
-                                                                      prefs.getInt(
-                                                                        "customerId",
-                                                                      );
+                                                                if (selectedCustomerId != null &&
+                                                                    selectedCustomerName != null) {
+                                                                  final prevCustomerId = prefs.getInt("customerId");
 
-                                                                  if (prevCustomerId !=
-                                                                      selectedCustomerId) {
-                                                                    // Customer changed -> save new values and clear cart
+                                                                  if (prevCustomerId != selectedCustomerId) {
                                                                     await prefs.setInt(
-                                                                      "customerId",
-                                                                      selectedCustomerId!,
-                                                                    );
+                                                                        "customerId", selectedCustomerId!);
                                                                     await prefs.setString(
-                                                                      "customerName",
-                                                                      selectedCustomerName!,
-                                                                    );
+                                                                        "customerName", selectedCustomerName!);
                                                                     _clearCart();
                                                                   } else {
-                                                                    // Customer did not change -> just close dialog
                                                                     Get.back();
                                                                   }
                                                                 } else {
                                                                   setState(() {
-                                                                    errorText =
-                                                                        "Please select a customer!";
+                                                                    errorText = "Please select a customer!";
                                                                   });
                                                                 }
                                                               },
-                                                              color:
-                                                                  AppColors
-                                                                      .mainColor,
-                                                              fontcolor:
-                                                                  AppColors
-                                                                      .whiteColor,
+                                                              color: AppColors.mainColor,
+                                                              fontcolor: AppColors.whiteColor,
                                                               height: 5.h,
                                                               width: 27.w,
                                                               fontsize: 15.sp,
                                                               radius: 12.0,
-                                                              iconData:
-                                                                  Icons.check,
+                                                              iconData: Icons.check,
                                                               iconsize: 17.sp,
                                                             ),
                                                           ],
@@ -489,11 +736,9 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                                               },
                                             );
                                           },
-
                                           child: CircleAvatar(
                                             radius: isIpad ? 40 : 20,
-                                            backgroundColor:
-                                                AppColors.containerColor,
+                                            backgroundColor: AppColors.containerColor,
                                             child: Icon(
                                               Icons.person_outline_rounded,
                                               color: AppColors.blackColor,
@@ -501,6 +746,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                                             ),
                                           ),
                                         ),
+
                                         SizedBox(width: isIpad ? 2.w : 3.5.w),
                                         GestureDetector(
                                           onTap: () {
@@ -1064,6 +1310,187 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
   }
 
   /// Customer Dialogue
+  // void _showSelectCustomerDialog() {
+  //   showDialog(
+  //     barrierDismissible: false,
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       int? selectedCustomerId;
+  //       String? selectedCustomerName;
+  //       String? errorText;
+  //
+  //       return FutureBuilder(
+  //         future: SharedPreferences.getInstance(),
+  //         builder: (context, snapshot) {
+  //           if (!snapshot.hasData) {
+  //             return Center(child: CircularProgressIndicator());
+  //           }
+  //
+  //           final prefs = snapshot.data!;
+  //           selectedCustomerId = prefs.getInt("customerId");
+  //           selectedCustomerName = prefs.getString("customerName");
+  //
+  //           return StatefulBuilder(
+  //             builder: (context, setState) {
+  //               return WillPopScope(
+  //                 onWillPop: () async {
+  //                   setState(() {
+  //                     errorText =
+  //                         " Please select a customer before proceeding.";
+  //                   });
+  //                   return false;
+  //                 }, // Prevent back button
+  //                 child: AlertDialog(
+  //                   backgroundColor: AppColors.whiteColor,
+  //                   shape: RoundedRectangleBorder(
+  //                     borderRadius: BorderRadius.circular(15),
+  //                   ),
+  //                   title: Text(
+  //                     "Select Customer",
+  //                     style: TextStyle(
+  //                       fontSize: 18.sp,
+  //                       fontFamily: FontFamily.bold,
+  //                       color: AppColors.blackColor,
+  //                     ),
+  //                   ),
+  //                   content: Column(
+  //                     mainAxisSize: MainAxisSize.min,
+  //                     children: [
+  //                       // List of customers
+  //                       ...customersList.map((customer) {
+  //                         bool isSelected = selectedCustomerId == customer.id;
+  //                         return InkWell(
+  //                           onTap: () {
+  //                             setState(() {
+  //                               selectedCustomerId = customer.id;
+  //                               selectedCustomerName =
+  //                                   "${customer.firstName} ${customer.lastName}";
+  //                               errorText = null; // clear error
+  //                             });
+  //                           },
+  //                           child: Container(
+  //                             padding: EdgeInsets.symmetric(
+  //                               vertical: 12,
+  //                               horizontal: 10,
+  //                             ),
+  //                             margin: EdgeInsets.symmetric(vertical: 5),
+  //                             decoration: BoxDecoration(
+  //                               color:
+  //                                   isSelected
+  //                                       ? AppColors.mainColor.withAlpha(25)
+  //                                       : AppColors.whiteColor,
+  //                               border: Border.all(
+  //                                 color:
+  //                                     isSelected
+  //                                         ? AppColors.mainColor
+  //                                         : AppColors.gray,
+  //                                 width: 1,
+  //                               ),
+  //                               borderRadius: BorderRadius.circular(10),
+  //                             ),
+  //                             child: Row(
+  //                               children: [
+  //                                 Icon(
+  //                                   isSelected
+  //                                       ? Icons.radio_button_checked
+  //                                       : Icons.radio_button_off,
+  //                                   color:
+  //                                       isSelected
+  //                                           ? AppColors.mainColor
+  //                                           : AppColors.gray,
+  //                                 ),
+  //                                 SizedBox(width: 10),
+  //                                 Text(
+  //                                   "${customer.firstName} ${customer.lastName}",
+  //                                   style: TextStyle(
+  //                                     fontSize: 16.sp,
+  //                                     fontFamily: FontFamily.regular,
+  //                                     color: AppColors.blackColor,
+  //                                   ),
+  //                                 ),
+  //                               ],
+  //                             ),
+  //                           ),
+  //                         );
+  //                       }),
+  //                       if (errorText != null) ...[
+  //                         SizedBox(height: 0.5.h),
+  //                         Text(
+  //                           errorText!,
+  //                           style: TextStyle(
+  //                             color: Colors.red,
+  //                             fontSize: 14.sp,
+  //                           ),
+  //                         ),
+  //                       ],
+  //                     ],
+  //                   ),
+  //                   actions: [
+  //                     // Disable Cancel button or just show error
+  //                     CustomButton(
+  //                       title: "Cancel",
+  //                       route: () {
+  //                         setState(() {
+  //                           errorText =
+  //                               " Please select a customer before proceeding.";
+  //                         });
+  //                       },
+  //                       color: AppColors.containerColor,
+  //                       fontcolor: AppColors.blackColor,
+  //                       height: 5.h,
+  //                       width: 27.w,
+  //                       fontsize: 15.sp,
+  //                       radius: 12.0,
+  //                     ),
+  //                     CustomButton(
+  //                       title: "Confirm",
+  //                       route: () async {
+  //                         if (selectedCustomerId != null &&
+  //                             selectedCustomerName != null) {
+  //                           Get.back();
+  //                           final prevCustomerId = prefs.getInt("customerId");
+  //
+  //                           if (prevCustomerId != selectedCustomerId) {
+  //                             // Customer changed -> save new values and clear cart
+  //                             await prefs.setInt(
+  //                               "customerId",
+  //                               selectedCustomerId!,
+  //                             );
+  //                             await prefs.setString(
+  //                               "customerName",
+  //                               selectedCustomerName!,
+  //                             );
+  //                             _clearCart();
+  //                           }
+  //
+  //                           // Close dialog only after saving
+  //                         } else {
+  //                           setState(() {
+  //                             errorText =
+  //                                 " Please select a customer before proceeding.";
+  //                           });
+  //                         }
+  //                       },
+  //                       color: AppColors.mainColor,
+  //                       fontcolor: AppColors.whiteColor,
+  //                       height: 5.h,
+  //                       width: 27.w,
+  //                       fontsize: 15.sp,
+  //                       radius: 12.0,
+  //                       iconData: Icons.check,
+  //                       iconsize: 17.sp,
+  //                     ),
+  //                   ],
+  //                 ),
+  //               );
+  //             },
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
+  /// Customer Dialogue
   void _showSelectCustomerDialog() {
     showDialog(
       barrierDismissible: false,
@@ -1072,28 +1499,46 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
         int? selectedCustomerId;
         String? selectedCustomerName;
         String? errorText;
+        TextEditingController searchController = TextEditingController();
 
         return FutureBuilder(
           future: SharedPreferences.getInstance(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
 
             final prefs = snapshot.data!;
             selectedCustomerId = prefs.getInt("customerId");
             selectedCustomerName = prefs.getString("customerName");
 
+            // Make a copy for filtering
+            List<FetchCustomersModal> filteredList = List.from(customersList);
+
             return StatefulBuilder(
               builder: (context, setState) {
+                void filterCustomers(String query) {
+                  setState(() {
+                    if (query.isEmpty) {
+                      filteredList = List.from(customersList);
+                    } else {
+                      filteredList = customersList
+                          .where((c) => ("${c.firstName} ${c.lastName}")
+                          .toLowerCase()
+                          .contains(query.toLowerCase()))
+                          .toList();
+                    }
+                  });
+                }
+
                 return WillPopScope(
                   onWillPop: () async {
                     setState(() {
                       errorText =
-                          " Please select a customer before proceeding.";
+                      "Please select a customer before proceeding.";
                     });
                     return false;
-                  }, // Prevent back button
+                  },
                   child: AlertDialog(
                     backgroundColor: AppColors.whiteColor,
                     shape: RoundedRectangleBorder(
@@ -1107,77 +1552,134 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                         color: AppColors.blackColor,
                       ),
                     ),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // List of customers
-                        ...customersList.map((customer) {
-                          bool isSelected = selectedCustomerId == customer.id;
-                          return InkWell(
-                            onTap: () {
-                              setState(() {
-                                selectedCustomerId = customer.id;
-                                selectedCustomerName =
-                                    "${customer.firstName} ${customer.lastName}";
-                                errorText = null; // clear error
-                              });
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 10,
+                    content: SizedBox(
+                      width: double.maxFinite,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // 🔍 Search Bar
+                          TextField(
+                            controller: searchController,
+                            decoration: InputDecoration(
+                              prefixIcon:
+                              Icon(Icons.search, color: AppColors.mainColor),
+                              hintText: "Search customer...",
+                              hintStyle: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 14.sp,
                               ),
-                              margin: EdgeInsets.symmetric(vertical: 5),
-                              decoration: BoxDecoration(
-                                color:
-                                    isSelected
-                                        ? AppColors.mainColor.withAlpha(25)
-                                        : AppColors.whiteColor,
-                                border: Border.all(
-                                  color:
-                                      isSelected
-                                          ? AppColors.mainColor
-                                          : AppColors.gray,
-                                  width: 1,
-                                ),
+                              enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: AppColors.gray,
+                                  width: 1.0,
+                                ),
                               ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    isSelected
-                                        ? Icons.radio_button_checked
-                                        : Icons.radio_button_off,
-                                    color:
-                                        isSelected
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: AppColors.mainColor,
+                                  width: 1.2,
+                                ),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 15,
+                              ),
+                            ),
+                            onChanged: filterCustomers,
+                          ),
+                          const SizedBox(height: 10),
+
+                          // Customer List
+                          Flexible(
+                            child: filteredList.isNotEmpty
+                                ? ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: filteredList.length,
+                              itemBuilder: (context, index) {
+                                final customer = filteredList[index];
+                                bool isSelected =
+                                    selectedCustomerId == customer.id;
+
+                                return InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      selectedCustomerId = customer.id;
+                                      selectedCustomerName =
+                                      "${customer.firstName} ${customer.lastName}";
+                                      errorText = null;
+                                    });
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12, horizontal: 10),
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 5),
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? AppColors.mainColor
+                                          .withAlpha(25)
+                                          : AppColors.whiteColor,
+                                      border: Border.all(
+                                        color: isSelected
                                             ? AppColors.mainColor
                                             : AppColors.gray,
-                                  ),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    "${customer.firstName} ${customer.lastName}",
-                                    style: TextStyle(
-                                      fontSize: 16.sp,
-                                      fontFamily: FontFamily.regular,
-                                      color: AppColors.blackColor,
+                                        width: 1,
+                                      ),
+                                      borderRadius:
+                                      BorderRadius.circular(10),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          isSelected
+                                              ? Icons.radio_button_checked
+                                              : Icons.radio_button_off,
+                                          color: isSelected
+                                              ? AppColors.mainColor
+                                              : AppColors.gray,
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          "${customer.firstName} ${customer.lastName}",
+                                          style: TextStyle(
+                                            fontSize: 16.sp,
+                                            fontFamily: FontFamily.regular,
+                                            color: AppColors.blackColor,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
+                                );
+                              },
+                            )
+                                : Padding(
+                              padding:
+                              const EdgeInsets.symmetric(vertical: 20),
+                              child: Text(
+                                "No customers found.",
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 15.sp,
+                                ),
                               ),
                             ),
-                          );
-                        }),
-                        if (errorText != null) ...[
-                          SizedBox(height: 0.5.h),
-                          Text(
-                            errorText!,
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 14.sp,
-                            ),
                           ),
+
+                          if (errorText != null) ...[
+                            SizedBox(height: 0.5.h),
+                            Text(
+                              errorText!,
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 14.sp,
+                              ),
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                     actions: [
                       // Disable Cancel button or just show error
@@ -1186,7 +1688,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                         route: () {
                           setState(() {
                             errorText =
-                                " Please select a customer before proceeding.";
+                            "Please select a customer before proceeding.";
                           });
                         },
                         color: AppColors.containerColor,
@@ -1205,23 +1707,16 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                             final prevCustomerId = prefs.getInt("customerId");
 
                             if (prevCustomerId != selectedCustomerId) {
-                              // Customer changed -> save new values and clear cart
                               await prefs.setInt(
-                                "customerId",
-                                selectedCustomerId!,
-                              );
+                                  "customerId", selectedCustomerId!);
                               await prefs.setString(
-                                "customerName",
-                                selectedCustomerName!,
-                              );
+                                  "customerName", selectedCustomerName!);
                               _clearCart();
                             }
-
-                            // Close dialog only after saving
                           } else {
                             setState(() {
                               errorText =
-                                  " Please select a customer before proceeding.";
+                              "Please select a customer before proceeding.";
                             });
                           }
                         },

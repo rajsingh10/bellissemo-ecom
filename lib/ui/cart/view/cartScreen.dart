@@ -1820,20 +1820,21 @@ class _CartScreenState extends State<CartScreen> {
                       child: CustomButton(
                         title: 'Checkout',
                         route: () {
-                          if (!credit && !proforma) {
-                            showCustomErrorSnackbar(
-                              title: "Credit or Proforma",
-                              message: "Please Select Credit or Proforma",
-                            );
-                          } else {
-                            Get.to(
-                              CheckOutScreen(
-                                cridit: credit == true ? "credit" : "proforma",
-                              ),
-                              transition: Transition.fade,
-                              duration: const Duration(milliseconds: 450),
-                            );
-                          }
+                          // if (!credit && !proforma) {
+                          //   showCustomErrorSnackbar(
+                          //     title: "Credit or Proforma",
+                          //     message: "Please Select Credit or Proforma",
+                          //   );
+                          // } else {
+                          //
+                          // }
+                          Get.to(
+                            CheckOutScreen(
+                              cridit: proforma==false?"":credit==false?"":credit == true ? "credit" : "proforma",
+                            ),
+                            transition: Transition.fade,
+                            duration: const Duration(milliseconds: 450),
+                          );
                         },
                         color: AppColors.mainColor,
                         fontcolor: AppColors.whiteColor,

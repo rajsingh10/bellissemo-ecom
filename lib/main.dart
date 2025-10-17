@@ -23,6 +23,7 @@ void main() async {
     await CartService().syncOfflineUpdate();
     await CartService().syncAppliedDiscounts();
     await CartService().syncOfflinePriceUpdate();
+    await CartService().syncOfflineAddCustomers();
     await OrderHistoryProvider().syncReOrders();
     await UpdateAddressService().syncOfflineAddress();
     await CartService().syncOfflineOrders();

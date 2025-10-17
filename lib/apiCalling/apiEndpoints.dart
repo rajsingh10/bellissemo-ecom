@@ -8,7 +8,7 @@ class apiEndpoints {
       "$baseUrl/wp-json/wc/v3/products/categories?parent=0&per_page=100";
   static String profile = "$baseUrl/wp-json/wp/v2/users/me?context=edit";
   static String banners = "$baseUrl/wp-json/wp/v2/banner";
-  static String fetchCustomers = "$baseUrl/wp-json/wc/v3/customers";
+  static String fetchCustomers = "$baseUrl/wp-json/custom-wc/v1/all-customers";
   static String fetchProducts = "$baseUrl/wp-json/wc/v3/products";
   static String fetchCategoryWiseProducts =
       "$baseUrl/wp-json/custom-wc/v1/all-products?category=";
@@ -36,4 +36,6 @@ class apiEndpoints {
       "$baseUrl/wp-json/jwt-auth/v1/token/refresh";
   static String setprice =
       "$baseUrl/wp-json/custom-pricing/v1/set";
+  static String addcustomer =
+      "$baseUrl/wp-json/wc/v3/customers";
 }
