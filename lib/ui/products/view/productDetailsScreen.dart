@@ -26,8 +26,9 @@ import '../../cart/service/cartServices.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   String? productId;
+  bool? isVariation;
 
-  ProductDetailsScreen({super.key, required this.productId});
+  ProductDetailsScreen({super.key, required this.productId, required this.isVariation});
 
   @override
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
@@ -44,7 +45,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   String? selectedAttributeKey;
   String? selectedAttributeValue;
   bool isAddingToCart = false;
-
+num currentqty = 0;
   String htmlToPlainText(String html) {
     final regex = RegExp(r'<[^>]*>', multiLine: true, caseSensitive: true);
     // Remove HTML tags
@@ -60,6 +61,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     if (productDetails != null) {
       selectedVariant = productDetails!.allVariations?.first;
       currentPrice = double.tryParse(selectedVariant?.price ?? '0') ?? 0.0;
+      currentqty = num.parse(selectedVariant?.packSize ?? '0');
       selectedVariationId = selectedVariant?.id;
       selectedAttributeKey = selectedVariant?.attributes?.getKey();
       selectedAttributeValue = selectedVariant?.attributes?.getValue();
@@ -69,8 +71,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   final List<String> availableSizes = ['512 GB', '1 TB', '2 TB'];
   String? selectedSize;
-
-  Map<String, int> colorQuantities = {};
   bool isIpad = 100.w >= 800;
   bool isLoading = true;
 
@@ -270,6 +270,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                                     variant.price ?? '0',
                                                   ) ??
                                                   0.0;
+                                              currentqty = num.parse(variant.packSize ?? '0');
 
                                               log(
                                                 'selectedVariationId :: $selectedVariationId  ',
@@ -643,6 +644,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                                                 productId:
                                                                     widget
                                                                         .productId,
+                                                                isVariation: widget.isVariation,
                                                               ),
                                                             );
                                                             _fetchProductDetails(); // will use cached data if offline
@@ -951,7 +953,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                                               () => ProductDetailsScreen(
                                                                 productId:
                                                                     widget
-                                                                        .productId,
+                                                                        .productId,isVariation: widget.isVariation,
                                                               ),
                                                             );
 
@@ -1035,7 +1037,116 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Container(
+                              widget.isVariation == false ?Container(
+                          padding: EdgeInsets.symmetric(
+                          horizontal: 3.w,
+                            vertical: 0.8.h,
+                          ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 5,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                int currentPackSize =
+                                    int.tryParse(
+                                      productDetails?.packsize ?? '0',
+                                    ) ??
+                                        0;
+
+                                // If first time, set the original pack size
+                                originalPackSize ??= currentPackSize;
+
+                                // Subtract the original pack size (e.g., 6 → 4 → 2)
+                                currentPackSize -= originalPackSize!;
+
+                                // Prevent going below 0
+                                if (currentPackSize <
+                                    originalPackSize!) {
+                                  currentPackSize = originalPackSize!;
+                                }
+
+                                // Update productDetails
+                                productDetails?.packsize =
+                                    currentPackSize.toString();
+
+                                print(
+                                  "Decrement → currentPackSize = $currentPackSize",
+                                );
+                              });
+                            },
+                            child: CircleAvatar(
+                              radius: isIpad ? 15.sp : 16,
+                              backgroundColor: Colors.transparent,
+                              child: Icon(
+                                Icons.remove,
+                                size: 18.sp,
+                                color: AppColors.blackColor,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 2.w),
+                          Text(
+                            productDetails?.packsize ?? '',
+                            style: TextStyle(
+                              fontSize: 17.sp,
+                              fontFamily: FontFamily.semiBold,
+                            ),
+                          ),
+                          SizedBox(width: 2.w),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                print(
+                                  "Before: productDetails?.packsize = ${productDetails?.packsize}",
+                                );
+
+                                // Convert current pack size
+                                int currentPackSize =
+                                    int.tryParse(
+                                      productDetails?.packsize ?? '0',
+                                    ) ??
+                                        0;
+
+                                // If first time, save original pack size
+                                originalPackSize ??= currentPackSize;
+
+                                // Add only the original pack size (e.g., 2 + 2 = 4, then 4 + 2 = 6)
+                                currentPackSize += originalPackSize!;
+
+                                // Update
+                                productDetails?.packsize =
+                                    currentPackSize.toString();
+
+                                print(
+                                  "After: currentPackSize = $currentPackSize",
+                                );
+                              });
+                            },
+
+                            child: CircleAvatar(
+                              radius: isIpad ? 15.sp : 16,
+                              backgroundColor: Colors.transparent,
+                              child: Icon(
+                                Icons.add,
+                                size: 18.sp,
+                                color: AppColors.blackColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ):Container(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: 3.w,
                                   vertical: 0.8.h,
@@ -1057,10 +1168,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                       onTap: () {
                                         setState(() {
                                           int currentPackSize =
-                                              int.tryParse(
-                                                productDetails?.packsize ?? '0',
-                                              ) ??
-                                              0;
+                                          currentqty.toInt();
 
                                           // If first time, set the original pack size
                                           originalPackSize ??= currentPackSize;
@@ -1075,8 +1183,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                           }
 
                                           // Update productDetails
-                                          productDetails?.packsize =
-                                              currentPackSize.toString();
+                                          currentqty =
+                                              currentPackSize;
 
                                           print(
                                             "Decrement → currentPackSize = $currentPackSize",
@@ -1095,7 +1203,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     ),
                                     SizedBox(width: 2.w),
                                     Text(
-                                      productDetails?.packsize ?? '',
+                                      currentqty.toString(),
                                       style: TextStyle(
                                         fontSize: 17.sp,
                                         fontFamily: FontFamily.semiBold,
@@ -1111,10 +1219,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                                           // Convert current pack size
                                           int currentPackSize =
-                                              int.tryParse(
-                                                productDetails?.packsize ?? '0',
-                                              ) ??
-                                              0;
+                                          currentqty.toInt();
 
                                           // If first time, save original pack size
                                           originalPackSize ??= currentPackSize;
@@ -1123,8 +1228,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                           currentPackSize += originalPackSize!;
 
                                           // Update
-                                          productDetails?.packsize =
-                                              currentPackSize.toString();
+                                          currentqty =
+                                              currentPackSize;
 
                                           print(
                                             "After: currentPackSize = $currentPackSize",
@@ -1421,7 +1526,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           "attribute_${selectedAttributeKey ?? ''}":
               selectedAttributeValue ?? '',
         },
-        quantity: int.parse((productDetails?.packsize).toString()),
+        quantity: currentqty.toInt(),
         itemNote: notesController.text.trim().toString(),
       );
 

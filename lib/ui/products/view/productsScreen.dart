@@ -1000,7 +1000,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           product.stockStatus == 'instock'
               ? () {
                 Get.to(
-                  () => ProductDetailsScreen(productId: product.id.toString()),
+                  () => ProductDetailsScreen(productId: product.id.toString(),isVariation: product.variations?.length != 0,),
                   transition: Transition.leftToRightWithFade,
                   duration: const Duration(milliseconds: 450),
                 );
@@ -1040,7 +1040,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         isFit: true,
                         radius: 20,
                       ),
-                      Column(
+                      product.variations?.length != 0
+                          ?Container():Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Row(
@@ -1073,7 +1074,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                 onTap:
                                     (product.stockStatus == 'instock')
                                         ? () {
-                                          product.variations?.length == 0
+                                            product.variations?.length == 0
                                               ? _addSimpleProductsToCart(
                                                 product,
                                               )
@@ -1576,10 +1577,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
           fetchPdfFile = FetchPdfFileModal.fromJson(data);
           pdfLink = fetchPdfFile?.savedUrl ?? '';
         }
-        showCustomErrorSnackbar(
-          title: 'Server Error',
-          message: 'Something went wrong. Loaded cached data (if available).',
-        );
+        // showCustomErrorSnackbar(
+        //   title: 'Server Error',
+        //   message: 'Something went wrong. Loaded cached data (if available).',
+        // );
       }
     } catch (_) {
       // Network exception → fallback to cache
@@ -1589,10 +1590,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
         fetchPdfFile = FetchPdfFileModal.fromJson(data);
         pdfLink = fetchPdfFile?.savedUrl ?? '';
       }
-      showCustomErrorSnackbar(
-        title: 'Network Error',
-        message: 'Unable to connect. Loaded cached data (if available).',
-      );
+      // showCustomErrorSnackbar(
+      //   title: 'Network Error',
+      //   message: 'Unable to connect. Loaded cached data (if available).',
+      // );
     }
   }
 
