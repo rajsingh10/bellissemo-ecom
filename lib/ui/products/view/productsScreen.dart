@@ -80,6 +80,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     });
     loadInitialData();
   }
+
   @override
   void initState() {
     super.initState();
@@ -106,7 +107,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         _fetchProducts().then((_) => setState(() {})),
         _fetchSubCategories().then((_) => setState(() {})),
         _fetchPdfFile().then(
-              (_) => setState(() {
+          (_) => setState(() {
             log('Pdf File : $pdfLink');
           }),
         ),
@@ -160,16 +161,16 @@ class _ProductsScreenState extends State<ProductsScreen> {
             // Check if product matches the text query
             bool matchesQuery =
                 query.isEmpty ||
-                    name.contains(query.toLowerCase()) ||
-                    packSize.contains(query.toLowerCase());
+                name.contains(query.toLowerCase()) ||
+                packSize.contains(query.toLowerCase());
 
             // Check if product matches selected categories
             bool matchesCategory =
                 selectedFilters.isEmpty ||
-                    (product.categories != null &&
-                        product.categories!.any(
-                              (category) => selectedFilters.contains(category.name),
-                        ));
+                (product.categories != null &&
+                    product.categories!.any(
+                      (category) => selectedFilters.contains(category.name),
+                    ));
 
             return matchesQuery && matchesCategory;
           }).toList();
@@ -177,13 +178,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
       // Sorting
       if (selectedSort == "Low to High") {
         filteredProducts.sort(
-              (a, b) => double.parse(
+          (a, b) => double.parse(
             a.price ?? "0",
           ).compareTo(double.parse(b.price ?? "0")),
         );
       } else if (selectedSort == "High to Low") {
         filteredProducts.sort(
-              (a, b) => double.parse(
+          (a, b) => double.parse(
             b.price ?? "0",
           ).compareTo(double.parse(a.price ?? "0")),
         );
@@ -209,781 +210,781 @@ class _ProductsScreenState extends State<ProductsScreen> {
     return Scaffold(
       backgroundColor: AppColors.bgColor,
       body:
-      isLoading
-          ? Loader()
-          : Stack(
-        children: [
-          Column(
-            children: [
-              TitleBar(
-                title:
-                widget.cate == null
-                    ? 'Products'
-                    : widget.cate.toString(),
-                isDrawerEnabled: true,
-                isSearchEnabled: true,
-                isBackEnabled: true,
-                showDownloadButton: true,
-                onDownload: () async {
-                  var box = HiveService().getPdfFileBox();
-
-                  // Check if we have cached PDF bytes for offline
-                  final cachedBytes = box.get(
-                    'pdf_bytes_${widget.slug}',
-                  );
-
-                  if (cachedBytes != null) {
-                    // ✅ Offline or fallback download using cached bytes
-                    await downloadFile(
-                      null, // No URL needed
-                      context,
-                      "${widget.cate} - Catalog",
-                      'pdf',
-                      fileBytes: Uint8List.fromList(cachedBytes),
-                    );
-                    return;
-                  }
-
-                  // If cached bytes are not available, check if URL exists
-                  if (pdfLink.isEmpty) {
-                    showCustomErrorSnackbar(
-                      title: "PDF Unavailable",
-                      message:
-                      "PDF is not available for download right now.",
-                    );
-                    return;
-                  }
-
-                  // ✅ Online download
-                  await downloadFile(
-                    pdfLink,
-                    context,
-                    "${widget.cate} - Catalog - ${pdfLink.split('/').last.split('.').first}",
-                    pdfLink.split('/').last.split('.').last,
-                  );
-                },
-
-                onSearch: () {
-                  setState(() {
-                    isSearchEnabled = !isSearchEnabled;
-                  });
-                },
-              ),
-              isSearchEnabled
-                  ? SearchField(controller: searchController)
-                  : SizedBox.shrink(),
-              SizedBox(height: 1.h),
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: ClampingScrollPhysics(),
-                  child: Column(
+          isLoading
+              ? Loader()
+              : Stack(
+                children: [
+                  Column(
                     children: [
-                      Row(
-                        mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                isFilter = !isFilter;
-                              });
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 3.w,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(30),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 6,
-                                    offset: Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  value: selectedSort,
-                                  borderRadius: BorderRadius.circular(
-                                    12,
-                                  ),
-                                  dropdownColor: Colors.white,
-                                  icon: Icon(
-                                    Icons.filter_tilt_shift,
-                                    color: AppColors.mainColor,
-                                  ),
-                                  items:
-                                  sortOptions.map((e) {
-                                    return DropdownMenuItem(
-                                      value: e,
-                                      child: Text(
-                                        'Filter Data   ',
-                                        style: TextStyle(
-                                          fontSize: 15.sp,
-                                          fontFamily:
-                                          FontFamily.semiBold,
-                                          color:
-                                          AppColors.blackColor,
+                      TitleBar(
+                        title:
+                            widget.cate == null
+                                ? 'Products'
+                                : widget.cate.toString(),
+                        isDrawerEnabled: true,
+                        isSearchEnabled: true,
+                        isBackEnabled: true,
+                        showDownloadButton: true,
+                        onDownload: () async {
+                          var box = HiveService().getPdfFileBox();
+
+                          // Check if we have cached PDF bytes for offline
+                          final cachedBytes = box.get(
+                            'pdf_bytes_${widget.slug}',
+                          );
+
+                          if (cachedBytes != null) {
+                            // ✅ Offline or fallback download using cached bytes
+                            await downloadFile(
+                              null, // No URL needed
+                              context,
+                              "${widget.cate} - Catalog",
+                              'pdf',
+                              fileBytes: Uint8List.fromList(cachedBytes),
+                            );
+                            return;
+                          }
+
+                          // If cached bytes are not available, check if URL exists
+                          if (pdfLink.isEmpty) {
+                            showCustomErrorSnackbar(
+                              title: "PDF Unavailable",
+                              message:
+                                  "PDF is not available for download right now.",
+                            );
+                            return;
+                          }
+
+                          // ✅ Online download
+                          await downloadFile(
+                            pdfLink,
+                            context,
+                            "${widget.cate} - Catalog - ${pdfLink.split('/').last.split('.').first}",
+                            pdfLink.split('/').last.split('.').last,
+                          );
+                        },
+
+                        onSearch: () {
+                          setState(() {
+                            isSearchEnabled = !isSearchEnabled;
+                          });
+                        },
+                      ),
+                      isSearchEnabled
+                          ? SearchField(controller: searchController)
+                          : SizedBox.shrink(),
+                      SizedBox(height: 1.h),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          physics: ClampingScrollPhysics(),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        isFilter = !isFilter;
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 3.w,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(30),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            blurRadius: 6,
+                                            offset: Offset(0, 3),
+                                          ),
+                                        ],
+                                      ),
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButton<String>(
+                                          value: selectedSort,
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          dropdownColor: Colors.white,
+                                          icon: Icon(
+                                            Icons.filter_tilt_shift,
+                                            color: AppColors.mainColor,
+                                          ),
+                                          items:
+                                              sortOptions.map((e) {
+                                                return DropdownMenuItem(
+                                                  value: e,
+                                                  child: Text(
+                                                    'Filter Data   ',
+                                                    style: TextStyle(
+                                                      fontSize: 15.sp,
+                                                      fontFamily:
+                                                          FontFamily.semiBold,
+                                                      color:
+                                                          AppColors.blackColor,
+                                                    ),
+                                                  ),
+                                                );
+                                              }).toList(),
+                                          onTap: () {
+                                            setState(() {
+                                              isFilter = !isFilter;
+                                              log("isFilter : $isFilter");
+                                            });
+                                          },
+                                          onChanged:
+                                              null, // <-- disables selection
                                         ),
                                       ),
-                                    );
-                                  }).toList(),
-                                  onTap: () {
-                                    setState(() {
-                                      isFilter = !isFilter;
-                                      log("isFilter : $isFilter");
-                                    });
-                                  },
-                                  onChanged:
-                                  null, // <-- disables selection
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 3.w,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(30),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 6,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                Text(
-                                  "Items per page",
-                                  style: TextStyle(
-                                    fontSize: 15.sp,
-                                    fontFamily: FontFamily.semiBold,
-                                    color: AppColors.blackColor,
+                                    ),
                                   ),
-                                ),
-                                SizedBox(width: 3.w),
 
-                                // Modern Dropdown
-                                DropdownButtonHideUnderline(
-                                  child: DropdownButton<int>(
-                                    value: itemsPerPage,
-                                    borderRadius: BorderRadius.circular(
-                                      12,
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 3.w,
                                     ),
-                                    dropdownColor: Colors.white,
-                                    style: TextStyle(
-                                      fontSize: 15.sp,
-                                      fontFamily: FontFamily.regular,
-                                      color: AppColors.blackColor,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(30),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black12,
+                                          blurRadius: 6,
+                                          offset: Offset(0, 3),
+                                        ),
+                                      ],
                                     ),
-                                    icon: Icon(
-                                      Icons.keyboard_arrow_down_rounded,
-                                      color: AppColors.mainColor,
-                                    ),
-                                    items:
-                                    itemsPerPageOptions.map((e) {
-                                      return DropdownMenuItem(
-                                        value: e,
-                                        child: Text(
-                                          e.toString(),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          "Items per page",
                                           style: TextStyle(
                                             fontSize: 15.sp,
-                                            fontFamily:
-                                            FontFamily.semiBold,
-                                            color:
-                                            AppColors.mainColor,
+                                            fontFamily: FontFamily.semiBold,
+                                            color: AppColors.blackColor,
                                           ),
                                         ),
-                                      );
-                                    }).toList(),
-                                    onChanged: (value) {
-                                      if (value != null) {
-                                        setState(() {
-                                          itemsPerPage = value;
-                                          currentPage = 0;
-                                        });
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                                        SizedBox(width: 3.w),
 
-                      SizedBox(height: 1.h),
-
-                      if (isFilter)
-                        Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 3.w,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(30),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 6,
-                                    offset: Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    "Sort by",
-                                    style: TextStyle(
-                                      fontSize: 15.sp,
-                                      fontFamily: FontFamily.semiBold,
-                                      color: AppColors.blackColor,
-                                    ),
-                                  ),
-                                  SizedBox(width: 3.w),
-                                  DropdownButtonHideUnderline(
-                                    child: DropdownButton<String>(
-                                      value: selectedSort,
-                                      borderRadius:
-                                      BorderRadius.circular(12),
-                                      dropdownColor: Colors.white,
-                                      icon: Icon(
-                                        Icons.sort,
-                                        color: AppColors.mainColor,
-                                      ),
-                                      items:
-                                      sortOptions.map((e) {
-                                        return DropdownMenuItem(
-                                          value: e,
-                                          child: Text(
-                                            e,
+                                        // Modern Dropdown
+                                        DropdownButtonHideUnderline(
+                                          child: DropdownButton<int>(
+                                            value: itemsPerPage,
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            dropdownColor: Colors.white,
                                             style: TextStyle(
                                               fontSize: 15.sp,
-                                              fontFamily:
-                                              FontFamily
-                                                  .semiBold,
-                                              color:
-                                              AppColors
-                                                  .mainColor,
+                                              fontFamily: FontFamily.regular,
+                                              color: AppColors.blackColor,
                                             ),
+                                            icon: Icon(
+                                              Icons.keyboard_arrow_down_rounded,
+                                              color: AppColors.mainColor,
+                                            ),
+                                            items:
+                                                itemsPerPageOptions.map((e) {
+                                                  return DropdownMenuItem(
+                                                    value: e,
+                                                    child: Text(
+                                                      e.toString(),
+                                                      style: TextStyle(
+                                                        fontSize: 15.sp,
+                                                        fontFamily:
+                                                            FontFamily.semiBold,
+                                                        color:
+                                                            AppColors.mainColor,
+                                                      ),
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                            onChanged: (value) {
+                                              if (value != null) {
+                                                setState(() {
+                                                  itemsPerPage = value;
+                                                  currentPage = 0;
+                                                });
+                                              }
+                                            },
                                           ),
-                                        );
-                                      }).toList(),
-                                      onChanged: (value) {
-                                        if (value != null) {
-                                          setState(() {
-                                            selectedSort = value;
-                                            _filterProducts();
-                                          });
-                                        }
-                                      },
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                            InkWell(
-                              onTap: () async {
-                                // Initialize with previously selected filters
-                                List<FetchSubCategoriesModal>
-                                tempSelectedFilters =
-                                subCategoriesList
-                                    .where(
-                                      (subCat) => selectedFilters
-                                      .contains(subCat.name),
-                                )
-                                    .toList();
 
-                                String? errorText;
+                              SizedBox(height: 1.h),
 
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return StatefulBuilder(
-                                      builder: (context, setState) {
-                                        return AlertDialog(
-                                          backgroundColor:
-                                          AppColors.whiteColor,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                            BorderRadius.circular(
-                                              15,
+                              if (isFilter)
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 3.w,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(30),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            blurRadius: 6,
+                                            offset: Offset(0, 3),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            "Sort by",
+                                            style: TextStyle(
+                                              fontSize: 15.sp,
+                                              fontFamily: FontFamily.semiBold,
+                                              color: AppColors.blackColor,
                                             ),
                                           ),
-                                          title: Row(
+                                          SizedBox(width: 3.w),
+                                          DropdownButtonHideUnderline(
+                                            child: DropdownButton<String>(
+                                              value: selectedSort,
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              dropdownColor: Colors.white,
+                                              icon: Icon(
+                                                Icons.sort,
+                                                color: AppColors.mainColor,
+                                              ),
+                                              items:
+                                                  sortOptions.map((e) {
+                                                    return DropdownMenuItem(
+                                                      value: e,
+                                                      child: Text(
+                                                        e,
+                                                        style: TextStyle(
+                                                          fontSize: 15.sp,
+                                                          fontFamily:
+                                                              FontFamily
+                                                                  .semiBold,
+                                                          color:
+                                                              AppColors
+                                                                  .mainColor,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }).toList(),
+                                              onChanged: (value) {
+                                                if (value != null) {
+                                                  setState(() {
+                                                    selectedSort = value;
+                                                    _filterProducts();
+                                                  });
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    InkWell(
+                                      onTap: () async {
+                                        // Initialize with previously selected filters
+                                        List<FetchSubCategoriesModal>
+                                        tempSelectedFilters =
+                                            subCategoriesList
+                                                .where(
+                                                  (subCat) => selectedFilters
+                                                      .contains(subCat.name),
+                                                )
+                                                .toList();
+
+                                        String? errorText;
+
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return StatefulBuilder(
+                                              builder: (context, setState) {
+                                                return AlertDialog(
+                                                  backgroundColor:
+                                                      AppColors.whiteColor,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          15,
+                                                        ),
+                                                  ),
+                                                  title: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        "Select Filters",
+                                                        style: TextStyle(
+                                                          fontSize: 18.sp,
+                                                          fontFamily:
+                                                              FontFamily.bold,
+                                                          color:
+                                                              AppColors
+                                                                  .blackColor,
+                                                        ),
+                                                      ),
+                                                      InkWell(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            tempSelectedFilters
+                                                                .clear();
+                                                            selectedFilters
+                                                                .clear();
+                                                            _filterProducts();
+                                                            Get.back();
+                                                          });
+                                                        },
+                                                        child: Text(
+                                                          "Clear Filters",
+                                                          style: TextStyle(
+                                                            fontSize: 18.sp,
+                                                            fontFamily:
+                                                                FontFamily.bold,
+                                                            color:
+                                                                AppColors
+                                                                    .mainColor,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  content:
+                                                      subCategoriesList.isEmpty
+                                                          ? SizedBox(
+                                                            height: 15.h,
+                                                            child: Center(
+                                                              child: Text(
+                                                                "No filters available",
+                                                                style: TextStyle(
+                                                                  fontSize:
+                                                                      16.sp,
+                                                                  fontFamily:
+                                                                      FontFamily
+                                                                          .regular,
+                                                                  color:
+                                                                      AppColors
+                                                                          .gray,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          )
+                                                          : SingleChildScrollView(
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              children:
+                                                                  subCategoriesList.map((
+                                                                    subCategory,
+                                                                  ) {
+                                                                    bool
+                                                                    isSelected =
+                                                                        tempSelectedFilters.contains(
+                                                                          subCategory,
+                                                                        );
+                                                                    return InkWell(
+                                                                      onTap: () {
+                                                                        setState(() {
+                                                                          if (isSelected) {
+                                                                            tempSelectedFilters.remove(
+                                                                              subCategory,
+                                                                            );
+                                                                          } else {
+                                                                            tempSelectedFilters.add(
+                                                                              subCategory,
+                                                                            );
+                                                                          }
+                                                                        });
+                                                                      },
+                                                                      child: Container(
+                                                                        padding: EdgeInsets.symmetric(
+                                                                          vertical:
+                                                                              12,
+                                                                          horizontal:
+                                                                              10,
+                                                                        ),
+                                                                        margin: EdgeInsets.symmetric(
+                                                                          vertical:
+                                                                              5,
+                                                                        ),
+                                                                        child: Row(
+                                                                          children: [
+                                                                            Container(
+                                                                              width:
+                                                                                  19.sp,
+                                                                              height:
+                                                                                  19.sp,
+                                                                              decoration: BoxDecoration(
+                                                                                shape:
+                                                                                    BoxShape.circle,
+                                                                                border: Border.all(
+                                                                                  color:
+                                                                                      isSelected
+                                                                                          ? AppColors.mainColor
+                                                                                          : AppColors.gray,
+                                                                                  width:
+                                                                                      2,
+                                                                                ),
+                                                                              ),
+                                                                              child:
+                                                                                  isSelected
+                                                                                      ? Center(
+                                                                                        child: Container(
+                                                                                          width:
+                                                                                              13.sp,
+                                                                                          height:
+                                                                                              13.sp,
+                                                                                          decoration: BoxDecoration(
+                                                                                            color:
+                                                                                                AppColors.mainColor,
+                                                                                            shape:
+                                                                                                BoxShape.circle,
+                                                                                          ),
+                                                                                        ),
+                                                                                      )
+                                                                                      : SizedBox.shrink(),
+                                                                            ),
+                                                                            SizedBox(
+                                                                              width:
+                                                                                  10,
+                                                                            ),
+                                                                            Expanded(
+                                                                              child: Text(
+                                                                                subCategory.name ??
+                                                                                    '',
+                                                                                style: TextStyle(
+                                                                                  fontSize:
+                                                                                      16.sp,
+                                                                                  fontFamily:
+                                                                                      FontFamily.regular,
+                                                                                  color:
+                                                                                      AppColors.blackColor,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                  }).toList(),
+                                                            ),
+                                                          ),
+                                                  actions: [
+                                                    CustomButton(
+                                                      title: "Cancel",
+                                                      route: () => Get.back(),
+                                                      color:
+                                                          AppColors
+                                                              .containerColor,
+                                                      fontcolor:
+                                                          AppColors.blackColor,
+                                                      height: 5.h,
+                                                      width: 30.w,
+                                                      fontsize: 15.sp,
+                                                      radius: 12.0,
+                                                    ),
+                                                    CustomButton(
+                                                      title: "Confirm",
+                                                      route:
+                                                          subCategoriesList
+                                                                  .isEmpty
+                                                              ? () {}
+                                                              : () {
+                                                                if (tempSelectedFilters
+                                                                    .isEmpty) {
+                                                                  setState(() {
+                                                                    errorText =
+                                                                        "Please select at least one filter!";
+                                                                  });
+                                                                } else {
+                                                                  setState(() {
+                                                                    selectedFilters =
+                                                                        tempSelectedFilters
+                                                                            .map(
+                                                                              (
+                                                                                e,
+                                                                              ) =>
+                                                                                  e.name ??
+                                                                                  '',
+                                                                            )
+                                                                            .toList();
+                                                                    _filterProducts(); // Apply filter immediately
+                                                                  });
+                                                                  Get.back();
+                                                                }
+                                                              },
+                                                      color:
+                                                          subCategoriesList
+                                                                  .isEmpty
+                                                              ? AppColors.gray
+                                                              : AppColors
+                                                                  .mainColor,
+                                                      fontcolor:
+                                                          AppColors.whiteColor,
+                                                      height: 5.h,
+                                                      width: 30.w,
+                                                      fontsize: 15.sp,
+                                                      radius: 12.0,
+                                                      iconData: Icons.check,
+                                                      iconsize: 17.sp,
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          },
+                                        );
+                                      },
+
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 3.w,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            30,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black12,
+                                              blurRadius: 6,
+                                              offset: Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: DropdownButtonHideUnderline(
+                                          child: DropdownButton<String>(
+                                            value: selectedSort,
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            dropdownColor: Colors.white,
+                                            icon: Icon(
+                                              Icons.filter_vintage_outlined,
+                                              color: AppColors.mainColor,
+                                            ),
+                                            items:
+                                                sortOptions.map((e) {
+                                                  return DropdownMenuItem(
+                                                    value: e,
+                                                    child: Text(
+                                                      'Filter Data Using  ',
+                                                      style: TextStyle(
+                                                        fontSize: 15.sp,
+                                                        fontFamily:
+                                                            FontFamily.semiBold,
+                                                        color:
+                                                            AppColors
+                                                                .blackColor,
+                                                      ),
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                            onChanged:
+                                                null, // <-- disables selection
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              if (filteredProducts.isNotEmpty)
+                                SizedBox(height: 1.h),
+                              filteredProducts.isEmpty
+                                  ? Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: isIpad ? 2.h : 15.h,
+                                    ),
+                                    child: emptyWidget(
+                                      icon: Icons.production_quantity_limits,
+                                      text: 'Products',
+                                    ),
+                                  )
+                                  : Column(
+                                    children: [
+                                      GridView.count(
+                                        shrinkWrap: true,
+                                        padding: EdgeInsets.zero,
+                                        physics: ClampingScrollPhysics(),
+                                        crossAxisCount: _getCrossAxisCount(
+                                          context,
+                                        ),
+                                        childAspectRatio: 0.75,
+                                        mainAxisSpacing: 1.h,
+                                        crossAxisSpacing: 2.w,
+                                        children:
+                                            currentPageProducts
+                                                .map((p) => _buildGridItem(p))
+                                                .toList(),
+                                      ),
+                                      SizedBox(height: 2.h),
+                                      // Pagination Section
+                                      if (filteredProducts.length >
+                                          itemsPerPage)
+                                        Padding(
+                                          padding: EdgeInsets.only(bottom: 2.h),
+                                          child: Row(
                                             mainAxisAlignment:
-                                            MainAxisAlignment
-                                                .spaceBetween,
+                                                MainAxisAlignment.center,
                                             children: [
-                                              Text(
-                                                "Select Filters",
-                                                style: TextStyle(
-                                                  fontSize: 18.sp,
-                                                  fontFamily:
-                                                  FontFamily.bold,
-                                                  color:
-                                                  AppColors
-                                                      .blackColor,
+                                              // Previous Button
+                                              InkWell(
+                                                onTap:
+                                                    currentPage > 0
+                                                        ? () {
+                                                          setState(
+                                                            () => currentPage--,
+                                                          );
+                                                          scrollController
+                                                              .animateTo(
+                                                                0,
+                                                                duration: Duration(
+                                                                  milliseconds:
+                                                                      300,
+                                                                ),
+                                                                curve:
+                                                                    Curves
+                                                                        .easeOut,
+                                                              );
+                                                        }
+                                                        : null,
+                                                borderRadius:
+                                                    BorderRadius.circular(30),
+                                                child: Container(
+                                                  padding: EdgeInsets.all(
+                                                    isIpad ? 1.2.w : 1.5.w,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        currentPage > 0
+                                                            ? AppColors
+                                                                .mainColor
+                                                            : Colors
+                                                                .grey
+                                                                .shade300,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.arrow_back_ios_new,
+                                                    size:
+                                                        isIpad ? 15.sp : 18.sp,
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
                                               ),
-                                              InkWell(
-                                                onTap: () {
-                                                  setState(() {
-                                                    tempSelectedFilters
-                                                        .clear();
-                                                    selectedFilters
-                                                        .clear();
-                                                    _filterProducts();
-                                                    Get.back();
-                                                  });
-                                                },
+
+                                              SizedBox(width: 4.w),
+
+                                              // Page Indicator
+                                              Container(
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: 4.w,
+                                                  vertical: 0.8.h,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(30),
+                                                ),
                                                 child: Text(
-                                                  "Clear Filters",
+                                                  "Page ${currentPage + 1}",
                                                   style: TextStyle(
-                                                    fontSize: 18.sp,
+                                                    fontSize: 14.sp,
                                                     fontFamily:
-                                                    FontFamily.bold,
+                                                        FontFamily.semiBold,
+                                                    color: AppColors.blackColor,
+                                                  ),
+                                                ),
+                                              ),
+
+                                              SizedBox(width: 4.w),
+
+                                              // Next Button
+                                              InkWell(
+                                                onTap:
+                                                    endIndex <
+                                                            filteredProducts
+                                                                .length
+                                                        ? () {
+                                                          setState(
+                                                            () => currentPage++,
+                                                          );
+                                                          scrollController
+                                                              .animateTo(
+                                                                0,
+                                                                duration: Duration(
+                                                                  milliseconds:
+                                                                      300,
+                                                                ),
+                                                                curve:
+                                                                    Curves
+                                                                        .easeOut,
+                                                              );
+                                                        }
+                                                        : null,
+                                                borderRadius:
+                                                    BorderRadius.circular(30),
+                                                child: Container(
+                                                  padding: EdgeInsets.all(
+                                                    isIpad ? 1.2.w : 1.5.w,
+                                                  ),
+                                                  decoration: BoxDecoration(
                                                     color:
-                                                    AppColors
-                                                        .mainColor,
+                                                        endIndex <
+                                                                filteredProducts
+                                                                    .length
+                                                            ? AppColors
+                                                                .mainColor
+                                                            : Colors
+                                                                .grey
+                                                                .shade300,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.arrow_forward_ios,
+                                                    size:
+                                                        isIpad ? 15.sp : 18.sp,
+                                                    color: Colors.white,
                                                   ),
                                                 ),
                                               ),
                                             ],
                                           ),
-                                          content:
-                                          subCategoriesList.isEmpty
-                                              ? SizedBox(
-                                            height: 15.h,
-                                            child: Center(
-                                              child: Text(
-                                                "No filters available",
-                                                style: TextStyle(
-                                                  fontSize:
-                                                  16.sp,
-                                                  fontFamily:
-                                                  FontFamily
-                                                      .regular,
-                                                  color:
-                                                  AppColors
-                                                      .gray,
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                              : SingleChildScrollView(
-                                            child: Column(
-                                              mainAxisSize:
-                                              MainAxisSize
-                                                  .min,
-                                              children:
-                                              subCategoriesList.map((
-                                                  subCategory,
-                                                  ) {
-                                                bool
-                                                isSelected =
-                                                tempSelectedFilters.contains(
-                                                  subCategory,
-                                                );
-                                                return InkWell(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      if (isSelected) {
-                                                        tempSelectedFilters.remove(
-                                                          subCategory,
-                                                        );
-                                                      } else {
-                                                        tempSelectedFilters.add(
-                                                          subCategory,
-                                                        );
-                                                      }
-                                                    });
-                                                  },
-                                                  child: Container(
-                                                    padding: EdgeInsets.symmetric(
-                                                      vertical:
-                                                      12,
-                                                      horizontal:
-                                                      10,
-                                                    ),
-                                                    margin: EdgeInsets.symmetric(
-                                                      vertical:
-                                                      5,
-                                                    ),
-                                                    child: Row(
-                                                      children: [
-                                                        Container(
-                                                          width:
-                                                          19.sp,
-                                                          height:
-                                                          19.sp,
-                                                          decoration: BoxDecoration(
-                                                            shape:
-                                                            BoxShape.circle,
-                                                            border: Border.all(
-                                                              color:
-                                                              isSelected
-                                                                  ? AppColors.mainColor
-                                                                  : AppColors.gray,
-                                                              width:
-                                                              2,
-                                                            ),
-                                                          ),
-                                                          child:
-                                                          isSelected
-                                                              ? Center(
-                                                            child: Container(
-                                                              width:
-                                                              13.sp,
-                                                              height:
-                                                              13.sp,
-                                                              decoration: BoxDecoration(
-                                                                color:
-                                                                AppColors.mainColor,
-                                                                shape:
-                                                                BoxShape.circle,
-                                                              ),
-                                                            ),
-                                                          )
-                                                              : SizedBox.shrink(),
-                                                        ),
-                                                        SizedBox(
-                                                          width:
-                                                          10,
-                                                        ),
-                                                        Expanded(
-                                                          child: Text(
-                                                            subCategory.name ??
-                                                                '',
-                                                            style: TextStyle(
-                                                              fontSize:
-                                                              16.sp,
-                                                              fontFamily:
-                                                              FontFamily.regular,
-                                                              color:
-                                                              AppColors.blackColor,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                );
-                                              }).toList(),
-                                            ),
-                                          ),
-                                          actions: [
-                                            CustomButton(
-                                              title: "Cancel",
-                                              route: () => Get.back(),
-                                              color:
-                                              AppColors
-                                                  .containerColor,
-                                              fontcolor:
-                                              AppColors.blackColor,
-                                              height: 5.h,
-                                              width: 30.w,
-                                              fontsize: 15.sp,
-                                              radius: 12.0,
-                                            ),
-                                            CustomButton(
-                                              title: "Confirm",
-                                              route:
-                                              subCategoriesList
-                                                  .isEmpty
-                                                  ? () {}
-                                                  : () {
-                                                if (tempSelectedFilters
-                                                    .isEmpty) {
-                                                  setState(() {
-                                                    errorText =
-                                                    "Please select at least one filter!";
-                                                  });
-                                                } else {
-                                                  setState(() {
-                                                    selectedFilters =
-                                                        tempSelectedFilters
-                                                            .map(
-                                                              (
-                                                              e,
-                                                              ) =>
-                                                          e.name ??
-                                                              '',
-                                                        )
-                                                            .toList();
-                                                    _filterProducts(); // Apply filter immediately
-                                                  });
-                                                  Get.back();
-                                                }
-                                              },
-                                              color:
-                                              subCategoriesList
-                                                  .isEmpty
-                                                  ? AppColors.gray
-                                                  : AppColors
-                                                  .mainColor,
-                                              fontcolor:
-                                              AppColors.whiteColor,
-                                              height: 5.h,
-                                              width: 30.w,
-                                              fontsize: 15.sp,
-                                              radius: 12.0,
-                                              iconData: Icons.check,
-                                              iconsize: 17.sp,
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
-                                );
-                              },
-
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 3.w,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(
-                                    30,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 6,
-                                      offset: Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<String>(
-                                    value: selectedSort,
-                                    borderRadius: BorderRadius.circular(
-                                      12,
-                                    ),
-                                    dropdownColor: Colors.white,
-                                    icon: Icon(
-                                      Icons.filter_vintage_outlined,
-                                      color: AppColors.mainColor,
-                                    ),
-                                    items:
-                                    sortOptions.map((e) {
-                                      return DropdownMenuItem(
-                                        value: e,
-                                        child: Text(
-                                          'Filter Data Using  ',
-                                          style: TextStyle(
-                                            fontSize: 15.sp,
-                                            fontFamily:
-                                            FontFamily.semiBold,
-                                            color:
-                                            AppColors
-                                                .blackColor,
-                                          ),
                                         ),
-                                      );
-                                    }).toList(),
-                                    onChanged:
-                                    null, // <-- disables selection
+                                    ],
                                   ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      if (filteredProducts.isNotEmpty)
-                        SizedBox(height: 1.h),
-                      filteredProducts.isEmpty
-                          ? Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: isIpad ? 2.h : 15.h,
-                        ),
-                        child: emptyWidget(
-                          icon: Icons.production_quantity_limits,
-                          text: 'Products',
-                        ),
-                      )
-                          : Column(
-                        children: [
-                          GridView.count(
-                            shrinkWrap: true,
-                            padding: EdgeInsets.zero,
-                            physics: ClampingScrollPhysics(),
-                            crossAxisCount: _getCrossAxisCount(
-                              context,
-                            ),
-                            childAspectRatio: 0.75,
-                            mainAxisSpacing: 1.h,
-                            crossAxisSpacing: 2.w,
-                            children:
-                            currentPageProducts
-                                .map((p) => _buildGridItem(p))
-                                .toList(),
+                            ],
                           ),
-                          SizedBox(height: 2.h),
-                          // Pagination Section
-                          if (filteredProducts.length >
-                              itemsPerPage)
-                            Padding(
-                              padding: EdgeInsets.only(bottom: 2.h),
-                              child: Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.center,
-                                children: [
-                                  // Previous Button
-                                  InkWell(
-                                    onTap:
-                                    currentPage > 0
-                                        ? () {
-                                      setState(
-                                            () => currentPage--,
-                                      );
-                                      scrollController
-                                          .animateTo(
-                                        0,
-                                        duration: Duration(
-                                          milliseconds:
-                                          300,
-                                        ),
-                                        curve:
-                                        Curves
-                                            .easeOut,
-                                      );
-                                    }
-                                        : null,
-                                    borderRadius:
-                                    BorderRadius.circular(30),
-                                    child: Container(
-                                      padding: EdgeInsets.all(
-                                        isIpad ? 1.2.w : 1.5.w,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color:
-                                        currentPage > 0
-                                            ? AppColors
-                                            .mainColor
-                                            : Colors
-                                            .grey
-                                            .shade300,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Icons.arrow_back_ios_new,
-                                        size:
-                                        isIpad ? 15.sp : 18.sp,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-
-                                  SizedBox(width: 4.w),
-
-                                  // Page Indicator
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 4.w,
-                                      vertical: 0.8.h,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius:
-                                      BorderRadius.circular(30),
-                                    ),
-                                    child: Text(
-                                      "Page ${currentPage + 1}",
-                                      style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontFamily:
-                                        FontFamily.semiBold,
-                                        color: AppColors.blackColor,
-                                      ),
-                                    ),
-                                  ),
-
-                                  SizedBox(width: 4.w),
-
-                                  // Next Button
-                                  InkWell(
-                                    onTap:
-                                    endIndex <
-                                        filteredProducts
-                                            .length
-                                        ? () {
-                                      setState(
-                                            () => currentPage++,
-                                      );
-                                      scrollController
-                                          .animateTo(
-                                        0,
-                                        duration: Duration(
-                                          milliseconds:
-                                          300,
-                                        ),
-                                        curve:
-                                        Curves
-                                            .easeOut,
-                                      );
-                                    }
-                                        : null,
-                                    borderRadius:
-                                    BorderRadius.circular(30),
-                                    child: Container(
-                                      padding: EdgeInsets.all(
-                                        isIpad ? 1.2.w : 1.5.w,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color:
-                                        endIndex <
-                                            filteredProducts
-                                                .length
-                                            ? AppColors
-                                            .mainColor
-                                            : Colors
-                                            .grey
-                                            .shade300,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Icons.arrow_forward_ios,
-                                        size:
-                                        isIpad ? 15.sp : 18.sp,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ],
+                        ),
                       ),
                     ],
-                  ),
-                ),
+                  ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
+                  // if (isAddingToCart)
+                  //   Container(
+                  //     decoration: BoxDecoration(
+                  //       color: Colors.black.withValues(alpha: 0.3),
+                  //     ),
+                  //     child: Loader(),
+                  //   ),
+                ],
               ),
-            ],
-          ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
-          // if (isAddingToCart)
-          //   Container(
-          //     decoration: BoxDecoration(
-          //       color: Colors.black.withValues(alpha: 0.3),
-          //     ),
-          //     child: Loader(),
-          //   ),
-        ],
-      ),
       bottomNavigationBar: SizedBox(
         height: isIpad ? 14.h : 10.h,
         child: CustomBar(selected: 8),
@@ -996,20 +997,20 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Widget _buildGridItem(CategoryWiseProductsModal product) {
     return InkWell(
       onTap:
-      product.stockStatus == 'instock'
-          ? () {
-        Get.to(
-              () => ProductDetailsScreen(productId: product.id.toString()),
-          transition: Transition.leftToRightWithFade,
-          duration: const Duration(milliseconds: 450),
-        );
-      }
-          : () {
-        showCustomErrorSnackbar(
-          title: "Out of Stock",
-          message: "${product.name} is not available right now!",
-        );
-      },
+          product.stockStatus == 'instock'
+              ? () {
+                Get.to(
+                  () => ProductDetailsScreen(productId: product.id.toString()),
+                  transition: Transition.leftToRightWithFade,
+                  duration: const Duration(milliseconds: 450),
+                );
+              }
+              : () {
+                showCustomErrorSnackbar(
+                  title: "Out of Stock",
+                  message: "${product.name} is not available right now!",
+                );
+              },
       child: Opacity(
         opacity: product.stockStatus == 'instock' ? 1.0 : 0.4,
         child: Card(
@@ -1031,9 +1032,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     children: [
                       CustomNetworkImage(
                         imageUrl:
-                        (product.images?.length == 0)
-                            ? ''
-                            : product.images?[0].src ?? '',
+                            (product.images?.length == 0)
+                                ? ''
+                                : product.images?[0].src ?? '',
                         height: double.infinity,
                         width: double.infinity,
                         isFit: true,
@@ -1047,16 +1048,16 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             children: [
                               GestureDetector(
                                 onTap:
-                                (product.stockStatus == 'instock')
-                                    ? () {
-                                  _removeProductFromCart(product);
-                                }
-                                    : null,
+                                    (product.stockStatus == 'instock')
+                                        ? () {
+                                          _removeProductFromCart(product);
+                                        }
+                                        : null,
                                 child: Container(
                                   padding:
-                                  isIpad
-                                      ? EdgeInsets.all(1.w)
-                                      : EdgeInsets.all(1.5.w),
+                                      isIpad
+                                          ? EdgeInsets.all(1.w)
+                                          : EdgeInsets.all(1.5.w),
                                   decoration: BoxDecoration(
                                     color: Colors.transparent,
                                     shape: BoxShape.circle,
@@ -1070,31 +1071,31 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               ),
                               GestureDetector(
                                 onTap:
-                                (product.stockStatus == 'instock')
-                                    ? () {
-                                  product.variations?.length == 0
-                                      ? _addSimpleProductsToCart(
-                                    product,
-                                  )
-                                      : _addVariationProductsToCart(
-                                    product,
-                                    product.firstVariation?.id,
-                                    product
-                                        .firstVariation
-                                        ?.varAttributes
-                                        ?.getKey(),
-                                    product
-                                        .firstVariation
-                                        ?.varAttributes
-                                        ?.getValue(),
-                                  );
-                                }
-                                    : null,
+                                    (product.stockStatus == 'instock')
+                                        ? () {
+                                          product.variations?.length == 0
+                                              ? _addSimpleProductsToCart(
+                                                product,
+                                              )
+                                              : _addVariationProductsToCart(
+                                                product,
+                                                product.firstVariation?.id,
+                                                product
+                                                    .firstVariation
+                                                    ?.varAttributes
+                                                    ?.getKey(),
+                                                product
+                                                    .firstVariation
+                                                    ?.varAttributes
+                                                    ?.getValue(),
+                                              );
+                                        }
+                                        : null,
                                 child: Container(
                                   padding:
-                                  isIpad
-                                      ? EdgeInsets.all(1.w)
-                                      : EdgeInsets.all(1.5.w),
+                                      isIpad
+                                          ? EdgeInsets.all(1.w)
+                                          : EdgeInsets.all(1.5.w),
                                   decoration: BoxDecoration(
                                     color: Colors.transparent,
                                     shape: BoxShape.circle,
@@ -1153,62 +1154,62 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
                     // Pack Size + Price Row
                     product.variations?.length == 0 ||
-                        product.variations == null
+                            product.variations == null
                         ? Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        isIpad
-                            ? Text(
-                          product.packSize == ""
-                              ? 'MOQ : 1'
-                              : 'MOQ : ${product.packSize}',
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontFamily: FontFamily.regular,
-                            color: AppColors.gray,
-                          ),
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            isIpad
+                                ? Text(
+                                  product.packSize == ""
+                                      ? 'MOQ : 1'
+                                      : 'MOQ : ${product.packSize}',
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontFamily: FontFamily.regular,
+                                    color: AppColors.gray,
+                                  ),
+                                )
+                                : Text(
+                                  product.packSize == ""
+                                      ? 'MOQ : 1'
+                                      : 'MOQ : ${product.packSize}',
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontFamily: FontFamily.regular,
+                                    color: AppColors.gray,
+                                  ),
+                                ),
+                            Text(
+                              "${product.cartQuantity == 0 || product.cartQuantity == null || product.cartQuantity == "" || product.cartQuantity == "0" ? "" : product.cartQuantity}",
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontFamily: FontFamily.semiBold,
+                                color: AppColors.mainColor,
+                              ),
+                            ),
+                          ],
                         )
-                            : Text(
-                          product.packSize == ""
-                              ? 'MOQ : 1'
-                              : 'MOQ : ${product.packSize}',
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontFamily: FontFamily.regular,
-                            color: AppColors.gray,
-                          ),
-                        ),
-                        Text(
-                          "${product.cartQuantity == 0 || product.cartQuantity == null || product.cartQuantity == "" || product.cartQuantity == "0" ? "" : product.cartQuantity}",
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontFamily: FontFamily.semiBold,
-                            color: AppColors.mainColor,
-                          ),
-                        ),
-                      ],
-                    )
                         : Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'MOQ : ${product.firstVariation?.packSize}',
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontFamily: FontFamily.regular,
-                            color: AppColors.gray,
-                          ),
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'MOQ : ${product.firstVariation?.packSize}',
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontFamily: FontFamily.regular,
+                                color: AppColors.gray,
+                              ),
+                            ),
+                            Text(
+                              "${product.cartQuantity == 0 || product.cartQuantity == null || product.cartQuantity == "" || product.cartQuantity == "0" ? "" : product.cartQuantity}",
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontFamily: FontFamily.semiBold,
+                                color: AppColors.mainColor,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          "${product.cartQuantity == 0 || product.cartQuantity == null || product.cartQuantity == "" || product.cartQuantity == "0" ? "" : product.cartQuantity}",
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontFamily: FontFamily.semiBold,
-                            color: AppColors.mainColor,
-                          ),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
               ),
@@ -1230,7 +1231,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
             data
                 .map<CategoryWiseProductsModal>(
                   (e) => CategoryWiseProductsModal.fromJson(e),
-            )
+                )
                 .toList();
 
         _filterProducts(); // 👈 refresh filtered list
@@ -1245,7 +1246,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
     try {
       final response = await ProductsProvider().categoryWiseProductsApi(
-
         widget.id,
         customerId,
       );
@@ -1255,7 +1255,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
             data
                 .map<CategoryWiseProductsModal>(
                   (e) => CategoryWiseProductsModal.fromJson(e),
-            )
+                )
                 .toList();
 
         await box.put('categoryProducts_${widget.id}', response.body);
@@ -1269,7 +1269,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
               data
                   .map<CategoryWiseProductsModal>(
                     (e) => CategoryWiseProductsModal.fromJson(e),
-              )
+                  )
                   .toList();
           _filterProducts(); // 👈 refresh here also
         }
@@ -1286,7 +1286,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
             data
                 .map<CategoryWiseProductsModal>(
                   (e) => CategoryWiseProductsModal.fromJson(e),
-            )
+                )
                 .toList();
         _filterProducts(); // 👈 refresh here too
       }
@@ -1298,15 +1298,15 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   Future<void> _addSimpleProductsToCart(
-      CategoryWiseProductsModal product,
-      ) async {
+    CategoryWiseProductsModal product,
+  ) async {
     setState(() {
       isAddingToCart = true;
       // 🔹 update UI immediately
       // product.cartQuantity = (product.cartQuantity ?? 0) + (product.packSize ?? 0);
       product.cartQuantity =
           (int.tryParse(product.cartQuantity?.toString() ?? '0') ?? 0) +
-              (int.tryParse(product.packSize?.toString() ?? '0') ?? 0);
+          (int.tryParse(product.packSize?.toString() ?? '0') ?? 0);
 
       /// pelu chu ave che
     });
@@ -1347,17 +1347,16 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   Future<void> _addVariationProductsToCart(
-      CategoryWiseProductsModal product,
-      variationId,
-      variationKey,
-      variationValue,
-      ) async {
+    CategoryWiseProductsModal product,
+    variationId,
+    variationKey,
+    variationValue,
+  ) async {
     setState(() {
       isAddingToCart = true;
       product.cartQuantity =
           (int.tryParse(product.cartQuantity?.toString() ?? '0') ?? 0) +
-              (int.tryParse(product.packSize?.toString() ?? '0') ?? 0);
-
+          (int.tryParse(product.packSize?.toString() ?? '0') ?? 0);
     });
 
     final cartService = CartService();
@@ -1597,57 +1596,57 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
   }
 
-// Future<void> _fetchPdfFile() async {
-//   var box = HiveService().getPdfFileBox();
-//
-//   if (!await checkInternet()) {
-//     // ✅ Load from Hive if offline
-//     final cachedData = box.get('pdf_${widget.slug}');
-//     if (cachedData != null) {
-//       final data = json.decode(cachedData);
-//       fetchPdfFile = FetchPdfFileModal.fromJson(data);
-//       pdfLink = fetchPdfFile?.savedUrl ?? '';
-//     }
-//     return;
-//   }
-//
-//   try {
-//     final response = await CategoriesProvider().fetchPdfFileApi(widget.slug);
-//     if (response.statusCode == 200) {
-//       final data = json.decode(response.body);
-//       fetchPdfFile = FetchPdfFileModal.fromJson(data);
-//
-//       // ✅ Save fresh API data into Hive
-//       await box.put('pdf_${widget.slug}', response.body);
-//
-//       pdfLink = fetchPdfFile?.savedUrl ?? '';
-//     } else {
-//       // API error → fallback to cache
-//       final cachedData = box.get('pdf_${widget.slug}');
-//       if (cachedData != null) {
-//         final data = json.decode(cachedData);
-//         fetchPdfFile = FetchPdfFileModal.fromJson(data);
-//         pdfLink = fetchPdfFile?.savedUrl ?? '';
-//       }
-//
-//       showCustomErrorSnackbar(
-//         title: 'Server Error',
-//         message: 'Something went wrong. Loaded cached data (if available).',
-//       );
-//     }
-//   } catch (_) {
-//     // Network exception → fallback to cache
-//     final cachedData = box.get('pdf_${widget.slug}');
-//     if (cachedData != null) {
-//       final data = json.decode(cachedData);
-//       fetchPdfFile = FetchPdfFileModal.fromJson(data);
-//       pdfLink = fetchPdfFile?.savedUrl ?? '';
-//     }
-//
-//     showCustomErrorSnackbar(
-//       title: 'Network Error',
-//       message: 'Unable to connect. Loaded cached data (if available).',
-//     );
-//   }
-// }
+  // Future<void> _fetchPdfFile() async {
+  //   var box = HiveService().getPdfFileBox();
+  //
+  //   if (!await checkInternet()) {
+  //     // ✅ Load from Hive if offline
+  //     final cachedData = box.get('pdf_${widget.slug}');
+  //     if (cachedData != null) {
+  //       final data = json.decode(cachedData);
+  //       fetchPdfFile = FetchPdfFileModal.fromJson(data);
+  //       pdfLink = fetchPdfFile?.savedUrl ?? '';
+  //     }
+  //     return;
+  //   }
+  //
+  //   try {
+  //     final response = await CategoriesProvider().fetchPdfFileApi(widget.slug);
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.body);
+  //       fetchPdfFile = FetchPdfFileModal.fromJson(data);
+  //
+  //       // ✅ Save fresh API data into Hive
+  //       await box.put('pdf_${widget.slug}', response.body);
+  //
+  //       pdfLink = fetchPdfFile?.savedUrl ?? '';
+  //     } else {
+  //       // API error → fallback to cache
+  //       final cachedData = box.get('pdf_${widget.slug}');
+  //       if (cachedData != null) {
+  //         final data = json.decode(cachedData);
+  //         fetchPdfFile = FetchPdfFileModal.fromJson(data);
+  //         pdfLink = fetchPdfFile?.savedUrl ?? '';
+  //       }
+  //
+  //       showCustomErrorSnackbar(
+  //         title: 'Server Error',
+  //         message: 'Something went wrong. Loaded cached data (if available).',
+  //       );
+  //     }
+  //   } catch (_) {
+  //     // Network exception → fallback to cache
+  //     final cachedData = box.get('pdf_${widget.slug}');
+  //     if (cachedData != null) {
+  //       final data = json.decode(cachedData);
+  //       fetchPdfFile = FetchPdfFileModal.fromJson(data);
+  //       pdfLink = fetchPdfFile?.savedUrl ?? '';
+  //     }
+  //
+  //     showCustomErrorSnackbar(
+  //       title: 'Network Error',
+  //       message: 'Unable to connect. Loaded cached data (if available).',
+  //     );
+  //   }
+  // }
 }

@@ -674,7 +674,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                             ),
                                                           ),
                                                           Text(
-                                                            "${order.deliveryDate==""||order.deliveryDate=="null"||order.deliveryDate==null?"N/A":order.deliveryDate}",
+                                                            "${order.deliveryDate == "" || order.deliveryDate == "null" || order.deliveryDate == null ? "N/A" : order.deliveryDate}",
                                                             style: TextStyle(
                                                               fontSize: 16.sp,
                                                               fontWeight:

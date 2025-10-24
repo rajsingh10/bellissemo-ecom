@@ -27,6 +27,7 @@ class CartService {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('login_token');
   }
+
   final Dio _dio = Dio();
 
   // ----------------- Add to Cart -----------------
@@ -36,8 +37,7 @@ class CartService {
     required String? itemNote,
     int? variationId,
     Map<String, dynamic>? variation,
-  })
-  async {
+  }) async {
     final box = HiveService().getAddCartBox();
 
     Map<String, dynamic> body =
@@ -239,7 +239,8 @@ class CartService {
         await increaseCart(
           overrideprice: overridePrice,
           cartItemKey: cartItemKey,
-          packsize: int.tryParse(pakasiz) ?? 0, // safely convert to int
+          packsize: int.tryParse(pakasiz) ?? 0,
+          // safely convert to int
           currentQuantity: quantity - (int.tryParse(pakasiz) ?? 0),
 
           isSync: true,
@@ -401,7 +402,8 @@ class CartService {
     }
 
     // int newQuantity = (totalQuantity - packsize).clamp(0, totalQuantity);
-    int newQuantity = ((totalQuantity - (packsize ?? 0))).clamp(0, totalQuantity).toInt();
+    int newQuantity =
+        ((totalQuantity - (packsize ?? 0))).clamp(0, totalQuantity).toInt();
 
     final hasInternet = await checkInternet();
 
@@ -463,8 +465,11 @@ class CartService {
 
       final body = {
         "cart_item_key": cartItemKey,
-        "quantity": ((onlineQuantity - (packsize ?? 0)).clamp(0, onlineQuantity)).toInt(),
-
+        "quantity":
+            ((onlineQuantity - (packsize ?? 0)).clamp(
+              0,
+              onlineQuantity,
+            )).toInt(),
       };
 
       final response = await _dio.post(
@@ -491,7 +496,9 @@ class CartService {
         }
 
         await cacheBox.put("cartData_$productId", {
-          "totalQuantity": ((onlineQuantity - (packsize ?? 0)) + (offlineQueuedQty ?? 0)).toInt(),
+          "totalQuantity":
+              ((onlineQuantity - (packsize ?? 0)) + (offlineQueuedQty ?? 0))
+                  .toInt(),
 
           "cartItemKey": cartItemKey,
         });
@@ -532,8 +539,9 @@ class CartService {
     num totalQuantity = cartData["totalQuantity"] ?? 0;
     print("totalQuantity====shu ave che${totalQuantity}");
     String? cartItemKey = cartData["cartItemKey"];
-    int quantityToSend = (totalQuantity + num.parse(packsize.toString())).toInt();
-print("quantityToSend====>>>>>>>>>${quantityToSend}");
+    int quantityToSend =
+        (totalQuantity + num.parse(packsize.toString())).toInt();
+    print("quantityToSend====>>>>>>>>>${quantityToSend}");
     Map<String, dynamic> body =
         cartItemKey != null
             ? {"cart_item_key": cartItemKey, "quantity": quantityToSend}
@@ -550,7 +558,7 @@ print("quantityToSend====>>>>>>>>>${quantityToSend}");
               "quantity": quantityToSend,
               "item_note": itemNote ?? "",
             };
-print("body shu ave che incerment ni ${body}");
+    print("body shu ave che incerment ni ${body}");
     final box = HiveService().getAddCartBox();
     final cacheBox = HiveService().getProductCartDataBox();
     if (!cacheBox.isOpen) await HiveService().init();
@@ -647,8 +655,7 @@ print("body shu ave che incerment ni ${body}");
     required int packsize,
     bool online = false,
     bool isSync = false, // prevent infinite loop during sync
-  })
-  async {
+  }) async {
     final int newQuantity;
     print("false shu ave che $online");
     if (online == true) {
@@ -1578,7 +1585,7 @@ print("body shu ave che incerment ni ${body}");
     await cacheBox.put("applied_discount", {
       "customerId": customerId,
       "enabled": enabled,
-      "discountType":discountType=="Percentage"?"percentage" :"fixed",
+      "discountType": discountType == "Percentage" ? "percentage" : "fixed",
       "discountValue": discountValue,
       "appliedAt": DateTime.now().toIso8601String(),
     });
@@ -1593,7 +1600,8 @@ print("body shu ave che incerment ni ${body}");
             "action": "apply_discount",
             "customer_id": customerId,
             "enabled": enabled,
-            "discount_type": discountType=="Percentage"?"percentage" :"fixed",
+            "discount_type":
+                discountType == "Percentage" ? "percentage" : "fixed",
             "discount_value": discountValue,
             "timestamp": DateTime.now().toIso8601String(),
           },
@@ -1621,7 +1629,7 @@ print("body shu ave che incerment ni ${body}");
       final body = {
         "customer_id": customerId,
         "enabled": enabled,
-        "discount_type":discountType=="Percentage"?"percentage" :"fixed",
+        "discount_type": discountType == "Percentage" ? "percentage" : "fixed",
         "discount_value": discountValue,
       };
 
@@ -1744,13 +1752,13 @@ print("body shu ave che incerment ni ${body}");
       }
     }
   }
+
   Future<Response?> updateProductPrice({
     required var userId,
     required var productId,
     required var price,
     bool isSync = false,
-  })
-  async {
+  }) async {
     final box = HiveService().getAddCartBox();
 
     // 🔹 OFFLINE mode: store in Hive queue
@@ -1766,7 +1774,9 @@ print("body shu ave che incerment ni ${body}");
             "timestamp": DateTime.now().toIso8601String(),
           },
         );
-        print("⚠️ Offline: queued price update → productId: $productId → ₹$price");
+        print(
+          "⚠️ Offline: queued price update → productId: $productId → ₹$price",
+        );
       }
       return null;
     }
@@ -1784,11 +1794,7 @@ print("body shu ave che incerment ni ${body}");
         "Accept": "application/json",
       };
 
-      final body = {
-        "user_id": userId,
-        "product_id": productId,
-        "price": price,
-      };
+      final body = {"user_id": userId, "product_id": productId, "price": price};
 
       final response = await _dio.post(
         apiEndpoints.setprice, // 🔸 define your API endpoint
@@ -1813,18 +1819,22 @@ print("body shu ave che incerment ni ${body}");
             "timestamp": DateTime.now().toIso8601String(),
           },
         );
-        print("⚠️ Failed online, saved offline → productId: $productId → ₹$price");
+        print(
+          "⚠️ Failed online, saved offline → productId: $productId → ₹$price",
+        );
       }
       return null;
     }
   }
+
   Future<void> syncOfflinePriceUpdate() async {
     final box = HiveService().getAddCartBox();
     if (!await checkInternet()) return; // only sync when online
 
-    final keys = box.keys
-        .where((k) => k.toString().startsWith("offline_price_update_"))
-        .toList();
+    final keys =
+        box.keys
+            .where((k) => k.toString().startsWith("offline_price_update_"))
+            .toList();
 
     for (var key in keys) {
       final data = box.get(key);
@@ -1850,17 +1860,129 @@ print("body shu ave che incerment ni ${body}");
       }
     }
   }
+
+  // Future<Response?> addCustomer({
+  //   required String email,
+  //   required String firstName,
+  //   required String lastName,
+  //   required String username,
+  //   required String password,
+  //   required String companynaame,
+  //   required String companyregistrationnumber,
+  //   required String vatnumber,
+  //   required String contactname,
+  //   required String mobilenumber,
+  //   bool isSync = false,
+  // }) async
+  // {
+  //   final box = HiveService().getCustomerBox();
+  //
+  //   // 🔹 OFFLINE MODE → Save request locally
+  //   if (!await checkInternet()) {
+  //     if (!isSync) {
+  //       await box.put(
+  //         "offline_customer_add_${DateTime.now().millisecondsSinceEpoch}",
+  //         {
+  //           "action": "add_customer",
+  //           "email": email,
+  //           "first_name": firstName,
+  //           "last_name": lastName,
+  //           "username": username,
+  //           "password": password,
+  //           "timestamp": DateTime.now().toIso8601String(),
+  //           "company_name": companynaame,
+  //           "company_registration_number": companyregistrationnumber,
+  //           "vat_number": vatnumber,
+  //           "contact_name": contactname,
+  //           "mobile_number": mobilenumber,
+  //         },
+  //       );
+  //       print("⚠️ Offline: queued new customer → $firstName $lastName");
+  //     }
+  //     return null;
+  //   }
+  //
+  //   // 🔹 ONLINE MODE → Call API
+  //   try {
+  //     String? token = await getSavedLoginToken();
+  //     if (token == null || token.isEmpty) {
+  //       throw Exception("Token not found");
+  //     }
+  //
+  //     final headers = {
+  //       "Authorization": "Bearer $token",
+  //       "Content-Type": "application/json",
+  //       "Accept": "application/json",
+  //     };
+  //
+  //     final body = {
+  //       "email": email,
+  //       "first_name": firstName,
+  //       "last_name": lastName,
+  //       "username": username,
+  //       "password": password,
+  //       // New Field
+  //       "company_name": companynaame,
+  //       "company_registration_number": companyregistrationnumber,
+  //       "vat_number": vatnumber,
+  //       "contact_name": contactname,
+  //       "mobile_number": mobilenumber,
+  //     };
+  //
+  //     final response = await _dio.post(
+  //       apiEndpoints.addcustomer, // 👈 your API endpoint here
+  //       data: jsonEncode(body),
+  //       options: Options(headers: headers),
+  //     );
+  //
+  //     if (response.statusCode == 200 || response.statusCode == 201) {
+  //       print("✅ Customer added online → $firstName $lastName");
+  //     }
+  //
+  //     return response;
+  //   } catch (e) {
+  //     // 🔹 If online fails → store locally
+  //     if (!isSync) {
+  //       await box.put(
+  //         "offline_customer_add_${DateTime.now().millisecondsSinceEpoch}",
+  //         {
+  //           "action": "add_customer",
+  //           "email": email,
+  //           "first_name": firstName,
+  //           "last_name": lastName,
+  //           "username": username,
+  //           "password": password,
+  //           // New Field
+  //           "company_name": companynaame,
+  //           "company_registration_number": companyregistrationnumber,
+  //           "vat_number": vatnumber,
+  //           "contact_name": contactname,
+  //           "mobile_number": mobilenumber,
+  //         },
+  //       );
+  //       print("⚠️ Failed online, saved offline → $firstName $lastName");
+  //     }
+  //     return null;
+  //   }
+  // }
+
   Future<Response?> addCustomer({
     required String email,
     required String firstName,
     required String lastName,
     required String username,
     required String password,
+    required String companynaame,
+    required String companyregistrationnumber,
+    required String vatnumber,
+    required String contactname,
+    required String mobilenumber,
+    required String address,
     bool isSync = false,
   }) async {
-    final box = HiveService().getCustomerBox(); // 👈 make sure to create this box
+    final box = HiveService().getCustomerBox();
 
-    // 🔹 OFFLINE MODE → Save request locally
+    // 🔹 OFFLINE MODE → Save locally
     if (!await checkInternet()) {
       if (!isSync) {
         await box.put(
@@ -1872,6 +1994,12 @@ print("body shu ave che incerment ni ${body}");
             "last_name": lastName,
             "username": username,
             "password": password,
+            "company_name": companynaame,
+            "company_registration_number": companyregistrationnumber,
+            "vat_number": vatnumber,
+            "contact_name": contactname,
+            "mobile_number": mobilenumber,
+            "company_address": address,
             "timestamp": DateTime.now().toIso8601String(),
           },
         );
@@ -1880,7 +2008,7 @@ print("body shu ave che incerment ni ${body}");
       return null;
     }
 
-    // 🔹 ONLINE MODE → Call API
+    // 🔹 ONLINE MODE → API CALL
     try {
       String? token = await getSavedLoginToken();
       if (token == null || token.isEmpty) {
@@ -1893,27 +2021,66 @@ print("body shu ave che incerment ni ${body}");
         "Accept": "application/json",
       };
 
+      // 🔸 Create full WooCommerce-style customer JSON
       final body = {
         "email": email,
         "first_name": firstName,
         "last_name": lastName,
         "username": username,
         "password": password,
+        "billing": {
+          "first_name": firstName,
+          "last_name": lastName,
+          "company": companynaame,
+          "address_1": "123 Street Name",
+          "address_2": "Business Complex",
+          "city": "Mumbai",
+          "state": "MH",
+          "postcode": "400001",
+          "country": "IN",
+          "email": email,
+          "phone": mobilenumber,
+        },
+        "shipping": {
+          "first_name": firstName,
+          "last_name": lastName,
+          "company": companynaame,
+          "address_1": "123 Street Name",
+          "address_2": "Business Complex",
+          "city": "Mumbai",
+          "state": "MH",
+          "postcode": "400001",
+          "country": "IN",
+        },
+        "meta_data": [
+          {"key": "company_name", "value": companynaame},
+          {
+            "key": "company_registration_number",
+            "value": companyregistrationnumber,
+          },
+          {"key": "vat_number", "value": vatnumber},
+          {"key": "contact_name", "value": contactname},
+          {"key": "mobile_number", "value": mobilenumber},
+          {"key": "mobile_number", "value": mobilenumber},
+          {"key": "company_address", "value": address},
+        ],
       };
 
       final response = await _dio.post(
-        apiEndpoints.addcustomer, // 👈 your API endpoint here
+        apiEndpoints.addcustomer,
         data: jsonEncode(body),
         options: Options(headers: headers),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("✅ Customer added online → $firstName $lastName");
+      } else {
+        print("⚠️ Failed to add customer: ${response.statusCode}");
       }
 
       return response;
     } catch (e) {
-      // 🔹 If online fails → store locally
+      // 🔹 Fallback → save offline if error
       if (!isSync) {
         await box.put(
           "offline_customer_add_${DateTime.now().millisecondsSinceEpoch}",
@@ -1924,6 +2091,12 @@ print("body shu ave che incerment ni ${body}");
             "last_name": lastName,
             "username": username,
             "password": password,
+            "company_name": companynaame,
+            "company_registration_number": companyregistrationnumber,
+            "vat_number": vatnumber,
+            "contact_name": contactname,
+            "mobile_number": mobilenumber,
+            "company_address": address,
             "timestamp": DateTime.now().toIso8601String(),
           },
         );
@@ -1932,36 +2105,130 @@ print("body shu ave che incerment ni ${body}");
       return null;
     }
   }
+
   Future<void> syncOfflineAddCustomers() async {
     final box = HiveService().getCustomerBox();
     if (!await checkInternet()) return;
 
-    final keys = box.keys
-        .where((k) => k.toString().startsWith("offline_customer_add_"))
-        .toList();
+    final keys =
+        box.keys
+            .where((k) => k.toString().startsWith("offline_customer_add_"))
+            .toList();
+
+    print("🛰 Syncing offline customers... Found: ${keys.length}");
 
     for (var key in keys) {
       final data = box.get(key);
       if (data == null) continue;
 
       try {
-        await addCustomer(
-          email: data['email'],
-          firstName: data['first_name'],
-          lastName: data['last_name'],
-          username: data['username'],
-          password: data['password'],
-          isSync: true,
+        String? token = await getSavedLoginToken();
+        if (token == null || token.isEmpty) throw Exception("Token not found");
+
+        final headers = {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        };
+
+        final body = {
+          "email": data['email'],
+          "first_name": data['first_name'],
+          "last_name": data['last_name'],
+          "username": data['username'],
+          "password": data['password'],
+          "billing": {
+            "first_name": data['first_name'],
+            "last_name": data['last_name'],
+            "company": data['company_name'],
+            "address_1": "123 Street Name",
+            "city": "Mumbai",
+            "state": "MH",
+            "postcode": "400001",
+            "country": "IN",
+            "email": data['email'],
+            "phone": data['mobile_number'],
+          },
+          "shipping": {
+            "first_name": data['first_name'],
+            "last_name": data['last_name'],
+            "company": data['company_name'],
+            "address_1": "123 Street Name",
+            "city": "Mumbai",
+            "state": "MH",
+            "postcode": "400001",
+            "country": "IN",
+          },
+          "meta_data": [
+            {"key": "company_name", "value": data['company_name']},
+            {
+              "key": "company_registration_number",
+              "value": data['company_registration_number'],
+            },
+            {"key": "vat_number", "value": data['vat_number']},
+            {"key": "contact_name", "value": data['contact_name']},
+            {"key": "mobile_number", "value": data['mobile_number']},
+            {"key": "company_address", "value": data['company_address']},
+            // ✅ fixed key
+          ],
+        };
+
+        final response = await _dio.post(
+          apiEndpoints.addcustomer,
+          data: jsonEncode(body),
+          options: Options(headers: headers),
         );
 
-        await box.delete(key);
-        print("✅ Synced offline customer → ${data['first_name']} ${data['last_name']}");
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          print(
+            "✅ Synced offline customer → ${data['first_name']} ${data['last_name']}",
+          );
+          await box.delete(key);
+        } else {
+          print(
+            "⚠️ Failed to sync customer → ${data['email']}: ${response.statusCode}",
+          );
+        }
       } catch (e, stackTrace) {
         print("⚠️ Failed to sync offline customer → ${data['email']}: $e");
-        print(stackTrace);
       }
     }
   }
 
-
+  // Future<void> syncOfflineAddCustomers() async {
+  //   final box = HiveService().getCustomerBox();
+  //   if (!await checkInternet()) return;
+  //
+  //   final keys = box.keys
+  //       .where((k) => k.toString().startsWith("offline_customer_add_"))
+  //       .toList();
+  //
+  //   for (var key in keys) {
+  //     final data = box.get(key);
+  //     if (data == null) continue;
+  //
+  //     try {
+  //       await addCustomer(
+  //         email: data['email'],
+  //         firstName: data['first_name'],
+  //         lastName: data['last_name'],
+  //         username: data['username'],
+  //         password: data['password'],
+  //         // New Field
+  //         companynaame: data['company_name'],
+  //         mobilenumber: data['mobile_number'],
+  //         contactname: data['contact_name'],
+  //         vatnumber: data['vat_number'],
+  //         companyregistrationnumber: data['company_registration_number'],
+  //         isSync: true,
+  //       );
+  //
+  //       await box.delete(key);
+  //       print("✅ Synced offline customer → ${data['first_name']} ${data['last_name']}");
+  //     } catch (e, stackTrace) {
+  //       print("⚠️ Failed to sync offline customer → ${data['email']}: $e");
+  //       print(stackTrace);
+  //     }
+  //   }
+  // }
 }

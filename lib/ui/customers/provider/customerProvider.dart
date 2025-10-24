@@ -14,6 +14,7 @@ class CustomerProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('login_token');
   }
+
   Future<http.Response> fetchCustomers() async {
     String url = apiEndpoints.fetchCustomers;
     LoginModal? loginData = await SaveDataLocal.getDataFromLocal();

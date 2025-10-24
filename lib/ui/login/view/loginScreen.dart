@@ -435,6 +435,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     });
   }
+
   Future<void> saveLoginToken(String? token) async {
     if (token == null || token.isEmpty) return;
     final prefs = await SharedPreferences.getInstance();

@@ -14,6 +14,7 @@ class ProfileProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('login_token');
   }
+
   Future<http.Response> fetchProfile() async {
     String url = apiEndpoints.profile;
     LoginModal? loginData = await SaveDataLocal.getDataFromLocal();

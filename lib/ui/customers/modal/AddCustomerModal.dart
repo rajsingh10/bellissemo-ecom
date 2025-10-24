@@ -5,12 +5,13 @@ class AddCustomerModal {
   String? username;
   String? password;
 
-  AddCustomerModal(
-      {this.email,
-        this.firstName,
-        this.lastName,
-        this.username,
-        this.password});
+  AddCustomerModal({
+    this.email,
+    this.firstName,
+    this.lastName,
+    this.username,
+    this.password,
+  });
 
   AddCustomerModal.fromJson(Map<String, dynamic> json) {
     email = json['email'];

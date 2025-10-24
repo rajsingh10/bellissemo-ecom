@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'package:bellissemo_ecom/Apicalling/sharedpreferance.dart';
 import 'package:bellissemo_ecom/ui/cart/View/cartScreen.dart';
 import 'package:bellissemo_ecom/ui/customers/view/customersScreen.dart';
-import 'package:bellissemo_ecom/ui/home/view/homeScreen.dart';
 import 'package:bellissemo_ecom/ui/login/view/loginScreen.dart';
 import 'package:bellissemo_ecom/ui/orderhistory/view/orderHistoryScreen.dart';
 import 'package:bellissemo_ecom/ui/profile/view/profileScreen.dart';

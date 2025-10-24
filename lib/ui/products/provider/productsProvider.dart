@@ -15,11 +15,12 @@ class ProductsProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('login_token');
   }
+
   Future<http.Response> fetchProducts(customerid) async {
     String url = "${apiEndpoints.fetchProducts}?customer_id=${customerid}";
     LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
     String? token = await getSavedLoginToken();
-print("url shu ave che======>>>>>>>> ${url}");
+    print("url shu ave che======>>>>>>>> ${url}");
     print("my token :: $token");
     if (token == null || token.isEmpty) {
       throw Exception('Token not found');
@@ -44,7 +45,7 @@ print("url shu ave che======>>>>>>>> ${url}");
     return responseJson;
   }
 
-  Future<http.Response> productDetailsApi(id,cstomerid) async {
+  Future<http.Response> productDetailsApi(id, cstomerid) async {
     String url = "${apiEndpoints.fetchProducts}/$id?customer_id=${cstomerid}";
     log('Variation Url :: $url');
     LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
@@ -74,8 +75,9 @@ print("url shu ave che======>>>>>>>> ${url}");
     return responseJson;
   }
 
-  Future<http.Response> categoryWiseProductsApi(id,customerid) async {
-    String url = "${apiEndpoints.fetchCategoryWiseProducts}${id}&customer_id=${customerid}";
+  Future<http.Response> categoryWiseProductsApi(id, customerid) async {
+    String url =
+        "${apiEndpoints.fetchCategoryWiseProducts}${id}&customer_id=${customerid}";
     log('Category Wise Products Url :: $url');
     LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
     String? token = await getSavedLoginToken();

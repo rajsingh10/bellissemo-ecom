@@ -32,10 +32,7 @@ class apiEndpoints {
   static String reorderApi = "$baseUrl/wp-json/bellissemo/v1/reorder";
   static String updatediscount =
       "$baseUrl/wp-json/bellissemo/v1/update-discount";
-  static String refreshToken =
-      "$baseUrl/wp-json/jwt-auth/v1/token/refresh";
-  static String setprice =
-      "$baseUrl/wp-json/custom-pricing/v1/set";
-  static String addcustomer =
-      "$baseUrl/wp-json/wc/v3/customers";
+  static String refreshToken = "$baseUrl/wp-json/jwt-auth/v1/token/refresh";
+  static String setprice = "$baseUrl/wp-json/custom-pricing/v1/set";
+  static String addcustomer = "$baseUrl/wp-json/wc/v3/customers";
 }

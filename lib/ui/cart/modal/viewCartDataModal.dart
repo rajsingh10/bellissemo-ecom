@@ -148,7 +148,8 @@ class Items {
       });
     }
     prices = json['prices'] != null ? Prices.fromJson(json['prices']) : null;
-    lineTotal = json['totals'] != null ? LineTotal.fromJson(json['totals']) : null;
+    lineTotal =
+        json['totals'] != null ? LineTotal.fromJson(json['totals']) : null;
 
     catalogVisibility = json['catalog_visibility'];
   }
@@ -184,6 +185,7 @@ class Items {
     return data;
   }
 }
+
 class LineTotal {
   String? lineSubtotal;
   String? lineSubtotalTax;
@@ -197,18 +199,19 @@ class LineTotal {
   String? currencyPrefix;
   String? currencySuffix;
 
-  LineTotal(
-      {this.lineSubtotal,
-        this.lineSubtotalTax,
-        this.lineTotal,
-        this.lineTotalTax,
-        this.currencyCode,
-        this.currencySymbol,
-        this.currencyMinorUnit,
-        this.currencyDecimalSeparator,
-        this.currencyThousandSeparator,
-        this.currencyPrefix,
-        this.currencySuffix});
+  LineTotal({
+    this.lineSubtotal,
+    this.lineSubtotalTax,
+    this.lineTotal,
+    this.lineTotalTax,
+    this.currencyCode,
+    this.currencySymbol,
+    this.currencyMinorUnit,
+    this.currencyDecimalSeparator,
+    this.currencyThousandSeparator,
+    this.currencyPrefix,
+    this.currencySuffix,
+  });
 
   LineTotal.fromJson(Map<String, dynamic> json) {
     lineSubtotal = json['line_subtotal'];
@@ -488,7 +491,6 @@ class Totals {
   var totalShippingTax;
   String? totalPrice;
   String? totalTax;
-
 
   String? currencyCode;
   String? currencySymbol;

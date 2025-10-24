@@ -371,7 +371,9 @@ class _CartScreenState extends State<CartScreen> {
                                                                                   () {
                                                                                     item.quantity =
                                                                                         currentQty -
-                                                                                            int.parse((viewCartData?.items?[i].packsize).toString()) ;
+                                                                                        int.parse(
+                                                                                          (viewCartData?.items?[i].packsize).toString(),
+                                                                                        );
                                                                                     updateCartTotalsLocally();
                                                                                   },
                                                                                 );
@@ -394,7 +396,9 @@ class _CartScreenState extends State<CartScreen> {
                                                                                     );
                                                                                     cachedCart.items?[i].quantity =
                                                                                         currentQty -
-                                                                                            int.parse((viewCartData?.items?[i].packsize).toString());
+                                                                                        int.parse(
+                                                                                          (viewCartData?.items?[i].packsize).toString(),
+                                                                                        );
                                                                                     await box.put(
                                                                                       'cart_$customerId',
                                                                                       json.encode(
@@ -413,7 +417,9 @@ class _CartScreenState extends State<CartScreen> {
                                                                                 // 🔹 Sync with server if online
                                                                                 if (await checkInternet()) {
                                                                                   await cartService.decreaseCart(
-                                                                                    packsize: int.parse((viewCartData?.items?[i].packsize).toString()) ,
+                                                                                    packsize: int.parse(
+                                                                                      (viewCartData?.items?[i].packsize).toString(),
+                                                                                    ),
                                                                                     cartItemKey:
                                                                                         item.key ??
                                                                                         "",
@@ -627,7 +633,9 @@ class _CartScreenState extends State<CartScreen> {
                                                                             setState(() {
                                                                               item.quantity =
                                                                                   currentQty +
-                                                                                      int.parse((viewCartData?.items?[i].packsize).toString());
+                                                                                  int.parse(
+                                                                                    (viewCartData?.items?[i].packsize).toString(),
+                                                                                  );
                                                                               updateCartTotalsLocally();
                                                                             });
 
@@ -669,7 +677,9 @@ class _CartScreenState extends State<CartScreen> {
                                                                             if (await checkInternet()) {
                                                                               try {
                                                                                 await CartService().increaseCart(
-                                                                                  packsize: int.parse((viewCartData?.items?[i].packsize).toString()) ,
+                                                                                  packsize: int.parse(
+                                                                                    (viewCartData?.items?[i].packsize).toString(),
+                                                                                  ),
                                                                                   overrideprice:
                                                                                       (double.parse(
                                                                                                 viewCartData?.items?[i].prices?.price ??
@@ -740,7 +750,8 @@ class _CartScreenState extends State<CartScreen> {
                                                               InkWell(
                                                                 onTap: () async {
                                                                   setState(() {
-                                                                    isLoading=true;
+                                                                    isLoading =
+                                                                        true;
                                                                   });
                                                                   final item =
                                                                       viewCartData
@@ -774,11 +785,10 @@ class _CartScreenState extends State<CartScreen> {
                                                                     // 🔹 Only fetch cart from server if online
                                                                     if (await checkInternet()) {
                                                                       await _fetchCart(); // just call it
-                                                                      setState(
-                                                                        () {
-                                                                          isLoading=false;
-                                                                        },
-                                                                      ); // refresh UI after _fetchCart updates viewCartData
+                                                                      setState(() {
+                                                                        isLoading =
+                                                                            false;
+                                                                      }); // refresh UI after _fetchCart updates viewCartData
                                                                     }
                                                                   } catch (
                                                                     e,
@@ -949,7 +959,6 @@ class _CartScreenState extends State<CartScreen> {
                                                                                                 viewCartData?.items?[i];
                                                                                             if (item ==
                                                                                                 null) {
-
                                                                                               return;
                                                                                             }
 
@@ -1018,7 +1027,9 @@ class _CartScreenState extends State<CartScreen> {
                                                                                             if (await checkInternet()) {
                                                                                               try {
                                                                                                 await CartService().increaseCart(
-                                                                                                  packsize: int.parse((viewCartData?.items?[i].packsize).toString()) ,
+                                                                                                  packsize: int.parse(
+                                                                                                    (viewCartData?.items?[i].packsize).toString(),
+                                                                                                  ),
                                                                                                   overrideprice: int.parse(
                                                                                                     dialogController.text.toString(),
                                                                                                   ),
@@ -1088,23 +1099,20 @@ class _CartScreenState extends State<CartScreen> {
                                                                       // Icon(Icons.edit,color: AppColors.mainColor,),
                                                                       // SizedBox(width: 2.w,),
                                                                       Text(
-                                                                        '${viewCartData?.totals?.currencySymbol ?? ''} '+ (double.parse(
-                                                                                  viewCartData?.items?[i].lineTotal?.lineTotal ??
-                                                                                      "0",
-                                                                                ) /
-                                                                                100)
-                                                                            .toStringAsFixed(
-                                                                              2,
-                                                                            ),
+                                                                        '${viewCartData?.totals?.currencySymbol ?? ''} ' +
+                                                                            (double.parse(
+                                                                                      viewCartData?.items?[i].lineTotal?.lineTotal ??
+                                                                                          "0",
+                                                                                    ) /
+                                                                                    100)
+                                                                                .toStringAsFixed(2),
                                                                         style: TextStyle(
                                                                           color:
-                                                                              AppColors
-                                                                                  .blackColor,
+                                                                              AppColors.blackColor,
                                                                           fontSize:
                                                                               14.sp,
                                                                           fontFamily:
-                                                                              FontFamily
-                                                                                  .semiBold,
+                                                                              FontFamily.semiBold,
                                                                         ),
                                                                       ),
                                                                     ],
@@ -1283,7 +1291,8 @@ class _CartScreenState extends State<CartScreen> {
                                                                   Row(
                                                                     children: [
                                                                       Container(
-                                                                        width: 65.w,
+                                                                        width:
+                                                                            65.w,
                                                                         child: DropdownButtonFormField<
                                                                           String
                                                                         >(
@@ -1318,7 +1327,8 @@ class _CartScreenState extends State<CartScreen> {
                                                                             });
                                                                           },
                                                                           decoration: InputDecoration(
-                                                                            disabledBorder: OutlineInputBorder(),
+                                                                            disabledBorder:
+                                                                                OutlineInputBorder(),
                                                                             labelText:
                                                                                 "Discount Type",
                                                                             border: OutlineInputBorder(
@@ -1326,11 +1336,9 @@ class _CartScreenState extends State<CartScreen> {
                                                                                 8,
                                                                               ),
                                                                             ),
-
                                                                           ),
                                                                         ),
                                                                       ),
-
                                                                     ],
                                                                   ),
                                                                   SizedBox(
@@ -1641,9 +1649,8 @@ class _CartScreenState extends State<CartScreen> {
                                     SizedBox(height: 2.h),
                                     Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.start,
+                                          MainAxisAlignment.start,
                                       children: [
-
                                         // Text(
                                         //   "${viewCartData?.totals?.currencySymbol}${(double.tryParse((totalamount?.tostring ?? 0)! / 100).toStringAsFixed(2)}",
                                         //   // "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
@@ -1653,21 +1660,33 @@ class _CartScreenState extends State<CartScreen> {
                                         //     fontFamily: FontFamily.semiBold,
                                         //   ),
                                         // ),
-                                        viewCartData?.totals?.customerDiscount?.enabled==false?Container() : viewCartData?.totals?.customerDiscount?.type=="percentage"  ? Text(
-                                    "*${viewCartData?.totals?.customerDiscount?.value}% Discount",
-                                      style: TextStyle(
-                                        color: AppColors.redColor,
-                                        fontSize: 17.sp,
-                                        fontFamily: FontFamily.semiBold,
-                                      ),
-                                    ):Text(
-                                          "*${viewCartData?.totals?.currencySymbol}${viewCartData?.totals?.customerDiscount?.value} Discount",
-                                          style: TextStyle(
-                                            color: AppColors.redColor,
-                                            fontSize: 17.sp,
-                                            fontFamily: FontFamily.semiBold,
-                                          ),
-                                        ),
+                                        viewCartData
+                                                    ?.totals
+                                                    ?.customerDiscount
+                                                    ?.enabled ==
+                                                false
+                                            ? Container()
+                                            : viewCartData
+                                                    ?.totals
+                                                    ?.customerDiscount
+                                                    ?.type ==
+                                                "percentage"
+                                            ? Text(
+                                              "*${viewCartData?.totals?.customerDiscount?.value}% Discount",
+                                              style: TextStyle(
+                                                color: AppColors.redColor,
+                                                fontSize: 17.sp,
+                                                fontFamily: FontFamily.semiBold,
+                                              ),
+                                            )
+                                            : Text(
+                                              "*${viewCartData?.totals?.currencySymbol}${viewCartData?.totals?.customerDiscount?.value} Discount",
+                                              style: TextStyle(
+                                                color: AppColors.redColor,
+                                                fontSize: 17.sp,
+                                                fontFamily: FontFamily.semiBold,
+                                              ),
+                                            ),
                                       ],
                                     ),
                                   ],
@@ -1698,7 +1717,7 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                       ),
                                       InkWell(
-                                        onTap: (){
+                                        onTap: () {
                                           setState(() {
                                             credit = true;
                                             log("=====>>>>>>>>$credit");
@@ -1741,7 +1760,7 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                       ),
                                       InkWell(
-                                        onTap: (){
+                                        onTap: () {
                                           setState(() {
                                             proforma = true;
                                             log("=====>>>>>>>>$proforma");
@@ -1770,7 +1789,8 @@ class _CartScreenState extends State<CartScreen> {
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-         isLoading|| viewCartData?.items?.length == 0 ||
+          isLoading ||
+                  viewCartData?.items?.length == 0 ||
                   viewCartData?.items?.length == null ||
                   viewCartData?.items?.length == []
               ? Container()
@@ -1830,7 +1850,14 @@ class _CartScreenState extends State<CartScreen> {
                           // }
                           Get.to(
                             CheckOutScreen(
-                              cridit: proforma==false?"":credit==false?"":credit == true ? "credit" : "proforma",
+                              cridit:
+                                  proforma == false
+                                      ? ""
+                                      : credit == false
+                                      ? ""
+                                      : credit == true
+                                      ? "credit"
+                                      : "proforma",
                             ),
                             transition: Transition.fade,
                             duration: const Duration(milliseconds: 450),
@@ -1895,7 +1922,7 @@ class _CartScreenState extends State<CartScreen> {
 
         int quantity = item.quantity ?? 0;
         log("quantity====>>>> $quantity");
-        item.lineTotal?.lineTotal= (itemPrice * quantity).toString();
+        item.lineTotal?.lineTotal = (itemPrice * quantity).toString();
 
         subtotal += itemPrice * quantity;
 

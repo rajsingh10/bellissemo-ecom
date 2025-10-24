@@ -14,6 +14,7 @@ class UpdateAddressService {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('login_token');
   }
+
   final Dio _dio = Dio();
 
   // ----------------- Update Address -----------------

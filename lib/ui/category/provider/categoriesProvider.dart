@@ -14,6 +14,7 @@ class CategoriesProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('login_token');
   }
+
   Future<http.Response> fetchCategoriesApi() async {
     String url = apiEndpoints.fetchCategories;
     LoginModal? loginData = await SaveDataLocal.getDataFromLocal();

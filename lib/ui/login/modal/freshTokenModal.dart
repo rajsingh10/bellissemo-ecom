@@ -8,15 +8,16 @@ class FreshTokenModal {
   String? userDisplayName;
   int? expiresIn;
 
-  FreshTokenModal(
-      {this.success,
-        this.accessToken,
-        this.refreshToken,
-        this.userId,
-        this.userEmail,
-        this.userNicename,
-        this.userDisplayName,
-        this.expiresIn});
+  FreshTokenModal({
+    this.success,
+    this.accessToken,
+    this.refreshToken,
+    this.userId,
+    this.userEmail,
+    this.userNicename,
+    this.userDisplayName,
+    this.expiresIn,
+  });
 
   FreshTokenModal.fromJson(Map<String, dynamic> json) {
     success = json['success'];

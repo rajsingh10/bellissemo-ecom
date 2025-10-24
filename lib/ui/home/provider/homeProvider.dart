@@ -15,6 +15,7 @@ class HomeProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('login_token');
   }
+
   Future<http.Response> fetchBanners() async {
     String url = apiEndpoints.banners;
     LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
@@ -43,34 +44,23 @@ class HomeProvider extends ChangeNotifier {
 
     return responseJson;
   }
-  Future<http.Response> refreshToken(
 
-      Map<String, String> bodyData,
-      ) async {
+  Future<http.Response> refreshToken(Map<String, String> bodyData) async {
     String url = apiEndpoints.refreshToken;
     print("📡 POST URL: $url");
     print("📦 Body Data: $bodyData");
 
-
-
-
-    Map<String, String> headers = {
-      'Content-Type': 'application/json',
-    };
+    Map<String, String> headers = {'Content-Type': 'application/json'};
 
     try {
       final response = await http
-          .post(
-        Uri.parse(url),
-        headers: headers,
-        body: json.encode(bodyData),
-      )
+          .post(Uri.parse(url), headers: headers, body: json.encode(bodyData))
           .timeout(
-        const Duration(seconds: 60),
-        onTimeout: () {
-          throw const SocketException('Request timed out');
-        },
-      );
+            const Duration(seconds: 60),
+            onTimeout: () {
+              throw const SocketException('Request timed out');
+            },
+          );
 
       print("✅ Response Status: ${response.statusCode}");
       print("📩 Response Body: ${response.body}");
@@ -82,5 +72,4 @@ class HomeProvider extends ChangeNotifier {
       rethrow;
     }
   }
-
 }

@@ -192,12 +192,12 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                     children: [
                                       // Sort Dropdown
                                       InkWell(
-                                        onTap: (){
+                                        onTap: () {
                                           Get.to(CreateCustomerPage());
                                         },
                                         child: Container(
                                           padding: EdgeInsets.symmetric(
-                                            horizontal: 3.w,vertical: 0.5.h,
+                                            horizontal: 3.w,
                                           ),
                                           decoration: BoxDecoration(
                                             color: Colors.white,
@@ -214,22 +214,57 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                           ),
                                           child: Row(
                                             children: [
-                                        Icon(Icons.person,color: AppColors.mainColor,size: 17.sp,),
-                                              SizedBox(width: 2.w,),
                                               Text(
                                                 "Add Customer",
                                                 style: TextStyle(
                                                   fontSize: 15.sp,
-                                                  fontFamily: FontFamily.semiBold,
+                                                  fontFamily:
+                                                      FontFamily.semiBold,
                                                   color: AppColors.blackColor,
                                                 ),
                                               ),
-
+                                              SizedBox(width: 1.w),
+                                              DropdownButtonHideUnderline(
+                                                child: DropdownButton<String>(
+                                                  value: selectedSort,
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  dropdownColor: Colors.white,
+                                                  icon: Icon(
+                                                    Icons.person,
+                                                    color: AppColors.mainColor,
+                                                  ),
+                                                  items:
+                                                      sortOptions
+                                                          .map(
+                                                            (
+                                                              e,
+                                                            ) => DropdownMenuItem(
+                                                              value: e,
+                                                              child: Text(
+                                                                '',
+                                                                style: TextStyle(
+                                                                  fontSize:
+                                                                      15.sp,
+                                                                  fontFamily:
+                                                                      FontFamily
+                                                                          .semiBold,
+                                                                  color:
+                                                                      AppColors
+                                                                          .mainColor,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          )
+                                                          .toList(),
+                                                  onChanged: null,
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),
                                       ),
-                                      SizedBox(width: 2.w,),
+                                      SizedBox(width: 2.w),
                                       Container(
                                         padding: EdgeInsets.symmetric(
                                           horizontal: 3.w,
@@ -249,7 +284,6 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                         ),
                                         child: Row(
                                           children: [
-
                                             Text(
                                               "Sort by",
                                               style: TextStyle(

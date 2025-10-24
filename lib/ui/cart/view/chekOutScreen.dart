@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'package:bellissemo_ecom/apiCalling/Loader.dart';
 import 'package:bellissemo_ecom/ui/cart/modal/viewCartDataModal.dart';
 import 'package:bellissemo_ecom/ui/cart/service/cartServices.dart';
-import 'package:bellissemo_ecom/ui/home/view/homeScreen.dart';
 import 'package:bellissemo_ecom/utils/customButton.dart';
 import 'package:bellissemo_ecom/utils/customMenuDrawer.dart';
 import 'package:bellissemo_ecom/utils/snackBars.dart';
@@ -1255,7 +1254,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                     showCustomErrorSnackbar(
                                       title: 'Address Required',
                                       message:
-                                      'Please add an address to continue',
+                                          'Please add an address to continue',
                                     );
                                   } else {
                                     Get.back();
@@ -1267,9 +1266,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                           ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
                                           : null, // send null if date not selected
                                     );
-
                                   }
-
                                 },
                                 color: AppColors.mainColor,
                                 fontcolor: AppColors.whiteColor,
@@ -1414,7 +1411,9 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     final box = HiveService().getViewCartBox();
     List<Map<String, dynamic>> items =
         viewCartData?.items?.map((item) {
-          print("shu ave che price jay che ======>>>>>>>>>${item.prices?.price }");
+          print(
+            "shu ave che price jay che ======>>>>>>>>>${item.prices?.price}",
+          );
           return {
             "product_id": item.id,
             "quantity": item.quantity,
@@ -1431,7 +1430,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     //     [];
     try {
       final response = await cartService.submitOrderApi(
-        deliveryDate:date==""|| date==null?"":date,
+        deliveryDate: date == "" || date == null ? "" : date,
         note: notesController.text.trim().toString(),
         shippingCharge:
             isShippingEnabled
@@ -1470,7 +1469,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         });
         Get.offAll(HomeMenuScreen());
       }
-    } catch (e,stackTrace) {
+    } catch (e, stackTrace) {
       showCustomErrorSnackbar(
         title: "Error",
         message: "Something went wrong while adding product.\n$e",
