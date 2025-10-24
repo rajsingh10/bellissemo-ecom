@@ -129,12 +129,7 @@ class _CreateCustomerPageState extends State<CreateCustomerPage> {
                       Icons.drive_file_rename_outline,
                       color: AppColors.gray,
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter yourCompany name";
-                      }
-                      return null;
-                    },
+
                   ),
                   SizedBox(height: 1.h),
                   AppTextField(
@@ -144,12 +139,7 @@ class _CreateCustomerPageState extends State<CreateCustomerPage> {
                     isTextavailable: true,
                     textInputType: TextInputType.name,
                     prefix: Icon(Icons.commit_rounded, color: AppColors.gray),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter Company registration number";
-                      }
-                      return null;
-                    },
+
                   ),
                   SizedBox(height: 1.h),
                   AppTextField(
@@ -162,12 +152,7 @@ class _CreateCustomerPageState extends State<CreateCustomerPage> {
                       Icons.vertical_align_top,
                       color: AppColors.gray,
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter Vat number";
-                      }
-                      return null;
-                    },
+
                   ),
                   SizedBox(height: 1.h),
                   AppTextField(
@@ -180,12 +165,7 @@ class _CreateCustomerPageState extends State<CreateCustomerPage> {
                       Icons.location_on_outlined,
                       color: AppColors.gray,
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter Address ";
-                      }
-                      return null;
-                    },
+
                   ),
                   SizedBox(height: 1.h),
                   AppTextField(
@@ -195,12 +175,7 @@ class _CreateCustomerPageState extends State<CreateCustomerPage> {
                     isTextavailable: true,
                     textInputType: TextInputType.name,
                     prefix: Icon(Icons.person, color: AppColors.gray),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter Contact Name";
-                      }
-                      return null;
-                    },
+
                   ),
                   SizedBox(height: 1.h),
                   AppTextField(
@@ -210,12 +185,7 @@ class _CreateCustomerPageState extends State<CreateCustomerPage> {
                     isTextavailable: true,
                     textInputType: TextInputType.number,
                     prefix: Icon(Icons.call, color: AppColors.gray),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter phone Number";
-                      }
-                      return null;
-                    },
+
                   ),
 
                   SizedBox(height: 1.h),
@@ -226,12 +196,7 @@ class _CreateCustomerPageState extends State<CreateCustomerPage> {
                     isTextavailable: true,
                     textInputType: TextInputType.number,
                     prefix: Icon(Icons.call, color: AppColors.gray),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter Mobile Number";
-                      }
-                      return null;
-                    },
+
                   ),
                   SizedBox(height: 4.h),
                   InkWell(

@@ -1235,7 +1235,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 )
                 .toList();
 
-        _filterProducts(); // 👈 refresh filtered list
+        _filterProducts();
       } else {
         showCustomErrorSnackbar(
           title: 'No Internet',
@@ -1499,10 +1499,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
               data.map((e) => FetchSubCategoriesModal.fromJson(e)).toList();
         }
 
-        showCustomErrorSnackbar(
-          title: 'Server Error',
-          message: 'Something went wrong. Loaded cached data (if available).',
-        );
+        // showCustomErrorSnackbar(
+        //   title: 'Server Error',
+        //   message: 'Something went wrong. Loaded cached data (if available).',
+        // );
       }
     } catch (_) {
       // Network exception → fallback to cache
