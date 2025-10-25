@@ -80,12 +80,12 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                 ),
                 child: Row(
                   children: [
-                    const CircleAvatar(
-                      radius: 35,
+                     CircleAvatar(
+                      radius: isIpad?60: 35,
                       backgroundColor: AppColors.mainColor,
                       child: Icon(
                         Icons.person,
-                        size: 40,
+                        size: isIpad?80:40,
                         color: Colors.blueAccent,
                       ),
                     ),
@@ -134,7 +134,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                     BoxShadow(
                       color: Colors.black12,
                       blurRadius: 6,
-                      offset: Offset(0, 3),
+                      offset: Offset(0,3),
                     ),
                   ],
                 ),
