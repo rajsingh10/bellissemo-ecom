@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:bellissemo_ecom/apiCalling/Loader.dart';
+import 'package:bellissemo_ecom/ui/customers/view/customerDetailScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -363,7 +364,9 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
   Widget _buildGridItem(FetchCustomersModal customer) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Get.to(CustomerDetailScreen());
+      },
       child: Card(
         color: AppColors.cardBgColor2,
         elevation: 3,
