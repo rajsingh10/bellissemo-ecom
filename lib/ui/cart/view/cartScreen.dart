@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:bellissemo_ecom/apiCalling/Loader.dart';
 import 'package:bellissemo_ecom/ui/cart/View/chekOutScreen.dart';
 import 'package:bellissemo_ecom/ui/cart/modal/viewCartDataModal.dart';
+import 'package:bellissemo_ecom/utils/customMenuDrawer.dart';
 import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -38,7 +39,8 @@ class _CartScreenState extends State<CartScreen> {
   List<bool> selectedItems = List.generate(5, (_) => false);
   bool selectAll = false;
   bool isIpad = 100.w >= 800;
-
+  final GlobalKey<ScaffoldState> _scaffoldKeyCART =
+  GlobalKey<ScaffoldState>();
   String? customerName;
   int? customerId;
 
@@ -120,6 +122,8 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: CustomDrawer(),
+      key: _scaffoldKeyCART,
       backgroundColor: AppColors.bgColor,
       body:
           isLoading
@@ -127,6 +131,9 @@ class _CartScreenState extends State<CartScreen> {
               : Column(
                 children: [
                   TitleBar(
+                    drawerCallback: () {
+                      _scaffoldKeyCART.currentState?.openDrawer();
+                    },
                     title: 'Cart',
                     isDrawerEnabled: true,
                     isSearchEnabled: false,
