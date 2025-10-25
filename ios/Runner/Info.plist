@@ -37,6 +37,10 @@
     <string>Bellissemo App needs access to your photo library to upload profile and document images.</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Bellissemo App requests photo library access for profile and chat features.</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Bellissemo App requests access to local network devices for using app and its functionalities this is mandatory.</string>
+    <key>NSBonjourServices</key>
+    <array/>
     <key>UILaunchStoryboardName</key>
     <string>LaunchScreen</string>
     <key>UIMainStoryboardFile</key>
