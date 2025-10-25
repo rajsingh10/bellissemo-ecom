@@ -1,3 +1,4 @@
+import 'package:bellissemo_ecom/ui/customers/modal/CustomerDetailModal.dart';
 import 'package:bellissemo_ecom/ui/login/modal/freshTokenModal.dart';
 import 'package:bellissemo_ecom/ui/login/modal/loginModal.dart';
 
@@ -45,3 +46,4 @@ RemoveCouponsModal? removeCouponsModal;
 ReorderModal? reorderModal;
 FreshTokenModal? freshToken;
 AddCustomerModal? addCustomerModal;
+Customerdetailmodal? customer;
