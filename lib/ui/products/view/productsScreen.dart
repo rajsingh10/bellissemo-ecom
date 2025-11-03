@@ -13,6 +13,7 @@ import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:bellissemo_ecom/utils/searchFields.dart';
 import 'package:bellissemo_ecom/utils/snackBars.dart';
 import 'package:bellissemo_ecom/utils/titlebarWidget.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -963,16 +964,41 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                   child: Stack(
                     children: [
-                      CustomNetworkImage(
-                        imageUrl:
-                            (product.images?.length == 0)
-                                ? ''
-                                : product.images?[0].src ?? '',
-                        height: double.infinity,
-                        width: double.infinity,
-                        isFit: true,
-                        radius: 20,
+                      // CustomNetworkImage(
+                      //   imageUrl:
+                      //       (product.images?.length == 0)
+                      //           ? ''
+                      //           : product.images?[0].src ?? '',
+                      //   height: double.infinity,
+                      //   width: double.infinity,
+                      //   isFit: true,
+                      //   radius: 20,
+                      // ),
+                      CarouselSlider(
+                        options: CarouselOptions(
+                          height: 200,
+                          enlargeCenterPage: true,
+                          enableInfiniteScroll: false,
+                          autoPlay: true,
+                        ),
+                        items: (product.images ?? []).map((img) {
+                          return Builder(
+                            builder: (BuildContext context) {
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: CustomNetworkImage(
+                                  imageUrl: img.src ?? '',
+                                  height: double.infinity,
+                                  width: double.infinity,
+                                  isFit: true,
+                                  radius: 20,
+                                ),
+                              );
+                            },
+                          );
+                        }).toList(),
                       ),
+
                       product.variations?.length != 0
                           ? Container()
                           : Column(
