@@ -977,13 +977,15 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       CarouselSlider(
                         options: CarouselOptions(
                           height: 200,
-                          enlargeCenterPage: true,
+                          viewportFraction: 1,
+                          // shows only one full image
+                          enlargeCenterPage: false,
+                          // disables zoom effect
                           enableInfiniteScroll: false,
-                          autoPlay: true,
+                          autoPlay: false,
                         ),
-                        items: (product.images ?? []).map((img) {
-                          return Builder(
-                            builder: (BuildContext context) {
+                        items:
+                            (product.images ?? []).map((img) {
                               return ClipRRect(
                                 borderRadius: BorderRadius.circular(20),
                                 child: CustomNetworkImage(
@@ -994,9 +996,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                   radius: 20,
                                 ),
                               );
-                            },
-                          );
-                        }).toList(),
+                            }).toList(),
                       ),
 
                       product.variations?.length != 0
