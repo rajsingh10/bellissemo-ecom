@@ -28,7 +28,11 @@ class ProductDetailsScreen extends StatefulWidget {
   String? productId;
   bool? isVariation;
 
-  ProductDetailsScreen({super.key, required this.productId, required this.isVariation});
+  ProductDetailsScreen({
+    super.key,
+    required this.productId,
+    required this.isVariation,
+  });
 
   @override
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
@@ -45,7 +49,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   String? selectedAttributeKey;
   String? selectedAttributeValue;
   bool isAddingToCart = false;
-num currentqty = 0;
+  num currentqty = 0;
+
   String htmlToPlainText(String html) {
     final regex = RegExp(r'<[^>]*>', multiLine: true, caseSensitive: true);
     // Remove HTML tags
@@ -270,7 +275,9 @@ num currentqty = 0;
                                                     variant.price ?? '0',
                                                   ) ??
                                                   0.0;
-                                              currentqty = num.parse(variant.packSize ?? '0');
+                                              currentqty = num.parse(
+                                                variant.packSize ?? '0',
+                                              );
 
                                               log(
                                                 'selectedVariationId :: $selectedVariationId  ',
@@ -644,7 +651,9 @@ num currentqty = 0;
                                                                 productId:
                                                                     widget
                                                                         .productId,
-                                                                isVariation: widget.isVariation,
+                                                                isVariation:
+                                                                    widget
+                                                                        .isVariation,
                                                               ),
                                                             );
                                                             _fetchProductDetails(); // will use cached data if offline
@@ -953,7 +962,10 @@ num currentqty = 0;
                                                               () => ProductDetailsScreen(
                                                                 productId:
                                                                     widget
-                                                                        .productId,isVariation: widget.isVariation,
+                                                                        .productId,
+                                                                isVariation:
+                                                                    widget
+                                                                        .isVariation,
                                                               ),
                                                             );
 
@@ -1037,219 +1049,231 @@ num currentqty = 0;
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              widget.isVariation == false ?Container(
-                          padding: EdgeInsets.symmetric(
-                          horizontal: 3.w,
-                            vertical: 0.8.h,
-                          ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(30),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 5,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                int currentPackSize =
-                                    int.tryParse(
-                                      productDetails?.packsize ?? '0',
-                                    ) ??
-                                        0;
-
-                                // If first time, set the original pack size
-                                originalPackSize ??= currentPackSize;
-
-                                // Subtract the original pack size (e.g., 6 → 4 → 2)
-                                currentPackSize -= originalPackSize!;
-
-                                // Prevent going below 0
-                                if (currentPackSize <
-                                    originalPackSize!) {
-                                  currentPackSize = originalPackSize!;
-                                }
-
-                                // Update productDetails
-                                productDetails?.packsize =
-                                    currentPackSize.toString();
-
-                                print(
-                                  "Decrement → currentPackSize = $currentPackSize",
-                                );
-                              });
-                            },
-                            child: CircleAvatar(
-                              radius: isIpad ? 15.sp : 16,
-                              backgroundColor: Colors.transparent,
-                              child: Icon(
-                                Icons.remove,
-                                size: 18.sp,
-                                color: AppColors.blackColor,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 2.w),
-                          Text(
-                            productDetails?.packsize ?? '',
-                            style: TextStyle(
-                              fontSize: 17.sp,
-                              fontFamily: FontFamily.semiBold,
-                            ),
-                          ),
-                          SizedBox(width: 2.w),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                print(
-                                  "Before: productDetails?.packsize = ${productDetails?.packsize}",
-                                );
-
-                                // Convert current pack size
-                                int currentPackSize =
-                                    int.tryParse(
-                                      productDetails?.packsize ?? '0',
-                                    ) ??
-                                        0;
-
-                                // If first time, save original pack size
-                                originalPackSize ??= currentPackSize;
-
-                                // Add only the original pack size (e.g., 2 + 2 = 4, then 4 + 2 = 6)
-                                currentPackSize += originalPackSize!;
-
-                                // Update
-                                productDetails?.packsize =
-                                    currentPackSize.toString();
-
-                                print(
-                                  "After: currentPackSize = $currentPackSize",
-                                );
-                              });
-                            },
-
-                            child: CircleAvatar(
-                              radius: isIpad ? 15.sp : 16,
-                              backgroundColor: Colors.transparent,
-                              child: Icon(
-                                Icons.add,
-                                size: 18.sp,
-                                color: AppColors.blackColor,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ):Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 3.w,
-                                  vertical: 0.8.h,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(30),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 5,
-                                      offset: Offset(0, 2),
+                              widget.isVariation == false
+                                  ? Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 3.w,
+                                      vertical: 0.8.h,
                                     ),
-                                  ],
-                                ),
-                                child: Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          int currentPackSize =
-                                          currentqty.toInt();
-
-                                          // If first time, set the original pack size
-                                          originalPackSize ??= currentPackSize;
-
-                                          // Subtract the original pack size (e.g., 6 → 4 → 2)
-                                          currentPackSize -= originalPackSize!;
-
-                                          // Prevent going below 0
-                                          if (currentPackSize <
-                                              originalPackSize!) {
-                                            currentPackSize = originalPackSize!;
-                                          }
-
-                                          // Update productDetails
-                                          currentqty =
-                                              currentPackSize;
-
-                                          print(
-                                            "Decrement → currentPackSize = $currentPackSize",
-                                          );
-                                        });
-                                      },
-                                      child: CircleAvatar(
-                                        radius: isIpad ? 15.sp : 16,
-                                        backgroundColor: Colors.transparent,
-                                        child: Icon(
-                                          Icons.remove,
-                                          size: 18.sp,
-                                          color: AppColors.blackColor,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(30),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black12,
+                                          blurRadius: 5,
+                                          offset: Offset(0, 2),
                                         ),
-                                      ),
+                                      ],
                                     ),
-                                    SizedBox(width: 2.w),
-                                    Text(
-                                      currentqty.toString(),
-                                      style: TextStyle(
-                                        fontSize: 17.sp,
-                                        fontFamily: FontFamily.semiBold,
-                                      ),
-                                    ),
-                                    SizedBox(width: 2.w),
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          print(
-                                            "Before: productDetails?.packsize = ${productDetails?.packsize}",
-                                          );
+                                    child: Row(
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              int currentPackSize =
+                                                  int.tryParse(
+                                                    productDetails?.packsize ??
+                                                        '0',
+                                                  ) ??
+                                                  0;
 
-                                          // Convert current pack size
-                                          int currentPackSize =
-                                          currentqty.toInt();
+                                              // If first time, set the original pack size
+                                              originalPackSize ??=
+                                                  currentPackSize;
 
-                                          // If first time, save original pack size
-                                          originalPackSize ??= currentPackSize;
+                                              // Subtract the original pack size (e.g., 6 → 4 → 2)
+                                              currentPackSize -=
+                                                  originalPackSize!;
 
-                                          // Add only the original pack size (e.g., 2 + 2 = 4, then 4 + 2 = 6)
-                                          currentPackSize += originalPackSize!;
+                                              // Prevent going below 0
+                                              if (currentPackSize <
+                                                  originalPackSize!) {
+                                                currentPackSize =
+                                                    originalPackSize!;
+                                              }
 
-                                          // Update
-                                          currentqty =
-                                              currentPackSize;
+                                              // Update productDetails
+                                              productDetails?.packsize =
+                                                  currentPackSize.toString();
 
-                                          print(
-                                            "After: currentPackSize = $currentPackSize",
-                                          );
-                                        });
-                                      },
-
-                                      child: CircleAvatar(
-                                        radius: isIpad ? 15.sp : 16,
-                                        backgroundColor: Colors.transparent,
-                                        child: Icon(
-                                          Icons.add,
-                                          size: 18.sp,
-                                          color: AppColors.blackColor,
+                                              print(
+                                                "Decrement → currentPackSize = $currentPackSize",
+                                              );
+                                            });
+                                          },
+                                          child: CircleAvatar(
+                                            radius: isIpad ? 15.sp : 16,
+                                            backgroundColor: Colors.transparent,
+                                            child: Icon(
+                                              Icons.remove,
+                                              size: 18.sp,
+                                              color: AppColors.blackColor,
+                                            ),
+                                          ),
                                         ),
-                                      ),
+                                        SizedBox(width: 2.w),
+                                        Text(
+                                          productDetails?.packsize ?? '',
+                                          style: TextStyle(
+                                            fontSize: 17.sp,
+                                            fontFamily: FontFamily.semiBold,
+                                          ),
+                                        ),
+                                        SizedBox(width: 2.w),
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              print(
+                                                "Before: productDetails?.packsize = ${productDetails?.packsize}",
+                                              );
+
+                                              // Convert current pack size
+                                              int currentPackSize =
+                                                  int.tryParse(
+                                                    productDetails?.packsize ??
+                                                        '0',
+                                                  ) ??
+                                                  0;
+
+                                              // If first time, save original pack size
+                                              originalPackSize ??=
+                                                  currentPackSize;
+
+                                              // Add only the original pack size (e.g., 2 + 2 = 4, then 4 + 2 = 6)
+                                              currentPackSize +=
+                                                  originalPackSize!;
+
+                                              // Update
+                                              productDetails?.packsize =
+                                                  currentPackSize.toString();
+
+                                              print(
+                                                "After: currentPackSize = $currentPackSize",
+                                              );
+                                            });
+                                          },
+
+                                          child: CircleAvatar(
+                                            radius: isIpad ? 15.sp : 16,
+                                            backgroundColor: Colors.transparent,
+                                            child: Icon(
+                                              Icons.add,
+                                              size: 18.sp,
+                                              color: AppColors.blackColor,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              ),
+                                  )
+                                  : Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 3.w,
+                                      vertical: 0.8.h,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(30),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black12,
+                                          blurRadius: 5,
+                                          offset: Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              int currentPackSize =
+                                                  currentqty.toInt();
+
+                                              // If first time, set the original pack size
+                                              originalPackSize ??=
+                                                  currentPackSize;
+
+                                              // Subtract the original pack size (e.g., 6 → 4 → 2)
+                                              currentPackSize -=
+                                                  originalPackSize!;
+
+                                              // Prevent going below 0
+                                              if (currentPackSize <
+                                                  originalPackSize!) {
+                                                currentPackSize =
+                                                    originalPackSize!;
+                                              }
+
+                                              // Update productDetails
+                                              currentqty = currentPackSize;
+
+                                              print(
+                                                "Decrement → currentPackSize = $currentPackSize",
+                                              );
+                                            });
+                                          },
+                                          child: CircleAvatar(
+                                            radius: isIpad ? 15.sp : 16,
+                                            backgroundColor: Colors.transparent,
+                                            child: Icon(
+                                              Icons.remove,
+                                              size: 18.sp,
+                                              color: AppColors.blackColor,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(width: 2.w),
+                                        Text(
+                                          currentqty.toString(),
+                                          style: TextStyle(
+                                            fontSize: 17.sp,
+                                            fontFamily: FontFamily.semiBold,
+                                          ),
+                                        ),
+                                        SizedBox(width: 2.w),
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              print(
+                                                "Before: productDetails?.packsize = ${productDetails?.packsize}",
+                                              );
+
+                                              // Convert current pack size
+                                              int currentPackSize =
+                                                  currentqty.toInt();
+
+                                              // If first time, save original pack size
+                                              originalPackSize ??=
+                                                  currentPackSize;
+
+                                              // Add only the original pack size (e.g., 2 + 2 = 4, then 4 + 2 = 6)
+                                              currentPackSize +=
+                                                  originalPackSize!;
+
+                                              // Update
+                                              currentqty = currentPackSize;
+
+                                              print(
+                                                "After: currentPackSize = $currentPackSize",
+                                              );
+                                            });
+                                          },
+
+                                          child: CircleAvatar(
+                                            radius: isIpad ? 15.sp : 16,
+                                            backgroundColor: Colors.transparent,
+                                            child: Icon(
+                                              Icons.add,
+                                              size: 18.sp,
+                                              color: AppColors.blackColor,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                               SizedBox(width: 4.w),
                               Expanded(
                                 child: CustomButton(

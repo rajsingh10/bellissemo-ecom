@@ -39,8 +39,7 @@ class _CartScreenState extends State<CartScreen> {
   List<bool> selectedItems = List.generate(5, (_) => false);
   bool selectAll = false;
   bool isIpad = 100.w >= 800;
-  final GlobalKey<ScaffoldState> _scaffoldKeyCART =
-  GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKeyCART = GlobalKey<ScaffoldState>();
   String? customerName;
   int? customerId;
 
@@ -846,273 +845,14 @@ class _CartScreenState extends State<CartScreen> {
                                                               //         FontFamily.semiBold,
                                                               //   ),
                                                               // ),
-                                                              InkWell(
-                                                                onTap: () async {
-                                                                  final discountResult = await Get.dialog<
-                                                                    Map<
-                                                                      String,
-                                                                      String
-                                                                    >
-                                                                  >(
-                                                                    Dialog(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .transparent,
-                                                                      child: StatefulBuilder(
-                                                                        builder: (
-                                                                          context,
-                                                                          setState,
-                                                                        ) {
-                                                                          final formKey =
-                                                                              GlobalKey<
-                                                                                FormState
-                                                                              >();
-                                                                          TextEditingController
-                                                                          dialogController =
-                                                                              TextEditingController();
-                                                                          String
-                                                                          selectedType =
-                                                                              "Amount"; // 👈 default dropdown value
-
-                                                                          return IntrinsicWidth(
-                                                                            stepWidth:
-                                                                                300,
-                                                                            child: IntrinsicHeight(
-                                                                              child: Container(
-                                                                                padding: EdgeInsets.all(
-                                                                                  16,
-                                                                                ),
-                                                                                decoration: BoxDecoration(
-                                                                                  color:
-                                                                                      AppColors.whiteColor,
-                                                                                  borderRadius: BorderRadius.circular(
-                                                                                    15,
-                                                                                  ),
-                                                                                ),
-                                                                                child: Column(
-                                                                                  mainAxisSize:
-                                                                                      MainAxisSize.min,
-                                                                                  children: [
-                                                                                    Form(
-                                                                                      key:
-                                                                                          formKey,
-                                                                                      child: AppTextField(
-                                                                                        key: ValueKey(
-                                                                                          selectedType,
-                                                                                        ),
-                                                                                        controller:
-                                                                                            dialogController,
-                                                                                        hintText:
-                                                                                            "Increase",
-                                                                                        text:
-                                                                                            "Increase",
-                                                                                        isTextavailable:
-                                                                                            true,
-                                                                                        textInputType:
-                                                                                            TextInputType.number,
-                                                                                        maxline:
-                                                                                            1,
-                                                                                        validator: (
-                                                                                          value,
-                                                                                        ) {
-                                                                                          if (value !=
-                                                                                                  null &&
-                                                                                              value.isNotEmpty &&
-                                                                                              double.tryParse(
-                                                                                                    value,
-                                                                                                  ) ==
-                                                                                                  null) {
-                                                                                            return "Enter a valid number";
-                                                                                          }
-                                                                                          return null;
-                                                                                        },
-                                                                                      ),
-                                                                                    ),
-
-                                                                                    SizedBox(
-                                                                                      height:
-                                                                                          24,
-                                                                                    ),
-                                                                                    Row(
-                                                                                      mainAxisAlignment:
-                                                                                          MainAxisAlignment.spaceBetween,
-                                                                                      children: [
-                                                                                        CustomButton(
-                                                                                          title:
-                                                                                              "Cancel",
-                                                                                          route:
-                                                                                              () =>
-                                                                                                  Get.back(),
-                                                                                          color:
-                                                                                              AppColors.containerColor,
-                                                                                          fontcolor:
-                                                                                              AppColors.blackColor,
-                                                                                          height:
-                                                                                              5.h,
-                                                                                          width:
-                                                                                              27.w,
-                                                                                          fontsize:
-                                                                                              15.sp,
-                                                                                          radius:
-                                                                                              12.0,
-                                                                                        ),
-                                                                                        CustomButton(
-                                                                                          title:
-                                                                                              "Increase Price",
-                                                                                          route: () async {
-                                                                                            bool increseprice =
-                                                                                                true;
-                                                                                            final item =
-                                                                                                viewCartData?.items?[i];
-                                                                                            if (item ==
-                                                                                                null) {
-                                                                                              return;
-                                                                                            }
-
-                                                                                            final currentQty =
-                                                                                                item.quantity ??
-                                                                                                1;
-                                                                                            final newPrice =
-                                                                                                double.tryParse(
-                                                                                                  dialogController.text,
-                                                                                                ) ??
-                                                                                                0;
-                                                                                            // update local UI
-                                                                                            setState(
-                                                                                              () {
-                                                                                                // item.quantity =
-                                                                                                //     currentQty + int.parse(item.quantity.toString())
-                                                                                                //     ;
-                                                                                                increseprice =
-                                                                                                    true;
-                                                                                                updateCartTotalsLocally(
-                                                                                                  offlineitemamount:
-                                                                                                      newPrice *
-                                                                                                      100,
-                                                                                                  itemIndex:
-                                                                                                      i,
-                                                                                                );
-                                                                                                // Get.back();
-                                                                                              },
-                                                                                            );
-
-                                                                                            // update Hive cache immediately
-                                                                                            var box =
-                                                                                                HiveService().getViewCartBox();
-                                                                                            final cachedData = box.get(
-                                                                                              'cart_$customerId',
-                                                                                            );
-                                                                                            if (cachedData !=
-                                                                                                    null &&
-                                                                                                cachedData.toString().isNotEmpty) {
-                                                                                              try {
-                                                                                                final data = json.decode(
-                                                                                                  cachedData,
-                                                                                                );
-                                                                                                final cachedCart = ViewCartDataModal.fromJson(
-                                                                                                  data,
-                                                                                                );
-                                                                                                cachedCart.items?[i].quantity = int.parse(
-                                                                                                  item.quantity.toString(),
-                                                                                                );
-                                                                                                await box.put(
-                                                                                                  'cart_$customerId',
-                                                                                                  json.encode(
-                                                                                                    cachedCart.toJson(),
-                                                                                                  ),
-                                                                                                );
-                                                                                              } catch (
-                                                                                                e
-                                                                                              ) {
-                                                                                                log(
-                                                                                                  "Error updating offline cache: $e",
-                                                                                                );
-                                                                                              }
-                                                                                            }
-
-                                                                                            // update server if online
-                                                                                            if (await checkInternet()) {
-                                                                                              try {
-                                                                                                await CartService().increaseCart(
-                                                                                                  packsize: int.parse(
-                                                                                                    (viewCartData?.items?[i].packsize).toString(),
-                                                                                                  ),
-                                                                                                  overrideprice: int.parse(
-                                                                                                    dialogController.text.toString(),
-                                                                                                  ),
-                                                                                                  cartItemKey:
-                                                                                                      item.key ??
-                                                                                                      "",
-                                                                                                  online:
-                                                                                                      increseprice,
-                                                                                                  currentQuantity:
-                                                                                                      currentQty,
-                                                                                                );
-                                                                                                await _fetchCart();
-                                                                                                // Get.back();
-                                                                                                Get.offAll(
-                                                                                                  CartScreen(),
-                                                                                                );
-                                                                                              } catch (
-                                                                                                e,
-                                                                                                trackTrace
-                                                                                              ) {
-                                                                                                showCustomErrorSnackbar(
-                                                                                                  title:
-                                                                                                      "Error",
-                                                                                                  message:
-                                                                                                      "Failed to update cart\n$e",
-                                                                                                );
-                                                                                                log(
-                                                                                                  "shu errro ave che =====>>>>$trackTrace",
-                                                                                                );
-                                                                                              }
-                                                                                            }
-                                                                                          },
-                                                                                          color:
-                                                                                              AppColors.mainColor,
-                                                                                          fontcolor:
-                                                                                              AppColors.whiteColor,
-                                                                                          height:
-                                                                                              5.h,
-                                                                                          width:
-                                                                                              40.w,
-                                                                                          fontsize:
-                                                                                              15.sp,
-                                                                                          radius:
-                                                                                              12.0,
-                                                                                          iconData:
-                                                                                              Icons.check,
-                                                                                          iconsize:
-                                                                                              17.sp,
-                                                                                        ),
-                                                                                      ],
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          );
-                                                                        },
-                                                                      ),
-                                                                    ),
-                                                                    barrierDismissible:
-                                                                        true,
-                                                                  );
-                                                                },
-                                                                child: Container(
+                                                              Container(
+                                                                child: InkWell(
                                                                   child: Row(
                                                                     children: [
                                                                       // Icon(Icons.edit,color: AppColors.mainColor,),
                                                                       // SizedBox(width: 2.w,),
                                                                       Text(
-                                                                        '${viewCartData?.totals?.currencySymbol ?? ''} ' +
-                                                                            (double.parse(
-                                                                                      viewCartData?.items?[i].lineTotal?.lineTotal ??
-                                                                                          "0",
-                                                                                    ) /
-                                                                                    100)
-                                                                                .toStringAsFixed(2),
+                                                                        '${viewCartData?.totals?.currencySymbol ?? ''} ${((double.parse(viewCartData?.items?[i].lineTotal?.lineTotal ?? "0") / (viewCartData?.items?[i].quantity ?? 1)) / 100).toStringAsFixed(2)}',
                                                                         style: TextStyle(
                                                                           color:
                                                                               AppColors.blackColor,
@@ -1160,7 +900,7 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                         SizedBox(width: 1.w),
                                         Text(
-                                          "Summary Order",
+                                          "Order Summary",
                                           style: TextStyle(
                                             color: AppColors.mainColor,
                                             fontSize: 18.sp,
@@ -1224,16 +964,6 @@ class _CartScreenState extends State<CartScreen> {
                                       children: [
                                         Row(
                                           children: [
-                                            Text(
-                                              "Discount",
-                                              style: TextStyle(
-                                                color: AppColors.gray,
-                                                fontSize: 16.sp,
-                                                fontFamily: FontFamily.semiBold,
-                                              ),
-                                            ),
-                                            SizedBox(width: 2.w),
-
                                             InkWell(
                                               onTap: () async {
                                                 final formKey =

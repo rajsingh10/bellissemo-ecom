@@ -62,16 +62,13 @@ class CustomerProvider extends ChangeNotifier {
     final response = await http
         .get(Uri.parse(url), headers: headers)
         .timeout(
-      const Duration(seconds: 60),
-      onTimeout: () {
-        throw const SocketException('Something went wrong');
-      },
-    );
+          const Duration(seconds: 60),
+          onTimeout: () {
+            throw const SocketException('Something went wrong');
+          },
+        );
     responseJson = responses(response);
 
     return responseJson;
   }
-
-
-
 }

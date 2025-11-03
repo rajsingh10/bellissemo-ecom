@@ -365,7 +365,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
   Widget _buildGridItem(FetchCustomersModal customer) {
     return InkWell(
       onTap: () {
-        Get.to(CustomerDetailScreen(id:(customer.id).toString()));
+        Get.to(CustomerDetailScreen(id: (customer.id).toString()));
       },
       child: Card(
         color: AppColors.cardBgColor2,

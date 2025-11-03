@@ -14,21 +14,22 @@ class Customerdetailmodal {
   bool? isPayingCustomer;
   AllMetaData? allMetaData;
 
-  Customerdetailmodal(
-      {this.id,
-        this.dateCreated,
-        this.dateCreatedGmt,
-        this.dateModified,
-        this.dateModifiedGmt,
-        this.email,
-        this.firstName,
-        this.lastName,
-        this.role,
-        this.username,
-        this.billing,
-        this.shipping,
-        this.isPayingCustomer,
-        this.allMetaData});
+  Customerdetailmodal({
+    this.id,
+    this.dateCreated,
+    this.dateCreatedGmt,
+    this.dateModified,
+    this.dateModifiedGmt,
+    this.email,
+    this.firstName,
+    this.lastName,
+    this.role,
+    this.username,
+    this.billing,
+    this.shipping,
+    this.isPayingCustomer,
+    this.allMetaData,
+  });
 
   Customerdetailmodal.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -42,14 +43,16 @@ class Customerdetailmodal {
     role = json['role'];
     username = json['username'];
     billing =
-    json['billing'] != null ? new Billing.fromJson(json['billing']) : null;
-    shipping = json['shipping'] != null
-        ? new Shipping.fromJson(json['shipping'])
-        : null;
+        json['billing'] != null ? new Billing.fromJson(json['billing']) : null;
+    shipping =
+        json['shipping'] != null
+            ? new Shipping.fromJson(json['shipping'])
+            : null;
     isPayingCustomer = json['is_paying_customer'];
-    allMetaData = json['all_meta_data'] != null
-        ? new AllMetaData.fromJson(json['all_meta_data'])
-        : null;
+    allMetaData =
+        json['all_meta_data'] != null
+            ? new AllMetaData.fromJson(json['all_meta_data'])
+            : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -91,18 +94,19 @@ class Billing {
   String? email;
   String? phone;
 
-  Billing(
-      {this.firstName,
-        this.lastName,
-        this.company,
-        this.address1,
-        this.address2,
-        this.city,
-        this.postcode,
-        this.country,
-        this.state,
-        this.email,
-        this.phone});
+  Billing({
+    this.firstName,
+    this.lastName,
+    this.company,
+    this.address1,
+    this.address2,
+    this.city,
+    this.postcode,
+    this.country,
+    this.state,
+    this.email,
+    this.phone,
+  });
 
   Billing.fromJson(Map<String, dynamic> json) {
     firstName = json['first_name'];
@@ -147,17 +151,18 @@ class Shipping {
   String? state;
   String? phone;
 
-  Shipping(
-      {this.firstName,
-        this.lastName,
-        this.company,
-        this.address1,
-        this.address2,
-        this.city,
-        this.postcode,
-        this.country,
-        this.state,
-        this.phone});
+  Shipping({
+    this.firstName,
+    this.lastName,
+    this.company,
+    this.address1,
+    this.address2,
+    this.city,
+    this.postcode,
+    this.country,
+    this.state,
+    this.phone,
+  });
 
   Shipping.fromJson(Map<String, dynamic> json) {
     firstName = json['first_name'];
@@ -227,44 +232,45 @@ class AllMetaData {
   String? mobileNumber;
   String? companyAddress;
 
-  AllMetaData(
-      {this.nickname,
-        this.firstName,
-        this.lastName,
-        this.description,
-        this.richEditing,
-        this.syntaxHighlighting,
-        this.commentShortcuts,
-        this.adminColor,
-        this.useSsl,
-        this.showAdminBarFront,
-        this.locale,
-        this.wpUserLevel,
-        this.lastUpdate,
-        this.billingFirstName,
-        this.billingLastName,
-        this.billingCompany,
-        this.billingAddress1,
-        this.billingCity,
-        this.billingState,
-        this.billingPostcode,
-        this.billingCountry,
-        this.billingEmail,
-        this.billingPhone,
-        this.shippingFirstName,
-        this.shippingLastName,
-        this.shippingCompany,
-        this.shippingAddress1,
-        this.shippingCity,
-        this.shippingState,
-        this.shippingPostcode,
-        this.shippingCountry,
-        this.companyName,
-        this.companyRegistrationNumber,
-        this.vatNumber,
-        this.contactName,
-        this.mobileNumber,
-        this.companyAddress});
+  AllMetaData({
+    this.nickname,
+    this.firstName,
+    this.lastName,
+    this.description,
+    this.richEditing,
+    this.syntaxHighlighting,
+    this.commentShortcuts,
+    this.adminColor,
+    this.useSsl,
+    this.showAdminBarFront,
+    this.locale,
+    this.wpUserLevel,
+    this.lastUpdate,
+    this.billingFirstName,
+    this.billingLastName,
+    this.billingCompany,
+    this.billingAddress1,
+    this.billingCity,
+    this.billingState,
+    this.billingPostcode,
+    this.billingCountry,
+    this.billingEmail,
+    this.billingPhone,
+    this.shippingFirstName,
+    this.shippingLastName,
+    this.shippingCompany,
+    this.shippingAddress1,
+    this.shippingCity,
+    this.shippingState,
+    this.shippingPostcode,
+    this.shippingCountry,
+    this.companyName,
+    this.companyRegistrationNumber,
+    this.vatNumber,
+    this.contactName,
+    this.mobileNumber,
+    this.companyAddress,
+  });
 
   AllMetaData.fromJson(Map<String, dynamic> json) {
     nickname = json['nickname'];

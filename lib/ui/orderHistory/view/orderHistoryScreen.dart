@@ -357,42 +357,17 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            "Order No #${order.id}",
-                                            style: TextStyle(
-                                              fontSize: 16.sp,
-                                              fontWeight: FontWeight.w600,
-                                              fontFamily: FontFamily.bold,
-                                              color: AppColors.blackColor,
-                                            ),
-                                          ),
-                                          SizedBox(height: 0.5.h),
                                           Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Container(
-                                                padding: EdgeInsets.symmetric(
-                                                  horizontal: 10,
-                                                  vertical: 4,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: AppColors.greenColor
-                                                      .withValues(alpha: 0.1),
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                child: Text(
-                                                  order
-                                                          .status
-                                                          ?.capitalizeFirst ??
-                                                      '',
-                                                  style: TextStyle(
-                                                    fontSize: 16.sp,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontFamily: FontFamily.bold,
-                                                    color: AppColors.greenColor,
-                                                  ),
+                                              Text(
+                                                "Order No #${order.id}",
+                                                style: TextStyle(
+                                                  fontSize: 16.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontFamily: FontFamily.bold,
+                                                  color: AppColors.blackColor,
                                                 ),
                                               ),
                                               Text(
@@ -405,50 +380,35 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                               ),
                                             ],
                                           ),
+                                          SizedBox(height: 0.5.h),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                customerName ?? "",
+                                                style: TextStyle(
+                                                  fontSize: 16.sp,
+                                                  color: AppColors.blackColor,
+                                                  fontFamily: FontFamily.bold,
+                                                ),
+                                              ),
+                                              Text(
+                                                "${order.currencySymbol} ${order.total}",
+                                                style: TextStyle(
+                                                  fontSize: 16.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontFamily: FontFamily.bold,
+                                                  color: AppColors.greenColor,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ],
                                       ),
                                       children: [
                                         Column(
                                           children: [
-                                            Row(
-                                              children: [
-                                                SizedBox(width: 3.w),
-                                                RichText(
-                                                  text: TextSpan(
-                                                    children: [
-                                                      TextSpan(
-                                                        text:
-                                                            "Customer : ", // label
-                                                        style: TextStyle(
-                                                          fontSize: 16.sp,
-                                                          color:
-                                                              AppColors
-                                                                  .blackColor,
-                                                          fontFamily:
-                                                              FontFamily
-                                                                  .bold, // bold for label
-                                                        ),
-                                                      ),
-                                                      TextSpan(
-                                                        text:
-                                                            customerName ?? "",
-                                                        // dynamic name
-                                                        style: TextStyle(
-                                                          fontSize: 16.sp,
-                                                          color:
-                                                              AppColors
-                                                                  .blackColor,
-                                                          fontFamily:
-                                                              FontFamily
-                                                                  .regular, // normal for value
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-
                                             Builder(
                                               builder: (context) {
                                                 double subtotal = 0.0;

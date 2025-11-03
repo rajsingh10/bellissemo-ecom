@@ -129,7 +129,6 @@ class _CreateCustomerPageState extends State<CreateCustomerPage> {
                       Icons.drive_file_rename_outline,
                       color: AppColors.gray,
                     ),
-
                   ),
                   SizedBox(height: 1.h),
                   AppTextField(
@@ -139,7 +138,6 @@ class _CreateCustomerPageState extends State<CreateCustomerPage> {
                     isTextavailable: true,
                     textInputType: TextInputType.name,
                     prefix: Icon(Icons.commit_rounded, color: AppColors.gray),
-
                   ),
                   SizedBox(height: 1.h),
                   AppTextField(
@@ -152,7 +150,6 @@ class _CreateCustomerPageState extends State<CreateCustomerPage> {
                       Icons.vertical_align_top,
                       color: AppColors.gray,
                     ),
-
                   ),
                   SizedBox(height: 1.h),
                   AppTextField(
@@ -165,7 +162,6 @@ class _CreateCustomerPageState extends State<CreateCustomerPage> {
                       Icons.location_on_outlined,
                       color: AppColors.gray,
                     ),
-
                   ),
                   SizedBox(height: 1.h),
                   AppTextField(
@@ -175,7 +171,6 @@ class _CreateCustomerPageState extends State<CreateCustomerPage> {
                     isTextavailable: true,
                     textInputType: TextInputType.name,
                     prefix: Icon(Icons.person, color: AppColors.gray),
-
                   ),
                   SizedBox(height: 1.h),
                   AppTextField(
@@ -185,7 +180,6 @@ class _CreateCustomerPageState extends State<CreateCustomerPage> {
                     isTextavailable: true,
                     textInputType: TextInputType.number,
                     prefix: Icon(Icons.call, color: AppColors.gray),
-
                   ),
 
                   SizedBox(height: 1.h),
@@ -196,7 +190,6 @@ class _CreateCustomerPageState extends State<CreateCustomerPage> {
                     isTextavailable: true,
                     textInputType: TextInputType.number,
                     prefix: Icon(Icons.call, color: AppColors.gray),
-
                   ),
                   SizedBox(height: 4.h),
                   InkWell(
