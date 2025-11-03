@@ -982,7 +982,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           enlargeCenterPage: false,
                           // disables zoom effect
                           enableInfiniteScroll: false,
-                          autoPlay: false,
+                          autoPlay: true,
                         ),
                         items:
                             (product.images ?? []).map((img) {
