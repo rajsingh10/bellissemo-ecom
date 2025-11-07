@@ -78,6 +78,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   String? selectedSize;
   bool isIpad = 100.w >= 800;
   bool isLoading = true;
+  Map<int, int> variantQuantities = {};
 
   Future<void> loadInitialData() async {
     setState(() => isLoading = true);
@@ -243,186 +244,483 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                           productDetails?.variations?.length == 0
                               ? Container()
-                              : SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children:
-                                      productDetails!.allVariations!.map((
-                                        variant,
-                                      ) {
-                                        final isSelected =
-                                            selectedVariant?.id == variant.id;
-                                        final variantImage =
-                                            variant.images!.isNotEmpty
-                                                ? variant.images!.first.src
-                                                : '';
+                              :
 
-                                        final variantName =
-                                            variant.attributes?.getValue();
+                              // SingleChildScrollView(
+                              //   scrollDirection: Axis.horizontal,
+                              //   child: Row(
+                              //     children:
+                              //         productDetails!.allVariations!.map((
+                              //           variant,
+                              //         ) {
+                              //           final isSelected =
+                              //               selectedVariant?.id == variant.id;
+                              //           final variantImage =
+                              //               variant.images!.isNotEmpty
+                              //                   ? variant.images!.first.src
+                              //                   : '';
+                              //           final variantName =
+                              //               variant.attributes?.getValue();
+                              //
+                              //           // 🟢 Get quantity for this variant (default = packSize)
+                              //           final variantQty =
+                              //               variantQuantities[variant.id] ??
+                              //               num.parse(variant.packSize ?? '0');
+                              //
+                              //           return GestureDetector(
+                              //             onTap: () {
+                              //               setState(() {
+                              //                 selectedVariant = variant;
+                              //                 selectedVariationId = variant.id;
+                              //                 selectedAttributeKey =
+                              //                     variant.attributes?.getKey();
+                              //                 selectedAttributeValue =
+                              //                     variant.attributes
+                              //                         ?.getValue();
+                              //                 currentPrice =
+                              //                     double.tryParse(
+                              //                       variant.price ?? '0',
+                              //                     ) ??
+                              //                     0.0;
+                              //
+                              //                 // 🟢 Initialize qty for selected variant if not already
+                              //                 variantQuantities.putIfAbsent(
+                              //                   variant.id!,
+                              //                   () => num.parse(
+                              //                     variant.packSize ?? '0',
+                              //                   ),
+                              //                 );
+                              //
+                              //                 log(
+                              //                   'selectedVariationId :: $selectedVariationId',
+                              //                 );
+                              //               });
+                              //             },
+                              //             child: Container(
+                              //               width: isIpad ? 20.w : 130,
+                              //               margin: const EdgeInsets.only(
+                              //                 right: 10,
+                              //               ),
+                              //               padding: const EdgeInsets.all(8),
+                              //               decoration: BoxDecoration(
+                              //                 color: Colors.white,
+                              //                 borderRadius:
+                              //                     BorderRadius.circular(14),
+                              //                 border: Border.all(
+                              //                   color:
+                              //                       isSelected
+                              //                           ? AppColors.mainColor
+                              //                           : Colors.grey.shade300,
+                              //                   width: isSelected ? 2 : 1,
+                              //                 ),
+                              //                 boxShadow: [
+                              //                   BoxShadow(
+                              //                     color: Colors.black12,
+                              //                     blurRadius: 5,
+                              //                     offset: Offset(0, 2),
+                              //                   ),
+                              //                 ],
+                              //               ),
+                              //               child: Column(
+                              //                 mainAxisSize: MainAxisSize.min,
+                              //                 children: [
+                              //                   // 🔹 Variant Image
+                              //                   variantImage!.isNotEmpty
+                              //                       ? CustomNetworkImage(
+                              //                         imageUrl: variantImage,
+                              //                         height:
+                              //                             isIpad ? 40.sp : 45,
+                              //                         width:
+                              //                             isIpad ? 40.sp : 45,
+                              //                         isCircle: true,
+                              //                         isProfile: false,
+                              //                         isFit: true,
+                              //                       )
+                              //                       : Container(
+                              //                         width:
+                              //                             isIpad ? 40.sp : 45,
+                              //                         height:
+                              //                             isIpad ? 40.sp : 45,
+                              //                         decoration: BoxDecoration(
+                              //                           color:
+                              //                               Colors
+                              //                                   .grey
+                              //                                   .shade200,
+                              //                           shape: BoxShape.circle,
+                              //                           border: Border.all(
+                              //                             color:
+                              //                                 Colors
+                              //                                     .grey
+                              //                                     .shade400,
+                              //                           ),
+                              //                         ),
+                              //                         child: const Icon(
+                              //                           Icons
+                              //                               .image_not_supported,
+                              //                           size: 20,
+                              //                         ),
+                              //                       ),
+                              //
+                              //                   const SizedBox(height: 6),
+                              //
+                              //                   // 🔹 Variant Name
+                              //                   Text(
+                              //                     variantName ?? '',
+                              //                     textAlign: TextAlign.center,
+                              //                     style: TextStyle(
+                              //                       fontSize:
+                              //                           isIpad ? 15.sp : 13,
+                              //                       fontFamily: FontFamily.bold,
+                              //                       color: AppColors.blackColor,
+                              //                     ),
+                              //                     overflow:
+                              //                         TextOverflow.ellipsis,
+                              //                     maxLines: 1,
+                              //                   ),
+                              //
+                              //                   const SizedBox(height: 6),
+                              //
+                              //                   // 🔹 Quantity (+/-)
+                              //                   Container(
+                              //                     padding:
+                              //                         const EdgeInsets.symmetric(
+                              //                           horizontal: 8,
+                              //                           vertical: 4,
+                              //                         ),
+                              //                     decoration: BoxDecoration(
+                              //                       color: Colors.white,
+                              //                       borderRadius:
+                              //                           BorderRadius.circular(
+                              //                             30,
+                              //                           ),
+                              //                       boxShadow: [
+                              //                         BoxShadow(
+                              //                           color: Colors.black12,
+                              //                           blurRadius: 4,
+                              //                           offset: Offset(0, 2),
+                              //                         ),
+                              //                       ],
+                              //                     ),
+                              //                     child: Row(
+                              //                       mainAxisAlignment:
+                              //                           MainAxisAlignment
+                              //                               .center,
+                              //                       children: [
+                              //                         GestureDetector(
+                              //
+                              //                           onTap: () {
+                              //                             setState(() {
+                              //                               int currentPackSize = variantQty.toInt();
+                              //                               final originalPackSize = num.parse(variant.packSize ?? '0');
+                              //
+                              //                               currentPackSize -= originalPackSize.toInt();
+                              //                               if (currentPackSize < 0) currentPackSize = 0;
+                              //
+                              //                               // Update local qty map
+                              //                               variantQuantities[variant.id!] = currentPackSize;
+                              //
+                              //                               // 🔹 Add or update in cart
+                              //                               addOrUpdateCartItem(
+                              //                                 productId: productDetails!.id!,
+                              //                                 variationId: variant.id!,
+                              //                                 attributeKey: variant.attributes?.getKey() ?? "attribute_pa_color",
+                              //                                 attributeValue: variant.attributes?.getValue() ?? "",
+                              //                                 quantity: currentPackSize,
+                              //                                 overridePrice: double.tryParse(variant.price ?? '0') ?? 0.0,
+                              //                                 itemNote: "Default price",
+                              //                               );
+                              //
+                              //                               // Update selection
+                              //                               selectedVariant = variant;
+                              //                               selectedVariationId = variant.id;
+                              //                               selectedAttributeKey = variant.attributes?.getKey();
+                              //                               selectedAttributeValue = variant.attributes?.getValue();
+                              //                               currentPrice = double.tryParse(variant.price ?? '0') ?? 0.0;
+                              //                             });
+                              //                           },
+                              //
+                              //                           child: Icon(
+                              //                             Icons.remove,
+                              //                             size: 18,
+                              //                             color:
+                              //                                 AppColors
+                              //                                     .blackColor,
+                              //                           ),
+                              //                         ),
+                              //                         const SizedBox(width: 8),
+                              //                         Text(
+                              //                           variantQty.toString(),
+                              //                           style: TextStyle(
+                              //                             fontSize: 14,
+                              //                             fontFamily:
+                              //                                 FontFamily
+                              //                                     .semiBold,
+                              //                           ),
+                              //                         ),
+                              //                         const SizedBox(width: 8),
+                              //                         GestureDetector(
+                              //                           // ➕ INCREMENT BUTTON
+                              //                           onTap: () {
+                              //                             setState(() {
+                              //                               int currentPackSize = variantQty.toInt();
+                              //                               final originalPackSize = num.parse(variant.packSize ?? '0');
+                              //
+                              //                               currentPackSize += originalPackSize.toInt();
+                              //
+                              //
+                              //                               variantQuantities[variant.id!] = currentPackSize;
+                              //
+                              //
+                              //                               addOrUpdateCartItem(
+                              //                                 productId: productDetails!.id!,
+                              //                                 variationId: variant.id!,
+                              //                                 attributeKey: variant.attributes?.getKey() ?? "attribute_pa_color",
+                              //                                 attributeValue: variant.attributes?.getValue() ?? "",
+                              //                                 quantity: currentPackSize,
+                              //                                 overridePrice: double.tryParse(variant.price ?? '0') ?? 0.0,
+                              //                                 itemNote: "Default price",
+                              //                               );
+                              //
+                              //                               // Update selection
+                              //                               selectedVariant = variant;
+                              //                               selectedVariationId = variant.id;
+                              //                               selectedAttributeKey = variant.attributes?.getKey();
+                              //                               selectedAttributeValue = variant.attributes?.getValue();
+                              //                               currentPrice = double.tryParse(variant.price ?? '0') ?? 0.0;
+                              //                             });
+                              //                           },
+                              //                           child: Icon(
+                              //                             Icons.add,
+                              //                             size: 18,
+                              //                             color:
+                              //                                 AppColors
+                              //                                     .blackColor,
+                              //                           ),
+                              //                         ),
+                              //                       ],
+                              //                     ),
+                              //                   ),
+                              //                 ],
+                              //               ),
+                              //             ),
+                              //           );
+                              //         }).toList(),
+                              //   ),
+                              // ),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: productDetails!.allVariations!.map((variant) {
+                                final isSelected = selectedVariant?.id == variant.id;
+                                final variantImage = variant.images!.isNotEmpty
+                                    ? variant.images!.first.src
+                                    : '';
+                                final variantName = variant.attributes?.getValue();
 
-                                        return GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              selectedVariant = variant;
-                                              selectedVariationId = variant.id;
-                                              selectedAttributeKey =
-                                                  variant.attributes?.getKey();
-                                              selectedAttributeValue =
-                                                  variant.attributes
-                                                      ?.getValue();
-                                              currentPrice =
-                                                  double.tryParse(
-                                                    variant.price ?? '0',
-                                                  ) ??
-                                                  0.0;
-                                              currentqty = num.parse(
-                                                variant.packSize ?? '0',
-                                              );
+                                // ✅ Default quantity = 0
+                                final int variantQty = (variantQuantities[variant.id] ?? 0).toInt();
 
-                                              log(
-                                                'selectedVariationId :: $selectedVariationId  ',
-                                              );
-                                            });
-                                          },
-                                          child: Container(
-                                            margin: const EdgeInsets.only(
-                                              right: 8,
-                                            ),
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 6,
-                                              vertical: 4,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color:
-                                                    isSelected
-                                                        ? AppColors.mainColor
-                                                        : Colors.grey.shade400,
-                                                width: isSelected ? 2 : 1,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                variantImage!.isNotEmpty
-                                                    ? CustomNetworkImage(
-                                                      imageUrl: variantImage,
-                                                      height:
-                                                          isIpad ? 16.sp : 20,
-                                                      width:
-                                                          isIpad ? 16.sp : 20,
-                                                      isCircle: true,
-                                                      isProfile: false,
-                                                      isFit: true,
-                                                    )
-                                                    : Container(
-                                                      width:
-                                                          isIpad ? 16.sp : 20,
-                                                      height:
-                                                          isIpad ? 16.sp : 20,
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            Colors
-                                                                .grey
-                                                                .shade200,
-                                                        shape: BoxShape.circle,
-                                                        border: Border.all(
-                                                          color:
-                                                              Colors
-                                                                  .grey
-                                                                  .shade400,
-                                                        ),
-                                                      ),
-                                                      child: const Icon(
-                                                        Icons
-                                                            .image_not_supported,
-                                                        size: 14,
-                                                      ),
-                                                    ),
-                                                const SizedBox(width: 5),
-                                                Flexible(
-                                                  child: Text(
-                                                    variantName ?? '',
-                                                    style: TextStyle(
-                                                      fontSize:
-                                                          isIpad ? 16.sp : 14,
-                                                      fontFamily:
-                                                          FontFamily.regular,
-                                                    ),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    maxLines: 1,
-                                                  ),
-                                                ),
-                                              ],
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      selectedVariant = variant;
+                                      selectedVariationId = variant.id;
+                                      selectedAttributeKey = variant.attributes?.getKey();
+                                      selectedAttributeValue = variant.attributes?.getValue();
+                                      currentPrice = double.tryParse(variant.price ?? '0') ?? 0.0;
+
+                                      // Initialize qty if not already in map
+                                      variantQuantities.putIfAbsent(variant.id!, () => 0);
+
+                                      log('selectedVariationId :: $selectedVariationId');
+                                    });
+                                  },
+                                  child: Container(
+                                    width: isIpad ? 20.w : 130,
+                                    margin: const EdgeInsets.only(right: 10),
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(
+                                        color: isSelected ? AppColors.mainColor : Colors.grey.shade300,
+                                        width: isSelected ? 2 : 1,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black12,
+                                          blurRadius: 5,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        // 🔹 Variant Image
+                                        variantImage!.isNotEmpty
+                                            ? CustomNetworkImage(
+                                          imageUrl: variantImage,
+                                          height: isIpad ? 40.sp : 45,
+                                          width: isIpad ? 40.sp : 45,
+                                          isCircle: true,
+                                          isProfile: false,
+                                          isFit: true,
+                                        )
+                                            : Container(
+                                          width: isIpad ? 40.sp : 45,
+                                          height: isIpad ? 40.sp : 45,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey.shade200,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: Colors.grey.shade400,
                                             ),
                                           ),
-                                        );
-                                      }).toList(),
-                                ),
-                              ),
+                                          child: const Icon(Icons.image_not_supported, size: 20),
+                                        ),
 
-                          SizedBox(height: 1.h),
+                                        const SizedBox(height: 6),
 
-                          //
-                          // Text(
-                          //   "Size Variants :",
-                          //   style: TextStyle(
-                          //     fontSize: 16.sp,
-                          //     color: AppColors.gray,
-                          //     fontFamily: FontFamily.regular,
-                          //   ),
-                          // ),
-                          // SizedBox(height: 1.h),
-                          //
-                          // SingleChildScrollView(
-                          //   scrollDirection: Axis.horizontal,
-                          //   child: Row(
-                          //     children:
-                          //         availableSizes.map((size) {
-                          //           return GestureDetector(
-                          //             onTap: () {
-                          //               setState(() {
-                          //                 selectedSize = size;
-                          //               });
-                          //             },
-                          //             child: Container(
-                          //               margin: EdgeInsets.only(right: 8),
-                          //               // spacing between items
-                          //               padding: EdgeInsets.symmetric(
-                          //                 horizontal: 4.w,
-                          //                 vertical: 1.h,
-                          //               ),
-                          //               decoration: BoxDecoration(
-                          //                 color:
-                          //                     selectedSize == size
-                          //                         ? AppColors.mainColor.withValues(
-                          //                           alpha: 0.2,
-                          //                         )
-                          //                         : Colors.transparent,
-                          //                 borderRadius: BorderRadius.circular(20),
-                          //                 border: Border.all(
-                          //                   color:
-                          //                       selectedSize == size
-                          //                           ? AppColors.mainColor
-                          //                           : Colors.grey.shade400,
-                          //                 ),
-                          //               ),
-                          //               child: Text(
-                          //                 size,
-                          //                 style: TextStyle(
-                          //                   fontSize: 14.sp,
-                          //                   fontFamily: FontFamily.regular,
-                          //                 ),
-                          //               ),
-                          //             ),
-                          //           );
-                          //         }).toList(),
-                          //   ),
-                          // ),
-                          // SizedBox(height: 1.h),
+                                        // 🔹 Variant Name
+                                        Text(
+                                          variantName ?? '',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: isIpad ? 15.sp : 13,
+                                            fontFamily: FontFamily.bold,
+                                            color: AppColors.blackColor,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+
+                                        const SizedBox(height: 6),
+
+                                        // 🔹 Quantity Section (+ / -)
+                                        Container(
+                                          padding:
+                                          const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(30),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black12,
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              // ➖ MINUS BUTTON
+                                              GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    int currentPackSize =
+                                                        variantQuantities[variant.id!] ?? 0;
+                                                    final int originalPackSize =
+                                                        int.tryParse(variant.packSize ?? '0') ?? 0;
+
+                                                    // 🧠 Prevent negative values
+                                                    currentPackSize -= originalPackSize;
+                                                    if (currentPackSize < 0) currentPackSize = 0;
+
+                                                    // 🟢 Update local map
+                                                    variantQuantities[variant.id!] = currentPackSize;
+
+                                                    // 🟢 Update cart item JSON
+                                                    addOrUpdateCartItem(
+                                                      productId: productDetails!.id!,
+                                                      variationId: variant.id!,
+                                                      attributeKey:
+                                                      variant.attributes?.getKey() ??
+                                                          "attribute_pa_color",
+                                                      attributeValue:
+                                                      variant.attributes?.getValue() ?? "",
+                                                      quantity: currentPackSize,
+                                                      overridePrice:
+                                                      double.tryParse(variant.price ?? '0') ?? 0.0,
+                                                      itemNote:  notesController.text==""||notesController.text==null?"":notesController.text.trim().toString(),
+                                                    );
+                                                  });
+                                                },
+                                                child: Icon(
+                                                  Icons.remove,
+                                                  size: 18,
+                                                  color: (variantQuantities[variant.id!] ?? 0) == 0
+                                                      ? Colors.grey // 🔸 Disabled when qty=0
+                                                      : AppColors.blackColor,
+                                                ),
+                                              ),
+
+                                              const SizedBox(width: 8),
+
+                                              // 🟢 Always show current quantity (starting from 0)
+                                              Text(
+                                                (variantQuantities[variant.id!] ?? 0).toString(),
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontFamily: FontFamily.semiBold,
+                                                ),
+                                              ),
+
+                                              const SizedBox(width: 8),
+
+                                              // ➕ PLUS BUTTON
+                                              GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    int currentPackSize =
+                                                        variantQuantities[variant.id!] ?? 0;
+                                                    final int originalPackSize =
+                                                        int.tryParse(variant.packSize ?? '0') ?? 0;
+
+                                                    // 🧩 Increment by pack size
+                                                    currentPackSize += originalPackSize;
+
+                                                    // 🟢 Update local map
+                                                    variantQuantities[variant.id!] = currentPackSize;
+
+                                                    // 🟢 Update cart
+                                                    addOrUpdateCartItem(
+                                                      productId: productDetails!.id!,
+                                                      variationId: variant.id!,
+                                                      attributeKey:
+                                                      variant.attributes?.getKey() ??
+                                                          "attribute_pa_color",
+                                                      attributeValue:
+                                                      variant.attributes?.getValue() ?? "",
+                                                      quantity: currentPackSize,
+                                                      overridePrice:
+                                                      double.tryParse(variant.price ?? '0') ?? 0.0,
+                                                      itemNote:  notesController.text==""||notesController.text==null?"":notesController.text.trim().toString(),
+                                                    );
+                                                  });
+                                                },
+                                                child: const Icon(
+                                                  Icons.add,
+                                                  size: 18,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+
+
+                        SizedBox(height: 1.h),
+
+
                           productDetails?.variations?.length == 0
                               ? InkWell(
                                 onTap: () async {
@@ -506,80 +804,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                                           fontsize: 15.sp,
                                                           radius: 12.0,
                                                         ),
-                                                        // CustomButton(
-                                                        //   title:
-                                                        //   "Increase Price",
-                                                        //   route: () async {
-                                                        //     bool increseprice =
-                                                        //     true;
-                                                        //
-                                                        //
-                                                        //     // update server if online
-                                                        //     // if (await checkInternet()) {
-                                                        //     //   try {
-                                                        //     //     await CartService().updateProductPrice(
-                                                        //     //       price:int.parse(dialogController.text.trim()) ,
-                                                        //     //       productId:int.parse(widget.productId.toString()) ,
-                                                        //     //       userId:int.parse(customerId.toString()) ,
-                                                        //     //
-                                                        //     //     );
-                                                        //     //
-                                                        //     //     Get.back();
-                                                        //     //     Get.back();
-                                                        //     //
-                                                        //     //     Get.offAll(() =>
-                                                        //     //     ProductDetailsScreen(productId: widget.productId,),
-                                                        //     //     );
-                                                        //     //     _fetchProductDetails();
-                                                        //     //   } catch (
-                                                        //     //   e,
-                                                        //     //   trackTrace
-                                                        //     //   ) {
-                                                        //     //     showCustomErrorSnackbar(
-                                                        //     //       title:
-                                                        //     //       "Error",
-                                                        //     //       message:
-                                                        //     //       "Failed to update cart\n$e",
-                                                        //     //     );
-                                                        //     //     log(
-                                                        //     //       "shu errro ave che =====>>>>$trackTrace",
-                                                        //     //     );
-                                                        //     //   }
-                                                        //     // }
-                                                        //     // await CartService().updateProductPrice(
-                                                        //     //   price:int.parse(dialogController.text.trim()) ,
-                                                        //     //   productId:int.parse(widget.productId.toString()) ,
-                                                        //     //   userId:int.parse(customerId.toString()) ,
-                                                        //     //
-                                                        //     // );
-                                                        //     //
-                                                        //     // Get.back();
-                                                        //     // Get.back();
-                                                        //     //
-                                                        //     // Get.offAll(() =>
-                                                        //     //     ProductDetailsScreen(productId: widget.productId,),
-                                                        //     // );
-                                                        //     // _fetchProductDetails();
-                                                        //
-                                                        //
-                                                        //   },
-                                                        //   color:
-                                                        //   AppColors.mainColor,
-                                                        //   fontcolor:
-                                                        //   AppColors.whiteColor,
-                                                        //   height:
-                                                        //   5.h,
-                                                        //   width:
-                                                        //   40.w,
-                                                        //   fontsize:
-                                                        //   15.sp,
-                                                        //   radius:
-                                                        //   12.0,
-                                                        //   iconData:
-                                                        //   Icons.check,
-                                                        //   iconsize:
-                                                        //   17.sp,
-                                                        // ),
+
                                                         CustomButton(
                                                           title: "Edit Price",
                                                           route: () async {
@@ -1045,7 +1270,29 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             ),
                           ),
                           SizedBox(height: 3.h),
+                          Container(
+                            alignment: Alignment.center,
+                            child: CustomButton(
+                              title: 'Add Note',
+                              route: () {
+                                showItemNotesDialog(context);
 
+                                log(
+                                  'selectedVariationId :: $selectedVariationId',
+                                );
+                              },
+                              color: AppColors.mainColor,
+                              fontcolor: AppColors.whiteColor,
+                              radius: isIpad ? 1.w : 3.w,
+                              height: isIpad ? 7.h : 5.h,
+                              fontsize: 16.sp,
+                              iconData: Icons.note,
+                              iconsize: 16.sp,
+                              width: 85.w
+
+                            ),
+                          ),
+                          SizedBox(height: 1.h),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -1167,6 +1414,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                       ],
                                     ),
                                   )
+                                  : productDetails?.variations?.length != 0
+                                  ? Container()
                                   : Container(
                                     padding: EdgeInsets.symmetric(
                                       horizontal: 3.w,
@@ -1258,6 +1507,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                               print(
                                                 "After: currentPackSize = $currentPackSize",
                                               );
+                                              addOrUpdateCartItem(
+                                                productId: productDetails!.id!,
+                                                variationId: "",
+                                                attributeKey:
+                                                "",
+                                                attributeValue:"",
+                                                // variant.attributes?.getValue() ?? "",
+                                                quantity: currentPackSize,
+                                                overridePrice:
+                                                double.tryParse(currentPackSize.toString()) ?? 0.0,
+                                                itemNote:  notesController.text==""||notesController.text==null?"":notesController.text.trim().toString(),
+                                              );
                                             });
                                           },
 
@@ -1279,102 +1540,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 child: CustomButton(
                                   title: 'Add to cart',
                                   route: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        String? errorText;
-
-                                        return StatefulBuilder(
-                                          builder: (context, setState) {
-                                            return AlertDialog(
-                                              backgroundColor:
-                                                  AppColors.whiteColor,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(15),
-                                              ),
-                                              title: Text(
-                                                "Item Notes",
-                                                style: TextStyle(
-                                                  fontSize: 18.sp,
-                                                  fontFamily: FontFamily.bold,
-                                                  color: AppColors.blackColor,
-                                                ),
-                                              ),
-                                              content: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  AppTextField(
-                                                    controller: notesController,
-                                                    hintText:
-                                                        "Enter Item notes here...",
-                                                    text: "Notes",
-                                                    isTextavailable: true,
-                                                    textInputType:
-                                                        TextInputType.multiline,
-                                                    maxline: 4,
-                                                    validator: (value) {
-                                                      if (value == null ||
-                                                          value.isEmpty) {
-                                                        return "Please enter Item notes";
-                                                      }
-                                                      return null;
-                                                    },
-                                                  ),
-                                                  if (errorText != null) ...[
-                                                    SizedBox(height: 8),
-                                                    Text(
-                                                      errorText!,
-                                                      style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontSize: 14.sp,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ],
-                                              ),
-                                              actions: [
-                                                CustomButton(
-                                                  title: "Cancel",
-                                                  route: () {
-                                                    Get.back();
-                                                  },
-                                                  color:
-                                                      AppColors.containerColor,
-                                                  fontcolor:
-                                                      AppColors.blackColor,
-                                                  height: 5.h,
-                                                  width: 30.w,
-                                                  fontsize: 15.sp,
-                                                  radius: 12.0,
-                                                ),
-                                                CustomButton(
-                                                  title: "Confirm",
-                                                  route: () async {
-                                                    productDetails
-                                                                ?.variations
-                                                                ?.length ==
-                                                            0
-                                                        ? _addSimpleProductsToCart()
-                                                        : _addVariationProductsToCart();
-                                                    Get.back();
-                                                  },
-                                                  color: AppColors.mainColor,
-                                                  fontcolor:
-                                                      AppColors.whiteColor,
-                                                  height: 5.h,
-                                                  width: 30.w,
-                                                  fontsize: 15.sp,
-                                                  radius: 12.0,
-                                                  iconData: Icons.check,
-                                                  iconsize: 17.sp,
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        );
-                                      },
-                                    );
+                                    productDetails?.variations?.length == 0
+                                        ? _addSimpleProductsToCart()
+                                        : _addVariationProductsToCart();
+                                    Get.back();
 
                                     log(
                                       'selectedVariationId :: $selectedVariationId',
@@ -1468,6 +1637,48 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   //   }
   // }
   int? originalPackSize;
+// 🟢 Place these at the top of your class (State)
+
+  List<Map<String, dynamic>> cartItems = [];
+
+  /// 🟢 Master function: Add or Update Cart Items
+  void addOrUpdateCartItem({
+    required int productId,
+    required var variationId,
+    required String attributeKey,
+    required String attributeValue,
+    required num quantity,
+    required double overridePrice,
+    String? itemNote,
+  }) {
+    final existingIndex = cartItems.indexWhere(
+          (item) => item['variation_id'] == variationId,
+    );
+
+    if (existingIndex != -1) {
+      // 🔹 Update existing item or remove if qty = 0
+      if (quantity <= 0) {
+        cartItems.removeAt(existingIndex);
+      } else {
+        cartItems[existingIndex]['quantity'] = quantity;
+        cartItems[existingIndex]['override_price'] = overridePrice;
+        cartItems[existingIndex]['item_note'] = itemNote ?? "Default price";
+      }
+    } else if (quantity > 0) {
+      // 🔹 Add new item
+      cartItems.add({
+        "product_id": productId,
+        "variation_id": variationId,
+        "variation": {attributeKey: attributeValue},
+        "quantity": quantity,
+        "item_note": itemNote ?? "Default price",
+        "override_price": overridePrice,
+      });
+    }
+
+    // 🟢 Print cart JSON for debugging
+    log("🛒 Updated Cart => ${jsonEncode({"items": cartItems})}");
+  }
 
   Future<void> _fetchProductDetails() async {
     var box = HiveService().getProductDetailsBox();
@@ -1537,6 +1748,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   Future<void> _addVariationProductsToCart() async {
+    if (!mounted) return;
     setState(() {
       isAddingToCart = true;
     });
@@ -1544,14 +1756,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
     try {
       final response = await cartService.addToCart(
-        productId: int.parse(widget.productId ?? ''),
-        variationId: selectedVariationId,
-        variation: {
-          "attribute_${selectedAttributeKey ?? ''}":
-              selectedAttributeValue ?? '',
-        },
-        quantity: currentqty.toInt(),
-        itemNote: notesController.text.trim().toString(),
+        items: cartItems
+        // productId: int.parse(widget.productId ?? ''),
+        // variationId: selectedVariationId,
+        // variation: {
+        //   "attribute_${selectedAttributeKey ?? ''}":
+        //       selectedAttributeValue ?? '',
+        // },
+        // quantity: currentqty.toInt(),
+        // itemNote: notesController.text.trim().toString(),
       );
 
       if (response != null && response.statusCode == 200) {
@@ -1559,15 +1772,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         //   title: "Added to Cart",
         //   message: "This product has been successfully added to your cart.",
         // );
+        if (!mounted) return;
         setState(() {
           isAddingToCart = false;
           // quantity = 1;
         });
+
       } else {
         // showCustomSuccessSnackbar(
         //   title: "Offline Mode",
         //   message: "Product added offline. It will sync once internet is back.",
         // );
+        if (!mounted) return;
         setState(() {
           isAddingToCart = false;
           // quantity = 1;
@@ -1578,20 +1794,120 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         title: "Error",
         message: "Something went wrong while adding product.\n$e",
       );
+      if (!mounted) return;
       setState(() {
         isAddingToCart = false;
       });
     }
   }
 
+  Future<void> showItemNotesDialog(BuildContext context) async {
+    TextEditingController notesController = TextEditingController();
+    String? errorText;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: AppColors.whiteColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              title: Text(
+                "Item Notes",
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontFamily: FontFamily.bold,
+                  color: AppColors.blackColor,
+                ),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AppTextField(
+                    controller: notesController,
+                    hintText: "Enter Item notes here...",
+                    text: "Notes",
+                    isTextavailable: true,
+                    textInputType: TextInputType.multiline,
+                    maxline: 4,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please enter Item notes";
+                      }
+                      return null;
+                    },
+                  ),
+                  if (errorText != null) ...[
+                    SizedBox(height: 8),
+                    Text(
+                      errorText!,
+                      style: TextStyle(color: Colors.red, fontSize: 14.sp),
+                    ),
+                  ],
+                ],
+              ),
+              actions: [
+                CustomButton(
+                  title: "Cancel",
+                  route: () {
+                    Get.back(); // closes dialog
+                  },
+                  color: AppColors.containerColor,
+                  fontcolor: AppColors.blackColor,
+                  height: 5.h,
+                  width: 30.w,
+                  fontsize: 15.sp,
+                  radius: 12.0,
+                ),
+                CustomButton(
+                  title: "Confirm",
+                  route: () async {
+                    if (notesController.text.trim().isEmpty) {
+                      setState(() {
+                        errorText = "Please enter Item notes";
+                      });
+                      return;
+                    }
+
+                    // 🟢 Add logic for product add
+                    // if (productDetails?.variations?.length == 0) {
+                    //   _addSimpleProductsToCart();
+                    // } else {
+                    //   _addVariationProductsToCart();
+                    // }
+
+                    Get.back(); // close dialog
+                  },
+                  color: AppColors.mainColor,
+                  fontcolor: AppColors.whiteColor,
+                  height: 5.h,
+                  width: 30.w,
+                  fontsize: 15.sp,
+                  radius: 12.0,
+                  iconData: Icons.check,
+                  iconsize: 17.sp,
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   Future<void> _addSimpleProductsToCart() async {
+    if (!mounted) return;
     setState(() {
       isAddingToCart = true;
     });
     final cartService = CartService();
 
     try {
-      final response = await cartService.addToCart(
+      final response = await cartService.addToCart1(
+          // items: cartItems
         productId: int.parse(widget.productId ?? ''),
         quantity: int.parse((productDetails?.packsize).toString()),
         itemNote: notesController.text.trim().toString(),
@@ -1602,6 +1918,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         //   title: "Added to Cart",
         //   message: "This product has been successfully added to your cart.",
         // );
+        if (!mounted) return;
         setState(() {
           isAddingToCart = false;
           // quantity = 1;
@@ -1611,6 +1928,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         //   title: "Offline Mode",
         //   message: "Product added offline. It will sync once internet is back.",
         // );
+        if (!mounted) return;
         setState(() {
           isAddingToCart = false;
           // quantity = 1;
@@ -1622,6 +1940,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         message: "Something went wrong while adding product.\n$e",
       );
       log('Error : $e');
+      if (!mounted) return;
       setState(() {
         isAddingToCart = false;
       });

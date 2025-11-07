@@ -19,7 +19,9 @@ void main() async {
   ConnectivityManager().startListening();
   if (await checkInternet()) {
     await CartService().syncOfflineCart();
+    await CartService().syncOfflineCart1();
     await CartService().syncOfflineActions();
+    await CartService().syncOfflineActions1();
     await CartService().syncOfflineUpdate();
     await CartService().syncAppliedDiscounts();
     await CartService().syncOfflinePriceUpdate();

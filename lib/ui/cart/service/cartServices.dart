@@ -31,7 +31,7 @@ class CartService {
   final Dio _dio = Dio();
 
   // ----------------- Add to Cart -----------------
-  Future<Response?> addToCart({
+  Future<Response?> addToCart1({
     required int productId,
     required int quantity,
     required String? itemNote,
@@ -104,9 +104,66 @@ class CartService {
       return null;
     }
   }
+  Future<Response?> addToCart({
+    required List<Map<String, dynamic>> items, // 🟢 Accepts multiple items
+  }) async {
+    final box = HiveService().getAddCartBox();
+
+    // 🟢 Create final body for API
+    Map<String, dynamic> body = {
+      "items": items,
+    };
+
+    print("📦 Cart Body:\n${prettyPrintJson(body)}");
+
+    // 🛜 Check Internet
+    if (!await checkInternet()) {
+      await box.put(
+        "offline_cart_${DateTime.now().millisecondsSinceEpoch}",
+        body,
+      );
+      print("📦 Added offline because no internet");
+      return null;
+    }
+
+    try {
+      String? token = await getSavedLoginToken();
+      if (token == null || token.isEmpty) throw Exception('Token not found');
+
+      final headers = {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      };
+
+      final response = await _dio.post(
+        apiEndpoints.addToCart,
+        data: jsonEncode(body),
+        options: Options(headers: headers),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // 🟢 Save response to Hive for offline persistence
+        await box.put(
+          "cart_batch_${DateTime.now().millisecondsSinceEpoch}",
+          response.data,
+        );
+      }
+
+      print("✅ Cart synced successfully");
+      return response;
+    } catch (e) {
+      await box.put(
+        "offline_cart_${DateTime.now().millisecondsSinceEpoch}",
+        body,
+      );
+      print("📦 Saved offline due to error: $e");
+      return null;
+    }
+  }
 
   // ----------------- Sync Offline Cart -----------------
-  Future<void> syncOfflineCart() async {
+  Future<void> syncOfflineCart1() async {
     final box = HiveService().getAddCartBox();
     final keys =
         box.keys
@@ -121,7 +178,7 @@ class CartService {
           body["variation_id"] != null && body["variation"] != null;
 
       try {
-        final response = await addToCart(
+        final response = await addToCart1(
           productId: body["product_id"],
           quantity: body["quantity"],
           itemNote: isVariableProduct ? null : body["item_note"],
@@ -147,9 +204,39 @@ class CartService {
       }
     }
   }
+  Future<void> syncOfflineCart() async {
+    final box = HiveService().getAddCartBox();
+    final keys = box.keys
+        .where((key) => key.toString().startsWith("offline_cart_"))
+        .toList();
+
+    if (keys.isEmpty) return;
+
+    for (var key in keys) {
+      final body = box.get(key);
+
+      try {
+        if (body != null && body["items"] != null) {
+          // 🟢 Re-send the stored "items" list
+          final response = await addToCart(
+            items: List<Map<String, dynamic>>.from(body["items"]),
+          );
+
+          if (response != null &&
+              (response.statusCode == 200 || response.statusCode == 201)) {
+            log("✅ Offline cart synced successfully → ${body["items"].length} items");
+            await box.delete(key);
+          }
+        }
+      } catch (e, stackTrace) {
+        log("⚠️ Failed to sync offline cart batch: $e");
+        print("stackTrace: $stackTrace");
+      }
+    }
+  }
 
   // ----------------- Sync Offline Actions -----------------
-  Future<void> syncOfflineActions() async {
+  Future<void> syncOfflineActions1() async {
     final box = HiveService().getAddCartBox();
     final keys =
         box.keys.where((key) => key.toString().startsWith("offline_")).toList();
@@ -177,7 +264,7 @@ class CartService {
 
           // Handle queued ADD actions
           if (key.toString().startsWith("offline_cart_")) {
-            final resp = await addToCart(
+            final resp = await addToCart1(
               productId: productId,
               quantity: quantity,
               itemNote: itemNote,
@@ -212,6 +299,93 @@ class CartService {
         }
       } catch (e) {
         print("⚠️ Failed to sync offline action $key: $e");
+      }
+    }
+  }
+  Future<void> syncOfflineActions() async {
+    final box = HiveService().getAddCartBox();
+    final keys =
+    box.keys.where((key) => key.toString().startsWith("offline_")).toList();
+
+    if (keys.isEmpty) return;
+
+    for (var key in keys) {
+      final actionData = box.get(key);
+
+      try {
+        // 🧹 Handle offline clear cart
+        if (actionData["action"] == "clear_cart") {
+          final response = await clearCart();
+          if (response != null &&
+              (response.statusCode == 200 || response.statusCode == 204)) {
+            await box.delete(key);
+            print("✅ Offline clear cart synced");
+          }
+        }
+
+        // 🛒 Handle offline cart add/update actions (bulk style)
+        else if (key.toString().startsWith("offline_cart_")) {
+          if (actionData["items"] != null) {
+            // Already stored as bulk "items" list
+            final List<Map<String, dynamic>> items =
+            List<Map<String, dynamic>>.from(actionData["items"]);
+
+            final response = await addToCart(items: items);
+
+            if (response != null &&
+                (response.statusCode == 200 || response.statusCode == 201)) {
+              await box.delete(key);
+              print("✅ Offline bulk cart synced: ${items.length} items");
+            }
+          } else if (actionData.containsKey("product_id")) {
+            // Old single-item format (convert to new "items" structure)
+            final productId = actionData["product_id"];
+            final quantity = actionData["quantity"] ?? 1;
+            final variationId = actionData["variation_id"];
+            final variation = actionData["variation"];
+            final itemNote = actionData["item_note"] ?? "";
+            final overridePrice = actionData["override_price"] ?? 0;
+
+            final List<Map<String, dynamic>> items = [
+              {
+                "product_id": productId,
+                if (variationId != null) "variation_id": variationId,
+                if (variation != null) "variation": variation,
+                "quantity": quantity,
+                "item_note": itemNote,
+                "override_price": overridePrice,
+              }
+            ];
+
+            final response = await addToCart(items: items);
+
+            if (response != null &&
+                (response.statusCode == 200 || response.statusCode == 201)) {
+              await box.delete(key);
+              print("✅ Offline single cart synced (converted to bulk)");
+            }
+          }
+        }
+
+        // 🗑️ Handle offline remove/decrease cart
+        else if (key.toString().startsWith("offline_remove_cart_")) {
+          final productId = actionData["product_id"];
+          final quantity = actionData["quantity"] ?? 1;
+
+          for (int i = 0; i < quantity; i++) {
+            final resp = await decreaseCartItem(productId: productId);
+            if (resp == null) {
+              print("⚠️ Still offline, will retry later: $productId");
+              break;
+            }
+          }
+
+          await box.delete(key);
+          print("✅ Offline remove cart item synced: $productId");
+        }
+      } catch (e, stackTrace) {
+        print("⚠️ Failed to sync offline action $key: $e");
+        print("StackTrace: $stackTrace");
       }
     }
   }

@@ -21,7 +21,9 @@ class ConnectivityManager {
       debounce = Timer(Duration(seconds: 2), () async {
         if (await checkInternet()) {
           await CartService().syncOfflineCart();
+          await CartService().syncOfflineCart1();
           await CartService().syncOfflineActions();
+          await CartService().syncOfflineActions1();
           await CartService().syncOfflineUpdate();
           await CartService().syncOfflinePriceUpdate();
           await CartService().syncOfflineAddCustomers();
