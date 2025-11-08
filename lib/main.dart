@@ -42,6 +42,8 @@ Future<void> main() async {
           DeviceOrientation.portraitDown,
         ]
         : <DeviceOrientation>[
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.landscapeRight,
           DeviceOrientation.portraitUp,
           DeviceOrientation.portraitDown,
         ],

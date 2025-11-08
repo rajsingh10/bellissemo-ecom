@@ -1114,7 +1114,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   duration: const Duration(milliseconds: 450),
                 );
               }
-              : null,
+              : () {
+                showCustomErrorSnackbar(
+                  title: "Out of Stock",
+                  message: "${product.name} is not available right now!",
+                );
+              },
       child: Opacity(
         opacity: product.stockStatus == 'instock' ? 1.0 : 0.45,
         child: Card(
@@ -1123,7 +1128,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           color: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(px(16)),
-            side: BorderSide(color: AppColors.border.withOpacity(0.25)),
+            side: BorderSide(color: AppColors.border.withValues(alpha: 0.25)),
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(px(16)),
@@ -1232,29 +1237,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                 ),
                                 SizedBox(width: px(6)),
                                 if (qty > 0)
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: px(10),
-                                      vertical: px(6),
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(
-                                        px(20),
-                                      ),
-                                      border: Border.all(
-                                        color: AppColors.border.withOpacity(
-                                          0.6,
-                                        ),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      qty.toString(), // ALWAYS SHOW
-                                      style: TextStyle(
-                                        fontFamily: FontFamily.semiBold,
-                                        fontSize: sp(13.5),
-                                        color: AppColors.blackColor,
-                                      ),
+                                 Text(
+                                    qty.toString(), // ALWAYS SHOW
+                                    style: TextStyle(
+                                      fontFamily: FontFamily.semiBold,
+                                      fontSize: sp(13.5),
+                                      color: AppColors.blackColor,
                                     ),
                                   ),
 
@@ -1272,18 +1260,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               ],
                             ),
                           if (hasVariations && qty > 0)
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: px(10),
-                                vertical: px(6),
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(px(20)),
-                                border: Border.all(
-                                  color: AppColors.border.withOpacity(0.6),
-                                ),
-                              ),
+                            Padding(
+                              padding:  EdgeInsets.only(right: 1.w),
                               child: Text(
                                 qty.toString(),
                                 style: TextStyle(
@@ -1303,13 +1281,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 if (product.stockStatus != 'instock')
                   Positioned.fill(
                     child: Container(
-                      color: Colors.black.withOpacity(0.55),
+                      color: Colors.black.withValues(alpha: 0.55),
                       // light frost overlay, cleaner UI
                       child: Center(
                         child: Text(
                           "Out of Stock",
                           style: TextStyle(
-                            fontSize: sp(14),
+                            fontSize: sp(16),
                             fontFamily: FontFamily.bold,
                             color: AppColors.whiteColor,
                           ),
@@ -1341,7 +1319,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         decoration: BoxDecoration(
           color:
               onTap == null
-                  ? AppColors.gray.withOpacity(0.25)
+                  ? AppColors.gray.withValues(alpha: 0.25)
                   : AppColors.mainColor,
           shape: BoxShape.circle,
         ),
