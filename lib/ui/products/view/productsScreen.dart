@@ -48,8 +48,8 @@ class ProductsScreen extends StatefulWidget {
 }
 
 class _ProductsScreenState extends State<ProductsScreen> {
-  int itemsPerPage = 4;
-  final List<int> itemsPerPageOptions = [3, 4, 5, 6];
+  int itemsPerPage = 3;
+  List<int> itemsPerPageOptions = [3, 4, 5, 6];
   List<CategoryWiseProductsModal> filteredProducts = [];
   List<CategoryWiseProductsModal> categoryWiseProductsList = [];
   bool isFilter = false;
@@ -71,6 +71,45 @@ class _ProductsScreenState extends State<ProductsScreen> {
       customerName = prefs.getString("customerName");
     });
     loadInitialData();
+  }
+
+  List<int> _optionsFor(Orientation orientation) {
+    if (!isIpad) return [3, 4]; // phone
+    return orientation != Orientation.portrait
+        ? [3, 4, 5, 6] // iPad portrait
+        : [3, 4, 5]; // iPad landscape
+  }
+
+  // NEW: clamp currently selected itemsPerPage to valid list
+  void _ensureValidItemsPerPage(Orientation orientation) {
+    final newOptions = _optionsFor(orientation);
+    if (!_listEquals(newOptions, itemsPerPageOptions)) {
+      itemsPerPageOptions = newOptions;
+
+      if (!itemsPerPageOptions.contains(itemsPerPage)) {
+        // choose the closest allowed value to current selection
+        int closest = itemsPerPageOptions.first;
+        int minDiff = (itemsPerPage - closest).abs();
+        for (final v in itemsPerPageOptions) {
+          final d = (itemsPerPage - v).abs();
+          if (d < minDiff) {
+            minDiff = d;
+            closest = v;
+          }
+        }
+        itemsPerPage = closest;
+      }
+    }
+  }
+
+  // tiny helper
+  bool _listEquals(List<int> a, List<int> b) {
+    if (identical(a, b)) return true;
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
   }
 
   @override
@@ -191,14 +230,16 @@ class _ProductsScreenState extends State<ProductsScreen> {
       builder: (context, orientation) {
         if (_lastOrientation != orientation) {
           _lastOrientation = orientation;
-          // avoid setState during build
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted && itemsPerPage != 4) {
-              setState(() {
-                itemsPerPage = 4; // 👈 force 4 on any rotation
-              });
-            }
+            if (!mounted) return;
+            setState(() {
+              // update options and clamp value safely on orientation change
+              _ensureValidItemsPerPage(orientation);
+            });
           });
+        } else {
+          // first build or unchanged—still ensure options are correct
+          _ensureValidItemsPerPage(orientation);
         }
 
         return Scaffold(
@@ -826,7 +867,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     children: [
                       CarouselSlider(
                         options: CarouselOptions(
-                          height: 25.h,
+                          height: Device.height,
                           viewportFraction: 1,
                           enlargeCenterPage: false,
                           enableInfiniteScroll: false,
@@ -846,85 +887,88 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               );
                             }).toList(),
                       ),
-                      product.variations?.length != 0
-                          ? Container()
-                          : Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  GestureDetector(
-                                    onTap:
-                                        (product.stockStatus == 'instock')
-                                            ? () {
-                                              _removeProductFromCart(product);
-                                            }
-                                            : null,
-                                    child: Container(
-                                      padding:
-                                          isIpad
-                                              ? EdgeInsets.all(1.w)
-                                              : EdgeInsets.all(1.5.w),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.transparent,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
+                      if ((product.variations?.length ?? 0) == 0)
+                        Positioned(
+                          left: 6,
+                          right: 6,
+                          bottom: 6,
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              // Inverse dynamic size
+                              double iconSize =
+                                  (60 + (120 - constraints.maxWidth)) * 0.20;
+                              iconSize = iconSize.clamp(
+                                32,
+                                35,
+                              ); // adjust limits as needed
+
+                              return IntrinsicWidth(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    IconButton(
+                                      onPressed:
+                                          (product.stockStatus == "instock")
+                                              ? () => _removeProductFromCart(
+                                                product,
+                                              )
+                                              : null,
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(),
+                                      icon: Icon(
                                         Icons.remove,
-                                        size: isIpad ? 15.sp : 20.sp,
+                                        size: iconSize,
                                         color: AppColors.blackColor,
                                       ),
                                     ),
-                                  ),
-                                  GestureDetector(
-                                    onTap:
-                                        (product.stockStatus == 'instock')
-                                            ? () {
-                                              product.variations?.length == 0
-                                                  ? _addSimpleProductsToCart(
-                                                    product,
-                                                  )
-                                                  : _addVariationProductsToCart(
-                                                    product,
-                                                    product.firstVariation?.id,
-                                                    product
-                                                        .firstVariation
-                                                        ?.varAttributes
-                                                        ?.getKey(),
-                                                    product
-                                                        .firstVariation
-                                                        ?.varAttributes
-                                                        ?.getValue(),
-                                                  );
-                                            }
-                                            : null,
-                                    child: Container(
-                                      padding:
-                                          isIpad
-                                              ? EdgeInsets.all(1.w)
-                                              : EdgeInsets.all(1.5.w),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.transparent,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
+
+                                    IconButton(
+                                      onPressed:
+                                          (product.stockStatus == "instock")
+                                              ? () {
+                                                (product.variations?.length ??
+                                                            0) ==
+                                                        0
+                                                    ? _addSimpleProductsToCart(
+                                                      product,
+                                                    )
+                                                    : _addVariationProductsToCart(
+                                                      product,
+                                                      product
+                                                          .firstVariation
+                                                          ?.id,
+                                                      product
+                                                          .firstVariation
+                                                          ?.varAttributes
+                                                          ?.getKey(),
+                                                      product
+                                                          .firstVariation
+                                                          ?.varAttributes
+                                                          ?.getValue(),
+                                                    );
+                                              }
+                                              : null,
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(),
+                                      icon: Icon(
                                         Icons.add,
-                                        size: isIpad ? 15.sp : 20.sp,
+                                        size: iconSize,
                                         color: AppColors.blackColor,
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ).paddingSymmetric(horizontal: 1.w),
-                              SizedBox(height: 0.5.h),
-                            ],
+                                  ],
+                                ),
+                              );
+                            },
                           ),
-                      if (!(product.stockStatus == 'instock'))
+                        ),
+
+                      if (product.stockStatus != 'instock')
                         Positioned.fill(
                           child: Container(
                             color: Colors.black.withValues(alpha: 0.4),
+                            // <-- fix here
                             child: Center(
                               child: Text(
                                 "Out of Stock",
@@ -937,6 +981,98 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             ),
                           ),
                         ),
+
+                      // product.variations?.length != 0
+                      //     ? Container()
+                      //     : Column(
+                      //       mainAxisAlignment: MainAxisAlignment.end,
+                      //       children: [
+                      //         Row(
+                      //           mainAxisAlignment:
+                      //               MainAxisAlignment.spaceBetween,
+                      //           children: [
+                      //             GestureDetector(
+                      //               onTap:
+                      //                   (product.stockStatus == 'instock')
+                      //                       ? () {
+                      //                         _removeProductFromCart(product);
+                      //                       }
+                      //                       : null,
+                      //               child: Container(
+                      //                 padding:
+                      //                     isIpad
+                      //                         ? EdgeInsets.all(1.w)
+                      //                         : EdgeInsets.all(1.5.w),
+                      //                 decoration: const BoxDecoration(
+                      //                   color: Colors.transparent,
+                      //                   shape: BoxShape.circle,
+                      //                 ),
+                      //                 child: Icon(
+                      //                   Icons.remove,
+                      //                   size: isIpad ? 15.sp : 20.sp,
+                      //                   color: AppColors.blackColor,
+                      //                 ),
+                      //               ),
+                      //             ),
+                      //             GestureDetector(
+                      //               onTap:
+                      //                   (product.stockStatus == 'instock')
+                      //                       ? () {
+                      //                         product.variations?.length == 0
+                      //                             ? _addSimpleProductsToCart(
+                      //                               product,
+                      //                             )
+                      //                             : _addVariationProductsToCart(
+                      //                               product,
+                      //                               product.firstVariation?.id,
+                      //                               product
+                      //                                   .firstVariation
+                      //                                   ?.varAttributes
+                      //                                   ?.getKey(),
+                      //                               product
+                      //                                   .firstVariation
+                      //                                   ?.varAttributes
+                      //                                   ?.getValue(),
+                      //                             );
+                      //                       }
+                      //                       : null,
+                      //               child: Container(
+                      //                 padding:
+                      //                     isIpad
+                      //                         ? EdgeInsets.all(1.w)
+                      //                         : EdgeInsets.all(1.5.w),
+                      //                 decoration: const BoxDecoration(
+                      //                   color: Colors.transparent,
+                      //                   shape: BoxShape.circle,
+                      //                 ),
+                      //                 child: Icon(
+                      //                   Icons.add,
+                      //                   size: isIpad ? 15.sp : 20.sp,
+                      //                   color: AppColors.blackColor,
+                      //                 ),
+                      //               ),
+                      //             ),
+                      //           ],
+                      //         ).paddingSymmetric(horizontal: 1.w),
+                      //         SizedBox(height: 0.5.h),
+                      //       ],
+                      //     ),
+                      // if (!(product.stockStatus == 'instock'))
+                      //   Positioned.fill(
+                      //     child: Container(
+                      //       color: Colors.black.withValues(alpha: 0.4),
+                      //       child: Center(
+                      //         child: Text(
+                      //           "Out of Stock",
+                      //           style: TextStyle(
+                      //             fontSize: 14.sp,
+                      //             fontFamily: FontFamily.bold,
+                      //             color: Colors.white,
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ),
                     ],
                   ),
                 ),
