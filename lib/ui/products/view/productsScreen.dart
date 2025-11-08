@@ -824,7 +824,280 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   bool isIpad = 100.w >= 800;
 
-  Widget _buildGridItem(CategoryWiseProductsModal product) {
+  // Widget _buildGridItem(CategoryWiseProductsModal product) {
+  //   return InkWell(
+  //     onTap:
+  //         product.stockStatus == 'instock'
+  //             ? () {
+  //               Get.to(
+  //                 () => ProductDetailsScreen(
+  //                   productId: product.id.toString(),
+  //                   isVariation: product.variations?.length != 0,
+  //                   id: widget.id,
+  //                   cate: widget.cate,
+  //                   slug: widget.slug,
+  //                 ),
+  //                 transition: Transition.leftToRightWithFade,
+  //                 duration: const Duration(milliseconds: 450),
+  //               );
+  //             }
+  //             : () {
+  //               showCustomErrorSnackbar(
+  //                 title: "Out of Stock",
+  //                 message: "${product.name} is not available right now!",
+  //               );
+  //             },
+  //     child: Opacity(
+  //       opacity: product.stockStatus == 'instock' ? 1.0 : 0.4,
+  //       child: Card(
+  //         color: AppColors.cardBgColor2,
+  //         elevation: 3,
+  //         shadowColor: Colors.black45,
+  //         shape: RoundedRectangleBorder(
+  //           side: BorderSide(color: AppColors.border),
+  //           borderRadius: BorderRadius.circular(20),
+  //         ),
+  //         child: Column(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             // Product Image
+  //             Expanded(
+  //               child: ClipRRect(
+  //                 borderRadius: const BorderRadius.vertical(
+  //                   top: Radius.circular(20),
+  //                 ),
+  //                 child: Stack(
+  //                   children: [
+  //                     CarouselSlider(
+  //                       options: CarouselOptions(
+  //                         height: Device.height,
+  //                         viewportFraction: 1,
+  //                         enlargeCenterPage: false,
+  //                         enableInfiniteScroll: false,
+  //                         autoPlay: true,
+  //                       ),
+  //                       items:
+  //                           (product.images ?? []).map((img) {
+  //                             return ClipRRect(
+  //                               borderRadius: BorderRadius.circular(20),
+  //                               child: CustomNetworkImage(
+  //                                 imageUrl: img.src ?? '',
+  //                                 height: double.infinity,
+  //                                 width: double.infinity,
+  //                                 isFit: true,
+  //                                 radius: 20,
+  //                               ),
+  //                             );
+  //                           }).toList(),
+  //                     ),
+  //                     if ((product.variations?.length ?? 0) == 0)
+  //                       Positioned(
+  //                         left: 6,
+  //                         right: 6,
+  //                         bottom: 6,
+  //                         child: LayoutBuilder(
+  //                           builder: (context, constraints) {
+  //                             // Inverse dynamic size
+  //                             double iconSize =
+  //                                 (60 + (120 - constraints.maxWidth)) * 0.20;
+  //                             iconSize = iconSize.clamp(
+  //                               32,
+  //                               35,
+  //                             ); // adjust limits as needed
+  //
+  //                             return IntrinsicWidth(
+  //                               child: Row(
+  //                                 mainAxisAlignment:
+  //                                     MainAxisAlignment.spaceBetween,
+  //                                 children: [
+  //                                   IconButton(
+  //                                     onPressed:
+  //                                         (product.stockStatus == "instock")
+  //                                             ? () => _removeProductFromCart(
+  //                                               product,
+  //                                             )
+  //                                             : null,
+  //                                     padding: EdgeInsets.zero,
+  //                                     constraints: const BoxConstraints(),
+  //                                     icon: Icon(
+  //                                       Icons.remove,
+  //                                       size: iconSize,
+  //                                       color: AppColors.blackColor,
+  //                                     ),
+  //                                   ),
+  //
+  //                                   IconButton(
+  //                                     onPressed:
+  //                                         (product.stockStatus == "instock")
+  //                                             ? () {
+  //                                               (product.variations?.length ??
+  //                                                           0) ==
+  //                                                       0
+  //                                                   ? _addSimpleProductsToCart(
+  //                                                     product,
+  //                                                   )
+  //                                                   : _addVariationProductsToCart(
+  //                                                     product,
+  //                                                     product
+  //                                                         .firstVariation
+  //                                                         ?.id,
+  //                                                     product
+  //                                                         .firstVariation
+  //                                                         ?.varAttributes
+  //                                                         ?.getKey(),
+  //                                                     product
+  //                                                         .firstVariation
+  //                                                         ?.varAttributes
+  //                                                         ?.getValue(),
+  //                                                   );
+  //                                             }
+  //                                             : null,
+  //                                     padding: EdgeInsets.zero,
+  //                                     constraints: const BoxConstraints(),
+  //                                     icon: Icon(
+  //                                       Icons.add,
+  //                                       size: iconSize,
+  //                                       color: AppColors.blackColor,
+  //                                     ),
+  //                                   ),
+  //                                 ],
+  //                               ),
+  //                             );
+  //                           },
+  //                         ),
+  //                       ),
+  //
+  //                     if (product.stockStatus != 'instock')
+  //                       Positioned.fill(
+  //                         child: Container(
+  //                           color: Colors.black.withValues(alpha: 0.4),
+  //                           // <-- fix here
+  //                           child: Center(
+  //                             child: Text(
+  //                               "Out of Stock",
+  //                               style: TextStyle(
+  //                                 fontSize: 14.sp,
+  //                                 fontFamily: FontFamily.bold,
+  //                                 color: Colors.white,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ),
+  //
+  //             // Details
+  //             Padding(
+  //               padding: EdgeInsets.all(2.w),
+  //               child: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   // Title
+  //                   Text(
+  //                     product.name ?? '',
+  //                     style: TextStyle(
+  //                       fontFamily: FontFamily.bold,
+  //                       fontSize: 15.sp,
+  //                       color: AppColors.blackColor,
+  //                     ),
+  //                     maxLines: 1,
+  //                     overflow: TextOverflow.ellipsis,
+  //                   ),
+  //                   SizedBox(height: 0.5.h),
+  //
+  //                   // Pack Size + Price Row
+  //                   product.variations?.length == 0 ||
+  //                           product.variations == null
+  //                       ? Row(
+  //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                         children: [
+  //                           Text(
+  //                             product.packSize == ""
+  //                                 ? 'MOQ : 1'
+  //                                 : 'MOQ : ${product.packSize}',
+  //                             style: TextStyle(
+  //                               fontSize: 14.sp,
+  //                               fontFamily: FontFamily.regular,
+  //                               color: AppColors.gray,
+  //                             ),
+  //                           ),
+  //                           Text(
+  //                             "${product.cartQuantity == 0 || product.cartQuantity == null || product.cartQuantity == "" || product.cartQuantity == "0" ? "" : product.cartQuantity}",
+  //                             style: TextStyle(
+  //                               fontSize: 14.sp,
+  //                               fontFamily: FontFamily.semiBold,
+  //                               color: AppColors.mainColor,
+  //                             ),
+  //                           ),
+  //                         ],
+  //                       )
+  //                       : Row(
+  //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                         children: [
+  //                           Text(
+  //                             'MOQ : ${product.firstVariation?.packSize}',
+  //                             style: TextStyle(
+  //                               fontSize: 14.sp,
+  //                               fontFamily: FontFamily.regular,
+  //                               color: AppColors.gray,
+  //                             ),
+  //                           ),
+  //                           Text(
+  //                             "${product.cartQuantity == 0 || product.cartQuantity == null || product.cartQuantity == "" || product.cartQuantity == "0" ? "" : product.cartQuantity}",
+  //                             style: TextStyle(
+  //                               fontSize: 14.sp,
+  //                               fontFamily: FontFamily.semiBold,
+  //                               color: AppColors.mainColor,
+  //                             ),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                 ],
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  Widget _buildGridItem(
+    CategoryWiseProductsModal product, {
+    double scale = 1.0,
+  }) {
+    final bool hasVariations = (product.variations?.isNotEmpty ?? false);
+    final int qty = int.tryParse(product.cartQuantity?.toString() ?? '0') ?? 0;
+
+    double sp(double v) => v * scale;
+    double px(double v) => v * scale;
+
+    void onAdd() {
+      if (product.stockStatus != "instock") return;
+      if (!hasVariations) {
+        _addSimpleProductsToCart(product);
+      } else {
+        _addVariationProductsToCart(
+          product,
+          product.firstVariation?.id,
+          product.firstVariation?.varAttributes?.getKey(),
+          product.firstVariation?.varAttributes?.getValue(),
+        );
+      }
+    }
+
+    void onRemove() {
+      if (product.stockStatus != "instock") return;
+      _removeProductFromCart(product);
+    }
+
+    final imgs = (product.images ?? []);
+    final safeCount =
+        imgs.isNotEmpty ? imgs.length : 1; // show placeholder if empty
+
     return InkWell(
       onTap:
           product.stockStatus == 'instock'
@@ -832,7 +1105,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 Get.to(
                   () => ProductDetailsScreen(
                     productId: product.id.toString(),
-                    isVariation: product.variations?.length != 0,
+                    isVariation: hasVariations,
                     id: widget.id,
                     cate: widget.cate,
                     slug: widget.slug,
@@ -841,317 +1114,241 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   duration: const Duration(milliseconds: 450),
                 );
               }
-              : () {
-                showCustomErrorSnackbar(
-                  title: "Out of Stock",
-                  message: "${product.name} is not available right now!",
-                );
-              },
+              : null,
       child: Opacity(
-        opacity: product.stockStatus == 'instock' ? 1.0 : 0.4,
+        opacity: product.stockStatus == 'instock' ? 1.0 : 0.45,
         child: Card(
-          color: AppColors.cardBgColor2,
-          elevation: 3,
-          shadowColor: Colors.black45,
+          elevation: 2,
+          shadowColor: Colors.black12,
+          color: Colors.white,
           shape: RoundedRectangleBorder(
-            side: BorderSide(color: AppColors.border),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(px(16)),
+            side: BorderSide(color: AppColors.border.withOpacity(0.25)),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Product Image
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(20),
-                  ),
-                  child: Stack(
-                    children: [
-                      CarouselSlider(
-                        options: CarouselOptions(
-                          height: Device.height,
-                          viewportFraction: 1,
-                          enlargeCenterPage: false,
-                          enableInfiniteScroll: false,
-                          autoPlay: true,
-                        ),
-                        items:
-                            (product.images ?? []).map((img) {
-                              return ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: CustomNetworkImage(
-                                  imageUrl: img.src ?? '',
-                                  height: double.infinity,
-                                  width: double.infinity,
-                                  isFit: true,
-                                  radius: 20,
-                                ),
-                              );
-                            }).toList(),
-                      ),
-                      if ((product.variations?.length ?? 0) == 0)
-                        Positioned(
-                          left: 6,
-                          right: 6,
-                          bottom: 6,
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              // Inverse dynamic size
-                              double iconSize =
-                                  (60 + (120 - constraints.maxWidth)) * 0.20;
-                              iconSize = iconSize.clamp(
-                                32,
-                                35,
-                              ); // adjust limits as needed
-
-                              return IntrinsicWidth(
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    IconButton(
-                                      onPressed:
-                                          (product.stockStatus == "instock")
-                                              ? () => _removeProductFromCart(
-                                                product,
-                                              )
-                                              : null,
-                                      padding: EdgeInsets.zero,
-                                      constraints: const BoxConstraints(),
-                                      icon: Icon(
-                                        Icons.remove,
-                                        size: iconSize,
-                                        color: AppColors.blackColor,
-                                      ),
-                                    ),
-
-                                    IconButton(
-                                      onPressed:
-                                          (product.stockStatus == "instock")
-                                              ? () {
-                                                (product.variations?.length ??
-                                                            0) ==
-                                                        0
-                                                    ? _addSimpleProductsToCart(
-                                                      product,
-                                                    )
-                                                    : _addVariationProductsToCart(
-                                                      product,
-                                                      product
-                                                          .firstVariation
-                                                          ?.id,
-                                                      product
-                                                          .firstVariation
-                                                          ?.varAttributes
-                                                          ?.getKey(),
-                                                      product
-                                                          .firstVariation
-                                                          ?.varAttributes
-                                                          ?.getValue(),
-                                                    );
-                                              }
-                                              : null,
-                                      padding: EdgeInsets.zero,
-                                      constraints: const BoxConstraints(),
-                                      icon: Icon(
-                                        Icons.add,
-                                        size: iconSize,
-                                        color: AppColors.blackColor,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-
-                      if (product.stockStatus != 'instock')
-                        Positioned.fill(
-                          child: Container(
-                            color: Colors.black.withValues(alpha: 0.4),
-                            // <-- fix here
-                            child: Center(
-                              child: Text(
-                                "Out of Stock",
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontFamily: FontFamily.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-
-                      // product.variations?.length != 0
-                      //     ? Container()
-                      //     : Column(
-                      //       mainAxisAlignment: MainAxisAlignment.end,
-                      //       children: [
-                      //         Row(
-                      //           mainAxisAlignment:
-                      //               MainAxisAlignment.spaceBetween,
-                      //           children: [
-                      //             GestureDetector(
-                      //               onTap:
-                      //                   (product.stockStatus == 'instock')
-                      //                       ? () {
-                      //                         _removeProductFromCart(product);
-                      //                       }
-                      //                       : null,
-                      //               child: Container(
-                      //                 padding:
-                      //                     isIpad
-                      //                         ? EdgeInsets.all(1.w)
-                      //                         : EdgeInsets.all(1.5.w),
-                      //                 decoration: const BoxDecoration(
-                      //                   color: Colors.transparent,
-                      //                   shape: BoxShape.circle,
-                      //                 ),
-                      //                 child: Icon(
-                      //                   Icons.remove,
-                      //                   size: isIpad ? 15.sp : 20.sp,
-                      //                   color: AppColors.blackColor,
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             GestureDetector(
-                      //               onTap:
-                      //                   (product.stockStatus == 'instock')
-                      //                       ? () {
-                      //                         product.variations?.length == 0
-                      //                             ? _addSimpleProductsToCart(
-                      //                               product,
-                      //                             )
-                      //                             : _addVariationProductsToCart(
-                      //                               product,
-                      //                               product.firstVariation?.id,
-                      //                               product
-                      //                                   .firstVariation
-                      //                                   ?.varAttributes
-                      //                                   ?.getKey(),
-                      //                               product
-                      //                                   .firstVariation
-                      //                                   ?.varAttributes
-                      //                                   ?.getValue(),
-                      //                             );
-                      //                       }
-                      //                       : null,
-                      //               child: Container(
-                      //                 padding:
-                      //                     isIpad
-                      //                         ? EdgeInsets.all(1.w)
-                      //                         : EdgeInsets.all(1.5.w),
-                      //                 decoration: const BoxDecoration(
-                      //                   color: Colors.transparent,
-                      //                   shape: BoxShape.circle,
-                      //                 ),
-                      //                 child: Icon(
-                      //                   Icons.add,
-                      //                   size: isIpad ? 15.sp : 20.sp,
-                      //                   color: AppColors.blackColor,
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //           ],
-                      //         ).paddingSymmetric(horizontal: 1.w),
-                      //         SizedBox(height: 0.5.h),
-                      //       ],
-                      //     ),
-                      // if (!(product.stockStatus == 'instock'))
-                      //   Positioned.fill(
-                      //     child: Container(
-                      //       color: Colors.black.withValues(alpha: 0.4),
-                      //       child: Center(
-                      //         child: Text(
-                      //           "Out of Stock",
-                      //           style: TextStyle(
-                      //             fontSize: 14.sp,
-                      //             fontFamily: FontFamily.bold,
-                      //             color: Colors.white,
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Details
-              Padding(
-                padding: EdgeInsets.all(2.w),
-                child: Column(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(px(16)),
+            child: Stack(
+              children: [
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title
-                    Text(
-                      product.name ?? '',
-                      style: TextStyle(
-                        fontFamily: FontFamily.bold,
-                        fontSize: 15.sp,
-                        color: AppColors.blackColor,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 0.5.h),
-
-                    // Pack Size + Price Row
-                    product.variations?.length == 0 ||
-                            product.variations == null
-                        ? Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              product.packSize == ""
-                                  ? 'MOQ : 1'
-                                  : 'MOQ : ${product.packSize}',
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                fontFamily: FontFamily.regular,
-                                color: AppColors.gray,
-                              ),
-                            ),
-                            Text(
-                              "${product.cartQuantity == 0 || product.cartQuantity == null || product.cartQuantity == "" || product.cartQuantity == "0" ? "" : product.cartQuantity}",
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                fontFamily: FontFamily.semiBold,
-                                color: AppColors.mainColor,
-                              ),
-                            ),
-                          ],
-                        )
-                        : Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'MOQ : ${product.firstVariation?.packSize}',
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                fontFamily: FontFamily.regular,
-                                color: AppColors.gray,
-                              ),
-                            ),
-                            Text(
-                              "${product.cartQuantity == 0 || product.cartQuantity == null || product.cartQuantity == "" || product.cartQuantity == "0" ? "" : product.cartQuantity}",
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                fontFamily: FontFamily.semiBold,
-                                color: AppColors.mainColor,
-                              ),
-                            ),
-                          ],
+                    // ============== IMAGE SLIDER (square) =================
+                    AspectRatio(
+                      aspectRatio: 1,
+                      child: CarouselSlider.builder(
+                        itemCount:
+                            (product.images?.length ?? 0) > 0
+                                ? product.images!.length
+                                : 1,
+                        options: CarouselOptions(
+                          viewportFraction: 1,
+                          enableInfiniteScroll:
+                              (product.images?.length ?? 0) > 1,
+                          enlargeCenterPage: false,
+                          autoPlay: (product.images?.length ?? 0) > 1,
+                          autoPlayInterval: const Duration(seconds: 4),
                         ),
+                        itemBuilder: (_, i, __) {
+                          final src =
+                              (product.images?.isNotEmpty ?? false)
+                                  ? (product.images![i].src ?? '')
+                                  : '';
+
+                          return ClipRRect(
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(
+                                px(16),
+                              ), // keep top rounded only
+                            ),
+                            child: CustomNetworkImage(
+                              imageUrl: src,
+                              height: double.infinity,
+                              width: double.infinity,
+                              isFit: true,
+                              // ✅ keep full cover
+                              radius: 0, // ✅ avoid inner corner rounding
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    // ================= TITLE =================
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: px(10),
+                        right: px(10),
+                        top: px(8),
+                      ),
+                      child: Text(
+                        product.name ?? '',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontFamily: FontFamily.semiBold,
+                          fontSize: sp(14),
+                          color: AppColors.blackColor,
+                        ),
+                      ),
+                    ),
+
+                    // ============== MOQ + COUNTER =================
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        px(10),
+                        px(6),
+                        px(10),
+                        px(10),
+                      ),
+                      child: Row(
+                        children: [
+                          // LEFT: MOQ TEXT
+                          Expanded(
+                            child: Text(
+                              hasVariations
+                                  ? 'MOQ : ${product.firstVariation?.packSize ?? "-"}'
+                                  : (product.packSize == ""
+                                      ? 'MOQ : 1'
+                                      : 'MOQ : ${product.packSize}'),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: sp(14),
+                                fontFamily: FontFamily.regular,
+                                color: AppColors.blackColor,
+                              ),
+                            ),
+                          ),
+                          if (!hasVariations)
+                            Row(
+                              children: [
+                                _circleBtn(
+                                  icon: Icons.remove,
+                                  onTap:
+                                      product.stockStatus == 'instock'
+                                          ? onRemove
+                                          : null,
+                                  size: px(32),
+                                  iconSize: px(18),
+                                ),
+                                SizedBox(width: px(6)),
+                                if (qty > 0)
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: px(10),
+                                      vertical: px(6),
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(
+                                        px(20),
+                                      ),
+                                      border: Border.all(
+                                        color: AppColors.border.withOpacity(
+                                          0.6,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      qty.toString(), // ALWAYS SHOW
+                                      style: TextStyle(
+                                        fontFamily: FontFamily.semiBold,
+                                        fontSize: sp(13.5),
+                                        color: AppColors.blackColor,
+                                      ),
+                                    ),
+                                  ),
+
+                                if (qty > 0) SizedBox(width: px(6)),
+
+                                _circleBtn(
+                                  icon: Icons.add,
+                                  onTap:
+                                      product.stockStatus == 'instock'
+                                          ? onAdd
+                                          : null,
+                                  size: px(32),
+                                  iconSize: px(18),
+                                ),
+                              ],
+                            ),
+                          if (hasVariations && qty > 0)
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: px(10),
+                                vertical: px(6),
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(px(20)),
+                                border: Border.all(
+                                  color: AppColors.border.withOpacity(0.6),
+                                ),
+                              ),
+                              child: Text(
+                                qty.toString(),
+                                style: TextStyle(
+                                  fontFamily: FontFamily.semiBold,
+                                  fontSize: sp(13.5),
+                                  color: AppColors.blackColor,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-              ),
-            ],
+
+                // OUT OF STOCK veil
+                if (product.stockStatus != 'instock')
+                  Positioned.fill(
+                    child: Container(
+                      color: Colors.black.withOpacity(0.55),
+                      // light frost overlay, cleaner UI
+                      child: Center(
+                        child: Text(
+                          "Out of Stock",
+                          style: TextStyle(
+                            fontSize: sp(14),
+                            fontFamily: FontFamily.bold,
+                            color: AppColors.whiteColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _circleBtn({
+    required IconData icon,
+    required VoidCallback? onTap,
+    double size = 32,
+    double iconSize = 18,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(size / 2),
+      child: Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color:
+              onTap == null
+                  ? AppColors.gray.withOpacity(0.25)
+                  : AppColors.mainColor,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          icon,
+          size: iconSize,
+          color: onTap == null ? AppColors.gray : Colors.white,
         ),
       ),
     );
@@ -1238,9 +1435,59 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
-  Widget buildGroupedGrid(List<CategoryWiseProductsModal> filteredProducts) {
-    final Map<String, List<CategoryWiseProductsModal>> grouped = {};
+  // Widget buildGroupedGrid(List<CategoryWiseProductsModal> filteredProducts) {
+  //   final Map<String, List<CategoryWiseProductsModal>> grouped = {};
+  //
+  //   for (var p in filteredProducts) {
+  //     final key =
+  //         (p.subCategoryName ?? "").trim().isEmpty
+  //             ? "Others"
+  //             : p.subCategoryName!.trim();
+  //     grouped.putIfAbsent(key, () => []).add(p);
+  //   }
+  //
+  //   final sortedGroups =
+  //       grouped.entries.toList()
+  //         ..sort((a, b) => a.key.toLowerCase().compareTo(b.key.toLowerCase()));
+  //
+  //   return ListView.builder(
+  //     shrinkWrap: true,
+  //     physics: const NeverScrollableScrollPhysics(),
+  //     itemCount: sortedGroups.length,
+  //     itemBuilder: (context, index) {
+  //       final subCategory = sortedGroups[index].key;
+  //       final products = sortedGroups[index].value;
+  //
+  //       return Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           GridView.count(
+  //             shrinkWrap: true,
+  //             padding: EdgeInsets.zero,
+  //             physics: const NeverScrollableScrollPhysics(),
+  //             crossAxisCount: itemsPerPage,
+  //             childAspectRatio: 0.75,
+  //             mainAxisSpacing: 1.h,
+  //             crossAxisSpacing: 2.w,
+  //             children: products.map((p) => _buildGridItem(p)).toList(),
+  //           ),
+  //           if (index != sortedGroups.length - 1)
+  //             Padding(
+  //               padding: EdgeInsets.symmetric(vertical: 1.h),
+  //               child: const DashedDivider(
+  //                 height: 1.2,
+  //                 color: AppColors.blueColor, // or AppColors.mainColor
+  //               ),
+  //             ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
+  Widget buildGroupedGrid(List<CategoryWiseProductsModal> filteredProducts) {
+    // group
+    final Map<String, List<CategoryWiseProductsModal>> grouped = {};
     for (var p in filteredProducts) {
       final key =
           (p.subCategoryName ?? "").trim().isEmpty
@@ -1248,41 +1495,71 @@ class _ProductsScreenState extends State<ProductsScreen> {
               : p.subCategoryName!.trim();
       grouped.putIfAbsent(key, () => []).add(p);
     }
-
     final sortedGroups =
         grouped.entries.toList()
           ..sort((a, b) => a.key.toLowerCase().compareTo(b.key.toLowerCase()));
 
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: sortedGroups.length,
-      itemBuilder: (context, index) {
-        final subCategory = sortedGroups[index].key;
-        final products = sortedGroups[index].value;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // grid math
+        const spacing = 12.0;
+        final cross = itemsPerPage;
+        final totalSpacing = spacing * (cross - 1);
+        final colWidth = (constraints.maxWidth - totalSpacing) / cross;
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GridView.count(
-              shrinkWrap: true,
-              padding: EdgeInsets.zero,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: itemsPerPage,
-              childAspectRatio: 0.75,
-              mainAxisSpacing: 1.h,
-              crossAxisSpacing: 2.w,
-              children: products.map((p) => _buildGridItem(p)).toList(),
-            ),
-            if (index != sortedGroups.length - 1)
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 1.h),
-                child: const DashedDivider(
-                  height: 1.2,
-                  color: AppColors.blueColor, // or AppColors.mainColor
+        // scale used by your card
+        final scale = (colWidth / 220.0).clamp(0.75, 1.15);
+
+        double extraTextTitle = 20; // title line height
+        double extraRow = 40; // MOQ + counter row height
+        double extraPaddings = 24; // vertical paddings/margins
+        final double extra =
+            (extraTextTitle + extraRow + extraPaddings) * scale;
+
+        // total height = image (colWidth) + extras
+        final double totalHeight = colWidth + extra;
+
+        // final ratio
+        double childAspectRatio = colWidth / totalHeight;
+
+        // safety clamps (avoid too-short or too-tall tiles)
+        childAspectRatio = childAspectRatio.clamp(0.60, 0.95);
+
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: sortedGroups.length,
+          itemBuilder: (context, index) {
+            final products = sortedGroups[index].value;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GridView.builder(
+                  itemCount: products.length,
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: cross,
+                    crossAxisSpacing: spacing,
+                    mainAxisSpacing: spacing,
+                    childAspectRatio: childAspectRatio, // ✅ dynamic & safe
+                  ),
+                  itemBuilder:
+                      (_, i) => _buildGridItem(products[i], scale: scale),
                 ),
-              ),
-          ],
+                if (index != sortedGroups.length - 1)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: DashedDivider(
+                      height: 1.2,
+                      color: AppColors.blueColor,
+                    ),
+                  ),
+              ],
+            );
+          },
         );
       },
     );

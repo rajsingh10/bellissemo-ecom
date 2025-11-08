@@ -268,9 +268,9 @@ class _CreateCustomerPageState extends State<CreateCustomerPage> {
                             );
                             Get.to(() => CustomersScreen());
                           } else {
-                            Get.snackbar(
-                              "Error",
-                              "Failed to add customer online",
+                            showCustomErrorSnackbar(
+                              title: 'There was an error while adding customer',
+                              message: 'Please try again',
                             );
                           }
                           return;

@@ -19,7 +19,7 @@ import '../../../utils/snackBars.dart';
 import '../../../utils/titlebarWidget.dart';
 import '../modal/fetchCustomersModal.dart';
 import '../provider/customerProvider.dart';
-import 'AddCustomerScreen.dart';
+import 'addCustomerScreen.dart';
 
 class CustomersScreen extends StatefulWidget {
   const CustomersScreen({super.key});
