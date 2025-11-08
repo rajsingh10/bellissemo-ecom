@@ -1,4 +1,6 @@
-import 'dart:math';
+// lib/main.dart
+import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:bellissemo_ecom/services/hiveServices.dart';
 import 'package:bellissemo_ecom/ui/cart/service/cartServices.dart';
@@ -13,10 +15,45 @@ import 'package:sizer/sizer.dart';
 import 'apiCalling/checkInternetModule.dart';
 import 'apiCalling/connectivityManager.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // --- Decide device class BEFORE runApp (iOS requires this to honor orientation) ---
+  final view =
+      ui.PlatformDispatcher.instance.implicitView ??
+      ui.PlatformDispatcher.instance.views.first;
+  final logicalSize = view.physicalSize / view.devicePixelRatio;
+  final diagonal = math.sqrt(
+    logicalSize.width * logicalSize.width +
+        logicalSize.height * logicalSize.height,
+  );
+
+  // Adjust threshold if you prefer a different tablet cutoff.
+  const tabletDiagonalThreshold = 1100.0;
+  final isTablet = diagonal >= tabletDiagonalThreshold;
+
+  // Set orientation ONCE before presenting any UI (avoids UISceneErrorDomain Code=101).
+  await SystemChrome.setPreferredOrientations(
+    isTablet
+        ? <DeviceOrientation>[
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.landscapeRight,
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]
+        : <DeviceOrientation>[
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ],
+  );
+
+  // Optional: keep status/nav bars as normal (no immersive mode changes).
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+  // --- Your startup work ---
   await HiveService().init();
   ConnectivityManager().startListening();
+
   if (await checkInternet()) {
     await CartService().syncOfflineCart();
     await CartService().syncOfflineCart1();
@@ -30,75 +67,8 @@ void main() async {
     await UpdateAddressService().syncOfflineAddress();
     await CartService().syncOfflineOrders();
   }
-  runApp(const OrientationHandler());
-}
 
-class OrientationHandler extends StatefulWidget {
-  const OrientationHandler({super.key});
-
-  @override
-  State<OrientationHandler> createState() => _OrientationHandlerState();
-}
-
-class _OrientationHandlerState extends State<OrientationHandler> {
-  bool _orientationSet = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // Set initial orientation to portrait to avoid layout issues
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_orientationSet) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _setOrientation();
-      });
-    }
-  }
-
-  void _setOrientation() async {
-    final size = MediaQuery.of(context).size;
-    final diagonal = sqrt(size.width * size.width + size.height * size.height);
-
-    print("Display diagonal: $diagonal");
-
-    final isTablet = diagonal >= 1100; // Customize threshold as needed
-    print("Is Tablet: $isTablet");
-
-    if (isTablet) {
-      await SystemChrome.setPreferredOrientations([
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
-      ]);
-    } else {
-      await SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.portraitDown,
-      ]);
-    }
-
-    setState(() {
-      _orientationSet = true;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_orientationSet) {
-      return const MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(body: Center(child: CircularProgressIndicator())),
-      );
-    }
-    return const MyApp();
-  }
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -114,6 +84,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             scaffoldBackgroundColor: Colors.white,
             primarySwatch: Colors.blue,
+            useMaterial3: false, // set true if your app is Material 3-ready
           ),
           home: const GreetingsScreen(),
         );

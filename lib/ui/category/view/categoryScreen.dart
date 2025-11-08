@@ -36,8 +36,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   List<FetchCategoriesModal> filteredCategories = [];
   List<FetchCategoriesModal> categoriesList = [];
 
-  String selectedSort = "A-Z";
-  final List<String> sortOptions = ["A-Z", "Z-A"];
+  String selectedSort = "All";
+  final List<String> sortOptions = ["All", "A-Z", "Z-A"];
 
   final GlobalKey<ScaffoldState> _scaffoldKeyCatalog =
       GlobalKey<ScaffoldState>();
@@ -167,6 +167,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       } else if (selectedSort == "Z-A") {
         filteredCategories.sort((a, b) => b.name!.compareTo(a.name!));
       }
+      // if selectedSort == "All", keep API/cache order
 
       currentPage = 0;
     });

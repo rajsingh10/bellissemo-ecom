@@ -5,7 +5,7 @@ class apiEndpoints {
 
   static String login = "$baseUrl/wp-json/jwt-auth/v1/token";
   static String fetchCategories =
-      "$baseUrl/wp-json/wc/v3/products/categories?parent=0&per_page=100";
+      "$baseUrl/wp-json/custom-wc/v1/all-categories";
   static String profile = "$baseUrl/wp-json/wp/v2/users/me?context=edit";
   static String banners = "$baseUrl/wp-json/wp/v2/banner";
   static String fetchCustomers = "$baseUrl/wp-json/custom-wc/v1/all-customers";

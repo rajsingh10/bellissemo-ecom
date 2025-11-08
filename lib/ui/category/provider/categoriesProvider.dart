@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:bellissemo_ecom/ui/login/modal/loginModal.dart';
@@ -17,6 +18,7 @@ class CategoriesProvider extends ChangeNotifier {
 
   Future<http.Response> fetchCategoriesApi() async {
     String url = apiEndpoints.fetchCategories;
+    log("Catalog Url : $url");
     LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
     String? token = await getSavedLoginToken();
 
@@ -29,7 +31,6 @@ class CategoriesProvider extends ChangeNotifier {
       "Content-Type": "application/json",
       "Accept": "application/json",
     };
-    print(url);
     var responseJson;
     final response = await http
         .get(Uri.parse(url), headers: headers)

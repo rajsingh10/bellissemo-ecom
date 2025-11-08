@@ -46,13 +46,6 @@ class HomeMenuScreen extends StatefulWidget {
 class _HomeMenuScreenState extends State<HomeMenuScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKeyHome2 = GlobalKey<ScaffoldState>();
   final TextEditingController searchController = TextEditingController();
-  final List<String> carouselImages = [
-    'https://www.cultbeauty.co.uk/images?url=https://static.thcdn.com/widgets/257-en/22/original-Hair%26ToolsPromo_Desktop-102922.jpg&format=webp&auto=avif&width=1920&fit=cover',
-    'https://www.lookfantastic.com/images?url=https://static.thcdn.com/widgets/95-en/51/original-0805_1361811_LF_GS_Prada_Paradigme_Bottle_1_NI_1920x600-130351.jpg&format=webp&auto=avif&width=1920&fit=cover',
-    'https://www.shutterstock.com/image-vector/makeup-products-realistic-vector-illustration-600nw-2463029283.jpg',
-    'https://www.shutterstock.com/image-vector/makeup-products-realistic-vector-illustration-600nw-2220636093.jpg',
-    'https://t3.ftcdn.net/jpg/08/58/78/66/360_F_858786633_6Uu7lePeLuTG8NYgrCD9dX6A6l5zA1Da.jpg',
-  ];
 
   bool searchBar = false;
   bool isDrawerOpen = false;
@@ -107,7 +100,6 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
 
     try {
       await Future.wait([
-        _fetchBanner().then((_) => setState(() {})),
         _fetchProfile().then((_) => setState(() {})),
         _fetchCustomers().then(
           (_) => setState(() {
@@ -125,17 +117,8 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
   }
 
   void _loadCachedData() {
-    var bannerBox = HiveService().getBannerBox();
     var profileBox = HiveService().getProfileBox();
     var customerBox = HiveService().getCustomerBox();
-
-    final cachedBanner = bannerBox.get('banner');
-    if (cachedBanner != null) {
-      final List data = json.decode(cachedBanner);
-      bannersList = data.map((e) => BannersModal.fromJson(e)).toList();
-      bannersImagesList =
-          bannersList.map((b) => b.featuredImageUrl ?? '').toList();
-    }
 
     final cachedCustomers = customerBox.get('customers');
     if (cachedCustomers != null) {
@@ -1243,65 +1226,6 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
         ),
       ),
     );
-  }
-
-  Future<void> _fetchBanner() async {
-    var box = HiveService().getBannerBox();
-
-    if (!await checkInternet()) {
-      // Load cached banner if offline
-      final cachedData = box.get('banner');
-      if (cachedData != null) {
-        final List data = json.decode(cachedData);
-        bannersList = data.map((e) => BannersModal.fromJson(e)).toList();
-      } else {
-        showCustomErrorSnackbar(
-          title: 'No Internet',
-          message: 'Please check your connection and try again.',
-        );
-      }
-      return;
-    }
-
-    try {
-      final response = await HomeProvider().fetchBanners();
-      if (response.statusCode == 200) {
-        final List data = json.decode(response.body);
-        bannersList = data.map((e) => BannersModal.fromJson(e)).toList();
-        bannersImagesList =
-            bannersList.map((banner) => banner.featuredImageUrl ?? '').toList();
-        // Save banner to Hive
-        await box.put('banner', response.body);
-      } else {
-        // Fallback: load cache if server fails
-        final cachedData = box.get('banner');
-        if (cachedData != null) {
-          final List data = json.decode(cachedData);
-          bannersList = data.map((e) => BannersModal.fromJson(e)).toList();
-          bannersImagesList =
-              bannersList
-                  .map((banner) => banner.featuredImageUrl ?? '')
-                  .toList();
-        }
-        showCustomErrorSnackbar(
-          title: 'Server Error',
-          message: 'Something went wrong. Please try again later.',
-        );
-      }
-    } catch (_) {
-      // Fallback: load cache on network error
-      final cachedData = box.get('banner');
-      if (cachedData != null) {
-        final List data = json.decode(cachedData);
-        bannersList = data.map((e) => BannersModal.fromJson(e)).toList();
-        bannersImagesList =
-            bannersList.map((banner) => banner.featuredImageUrl ?? '').toList();
-      }
-      showCustomErrorSnackbar(
-        title: 'Network Error',
-        message: 'Unable to connect. Please check your internet and try again.',
-      );
-    }
   }
 
   Future<void> _fetchProfile() async {

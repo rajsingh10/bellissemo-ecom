@@ -115,6 +115,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
   @override
   void initState() {
     super.initState();
+    setState(() {
+      itemsPerPage = isIpad ? 4 : 3;
+    });
     _loadCustomer(); // instead of dummy products
     searchController.addListener(() {
       _filterProducts(searchController.text);

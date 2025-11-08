@@ -54,6 +54,7 @@ class _CreateCustomerPageState extends State<CreateCustomerPage> {
                     title: 'Add Customers',
                     isDrawerEnabled: true,
                     isSearchEnabled: false,
+                    isBackEnabled: true,
                     drawerCallback: () {
                       _scaffoldKeyaddCustomer.currentState?.openDrawer();
                     },

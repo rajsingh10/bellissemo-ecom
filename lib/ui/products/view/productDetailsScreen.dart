@@ -680,7 +680,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                             });
                                           },
                                           child: Container(
-width: cardWidth,
+                                            width: cardWidth,
                                             margin: EdgeInsets.only(
                                               right: marginRight,
                                             ),
@@ -755,9 +755,7 @@ width: cardWidth,
                                                       ),
                                                     ),
 
-                                                SizedBox(
-                                                  height: 0.5.h,
-                                                ),
+                                                SizedBox(height: 0.5.h),
 
                                                 // 🔹 Variant Name
                                                 Text(
@@ -773,17 +771,13 @@ width: cardWidth,
                                                   maxLines: 1,
                                                 ),
 
-                                                SizedBox(
-                                                  height: 0.5.h,
-                                                ),
+                                                SizedBox(height: 0.5.h),
 
                                                 // 🔹 Quantity Section (+ / -)
                                                 Container(
                                                   padding: EdgeInsets.symmetric(
-                                                    horizontal:
-                                                        2.w,
-                                                    vertical:
-                                                        1.h,
+                                                    horizontal: 2.w,
+                                                    vertical: 1.h,
                                                   ),
                                                   decoration: BoxDecoration(
                                                     color: Colors.white,
@@ -794,8 +788,7 @@ width: cardWidth,
                                                     boxShadow: [
                                                       BoxShadow(
                                                         color: Colors.black12,
-                                                        blurRadius:
-                                                          90,
+                                                        blurRadius: 90,
                                                         offset: Offset(
                                                           0,
                                                           screenHeight * 0.002,
@@ -885,10 +878,7 @@ width: cardWidth,
                                                         ),
                                                       ),
 
-                                                      SizedBox(
-                                                        width:
-                                                            2.w
-                                                      ),
+                                                      SizedBox(width: 2.w),
 
                                                       // 🟢 Quantity Text
                                                       Text(
@@ -908,10 +898,7 @@ width: cardWidth,
                                                         ),
                                                       ),
 
-                                                      SizedBox(
-                                                        width:
-                                                            2.w
-                                                      ),
+                                                      SizedBox(width: 2.w),
 
                                                       // ➕ PLUS BUTTON
                                                       GestureDetector(
@@ -1205,8 +1192,7 @@ width: cardWidth,
                                   ),
                                 ),
                               )
-                              :
-                          InkWell(
+                              : InkWell(
                                 onTap: () async {
                                   final discountResult = await Get.dialog<
                                     Map<String, String>

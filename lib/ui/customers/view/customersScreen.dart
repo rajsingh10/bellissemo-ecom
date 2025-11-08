@@ -175,14 +175,86 @@ class _CustomersScreenState extends State<CustomersScreen> {
                   Expanded(
                     child:
                         filteredCustomers.isEmpty
-                            ? Padding(
-                              padding: EdgeInsets.symmetric(
-                                vertical: isIpad ? 2.h : 15.h,
-                              ),
-                              child: emptyWidget(
-                                icon: Icons.people,
-                                text: 'Customers',
-                              ),
+                            ? Column(
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    Get.to(CreateCustomerPage());
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 3.w,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(30),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: Colors.black12,
+                                          blurRadius: 6,
+                                          offset: Offset(0, 3),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          "Add Customer",
+                                          style: TextStyle(
+                                            fontSize: 15.sp,
+                                            fontFamily: FontFamily.semiBold,
+                                            color: AppColors.blackColor,
+                                          ),
+                                        ),
+                                        SizedBox(width: 1.w),
+                                        DropdownButtonHideUnderline(
+                                          child: DropdownButton<String>(
+                                            value: selectedSort,
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            dropdownColor: Colors.white,
+                                            icon: Icon(
+                                              Icons.person,
+                                              color: AppColors.mainColor,
+                                            ),
+                                            items:
+                                                sortOptions
+                                                    .map(
+                                                      (e) => DropdownMenuItem(
+                                                        value: e,
+                                                        child: Text(
+                                                          '',
+                                                          style: TextStyle(
+                                                            fontSize: 15.sp,
+                                                            fontFamily:
+                                                                FontFamily
+                                                                    .semiBold,
+                                                            color:
+                                                                AppColors
+                                                                    .mainColor,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                    .toList(),
+                                            onChanged: null,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: isIpad ? 2.h : 15.h,
+                                  ),
+                                  child: emptyWidget(
+                                    icon: Icons.people,
+                                    text: 'Customers',
+                                  ),
+                                ),
+                              ],
                             )
                             : SingleChildScrollView(
                               physics: const ClampingScrollPhysics(),
