@@ -789,6 +789,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   () => ProductDetailsScreen(
                     productId: product.id.toString(),
                     isVariation: product.variations?.length != 0,
+                    id: widget.id,
+                    cate: widget.cate,
+                    slug: widget.slug,
                   ),
                   transition: Transition.leftToRightWithFade,
                   duration: const Duration(milliseconds: 450),
