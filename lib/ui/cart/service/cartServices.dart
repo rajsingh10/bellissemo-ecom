@@ -104,15 +104,14 @@ class CartService {
       return null;
     }
   }
+
   Future<Response?> addToCart({
     required List<Map<String, dynamic>> items, // 🟢 Accepts multiple items
   }) async {
     final box = HiveService().getAddCartBox();
 
     // 🟢 Create final body for API
-    Map<String, dynamic> body = {
-      "items": items,
-    };
+    Map<String, dynamic> body = {"items": items};
 
     print("📦 Cart Body:\n${prettyPrintJson(body)}");
 
@@ -204,11 +203,13 @@ class CartService {
       }
     }
   }
+
   Future<void> syncOfflineCart() async {
     final box = HiveService().getAddCartBox();
-    final keys = box.keys
-        .where((key) => key.toString().startsWith("offline_cart_"))
-        .toList();
+    final keys =
+        box.keys
+            .where((key) => key.toString().startsWith("offline_cart_"))
+            .toList();
 
     if (keys.isEmpty) return;
 
@@ -224,7 +225,9 @@ class CartService {
 
           if (response != null &&
               (response.statusCode == 200 || response.statusCode == 201)) {
-            log("✅ Offline cart synced successfully → ${body["items"].length} items");
+            log(
+              "✅ Offline cart synced successfully → ${body["items"].length} items",
+            );
             await box.delete(key);
           }
         }
@@ -302,10 +305,11 @@ class CartService {
       }
     }
   }
+
   Future<void> syncOfflineActions() async {
     final box = HiveService().getAddCartBox();
     final keys =
-    box.keys.where((key) => key.toString().startsWith("offline_")).toList();
+        box.keys.where((key) => key.toString().startsWith("offline_")).toList();
 
     if (keys.isEmpty) return;
 
@@ -322,13 +326,12 @@ class CartService {
             print("✅ Offline clear cart synced");
           }
         }
-
         // 🛒 Handle offline cart add/update actions (bulk style)
         else if (key.toString().startsWith("offline_cart_")) {
           if (actionData["items"] != null) {
             // Already stored as bulk "items" list
             final List<Map<String, dynamic>> items =
-            List<Map<String, dynamic>>.from(actionData["items"]);
+                List<Map<String, dynamic>>.from(actionData["items"]);
 
             final response = await addToCart(items: items);
 
@@ -354,7 +357,7 @@ class CartService {
                 "quantity": quantity,
                 "item_note": itemNote,
                 "override_price": overridePrice,
-              }
+              },
             ];
 
             final response = await addToCart(items: items);
@@ -366,7 +369,6 @@ class CartService {
             }
           }
         }
-
         // 🗑️ Handle offline remove/decrease cart
         else if (key.toString().startsWith("offline_remove_cart_")) {
           final productId = actionData["product_id"];

@@ -245,7 +245,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           productDetails?.variations?.length == 0
                               ? Container()
                               :
-
                               // SingleChildScrollView(
                               //   scrollDirection: Axis.horizontal,
                               //   child: Row(
@@ -507,219 +506,350 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               //         }).toList(),
                               //   ),
                               // ),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: productDetails!.allVariations!.map((variant) {
-                                final isSelected = selectedVariant?.id == variant.id;
-                                final variantImage = variant.images!.isNotEmpty
-                                    ? variant.images!.first.src
-                                    : '';
-                                final variantName = variant.attributes?.getValue();
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children:
+                                      productDetails!.allVariations!.map((
+                                        variant,
+                                      ) {
+                                        final isSelected =
+                                            selectedVariant?.id == variant.id;
+                                        final variantImage =
+                                            variant.images!.isNotEmpty
+                                                ? variant.images!.first.src
+                                                : '';
+                                        final variantName =
+                                            variant.attributes?.getValue();
 
-                                // ✅ Default quantity = 0
-                                final int variantQty = (variantQuantities[variant.id] ?? 0).toInt();
+                                        // ✅ Default quantity = 0
+                                        final int variantQty =
+                                            (variantQuantities[variant.id] ?? 0)
+                                                .toInt();
 
-                                return GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      selectedVariant = variant;
-                                      selectedVariationId = variant.id;
-                                      selectedAttributeKey = variant.attributes?.getKey();
-                                      selectedAttributeValue = variant.attributes?.getValue();
-                                      currentPrice = double.tryParse(variant.price ?? '0') ?? 0.0;
+                                        return GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              selectedVariant = variant;
+                                              selectedVariationId = variant.id;
+                                              selectedAttributeKey =
+                                                  variant.attributes?.getKey();
+                                              selectedAttributeValue =
+                                                  variant.attributes
+                                                      ?.getValue();
+                                              currentPrice =
+                                                  double.tryParse(
+                                                    variant.price ?? '0',
+                                                  ) ??
+                                                  0.0;
 
-                                      // Initialize qty if not already in map
-                                      variantQuantities.putIfAbsent(variant.id!, () => 0);
+                                              // Initialize qty if not already in map
+                                              variantQuantities.putIfAbsent(
+                                                variant.id!,
+                                                () => 0,
+                                              );
 
-                                      log('selectedVariationId :: $selectedVariationId');
-                                    });
-                                  },
-                                  child: Container(
-                                    width: isIpad ? 20.w : 130,
-                                    margin: const EdgeInsets.only(right: 10),
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(14),
-                                      border: Border.all(
-                                        color: isSelected ? AppColors.mainColor : Colors.grey.shade300,
-                                        width: isSelected ? 2 : 1,
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black12,
-                                          blurRadius: 5,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        // 🔹 Variant Image
-                                        variantImage!.isNotEmpty
-                                            ? CustomNetworkImage(
-                                          imageUrl: variantImage,
-                                          height: isIpad ? 40.sp : 45,
-                                          width: isIpad ? 40.sp : 45,
-                                          isCircle: true,
-                                          isProfile: false,
-                                          isFit: true,
-                                        )
-                                            : Container(
-                                          width: isIpad ? 40.sp : 45,
-                                          height: isIpad ? 40.sp : 45,
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey.shade200,
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                              color: Colors.grey.shade400,
+                                              log(
+                                                'selectedVariationId :: $selectedVariationId',
+                                              );
+                                            });
+                                          },
+                                          child: Container(
+                                            width: isIpad ? 20.w : 130,
+                                            margin: const EdgeInsets.only(
+                                              right: 10,
+                                            ),
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                              border: Border.all(
+                                                color:
+                                                    isSelected
+                                                        ? AppColors.mainColor
+                                                        : Colors.grey.shade300,
+                                                width: isSelected ? 2 : 1,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black12,
+                                                  blurRadius: 5,
+                                                  offset: const Offset(0, 2),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                // 🔹 Variant Image
+                                                variantImage!.isNotEmpty
+                                                    ? CustomNetworkImage(
+                                                      imageUrl: variantImage,
+                                                      height:
+                                                          isIpad ? 40.sp : 45,
+                                                      width:
+                                                          isIpad ? 40.sp : 45,
+                                                      isCircle: true,
+                                                      isProfile: false,
+                                                      isFit: true,
+                                                    )
+                                                    : Container(
+                                                      width:
+                                                          isIpad ? 40.sp : 45,
+                                                      height:
+                                                          isIpad ? 40.sp : 45,
+                                                      decoration: BoxDecoration(
+                                                        color:
+                                                            Colors
+                                                                .grey
+                                                                .shade200,
+                                                        shape: BoxShape.circle,
+                                                        border: Border.all(
+                                                          color:
+                                                              Colors
+                                                                  .grey
+                                                                  .shade400,
+                                                        ),
+                                                      ),
+                                                      child: const Icon(
+                                                        Icons
+                                                            .image_not_supported,
+                                                        size: 20,
+                                                      ),
+                                                    ),
+
+                                                const SizedBox(height: 6),
+
+                                                // 🔹 Variant Name
+                                                Text(
+                                                  variantName ?? '',
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    fontSize:
+                                                        isIpad ? 15.sp : 13,
+                                                    fontFamily: FontFamily.bold,
+                                                    color: AppColors.blackColor,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                ),
+
+                                                const SizedBox(height: 6),
+
+                                                // 🔹 Quantity Section (+ / -)
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 4,
+                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          30,
+                                                        ),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black12,
+                                                        blurRadius: 4,
+                                                        offset: const Offset(
+                                                          0,
+                                                          2,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      // ➖ MINUS BUTTON
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            int
+                                                            currentPackSize =
+                                                                variantQuantities[variant
+                                                                    .id!] ??
+                                                                0;
+                                                            final int
+                                                            originalPackSize =
+                                                                int.tryParse(
+                                                                  variant.packSize ??
+                                                                      '0',
+                                                                ) ??
+                                                                0;
+
+                                                            // 🧠 Prevent negative values
+                                                            currentPackSize -=
+                                                                originalPackSize;
+                                                            if (currentPackSize <
+                                                                0)
+                                                              currentPackSize =
+                                                                  0;
+
+                                                            // 🟢 Update local map
+                                                            variantQuantities[variant
+                                                                    .id!] =
+                                                                currentPackSize;
+
+                                                            // 🟢 Update cart item JSON
+                                                            addOrUpdateCartItem(
+                                                              productId:
+                                                                  productDetails!
+                                                                      .id!,
+                                                              variationId:
+                                                                  variant.id!,
+                                                              attributeKey:
+                                                                  variant
+                                                                      .attributes
+                                                                      ?.getKey() ??
+                                                                  "attribute_pa_color",
+                                                              attributeValue:
+                                                                  variant
+                                                                      .attributes
+                                                                      ?.getValue() ??
+                                                                  "",
+                                                              quantity:
+                                                                  currentPackSize,
+                                                              overridePrice:
+                                                                  double.tryParse(
+                                                                    variant.price ??
+                                                                        '0',
+                                                                  ) ??
+                                                                  0.0,
+                                                              itemNote:
+                                                                  notesController.text ==
+                                                                              "" ||
+                                                                          notesController.text ==
+                                                                              null
+                                                                      ? ""
+                                                                      : notesController
+                                                                          .text
+                                                                          .trim()
+                                                                          .toString(),
+                                                            );
+                                                          });
+                                                        },
+                                                        child: Icon(
+                                                          Icons.remove,
+                                                          size: 18,
+                                                          color:
+                                                              (variantQuantities[variant
+                                                                              .id!] ??
+                                                                          0) ==
+                                                                      0
+                                                                  ? Colors
+                                                                      .grey // 🔸 Disabled when qty=0
+                                                                  : AppColors
+                                                                      .blackColor,
+                                                        ),
+                                                      ),
+
+                                                      const SizedBox(width: 8),
+
+                                                      // 🟢 Always show current quantity (starting from 0)
+                                                      Text(
+                                                        (variantQuantities[variant
+                                                                    .id!] ??
+                                                                0)
+                                                            .toString(),
+                                                        style: TextStyle(
+                                                          fontSize: 14,
+                                                          fontFamily:
+                                                              FontFamily
+                                                                  .semiBold,
+                                                        ),
+                                                      ),
+
+                                                      const SizedBox(width: 8),
+
+                                                      // ➕ PLUS BUTTON
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            int
+                                                            currentPackSize =
+                                                                variantQuantities[variant
+                                                                    .id!] ??
+                                                                0;
+                                                            final int
+                                                            originalPackSize =
+                                                                int.tryParse(
+                                                                  variant.packSize ??
+                                                                      '0',
+                                                                ) ??
+                                                                0;
+
+                                                            // 🧩 Increment by pack size
+                                                            currentPackSize +=
+                                                                originalPackSize;
+
+                                                            // 🟢 Update local map
+                                                            variantQuantities[variant
+                                                                    .id!] =
+                                                                currentPackSize;
+
+                                                            // 🟢 Update cart
+                                                            addOrUpdateCartItem(
+                                                              productId:
+                                                                  productDetails!
+                                                                      .id!,
+                                                              variationId:
+                                                                  variant.id!,
+                                                              attributeKey:
+                                                                  variant
+                                                                      .attributes
+                                                                      ?.getKey() ??
+                                                                  "attribute_pa_color",
+                                                              attributeValue:
+                                                                  variant
+                                                                      .attributes
+                                                                      ?.getValue() ??
+                                                                  "",
+                                                              quantity:
+                                                                  currentPackSize,
+                                                              overridePrice:
+                                                                  double.tryParse(
+                                                                    variant.price ??
+                                                                        '0',
+                                                                  ) ??
+                                                                  0.0,
+                                                              itemNote:
+                                                                  notesController.text ==
+                                                                              "" ||
+                                                                          notesController.text ==
+                                                                              null
+                                                                      ? ""
+                                                                      : notesController
+                                                                          .text
+                                                                          .trim()
+                                                                          .toString(),
+                                                            );
+                                                          });
+                                                        },
+                                                        child: const Icon(
+                                                          Icons.add,
+                                                          size: 18,
+                                                          color: Colors.black,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          child: const Icon(Icons.image_not_supported, size: 20),
-                                        ),
+                                        );
+                                      }).toList(),
+                                ),
+                              ),
 
-                                        const SizedBox(height: 6),
-
-                                        // 🔹 Variant Name
-                                        Text(
-                                          variantName ?? '',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: isIpad ? 15.sp : 13,
-                                            fontFamily: FontFamily.bold,
-                                            color: AppColors.blackColor,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                        ),
-
-                                        const SizedBox(height: 6),
-
-                                        // 🔹 Quantity Section (+ / -)
-                                        Container(
-                                          padding:
-                                          const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(30),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black12,
-                                                blurRadius: 4,
-                                                offset: const Offset(0, 2),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              // ➖ MINUS BUTTON
-                                              GestureDetector(
-                                                onTap: () {
-                                                  setState(() {
-                                                    int currentPackSize =
-                                                        variantQuantities[variant.id!] ?? 0;
-                                                    final int originalPackSize =
-                                                        int.tryParse(variant.packSize ?? '0') ?? 0;
-
-                                                    // 🧠 Prevent negative values
-                                                    currentPackSize -= originalPackSize;
-                                                    if (currentPackSize < 0) currentPackSize = 0;
-
-                                                    // 🟢 Update local map
-                                                    variantQuantities[variant.id!] = currentPackSize;
-
-                                                    // 🟢 Update cart item JSON
-                                                    addOrUpdateCartItem(
-                                                      productId: productDetails!.id!,
-                                                      variationId: variant.id!,
-                                                      attributeKey:
-                                                      variant.attributes?.getKey() ??
-                                                          "attribute_pa_color",
-                                                      attributeValue:
-                                                      variant.attributes?.getValue() ?? "",
-                                                      quantity: currentPackSize,
-                                                      overridePrice:
-                                                      double.tryParse(variant.price ?? '0') ?? 0.0,
-                                                      itemNote:  notesController.text==""||notesController.text==null?"":notesController.text.trim().toString(),
-                                                    );
-                                                  });
-                                                },
-                                                child: Icon(
-                                                  Icons.remove,
-                                                  size: 18,
-                                                  color: (variantQuantities[variant.id!] ?? 0) == 0
-                                                      ? Colors.grey // 🔸 Disabled when qty=0
-                                                      : AppColors.blackColor,
-                                                ),
-                                              ),
-
-                                              const SizedBox(width: 8),
-
-                                              // 🟢 Always show current quantity (starting from 0)
-                                              Text(
-                                                (variantQuantities[variant.id!] ?? 0).toString(),
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontFamily: FontFamily.semiBold,
-                                                ),
-                                              ),
-
-                                              const SizedBox(width: 8),
-
-                                              // ➕ PLUS BUTTON
-                                              GestureDetector(
-                                                onTap: () {
-                                                  setState(() {
-                                                    int currentPackSize =
-                                                        variantQuantities[variant.id!] ?? 0;
-                                                    final int originalPackSize =
-                                                        int.tryParse(variant.packSize ?? '0') ?? 0;
-
-                                                    // 🧩 Increment by pack size
-                                                    currentPackSize += originalPackSize;
-
-                                                    // 🟢 Update local map
-                                                    variantQuantities[variant.id!] = currentPackSize;
-
-                                                    // 🟢 Update cart
-                                                    addOrUpdateCartItem(
-                                                      productId: productDetails!.id!,
-                                                      variationId: variant.id!,
-                                                      attributeKey:
-                                                      variant.attributes?.getKey() ??
-                                                          "attribute_pa_color",
-                                                      attributeValue:
-                                                      variant.attributes?.getValue() ?? "",
-                                                      quantity: currentPackSize,
-                                                      overridePrice:
-                                                      double.tryParse(variant.price ?? '0') ?? 0.0,
-                                                      itemNote:  notesController.text==""||notesController.text==null?"":notesController.text.trim().toString(),
-                                                    );
-                                                  });
-                                                },
-                                                child: const Icon(
-                                                  Icons.add,
-                                                  size: 18,
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-
-
-                        SizedBox(height: 1.h),
-
+                          SizedBox(height: 1.h),
 
                           productDetails?.variations?.length == 0
                               ? InkWell(
@@ -1288,8 +1418,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               fontsize: 16.sp,
                               iconData: Icons.note,
                               iconsize: 16.sp,
-                              width: 85.w
-
+                              width: 85.w,
                             ),
                           ),
                           SizedBox(height: 1.h),
@@ -1510,14 +1639,26 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                               addOrUpdateCartItem(
                                                 productId: productDetails!.id!,
                                                 variationId: "",
-                                                attributeKey:
-                                                "",
-                                                attributeValue:"",
+                                                attributeKey: "",
+                                                attributeValue: "",
                                                 // variant.attributes?.getValue() ?? "",
                                                 quantity: currentPackSize,
                                                 overridePrice:
-                                                double.tryParse(currentPackSize.toString()) ?? 0.0,
-                                                itemNote:  notesController.text==""||notesController.text==null?"":notesController.text.trim().toString(),
+                                                    double.tryParse(
+                                                      currentPackSize
+                                                          .toString(),
+                                                    ) ??
+                                                    0.0,
+                                                itemNote:
+                                                    notesController.text ==
+                                                                "" ||
+                                                            notesController
+                                                                    .text ==
+                                                                null
+                                                        ? ""
+                                                        : notesController.text
+                                                            .trim()
+                                                            .toString(),
                                               );
                                             });
                                           },
@@ -1637,7 +1778,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   //   }
   // }
   int? originalPackSize;
-// 🟢 Place these at the top of your class (State)
+
+  // 🟢 Place these at the top of your class (State)
 
   List<Map<String, dynamic>> cartItems = [];
 
@@ -1652,7 +1794,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     String? itemNote,
   }) {
     final existingIndex = cartItems.indexWhere(
-          (item) => item['variation_id'] == variationId,
+      (item) => item['variation_id'] == variationId,
     );
 
     if (existingIndex != -1) {
@@ -1756,7 +1898,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
     try {
       final response = await cartService.addToCart(
-        items: cartItems
+        items: cartItems,
         // productId: int.parse(widget.productId ?? ''),
         // variationId: selectedVariationId,
         // variation: {
@@ -1777,7 +1919,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           isAddingToCart = false;
           // quantity = 1;
         });
-
       } else {
         // showCustomSuccessSnackbar(
         //   title: "Offline Mode",
@@ -1907,7 +2048,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
     try {
       final response = await cartService.addToCart1(
-          // items: cartItems
+        // items: cartItems
         productId: int.parse(widget.productId ?? ''),
         quantity: int.parse((productDetails?.packsize).toString()),
         itemNote: notesController.text.trim().toString(),

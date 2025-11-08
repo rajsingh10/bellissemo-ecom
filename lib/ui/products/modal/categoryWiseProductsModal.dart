@@ -40,6 +40,7 @@ class CategoryWiseProductsModal {
   int? shippingClassId;
   bool? reviewsAllowed;
   String? averageRating;
+  String? subCategoryName;
   int? ratingCount;
   int? parentId;
   String? purchaseNote;
@@ -100,6 +101,7 @@ class CategoryWiseProductsModal {
     this.shippingClassId,
     this.reviewsAllowed,
     this.averageRating,
+    this.subCategoryName,
     this.ratingCount,
     this.parentId,
     this.purchaseNote,
@@ -164,6 +166,7 @@ class CategoryWiseProductsModal {
     shippingClassId = json['shipping_class_id'];
     reviewsAllowed = json['reviews_allowed'];
     averageRating = json['average_rating'];
+    subCategoryName = json['sub_category_name'];
     ratingCount = json['rating_count'];
     parentId = json['parent_id'];
     purchaseNote = json['purchase_note'];
@@ -254,6 +257,7 @@ class CategoryWiseProductsModal {
     data['shipping_class_id'] = shippingClassId;
     data['reviews_allowed'] = reviewsAllowed;
     data['average_rating'] = averageRating;
+    data['sub_category_name'] = subCategoryName;
     data['rating_count'] = ratingCount;
     data['parent_id'] = parentId;
     data['purchase_note'] = purchaseNote;
