@@ -626,7 +626,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                                         final cardWidth =
                                             screenWidth *
-                                            (isIpad ? 0.16 : 0.35);
+                                            (isIpad ? 0.25 : 0.35);
                                         final cardHeight =
                                             screenHeight *
                                             (isIpad ? 0.23 : 0.18);
@@ -634,7 +634,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                         final borderRadius =
                                             screenWidth * 0.035;
                                         final fontSize = screenWidth * 0.035;
-                                        final iconSize = screenWidth * 0.045;
+                                        final iconSize = screenWidth * 0.025;
                                         final paddingValue = screenWidth * 0.02;
                                         final marginRight = screenWidth * 0.025;
 
@@ -680,8 +680,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                             });
                                           },
                                           child: Container(
-                                            width: cardWidth,
-                                            height: cardHeight,
+width: cardWidth,
                                             margin: EdgeInsets.only(
                                               right: marginRight,
                                             ),
@@ -723,8 +722,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                                 variantImage!.isNotEmpty
                                                     ? CustomNetworkImage(
                                                       imageUrl: variantImage,
-                                                      height: imageSize,
-                                                      width: imageSize,
+                                                      height: 10.w,
+                                                      width: 10.w,
                                                       isCircle: true,
                                                       isProfile: false,
                                                       isFit: true,
@@ -757,7 +756,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                                     ),
 
                                                 SizedBox(
-                                                  height: screenHeight * 0.008,
+                                                  height: 0.5.h,
                                                 ),
 
                                                 // 🔹 Variant Name
@@ -765,7 +764,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                                   variantName ?? '',
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
-                                                    fontSize: fontSize,
+                                                    fontSize: 15.sp,
                                                     fontFamily: FontFamily.bold,
                                                     color: AppColors.blackColor,
                                                   ),
@@ -775,28 +774,28 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                                 ),
 
                                                 SizedBox(
-                                                  height: screenHeight * 0.01,
+                                                  height: 0.5.h,
                                                 ),
 
                                                 // 🔹 Quantity Section (+ / -)
                                                 Container(
                                                   padding: EdgeInsets.symmetric(
                                                     horizontal:
-                                                        screenWidth * 0.025,
+                                                        2.w,
                                                     vertical:
-                                                        screenHeight * 0.006,
+                                                        1.h,
                                                   ),
                                                   decoration: BoxDecoration(
                                                     color: Colors.white,
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                          screenWidth * 0.07,
+                                                          90,
                                                         ),
                                                     boxShadow: [
                                                       BoxShadow(
                                                         color: Colors.black12,
                                                         blurRadius:
-                                                            screenWidth * 0.02,
+                                                          90,
                                                         offset: Offset(
                                                           0,
                                                           screenHeight * 0.002,
@@ -888,7 +887,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                                                       SizedBox(
                                                         width:
-                                                            screenWidth * 0.02,
+                                                            2.w
                                                       ),
 
                                                       // 🟢 Quantity Text
@@ -899,7 +898,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                                             .toString(),
                                                         style: TextStyle(
                                                           fontSize:
-                                                              fontSize * 0.9,
+                                                              fontSize * 0.5,
                                                           fontFamily:
                                                               FontFamily
                                                                   .semiBold,
@@ -911,7 +910,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                                                       SizedBox(
                                                         width:
-                                                            screenWidth * 0.02,
+                                                            2.w
                                                       ),
 
                                                       // ➕ PLUS BUTTON
@@ -1206,7 +1205,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   ),
                                 ),
                               )
-                              : InkWell(
+                              :
+                          InkWell(
                                 onTap: () async {
                                   final discountResult = await Get.dialog<
                                     Map<String, String>
@@ -1288,71 +1288,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                                           fontsize: 15.sp,
                                                           radius: 12.0,
                                                         ),
-                                                        // CustomButton(
-                                                        //   title:
-                                                        //   "Increase Price",
-                                                        //   route: () async {
-                                                        //     bool increseprice =
-                                                        //     true;
-                                                        //     if (dialogController.text.trim().isEmpty) return;
-                                                        //
-                                                        //     final enteredPrice = int.parse(dialogController.text.trim());
-                                                        //
-                                                        //     // Immediately update locally so UI reflects new price
-                                                        //     setState(() {
-                                                        //       productDetails?.price = enteredPrice.toString();
-                                                        //     });
-                                                        //
-                                                        //     // Save / Sync to backend or offline queue
-                                                        //     await CartService().updateProductPrice(
-                                                        //       price: enteredPrice,
-                                                        //       productId: selectedVariationId,
-                                                        //       userId: int.parse(customerId.toString()),
-                                                        //     );
-                                                        //
-                                                        //     // Cache updated product details (for offline view)
-                                                        //     var box = HiveService().getProductDetailsBox();
-                                                        //     final cachedData = box.get('productDetails${widget.productId}');
-                                                        //     if (cachedData != null) {
-                                                        //       final data = json.decode(cachedData);
-                                                        //       data['price'] = enteredPrice;
-                                                        //       await box.put('productDetails${widget.productId}', json.encode(data));
-                                                        //     }
-                                                        //
-                                                        //     // Close dialogs and refresh UI
-                                                        //     Get.back();
-                                                        //     Get.back();
-                                                        //     Get.offAll(() =>
-                                                        //         ProductDetailsScreen(productId: widget.productId,),
-                                                        //     );
-                                                        //     _fetchProductDetails();
-                                                        //
-                                                        //
-                                                        //     // Get.back();
-                                                        //     // Get.back();
-                                                        //     //
-                                                        // Get.offAll(() =>
-                                                        //     ProductDetailsScreen(productId: widget.productId,),
-                                                        // );
-                                                        //     // _fetchProductDetails();
-                                                        //   },
-                                                        //   color:
-                                                        //   AppColors.mainColor,
-                                                        //   fontcolor:
-                                                        //   AppColors.whiteColor,
-                                                        //   height:
-                                                        //   5.h,
-                                                        //   width:
-                                                        //   40.w,
-                                                        //   fontsize:
-                                                        //   15.sp,
-                                                        //   radius:
-                                                        //   12.0,
-                                                        //   iconData:
-                                                        //   Icons.check,
-                                                        //   iconsize:
-                                                        //   17.sp,
-                                                        // ),
+
                                                         CustomButton(
                                                           title: "Edit Price",
                                                           route: () async {
