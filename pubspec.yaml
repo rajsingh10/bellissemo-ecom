@@ -65,6 +65,7 @@ dependencies:
   hive:
   hive_flutter:
   flutter_html:
+  photo_view:
 
 dev_dependencies:
   flutter_test:

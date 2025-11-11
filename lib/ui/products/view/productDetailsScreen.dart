@@ -10,6 +10,8 @@ import 'package:bellissemo_ecom/utils/customButton.dart';
 import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 import 'package:readmore/readmore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
@@ -139,6 +141,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     });
     loadInitialData();
   }
+  bool isFullScreen = false;
+  int fullScreenIndex = 0;
 
   @override
   void initState() {
@@ -197,11 +201,37 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           ),
                           SizedBox(height: 2.h),
 
-                          ImageSlider(
-                            imageUrls: currentImages,
-                            height: isIpad ? 50.h : 25.h,
-                            autoScroll: false,
+                          // ImageSlider(
+                          //   imageUrls: currentImages,
+                          //   height: isIpad ? 50.h : 25.h,
+                          //   autoScroll: false,
+                          // ),
+                          Stack(
+                            children: [
+                              ImageSlider(
+                                imageUrls: currentImages,
+                                height: isIpad ? 50.h : 25.h,
+                                autoScroll: false,
+                                onImageTap: (index) {
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: true,
+                                    builder: (context) {
+                                      return Dialog(
+                                        backgroundColor: Colors.transparent,
+                                        insetPadding: EdgeInsets.zero, // make dialog truly fullscreen
+                                        child: FullScreenImageDialog(
+                                          images: currentImages,
+                                          initialIndex: index,
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ],
                           ),
+
                           SizedBox(height: 2.h),
 
                           Text(
