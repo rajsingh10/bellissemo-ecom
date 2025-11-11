@@ -22,12 +22,12 @@ class AddCustomerModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['email'] = this.email;
-    data['first_name'] = this.firstName;
-    data['last_name'] = this.lastName;
-    data['username'] = this.username;
-    data['password'] = this.password;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['email'] = email;
+    data['first_name'] = firstName;
+    data['last_name'] = lastName;
+    data['username'] = username;
+    data['password'] = password;
     return data;
   }
 }

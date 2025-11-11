@@ -1474,7 +1474,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         title: "Error",
         message: "Something went wrong while adding product.\n$e",
       );
-      print("dssfsdf============>>>>>>>>${stackTrace}");
+      print("dssfsdf============>>>>>>>>$stackTrace");
       setState(() {
         isAddingToCart = false;
       });

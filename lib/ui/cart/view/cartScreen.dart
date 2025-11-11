@@ -1027,13 +1027,13 @@ class _CartScreenState extends State<CartScreen> {
                                                                   // 👇 Dropdown for Amount / Percentage
                                                                   Row(
                                                                     children: [
-                                                                      Container(
+                                                                      SizedBox(
                                                                         width:
                                                                             65.w,
                                                                         child: DropdownButtonFormField<
                                                                           String
                                                                         >(
-                                                                          value:
+                                                                          initialValue:
                                                                               selectedType,
                                                                           items:
                                                                               [

@@ -8,13 +8,13 @@ class PriceUpdateModal {
   PriceUpdateModal.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     message = json['message'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['success'] = this.success;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['success'] = success;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -36,10 +36,10 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['user_id'] = this.userId;
-    data['product_id'] = this.productId;
-    data['price'] = this.price;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['user_id'] = userId;
+    data['product_id'] = productId;
+    data['price'] = price;
     return data;
   }
 }

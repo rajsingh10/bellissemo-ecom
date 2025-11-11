@@ -14,7 +14,7 @@ import '../../cart/service/cartServices.dart';
 import 'customersScreen.dart';
 
 class CreateCustomerPage extends StatefulWidget {
-  const CreateCustomerPage({Key? key}) : super(key: key);
+  const CreateCustomerPage({super.key});
 
   @override
   State<CreateCustomerPage> createState() => _CreateCustomerPageState();

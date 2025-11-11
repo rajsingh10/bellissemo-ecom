@@ -212,31 +212,31 @@ class _ImageSliderState extends State<ImageSlider> {
           children: [
             widget.imageUrls.length == 1
                 ? GestureDetector(
-              onTap: () => widget.onImageTap?.call(0), // ✅ Added
-              child: CustomNetworkImage(
-                imageUrl: widget.imageUrls.first,
-                height: double.infinity,
-                width: double.infinity,
-                isFit: true,
-                radius: 20,
-              ),
-            )
-                : PageView.builder(
-              controller: _pageController,
-              itemCount: widget.imageUrls.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () => widget.onImageTap?.call(index), // ✅ Added
+                  onTap: () => widget.onImageTap?.call(0), // ✅ Added
                   child: CustomNetworkImage(
-                    imageUrl: widget.imageUrls[index],
+                    imageUrl: widget.imageUrls.first,
                     height: double.infinity,
                     width: double.infinity,
                     isFit: true,
                     radius: 20,
                   ),
-                );
-              },
-            ),
+                )
+                : PageView.builder(
+                  controller: _pageController,
+                  itemCount: widget.imageUrls.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () => widget.onImageTap?.call(index), // ✅ Added
+                      child: CustomNetworkImage(
+                        imageUrl: widget.imageUrls[index],
+                        height: double.infinity,
+                        width: double.infinity,
+                        isFit: true,
+                        radius: 20,
+                      ),
+                    );
+                  },
+                ),
             if (widget.imageUrls.length > 1)
               Positioned(
                 bottom: 10,
@@ -257,6 +257,7 @@ class _ImageSliderState extends State<ImageSlider> {
     );
   }
 }
+
 class ImageSlider1 extends StatelessWidget {
   final List<String> imageUrls;
   final double height;
@@ -264,12 +265,12 @@ class ImageSlider1 extends StatelessWidget {
   final Function(int)? onImageTap;
 
   const ImageSlider1({
-    Key? key,
+    super.key,
     required this.imageUrls,
     required this.height,
     this.autoScroll = false,
     this.onImageTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -292,16 +293,15 @@ class ImageSlider1 extends StatelessWidget {
   }
 }
 
-
 class FullScreenImageDialog extends StatefulWidget {
   final List<String> images;
   final int initialIndex;
 
   const FullScreenImageDialog({
-    Key? key,
+    super.key,
     required this.images,
     required this.initialIndex,
-  }) : super(key: key);
+  });
 
   @override
   State<FullScreenImageDialog> createState() => _FullScreenImageDialogState();
@@ -323,7 +323,7 @@ class _FullScreenImageDialogState extends State<FullScreenImageDialog> {
     return Stack(
       children: [
         Container(
-          color: Colors.black,
+          color: AppColors.blackColor.withValues(alpha: 0.2),
           child: PhotoViewGallery.builder(
             itemCount: widget.images.length,
             pageController: _pageController,
@@ -334,7 +334,9 @@ class _FullScreenImageDialogState extends State<FullScreenImageDialog> {
                 maxScale: PhotoViewComputedScale.covered * 2,
               );
             },
-            backgroundDecoration: const BoxDecoration(color: Colors.black),
+            backgroundDecoration: BoxDecoration(
+              color: AppColors.blackColor.withValues(alpha: 0.2),
+            ),
             onPageChanged: (index) => setState(() => currentIndex = index),
           ),
         ),

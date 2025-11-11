@@ -10,8 +10,6 @@ import 'package:bellissemo_ecom/utils/customButton.dart';
 import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:photo_view/photo_view.dart';
-import 'package:photo_view/photo_view_gallery.dart';
 import 'package:readmore/readmore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
@@ -59,6 +57,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   String? selectedAttributeValue;
   bool isAddingToCart = false;
   num currentqty = 0;
+  final ScrollController _detailsScrollCtrl = ScrollController();
 
   String htmlToPlainText(String html) {
     final regex = RegExp(r'<[^>]*>', multiLine: true, caseSensitive: true);
@@ -141,6 +140,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     });
     loadInitialData();
   }
+
   bool isFullScreen = false;
   int fullScreenIndex = 0;
 
@@ -150,6 +150,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     super.initState();
 
     _loadCustomer();
+  }
+
+  @override
+  void dispose() {
+    _detailsScrollCtrl.dispose();
+    notesController.dispose();
+    super.dispose();
   }
 
   @override
@@ -184,1288 +191,1342 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               )
               : Stack(
                 children: [
-                  SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 3.w,
-                        vertical: 0.5.h,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TitleBar(
-                            title: 'Product Details',
-                            isDrawerEnabled: true,
-                            isBackEnabled: true,
-                          ),
-                          SizedBox(height: 2.h),
-
-                          // ImageSlider(
-                          //   imageUrls: currentImages,
-                          //   height: isIpad ? 50.h : 25.h,
-                          //   autoScroll: false,
-                          // ),
-                          Stack(
-                            children: [
-                              ImageSlider(
-                                imageUrls: currentImages,
-                                height: isIpad ? 50.h : 25.h,
-                                autoScroll: false,
-                                onImageTap: (index) {
-                                  showDialog(
-                                    context: context,
-                                    barrierDismissible: true,
-                                    builder: (context) {
-                                      return Dialog(
-                                        backgroundColor: Colors.transparent,
-                                        insetPadding: EdgeInsets.zero, // make dialog truly fullscreen
-                                        child: FullScreenImageDialog(
-                                          images: currentImages,
-                                          initialIndex: index,
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-
-                          SizedBox(height: 2.h),
-
-                          Text(
-                            productDetails?.name ?? '',
-                            style: TextStyle(
-                              fontSize: 18.sp,
-                              fontFamily: FontFamily.bold,
-                              color: AppColors.blackColor,
+                  Scrollbar(
+                    controller: _detailsScrollCtrl,
+                    thumbVisibility: true,
+                    // always show the thumb
+                    trackVisibility: isIpad,
+                    // show track on iPad
+                    interactive: true,
+                    thickness: isIpad ? 8 : 6,
+                    radius: const Radius.circular(12),
+                    child: SingleChildScrollView(
+                      controller: _detailsScrollCtrl,
+                      physics: const BouncingScrollPhysics(),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 3.w,
+                          vertical: 0.5.h,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TitleBar(
+                              title: 'Product Details',
+                              isDrawerEnabled: true,
+                              isBackEnabled: true,
                             ),
-                          ),
-                          SizedBox(height: 1.h),
+                            SizedBox(height: 2.h),
 
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.star,
-                                color: Colors.orange,
-                                size: 20.sp,
-                              ),
-                              SizedBox(width: 1.w),
-                              Text(
-                                '${productDetails?.ratingCount} Ratings',
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontFamily: FontFamily.semiBold,
-                                  color: AppColors.blackColor,
+                            // ImageSlider(
+                            //   imageUrls: currentImages,
+                            //   height: isIpad ? 50.h : 25.h,
+                            //   autoScroll: false,
+                            // ),
+                            Stack(
+                              children: [
+                                ImageSlider(
+                                  imageUrls: currentImages,
+                                  height: isIpad ? 50.h : 25.h,
+                                  autoScroll: false,
+                                  onImageTap: (index) {
+                                    showDialog(
+                                      context: context,
+                                      barrierDismissible: true,
+                                      builder: (context) {
+                                        return Dialog(
+                                          backgroundColor: AppColors.blackColor
+                                              .withValues(alpha: 0.0),
+                                          insetPadding: EdgeInsets.zero,
+                                          // make dialog truly fullscreen
+                                          child: FullScreenImageDialog(
+                                            images: currentImages,
+                                            initialIndex: index,
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
                                 ),
+                              ],
+                            ),
+
+                            SizedBox(height: 2.h),
+
+                            Text(
+                              productDetails?.name ?? '',
+                              style: TextStyle(
+                                fontSize: 18.sp,
+                                fontFamily: FontFamily.bold,
+                                color: AppColors.blackColor,
                               ),
-                            ],
-                          ),
-                          productDetails?.variations?.length == 0
-                              ? Container()
-                              : SizedBox(height: 1.h),
-                          productDetails?.variations?.length == 0
-                              ? Container()
-                              : Text(
-                                "Product Variants :",
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  color: AppColors.gray,
-                                  fontFamily: FontFamily.regular,
+                            ),
+                            SizedBox(height: 1.h),
+
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.star,
+                                  color: Colors.orange,
+                                  size: 20.sp,
                                 ),
-                              ),
-                          productDetails?.variations?.length == 0
-                              ? Container()
-                              : SizedBox(height: 1.h),
+                                SizedBox(width: 1.w),
+                                Text(
+                                  '${productDetails?.ratingCount} Ratings',
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontFamily: FontFamily.semiBold,
+                                    color: AppColors.blackColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            productDetails?.variations?.length == 0
+                                ? Container()
+                                : SizedBox(height: 1.h),
+                            productDetails?.variations?.length == 0
+                                ? Container()
+                                : Text(
+                                  "Product Variants :",
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    color: AppColors.gray,
+                                    fontFamily: FontFamily.regular,
+                                  ),
+                                ),
+                            productDetails?.variations?.length == 0
+                                ? Container()
+                                : SizedBox(height: 1.h),
 
-                          productDetails?.variations?.length == 0
-                              ? Container()
-                              :
+                            productDetails?.variations?.length == 0
+                                ? Container()
+                                : SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children:
+                                        productDetails!.allVariations!.map((
+                                          variant,
+                                        ) {
+                                          final isSelected =
+                                              selectedVariant?.id == variant.id;
+                                          final variantImage =
+                                              variant.images!.isNotEmpty
+                                                  ? variant.images!.first.src
+                                                  : '';
+                                          final variantName =
+                                              variant.attributes?.getValue();
 
-                              SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children:
-                                      productDetails!.allVariations!.map((
-                                        variant,
-                                      ) {
-                                        final isSelected =
-                                            selectedVariant?.id == variant.id;
-                                        final variantImage =
-                                            variant.images!.isNotEmpty
-                                                ? variant.images!.first.src
-                                                : '';
-                                        final variantName =
-                                            variant.attributes?.getValue();
+                                          // ✅ Default quantity = 0
+                                          final int variantQty =
+                                              (variantQuantities[variant.id] ??
+                                                      0)
+                                                  .toInt();
 
-                                        // ✅ Default quantity = 0
-                                        final int variantQty =
-                                            (variantQuantities[variant.id] ?? 0)
-                                                .toInt();
+                                          // ✅ Responsive sizing
+                                          final screenWidth =
+                                              MediaQuery.of(context).size.width;
+                                          final screenHeight =
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.height;
 
-                                        // ✅ Responsive sizing
-                                        final screenWidth =
-                                            MediaQuery.of(context).size.width;
-                                        final screenHeight =
-                                            MediaQuery.of(context).size.height;
+                                          final cardWidth =
+                                              screenWidth *
+                                              (isIpad ? 0.25 : 0.35);
+                                          final cardHeight =
+                                              screenHeight *
+                                              (isIpad ? 0.23 : 0.18);
+                                          final imageSize = cardHeight * 0.45;
+                                          final borderRadius =
+                                              screenWidth * 0.035;
+                                          final fontSize = screenWidth * 0.035;
+                                          final iconSize =
+                                              screenWidth *
+                                              (isIpad ? 0.025 : 0.045);
+                                          final paddingValue =
+                                              screenWidth * 0.02;
+                                          final marginRight =
+                                              screenWidth * 0.025;
 
-                                        final cardWidth =
-                                            screenWidth *
-                                            (isIpad ? 0.25 : 0.35);
-                                        final cardHeight =
-                                            screenHeight *
-                                            (isIpad ? 0.23 : 0.18);
-                                        final imageSize = cardHeight * 0.45;
-                                        final borderRadius =
-                                            screenWidth * 0.035;
-                                        final fontSize = screenWidth * 0.035;
-                                        final iconSize = screenWidth * (isIpad ?0.025:0.045);
-                                        final paddingValue = screenWidth * 0.02;
-                                        final marginRight = screenWidth * 0.025;
+                                          return GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                selectedVariant = variant;
+                                                selectedVariationId =
+                                                    variant.id;
+                                                selectedAttributeKey =
+                                                    variant.attributes
+                                                        ?.getKey();
+                                                selectedAttributeValue =
+                                                    variant.attributes
+                                                        ?.getValue();
 
-                                        return GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              selectedVariant = variant;
-                                              selectedVariationId = variant.id;
-                                              selectedAttributeKey =
-                                                  variant.attributes?.getKey();
-                                              selectedAttributeValue =
-                                                  variant.attributes
-                                                      ?.getValue();
+                                                // ✅ Update current images for ImageSlider
+                                                currentImages =
+                                                    variant.images != null &&
+                                                            variant
+                                                                .images!
+                                                                .isNotEmpty
+                                                        ? variant.images!
+                                                            .map(
+                                                              (img) =>
+                                                                  img.src ?? '',
+                                                            )
+                                                            .where(
+                                                              (e) =>
+                                                                  e.isNotEmpty,
+                                                            )
+                                                            .toList()
+                                                        : [];
 
-                                              // ✅ Update current images for ImageSlider
-                                              currentImages =
-                                                  variant.images != null &&
-                                                          variant
-                                                              .images!
-                                                              .isNotEmpty
-                                                      ? variant.images!
-                                                          .map(
-                                                            (img) =>
-                                                                img.src ?? '',
-                                                          )
-                                                          .where(
-                                                            (e) => e.isNotEmpty,
-                                                          )
-                                                          .toList()
-                                                      : [];
+                                                currentPrice =
+                                                    double.tryParse(
+                                                      variant.price ?? '0',
+                                                    ) ??
+                                                    0.0;
 
-                                              currentPrice =
-                                                  double.tryParse(
-                                                    variant.price ?? '0',
-                                                  ) ??
-                                                  0.0;
-
-                                              // Initialize qty if not already in map
-                                              variantQuantities.putIfAbsent(
-                                                variant.id!,
-                                                () => 0,
-                                              );
-                                            });
-                                          },
-                                          child: Container(
-                                            width: cardWidth,
-                                            margin: EdgeInsets.only(
-                                              right: marginRight,
-                                            ),
-                                            padding: EdgeInsets.all(
-                                              paddingValue,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                    borderRadius,
-                                                  ),
-                                              border: Border.all(
-                                                color:
-                                                    isSelected
-                                                        ? AppColors.mainColor
-                                                        : Colors.grey.shade300,
-                                                width:
-                                                    isSelected
-                                                        ? screenWidth * 0.005
-                                                        : screenWidth * 0.002,
+                                                // Initialize qty if not already in map
+                                                variantQuantities.putIfAbsent(
+                                                  variant.id!,
+                                                  () => 0,
+                                                );
+                                              });
+                                            },
+                                            child: Container(
+                                              width: cardWidth,
+                                              margin: EdgeInsets.only(
+                                                right: marginRight,
                                               ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black12,
-                                                  blurRadius:
-                                                      screenWidth * 0.02,
-                                                  offset: Offset(
-                                                    0,
-                                                    screenHeight * 0.002,
-                                                  ),
+                                              padding: EdgeInsets.all(
+                                                paddingValue,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                      borderRadius,
+                                                    ),
+                                                border: Border.all(
+                                                  color:
+                                                      isSelected
+                                                          ? AppColors.mainColor
+                                                          : Colors
+                                                              .grey
+                                                              .shade300,
+                                                  width:
+                                                      isSelected
+                                                          ? screenWidth * 0.005
+                                                          : screenWidth * 0.002,
                                                 ),
-                                              ],
-                                            ),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                // 🔹 Variant Image
-                                                variantImage!.isNotEmpty
-                                                    ? CustomNetworkImage(
-                                                      imageUrl: variantImage,
-                                                      height: 10.w,
-                                                      width: 10.w,
-                                                      isCircle: true,
-                                                      isProfile: false,
-                                                      isFit: true,
-                                                    )
-                                                    : Container(
-                                                      width: imageSize,
-                                                      height: imageSize,
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            Colors
-                                                                .grey
-                                                                .shade200,
-                                                        shape: BoxShape.circle,
-                                                        border: Border.all(
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black12,
+                                                    blurRadius:
+                                                        screenWidth * 0.02,
+                                                    offset: Offset(
+                                                      0,
+                                                      screenHeight * 0.002,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  // 🔹 Variant Image
+                                                  variantImage!.isNotEmpty
+                                                      ? CustomNetworkImage(
+                                                        imageUrl: variantImage,
+                                                        height: 10.w,
+                                                        width: 10.w,
+                                                        isCircle: true,
+                                                        isProfile: false,
+                                                        isFit: true,
+                                                      )
+                                                      : Container(
+                                                        width: imageSize,
+                                                        height: imageSize,
+                                                        decoration: BoxDecoration(
                                                           color:
                                                               Colors
                                                                   .grey
-                                                                  .shade400,
-                                                          width:
-                                                              screenWidth *
-                                                              0.002,
+                                                                  .shade200,
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          border: Border.all(
+                                                            color:
+                                                                Colors
+                                                                    .grey
+                                                                    .shade400,
+                                                            width:
+                                                                screenWidth *
+                                                                0.002,
+                                                          ),
                                                         ),
-                                                      ),
-                                                      child: Icon(
-                                                        Icons
-                                                            .image_not_supported,
-                                                        size: iconSize,
-                                                        color: Colors.grey,
-                                                      ),
-                                                    ),
-
-                                                SizedBox(height: 0.5.h),
-
-                                                // 🔹 Variant Name
-                                                Text(
-                                                  variantName ?? '',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    fontSize: 15.sp,
-                                                    fontFamily: FontFamily.bold,
-                                                    color: AppColors.blackColor,
-                                                  ),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  maxLines: 1,
-                                                ),
-
-                                                SizedBox(height: 0.5.h),
-
-                                                // 🔹 Quantity Section (+ / -)
-                                                Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                    horizontal: 2.w,
-                                                    vertical: 1.h,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          90,
-                                                        ),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors.black12,
-                                                        blurRadius: 90,
-                                                        offset: Offset(
-                                                          0,
-                                                          screenHeight * 0.002,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      // ➖ MINUS BUTTON
-                                                      GestureDetector(
-                                                        onTap: () {
-                                                          setState(() {
-                                                            int
-                                                            currentPackSize =
-                                                                variantQuantities[variant
-                                                                    .id!] ??
-                                                                0;
-                                                            final int
-                                                            originalPackSize =
-                                                                int.tryParse(
-                                                                  variant.packSize ??
-                                                                      '0',
-                                                                ) ??
-                                                                0;
-
-                                                            currentPackSize -=
-                                                                originalPackSize;
-                                                            if (currentPackSize <
-                                                                0)
-                                                              currentPackSize =
-                                                                  0;
-
-                                                            variantQuantities[variant
-                                                                    .id!] =
-                                                                currentPackSize;
-
-                                                            addOrUpdateCartItem(
-                                                              productId:
-                                                                  productDetails!
-                                                                      .id!,
-                                                              variationId:
-                                                                  variant.id!,
-                                                              attributeKey:
-                                                                  variant
-                                                                      .attributes
-                                                                      ?.getKey() ??
-                                                                  "attribute_pa_color",
-                                                              attributeValue:
-                                                                  variant
-                                                                      .attributes
-                                                                      ?.getValue() ??
-                                                                  "",
-                                                              quantity:
-                                                                  currentPackSize,
-                                                              overridePrice:
-                                                                  double.tryParse(
-                                                                    variant.price ??
-                                                                        '0',
-                                                                  ) ??
-                                                                  0.0,
-                                                              itemNote:
-                                                                  notesController
-                                                                          .text
-                                                                          .isEmpty
-                                                                      ? ""
-                                                                      : notesController
-                                                                          .text
-                                                                          .trim(),
-                                                            );
-                                                          });
-                                                        },
                                                         child: Icon(
-                                                          Icons.remove,
+                                                          Icons
+                                                              .image_not_supported,
                                                           size: iconSize,
-                                                          color:
-                                                              (variantQuantities[variant
-                                                                              .id!] ??
-                                                                          0) ==
-                                                                      0
-                                                                  ? Colors.grey
-                                                                  : AppColors
-                                                                      .blackColor,
+                                                          color: Colors.grey,
                                                         ),
                                                       ),
 
-                                                      SizedBox(width: 2.w),
+                                                  SizedBox(height: 0.5.h),
 
-                                                      // 🟢 Quantity Text
-                                                      Text(
-                                                        (variantQuantities[variant
-                                                                    .id!] ??
-                                                                0)
-                                                            .toString(),
-                                                        style: TextStyle(
-                                                          fontSize:
-                                                              fontSize * (isIpad?0.5:0.75),
-                                                          fontFamily:
-                                                              FontFamily
-                                                                  .semiBold,
-                                                          color:
-                                                              AppColors
-                                                                  .blackColor,
-                                                        ),
-                                                      ),
-
-                                                      SizedBox(width: 2.w),
-
-                                                      // ➕ PLUS BUTTON
-                                                      GestureDetector(
-                                                        onTap: () {
-                                                          setState(() {
-                                                            int
-                                                            currentPackSize =
-                                                                variantQuantities[variant
-                                                                    .id!] ??
-                                                                0;
-                                                            final int
-                                                            originalPackSize =
-                                                                int.tryParse(
-                                                                  variant.packSize ??
-                                                                      '0',
-                                                                ) ??
-                                                                0;
-
-                                                            currentPackSize +=
-                                                                originalPackSize;
-
-                                                            variantQuantities[variant
-                                                                    .id!] =
-                                                                currentPackSize;
-
-                                                            addOrUpdateCartItem(
-                                                              productId:
-                                                                  productDetails!
-                                                                      .id!,
-                                                              variationId:
-                                                                  variant.id!,
-                                                              attributeKey:
-                                                                  variant
-                                                                      .attributes
-                                                                      ?.getKey() ??
-                                                                  "attribute_pa_color",
-                                                              attributeValue:
-                                                                  variant
-                                                                      .attributes
-                                                                      ?.getValue() ??
-                                                                  "",
-                                                              quantity:
-                                                                  currentPackSize,
-                                                              overridePrice:
-                                                                  double.tryParse(
-                                                                    variant.price ??
-                                                                        '0',
-                                                                  ) ??
-                                                                  0.0,
-                                                              itemNote:
-                                                                  notesController
-                                                                          .text
-                                                                          .isEmpty
-                                                                      ? ""
-                                                                      : notesController
-                                                                          .text
-                                                                          .trim(),
-                                                            );
-                                                          });
-                                                        },
-                                                        child: Icon(
-                                                          Icons.add,
-                                                          size: iconSize,
-                                                          color:
-                                                              AppColors
-                                                                  .blackColor,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      }).toList(),
-                                ),
-                              ),
-
-                          SizedBox(height: 1.h),
-
-                          productDetails?.variations?.length == 0
-                              ? InkWell(
-                                onTap: () async {
-                                  final discountResult = await Get.dialog<
-                                    Map<String, String>
-                                  >(
-                                    Dialog(
-                                      backgroundColor: Colors.transparent,
-                                      child: StatefulBuilder(
-                                        builder: (context, setState) {
-                                          final formKey =
-                                              GlobalKey<FormState>();
-                                          TextEditingController
-                                          dialogController =
-                                              TextEditingController();
-                                          String selectedType =
-                                              "Amount"; // 👈 default dropdown value
-
-                                          return IntrinsicWidth(
-                                            stepWidth: 300,
-                                            child: IntrinsicHeight(
-                                              child: Container(
-                                                padding: EdgeInsets.all(16),
-                                                decoration: BoxDecoration(
-                                                  color: AppColors.whiteColor,
-                                                  borderRadius:
-                                                      BorderRadius.circular(15),
-                                                ),
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    Form(
-                                                      key: formKey,
-                                                      child: AppTextField(
-                                                        key: ValueKey(
-                                                          selectedType,
-                                                        ),
-                                                        controller:
-                                                            dialogController,
-                                                        hintText: "Edit Price",
-                                                        text: "Edit Price",
-                                                        isTextavailable: true,
-                                                        textInputType:
-                                                            TextInputType
-                                                                .number,
-                                                        maxline: 1,
-                                                        validator: (value) {
-                                                          if (value != null &&
-                                                              value
-                                                                  .isNotEmpty &&
-                                                              double.tryParse(
-                                                                    value,
-                                                                  ) ==
-                                                                  null) {
-                                                            return "Enter a valid number";
-                                                          }
-                                                          return null;
-                                                        },
-                                                      ),
+                                                  // 🔹 Variant Name
+                                                  Text(
+                                                    variantName ?? '',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontSize: 15.sp,
+                                                      fontFamily:
+                                                          FontFamily.bold,
+                                                      color:
+                                                          AppColors.blackColor,
                                                     ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    maxLines: 1,
+                                                  ),
 
-                                                    SizedBox(height: 24),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        CustomButton(
-                                                          title: "Cancel",
-                                                          route:
-                                                              () => Get.back(),
-                                                          color:
-                                                              AppColors
-                                                                  .containerColor,
-                                                          fontcolor:
-                                                              AppColors
-                                                                  .blackColor,
-                                                          height: 5.h,
-                                                          width: 27.w,
-                                                          fontsize: 15.sp,
-                                                          radius: 12.0,
+                                                  SizedBox(height: 0.5.h),
+
+                                                  // 🔹 Quantity Section (+ / -)
+                                                  Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                          horizontal: 2.w,
+                                                          vertical: 1.h,
                                                         ),
-
-                                                        CustomButton(
-                                                          title: "Edit Price",
-                                                          route: () async {
-                                                            if (dialogController
-                                                                .text
-                                                                .trim()
-                                                                .isEmpty)
-                                                              return;
-
-                                                            final enteredPrice =
-                                                                int.parse(
-                                                                  dialogController
-                                                                      .text
-                                                                      .trim(),
-                                                                );
-
-                                                            // Immediately update locally so UI reflects new price
-                                                            setState(() {
-                                                              productDetails
-                                                                      ?.price =
-                                                                  enteredPrice
-                                                                      .toString();
-                                                            });
-
-                                                            // Save / Sync to backend or offline queue
-                                                            await CartService().updateProductPrice(
-                                                              price:
-                                                                  enteredPrice,
-                                                              productId: int.parse(
-                                                                widget.productId
-                                                                    .toString(),
-                                                              ),
-                                                              userId: int.parse(
-                                                                customerId
-                                                                    .toString(),
-                                                              ),
-                                                            );
-
-                                                            // Cache updated product details (for offline view)
-                                                            var box =
-                                                                HiveService()
-                                                                    .getProductDetailsBox();
-                                                            final cachedData =
-                                                                box.get(
-                                                                  'productDetails${widget.productId}',
-                                                                );
-                                                            if (cachedData !=
-                                                                null) {
-                                                              final data = json
-                                                                  .decode(
-                                                                    cachedData,
-                                                                  );
-                                                              data['price'] =
-                                                                  enteredPrice;
-                                                              await box.put(
-                                                                'productDetails${widget.productId}',
-                                                                json.encode(
-                                                                  data,
-                                                                ),
-                                                              );
-                                                            }
-
-                                                            // Close dialogs and refresh UI
-                                                            Get.back();
-                                                            Get.back();
-                                                            Get.back();
-                                                            Get.to(
-                                                              () => ProductDetailsScreen(
-                                                                productId:
-                                                                    widget
-                                                                        .productId,
-                                                                isVariation:
-                                                                    widget
-                                                                        .isVariation,
-                                                                id: widget.id,
-                                                                cate:
-                                                                    widget.cate,
-                                                                slug:
-                                                                    widget.slug,
-                                                              ),
-                                                            );
-                                                            _fetchProductDetails(); // will use cached data if offline
-                                                          },
-                                                          color:
-                                                              AppColors
-                                                                  .mainColor,
-                                                          fontcolor:
-                                                              AppColors
-                                                                  .whiteColor,
-                                                          height: 5.h,
-                                                          width: 40.w,
-                                                          fontsize: 15.sp,
-                                                          radius: 12.0,
-                                                          iconData: Icons.check,
-                                                          iconsize: 17.sp,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            90,
+                                                          ),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black12,
+                                                          blurRadius: 90,
+                                                          offset: Offset(
+                                                            0,
+                                                            screenHeight *
+                                                                0.002,
+                                                          ),
                                                         ),
                                                       ],
                                                     ),
-                                                  ],
-                                                ),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        // ➖ MINUS BUTTON
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            setState(() {
+                                                              int
+                                                              currentPackSize =
+                                                                  variantQuantities[variant
+                                                                      .id!] ??
+                                                                  0;
+                                                              final int
+                                                              originalPackSize =
+                                                                  int.tryParse(
+                                                                    variant.packSize ??
+                                                                        '0',
+                                                                  ) ??
+                                                                  0;
+
+                                                              currentPackSize -=
+                                                                  originalPackSize;
+                                                              if (currentPackSize <
+                                                                  0) {
+                                                                currentPackSize =
+                                                                    0;
+                                                              }
+
+                                                              variantQuantities[variant
+                                                                      .id!] =
+                                                                  currentPackSize;
+
+                                                              addOrUpdateCartItem(
+                                                                productId:
+                                                                    productDetails!
+                                                                        .id!,
+                                                                variationId:
+                                                                    variant.id!,
+                                                                attributeKey:
+                                                                    variant
+                                                                        .attributes
+                                                                        ?.getKey() ??
+                                                                    "attribute_pa_color",
+                                                                attributeValue:
+                                                                    variant
+                                                                        .attributes
+                                                                        ?.getValue() ??
+                                                                    "",
+                                                                quantity:
+                                                                    currentPackSize,
+                                                                overridePrice:
+                                                                    double.tryParse(
+                                                                      variant.price ??
+                                                                          '0',
+                                                                    ) ??
+                                                                    0.0,
+                                                                itemNote:
+                                                                    notesController
+                                                                            .text
+                                                                            .isEmpty
+                                                                        ? ""
+                                                                        : notesController
+                                                                            .text
+                                                                            .trim(),
+                                                              );
+                                                            });
+                                                          },
+                                                          child: Icon(
+                                                            Icons.remove,
+                                                            size: iconSize,
+                                                            color:
+                                                                (variantQuantities[variant.id!] ??
+                                                                            0) ==
+                                                                        0
+                                                                    ? Colors
+                                                                        .grey
+                                                                    : AppColors
+                                                                        .blackColor,
+                                                          ),
+                                                        ),
+
+                                                        SizedBox(width: 2.w),
+
+                                                        // 🟢 Quantity Text
+                                                        Text(
+                                                          (variantQuantities[variant
+                                                                      .id!] ??
+                                                                  0)
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                            fontSize:
+                                                                fontSize *
+                                                                (isIpad
+                                                                    ? 0.5
+                                                                    : 0.75),
+                                                            fontFamily:
+                                                                FontFamily
+                                                                    .semiBold,
+                                                            color:
+                                                                AppColors
+                                                                    .blackColor,
+                                                          ),
+                                                        ),
+
+                                                        SizedBox(width: 2.w),
+
+                                                        // ➕ PLUS BUTTON
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            setState(() {
+                                                              int
+                                                              currentPackSize =
+                                                                  variantQuantities[variant
+                                                                      .id!] ??
+                                                                  0;
+                                                              final int
+                                                              originalPackSize =
+                                                                  int.tryParse(
+                                                                    variant.packSize ??
+                                                                        '0',
+                                                                  ) ??
+                                                                  0;
+
+                                                              currentPackSize +=
+                                                                  originalPackSize;
+
+                                                              variantQuantities[variant
+                                                                      .id!] =
+                                                                  currentPackSize;
+
+                                                              addOrUpdateCartItem(
+                                                                productId:
+                                                                    productDetails!
+                                                                        .id!,
+                                                                variationId:
+                                                                    variant.id!,
+                                                                attributeKey:
+                                                                    variant
+                                                                        .attributes
+                                                                        ?.getKey() ??
+                                                                    "attribute_pa_color",
+                                                                attributeValue:
+                                                                    variant
+                                                                        .attributes
+                                                                        ?.getValue() ??
+                                                                    "",
+                                                                quantity:
+                                                                    currentPackSize,
+                                                                overridePrice:
+                                                                    double.tryParse(
+                                                                      variant.price ??
+                                                                          '0',
+                                                                    ) ??
+                                                                    0.0,
+                                                                itemNote:
+                                                                    notesController
+                                                                            .text
+                                                                            .isEmpty
+                                                                        ? ""
+                                                                        : notesController
+                                                                            .text
+                                                                            .trim(),
+                                                              );
+                                                            });
+                                                          },
+                                                          child: Icon(
+                                                            Icons.add,
+                                                            size: iconSize,
+                                                            color:
+                                                                AppColors
+                                                                    .blackColor,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           );
-                                        },
-                                      ),
-                                    ),
-                                    barrierDismissible: true,
-                                  );
-                                },
-                                child: Container(
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.edit,
-                                        color: AppColors.mainColor,
-                                      ),
-                                      Text(
-                                        "${productDetails?.currencySymbol ?? ''}${productDetails?.price ?? ''}",
-                                        style: TextStyle(
-                                          fontSize: 20.sp,
-                                          fontFamily: FontFamily.bold,
-                                          color: AppColors.mainColor,
-                                        ),
-                                      ),
-                                    ],
+                                        }).toList(),
                                   ),
                                 ),
-                              )
-                              : InkWell(
-                                onTap: () async {
-                                  final discountResult = await Get.dialog<
-                                    Map<String, String>
-                                  >(
-                                    Dialog(
-                                      backgroundColor: Colors.transparent,
-                                      child: StatefulBuilder(
-                                        builder: (context, setState) {
-                                          final formKey =
-                                              GlobalKey<FormState>();
-                                          TextEditingController
-                                          dialogController =
-                                              TextEditingController();
-                                          String selectedType =
-                                              "Amount"; // 👈 default dropdown value
 
-                                          return IntrinsicWidth(
-                                            stepWidth: 300,
-                                            child: IntrinsicHeight(
-                                              child: Container(
-                                                padding: EdgeInsets.all(16),
-                                                decoration: BoxDecoration(
-                                                  color: AppColors.whiteColor,
-                                                  borderRadius:
-                                                      BorderRadius.circular(15),
-                                                ),
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    Form(
-                                                      key: formKey,
-                                                      child: AppTextField(
-                                                        key: ValueKey(
-                                                          selectedType,
+                            SizedBox(height: 1.h),
+
+                            productDetails?.variations?.length == 0
+                                ? InkWell(
+                                  onTap: () async {
+                                    final discountResult = await Get.dialog<
+                                      Map<String, String>
+                                    >(
+                                      Dialog(
+                                        backgroundColor: Colors.transparent,
+                                        child: StatefulBuilder(
+                                          builder: (context, setState) {
+                                            final formKey =
+                                                GlobalKey<FormState>();
+                                            TextEditingController
+                                            dialogController =
+                                                TextEditingController();
+                                            String selectedType =
+                                                "Amount"; // 👈 default dropdown value
+
+                                            return IntrinsicWidth(
+                                              stepWidth: 300,
+                                              child: IntrinsicHeight(
+                                                child: Container(
+                                                  padding: EdgeInsets.all(16),
+                                                  decoration: BoxDecoration(
+                                                    color: AppColors.whiteColor,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          15,
                                                         ),
-                                                        controller:
-                                                            dialogController,
-                                                        hintText: "Edit Price",
-                                                        text: "Edit Price",
-                                                        isTextavailable: true,
-                                                        textInputType:
-                                                            TextInputType
-                                                                .number,
-                                                        maxline: 1,
-                                                        validator: (value) {
-                                                          if (value != null &&
-                                                              value
-                                                                  .isNotEmpty &&
-                                                              double.tryParse(
-                                                                    value,
-                                                                  ) ==
-                                                                  null) {
-                                                            return "Enter a valid number";
-                                                          }
-                                                          return null;
-                                                        },
-                                                      ),
-                                                    ),
-
-                                                    SizedBox(height: 24),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        CustomButton(
-                                                          title: "Cancel",
-                                                          route:
-                                                              () => Get.back(),
-                                                          color:
-                                                              AppColors
-                                                                  .containerColor,
-                                                          fontcolor:
-                                                              AppColors
-                                                                  .blackColor,
-                                                          height: 5.h,
-                                                          width: 27.w,
-                                                          fontsize: 15.sp,
-                                                          radius: 12.0,
-                                                        ),
-
-                                                        CustomButton(
-                                                          title: "Edit Price",
-                                                          route: () async {
-                                                            if (dialogController
-                                                                .text
-                                                                .trim()
-                                                                .isEmpty)
-                                                              return;
-
-                                                            final enteredPrice =
+                                                  ),
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Form(
+                                                        key: formKey,
+                                                        child: AppTextField(
+                                                          key: ValueKey(
+                                                            selectedType,
+                                                          ),
+                                                          controller:
+                                                              dialogController,
+                                                          hintText:
+                                                              "Edit Price",
+                                                          text: "Edit Price",
+                                                          isTextavailable: true,
+                                                          textInputType:
+                                                              TextInputType
+                                                                  .number,
+                                                          maxline: 1,
+                                                          validator: (value) {
+                                                            if (value != null &&
+                                                                value
+                                                                    .isNotEmpty &&
                                                                 double.tryParse(
-                                                                  dialogController
-                                                                      .text
-                                                                      .trim(),
-                                                                );
-                                                            if (enteredPrice ==
-                                                                null) {
-                                                              showCustomErrorSnackbar(
-                                                                title:
-                                                                    "Invalid Input",
-                                                                message:
-                                                                    "Please enter a valid price.",
-                                                              );
-                                                              return;
+                                                                      value,
+                                                                    ) ==
+                                                                    null) {
+                                                              return "Enter a valid number";
                                                             }
+                                                            return null;
+                                                          },
+                                                        ),
+                                                      ),
 
-                                                            // ✅ Update local UI immediately
-                                                            setState(() {
-                                                              currentPrice =
-                                                                  enteredPrice;
-                                                              if (selectedVariant !=
-                                                                  null) {
-                                                                selectedVariant!
-                                                                        .price =
-                                                                    enteredPrice
-                                                                        .toString();
-                                                              } else {
+                                                      SizedBox(height: 24),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          CustomButton(
+                                                            title: "Cancel",
+                                                            route:
+                                                                () =>
+                                                                    Get.back(),
+                                                            color:
+                                                                AppColors
+                                                                    .containerColor,
+                                                            fontcolor:
+                                                                AppColors
+                                                                    .blackColor,
+                                                            height: 5.h,
+                                                            width: 27.w,
+                                                            fontsize: 15.sp,
+                                                            radius: 12.0,
+                                                          ),
+
+                                                          CustomButton(
+                                                            title: "Edit Price",
+                                                            route: () async {
+                                                              if (dialogController
+                                                                  .text
+                                                                  .trim()
+                                                                  .isEmpty) {
+                                                                return;
+                                                              }
+
+                                                              final enteredPrice =
+                                                                  int.parse(
+                                                                    dialogController
+                                                                        .text
+                                                                        .trim(),
+                                                                  );
+
+                                                              // Immediately update locally so UI reflects new price
+                                                              setState(() {
                                                                 productDetails
                                                                         ?.price =
                                                                     enteredPrice
                                                                         .toString();
-                                                              }
-                                                            });
+                                                              });
 
-                                                            // ✅ Save / Sync (handles both online and offline)
-                                                            await CartService().updateProductPrice(
-                                                              price:
-                                                                  enteredPrice,
-                                                              productId:
-                                                                  selectedVariationId ??
-                                                                  int.parse(
-                                                                    widget
-                                                                        .productId
-                                                                        .toString(),
-                                                                  ),
-                                                              userId: int.parse(
-                                                                customerId
-                                                                    .toString(),
-                                                              ),
-                                                            );
-
-                                                            // ✅ Update cached product details (for offline viewing)
-                                                            var box =
-                                                                HiveService()
-                                                                    .getProductDetailsBox();
-                                                            final cachedData =
-                                                                box.get(
-                                                                  'productDetails${widget.productId}',
-                                                                );
-                                                            if (cachedData !=
-                                                                null) {
-                                                              final data = json
-                                                                  .decode(
-                                                                    cachedData,
-                                                                  );
-
-                                                              // Update base price or variant price in cache
-                                                              if (selectedVariationId !=
-                                                                      null &&
-                                                                  data['all_variations'] !=
-                                                                      null) {
-                                                                for (var variant
-                                                                    in data['all_variations']) {
-                                                                  if (variant['id'] ==
-                                                                      selectedVariationId) {
-                                                                    variant['price'] =
-                                                                        enteredPrice
-                                                                            .toString();
-                                                                  }
-                                                                }
-                                                              } else {
-                                                                data['price'] =
-                                                                    enteredPrice
-                                                                        .toString();
-                                                              }
-
-                                                              await box.put(
-                                                                'productDetails${widget.productId}',
-                                                                json.encode(
-                                                                  data,
+                                                              // Save / Sync to backend or offline queue
+                                                              await CartService().updateProductPrice(
+                                                                price:
+                                                                    enteredPrice,
+                                                                productId: int.parse(
+                                                                  widget
+                                                                      .productId
+                                                                      .toString(),
+                                                                ),
+                                                                userId: int.parse(
+                                                                  customerId
+                                                                      .toString(),
                                                                 ),
                                                               );
-                                                            }
 
-                                                            // ✅ Close dialogs and refresh product data
-                                                            Get.back();
-                                                            Get.back();
-                                                            Get.back();
-                                                            Get.to(
-                                                              () => ProductDetailsScreen(
-                                                                productId:
-                                                                    widget
-                                                                        .productId,
-                                                                isVariation:
-                                                                    widget
-                                                                        .isVariation,
-                                                                id: widget.id,
-                                                                cate:
-                                                                    widget.cate,
-                                                                slug:
-                                                                    widget.slug,
-                                                              ),
-                                                            );
+                                                              // Cache updated product details (for offline view)
+                                                              var box =
+                                                                  HiveService()
+                                                                      .getProductDetailsBox();
+                                                              final cachedData =
+                                                                  box.get(
+                                                                    'productDetails${widget.productId}',
+                                                                  );
+                                                              if (cachedData !=
+                                                                  null) {
+                                                                final data =
+                                                                    json.decode(
+                                                                      cachedData,
+                                                                    );
+                                                                data['price'] =
+                                                                    enteredPrice;
+                                                                await box.put(
+                                                                  'productDetails${widget.productId}',
+                                                                  json.encode(
+                                                                    data,
+                                                                  ),
+                                                                );
+                                                              }
 
-                                                            _fetchProductDetails();
-                                                          },
-                                                          color:
-                                                              AppColors
-                                                                  .mainColor,
-                                                          fontcolor:
-                                                              AppColors
-                                                                  .whiteColor,
-                                                          height: 5.h,
-                                                          width: 40.w,
-                                                          fontsize: 15.sp,
-                                                          radius: 12.0,
-                                                          iconData: Icons.check,
-                                                          iconsize: 17.sp,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
+                                                              // Close dialogs and refresh UI
+                                                              Get.back();
+                                                              Get.back();
+                                                              Get.back();
+                                                              Get.to(
+                                                                () => ProductDetailsScreen(
+                                                                  productId:
+                                                                      widget
+                                                                          .productId,
+                                                                  isVariation:
+                                                                      widget
+                                                                          .isVariation,
+                                                                  id: widget.id,
+                                                                  cate:
+                                                                      widget
+                                                                          .cate,
+                                                                  slug:
+                                                                      widget
+                                                                          .slug,
+                                                                ),
+                                                              );
+                                                              _fetchProductDetails(); // will use cached data if offline
+                                                            },
+                                                            color:
+                                                                AppColors
+                                                                    .mainColor,
+                                                            fontcolor:
+                                                                AppColors
+                                                                    .whiteColor,
+                                                            height: 5.h,
+                                                            width: 40.w,
+                                                            fontsize: 15.sp,
+                                                            radius: 12.0,
+                                                            iconData:
+                                                                Icons.check,
+                                                            iconsize: 17.sp,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    barrierDismissible: true,
-                                  );
-                                },
-                                child: Container(
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.edit,
-                                        color: AppColors.mainColor,
-                                      ),
-                                      Text(
-                                        "${productDetails?.currencySymbol ?? ''}${currentPrice.toStringAsFixed(2)}",
-                                        style: TextStyle(
-                                          fontSize: 20.sp,
-                                          fontFamily: FontFamily.bold,
-                                          color: AppColors.mainColor,
+                                            );
+                                          },
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                          SizedBox(height: 1.h),
-
-                          ReadMoreText(
-                            htmlToPlainText(productDetails?.description ?? ''),
-                            trimLines: 10,
-
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              fontFamily: FontFamily.regular,
-                              color: AppColors.gray,
-                              height: 1.4,
-                            ),
-                            colorClickableText: AppColors.mainColor,
-                            // Color of "Read more/less"
-                            trimMode: TrimMode.Line,
-                            trimCollapsedText: ' Read more',
-                            trimExpandedText: ' Read less',
-                            moreStyle: TextStyle(
-                              fontSize: 16.sp,
-                              fontFamily: FontFamily.regular,
-                              color: AppColors.mainColor,
-                            ),
-                            lessStyle: TextStyle(
-                              fontSize: 16.sp,
-                              fontFamily: FontFamily.regular,
-                              color: AppColors.mainColor,
-                            ),
-                          ),
-                          SizedBox(height: 3.h),
-                          Container(
-                            alignment: Alignment.center,
-                            child: CustomButton(
-                              title: 'Add Note',
-                              route: () {
-                                showItemNotesDialog(context);
-
-                                log(
-                                  'selectedVariationId :: $selectedVariationId',
-                                );
-                              },
-                              color: AppColors.mainColor,
-                              fontcolor: AppColors.whiteColor,
-                              radius: isIpad ? 1.w : 3.w,
-                              height: isIpad ? 7.h : 5.h,
-                              fontsize: 16.sp,
-                              iconData: Icons.note,
-                              iconsize: 16.sp,
-                              width: 85.w,
-                            ),
-                          ),
-                          SizedBox(height: 1.h),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              widget.isVariation == false
-                                  ? Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 3.w,
-                                      vertical: 0.8.h,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(30),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black12,
-                                          blurRadius: 5,
-                                          offset: Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              int currentPackSize =
-                                                  int.tryParse(
-                                                    productDetails?.packsize ??
-                                                        '0',
-                                                  ) ??
-                                                  0;
-
-                                              // If first time, set the original pack size
-                                              originalPackSize ??=
-                                                  currentPackSize;
-
-                                              // Subtract the original pack size (e.g., 6 → 4 → 2)
-                                              currentPackSize -=
-                                                  originalPackSize!;
-
-                                              // Prevent going below 0
-                                              if (currentPackSize <
-                                                  originalPackSize!) {
-                                                currentPackSize =
-                                                    originalPackSize!;
-                                              }
-
-                                              // Update productDetails
-                                              productDetails?.packsize =
-                                                  currentPackSize.toString();
-
-                                              print(
-                                                "Decrement → currentPackSize = $currentPackSize",
-                                              );
-                                            });
-                                          },
-                                          child: CircleAvatar(
-                                            radius: isIpad ? 15.sp : 16,
-                                            backgroundColor: Colors.transparent,
-                                            child: Icon(
-                                              Icons.remove,
-                                              size: 18.sp,
-                                              color: AppColors.blackColor,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(width: 2.w),
-                                        Text(
-                                          productDetails?.packsize ?? '',
-                                          style: TextStyle(
-                                            fontSize: 17.sp,
-                                            fontFamily: FontFamily.semiBold,
-                                          ),
-                                        ),
-                                        SizedBox(width: 2.w),
-                                        GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              print(
-                                                "Before: productDetails?.packsize = ${productDetails?.packsize}",
-                                              );
-
-                                              // Convert current pack size
-                                              int currentPackSize =
-                                                  int.tryParse(
-                                                    productDetails?.packsize ??
-                                                        '0',
-                                                  ) ??
-                                                  0;
-
-                                              // If first time, save original pack size
-                                              originalPackSize ??=
-                                                  currentPackSize;
-
-                                              // Add only the original pack size (e.g., 2 + 2 = 4, then 4 + 2 = 6)
-                                              currentPackSize +=
-                                                  originalPackSize!;
-
-                                              // Update
-                                              productDetails?.packsize =
-                                                  currentPackSize.toString();
-
-                                              print(
-                                                "After: currentPackSize = $currentPackSize",
-                                              );
-                                            });
-                                          },
-
-                                          child: CircleAvatar(
-                                            radius: isIpad ? 15.sp : 16,
-                                            backgroundColor: Colors.transparent,
-                                            child: Icon(
-                                              Icons.add,
-                                              size: 18.sp,
-                                              color: AppColors.blackColor,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                  : productDetails?.variations?.length != 0
-                                  ? Container()
-                                  : Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 3.w,
-                                      vertical: 0.8.h,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(30),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black12,
-                                          blurRadius: 5,
-                                          offset: Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              int currentPackSize =
-                                                  currentqty.toInt();
-
-                                              // If first time, set the original pack size
-                                              originalPackSize ??=
-                                                  currentPackSize;
-
-                                              // Subtract the original pack size (e.g., 6 → 4 → 2)
-                                              currentPackSize -=
-                                                  originalPackSize!;
-
-                                              // Prevent going below 0
-                                              if (currentPackSize <
-                                                  originalPackSize!) {
-                                                currentPackSize =
-                                                    originalPackSize!;
-                                              }
-
-                                              // Update productDetails
-                                              currentqty = currentPackSize;
-
-                                              print(
-                                                "Decrement → currentPackSize = $currentPackSize",
-                                              );
-                                            });
-                                          },
-                                          child: CircleAvatar(
-                                            radius: isIpad ? 15.sp : 16,
-                                            backgroundColor: Colors.transparent,
-                                            child: Icon(
-                                              Icons.remove,
-                                              size: 18.sp,
-                                              color: AppColors.blackColor,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(width: 2.w),
-                                        Text(
-                                          currentqty.toString(),
-                                          style: TextStyle(
-                                            fontSize: 17.sp,
-                                            fontFamily: FontFamily.semiBold,
-                                          ),
-                                        ),
-                                        SizedBox(width: 2.w),
-                                        GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              print(
-                                                "Before: productDetails?.packsize = ${productDetails?.packsize}",
-                                              );
-
-                                              // Convert current pack size
-                                              int currentPackSize =
-                                                  currentqty.toInt();
-
-                                              // If first time, save original pack size
-                                              originalPackSize ??=
-                                                  currentPackSize;
-
-                                              // Add only the original pack size (e.g., 2 + 2 = 4, then 4 + 2 = 6)
-                                              currentPackSize +=
-                                                  originalPackSize!;
-
-                                              // Update
-                                              currentqty = currentPackSize;
-
-                                              print(
-                                                "After: currentPackSize = $currentPackSize",
-                                              );
-                                              addOrUpdateCartItem(
-                                                productId: productDetails!.id!,
-                                                variationId: "",
-                                                attributeKey: "",
-                                                attributeValue: "",
-                                                // variant.attributes?.getValue() ?? "",
-                                                quantity: currentPackSize,
-                                                overridePrice:
-                                                    double.tryParse(
-                                                      currentPackSize
-                                                          .toString(),
-                                                    ) ??
-                                                    0.0,
-                                                itemNote:
-                                                    notesController.text ==
-                                                                "" ||
-                                                            notesController
-                                                                    .text ==
-                                                                null
-                                                        ? ""
-                                                        : notesController.text
-                                                            .trim()
-                                                            .toString(),
-                                              );
-                                            });
-                                          },
-
-                                          child: CircleAvatar(
-                                            radius: isIpad ? 15.sp : 16,
-                                            backgroundColor: Colors.transparent,
-                                            child: Icon(
-                                              Icons.add,
-                                              size: 18.sp,
-                                              color: AppColors.blackColor,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                              SizedBox(width: 4.w),
-                              Expanded(
-                                child: CustomButton(
-                                  title: 'Add to cart',
-                                  route: () {
-                                    productDetails?.variations?.length == 0
-                                        ? _addSimpleProductsToCart()
-                                        : _addVariationProductsToCart();
-                                    // Get.back();
-
-                                    log(
-                                      'selectedVariationId :: $selectedVariationId',
+                                      barrierDismissible: true,
                                     );
                                   },
-                                  color: AppColors.mainColor,
-                                  fontcolor: AppColors.whiteColor,
-                                  radius: isIpad ? 1.w : 3.w,
-                                  height: isIpad ? 7.h : 5.h,
-                                  fontsize: 16.sp,
-                                  iconData: Icons.shopping_cart_outlined,
-                                  iconsize: 16.sp,
-                                ),
-                              ),
+                                  child: Container(
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.edit,
+                                          color: AppColors.mainColor,
+                                        ),
+                                        Text(
+                                          "${productDetails?.currencySymbol ?? ''}${productDetails?.price ?? ''}",
+                                          style: TextStyle(
+                                            fontSize: 20.sp,
+                                            fontFamily: FontFamily.bold,
+                                            color: AppColors.mainColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                                : InkWell(
+                                  onTap: () async {
+                                    final discountResult = await Get.dialog<
+                                      Map<String, String>
+                                    >(
+                                      Dialog(
+                                        backgroundColor: Colors.transparent,
+                                        child: StatefulBuilder(
+                                          builder: (context, setState) {
+                                            final formKey =
+                                                GlobalKey<FormState>();
+                                            TextEditingController
+                                            dialogController =
+                                                TextEditingController();
+                                            String selectedType =
+                                                "Amount"; // 👈 default dropdown value
 
-                              SizedBox(width: 4.w),
-                            ],
-                          ),
-                          SizedBox(height: 5.h),
-                        ],
+                                            return IntrinsicWidth(
+                                              stepWidth: 300,
+                                              child: IntrinsicHeight(
+                                                child: Container(
+                                                  padding: EdgeInsets.all(16),
+                                                  decoration: BoxDecoration(
+                                                    color: AppColors.whiteColor,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          15,
+                                                        ),
+                                                  ),
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Form(
+                                                        key: formKey,
+                                                        child: AppTextField(
+                                                          key: ValueKey(
+                                                            selectedType,
+                                                          ),
+                                                          controller:
+                                                              dialogController,
+                                                          hintText:
+                                                              "Edit Price",
+                                                          text: "Edit Price",
+                                                          isTextavailable: true,
+                                                          textInputType:
+                                                              TextInputType
+                                                                  .number,
+                                                          maxline: 1,
+                                                          validator: (value) {
+                                                            if (value != null &&
+                                                                value
+                                                                    .isNotEmpty &&
+                                                                double.tryParse(
+                                                                      value,
+                                                                    ) ==
+                                                                    null) {
+                                                              return "Enter a valid number";
+                                                            }
+                                                            return null;
+                                                          },
+                                                        ),
+                                                      ),
+
+                                                      SizedBox(height: 24),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          CustomButton(
+                                                            title: "Cancel",
+                                                            route:
+                                                                () =>
+                                                                    Get.back(),
+                                                            color:
+                                                                AppColors
+                                                                    .containerColor,
+                                                            fontcolor:
+                                                                AppColors
+                                                                    .blackColor,
+                                                            height: 5.h,
+                                                            width: 27.w,
+                                                            fontsize: 15.sp,
+                                                            radius: 12.0,
+                                                          ),
+
+                                                          CustomButton(
+                                                            title: "Edit Price",
+                                                            route: () async {
+                                                              if (dialogController
+                                                                  .text
+                                                                  .trim()
+                                                                  .isEmpty) {
+                                                                return;
+                                                              }
+
+                                                              final enteredPrice =
+                                                                  double.tryParse(
+                                                                    dialogController
+                                                                        .text
+                                                                        .trim(),
+                                                                  );
+                                                              if (enteredPrice ==
+                                                                  null) {
+                                                                showCustomErrorSnackbar(
+                                                                  title:
+                                                                      "Invalid Input",
+                                                                  message:
+                                                                      "Please enter a valid price.",
+                                                                );
+                                                                return;
+                                                              }
+
+                                                              // ✅ Update local UI immediately
+                                                              setState(() {
+                                                                currentPrice =
+                                                                    enteredPrice;
+                                                                if (selectedVariant !=
+                                                                    null) {
+                                                                  selectedVariant!
+                                                                          .price =
+                                                                      enteredPrice
+                                                                          .toString();
+                                                                } else {
+                                                                  productDetails
+                                                                          ?.price =
+                                                                      enteredPrice
+                                                                          .toString();
+                                                                }
+                                                              });
+
+                                                              // ✅ Save / Sync (handles both online and offline)
+                                                              await CartService().updateProductPrice(
+                                                                price:
+                                                                    enteredPrice,
+                                                                productId:
+                                                                    selectedVariationId ??
+                                                                    int.parse(
+                                                                      widget
+                                                                          .productId
+                                                                          .toString(),
+                                                                    ),
+                                                                userId: int.parse(
+                                                                  customerId
+                                                                      .toString(),
+                                                                ),
+                                                              );
+
+                                                              // ✅ Update cached product details (for offline viewing)
+                                                              var box =
+                                                                  HiveService()
+                                                                      .getProductDetailsBox();
+                                                              final cachedData =
+                                                                  box.get(
+                                                                    'productDetails${widget.productId}',
+                                                                  );
+                                                              if (cachedData !=
+                                                                  null) {
+                                                                final data =
+                                                                    json.decode(
+                                                                      cachedData,
+                                                                    );
+
+                                                                // Update base price or variant price in cache
+                                                                if (selectedVariationId !=
+                                                                        null &&
+                                                                    data['all_variations'] !=
+                                                                        null) {
+                                                                  for (var variant
+                                                                      in data['all_variations']) {
+                                                                    if (variant['id'] ==
+                                                                        selectedVariationId) {
+                                                                      variant['price'] =
+                                                                          enteredPrice
+                                                                              .toString();
+                                                                    }
+                                                                  }
+                                                                } else {
+                                                                  data['price'] =
+                                                                      enteredPrice
+                                                                          .toString();
+                                                                }
+
+                                                                await box.put(
+                                                                  'productDetails${widget.productId}',
+                                                                  json.encode(
+                                                                    data,
+                                                                  ),
+                                                                );
+                                                              }
+
+                                                              // ✅ Close dialogs and refresh product data
+                                                              Get.back();
+                                                              Get.back();
+                                                              Get.back();
+                                                              Get.to(
+                                                                () => ProductDetailsScreen(
+                                                                  productId:
+                                                                      widget
+                                                                          .productId,
+                                                                  isVariation:
+                                                                      widget
+                                                                          .isVariation,
+                                                                  id: widget.id,
+                                                                  cate:
+                                                                      widget
+                                                                          .cate,
+                                                                  slug:
+                                                                      widget
+                                                                          .slug,
+                                                                ),
+                                                              );
+
+                                                              _fetchProductDetails();
+                                                            },
+                                                            color:
+                                                                AppColors
+                                                                    .mainColor,
+                                                            fontcolor:
+                                                                AppColors
+                                                                    .whiteColor,
+                                                            height: 5.h,
+                                                            width: 40.w,
+                                                            fontsize: 15.sp,
+                                                            radius: 12.0,
+                                                            iconData:
+                                                                Icons.check,
+                                                            iconsize: 17.sp,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      barrierDismissible: true,
+                                    );
+                                  },
+                                  child: Container(
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.edit,
+                                          color: AppColors.mainColor,
+                                        ),
+                                        Text(
+                                          "${productDetails?.currencySymbol ?? ''}${currentPrice.toStringAsFixed(2)}",
+                                          style: TextStyle(
+                                            fontSize: 20.sp,
+                                            fontFamily: FontFamily.bold,
+                                            color: AppColors.mainColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                            SizedBox(height: 1.h),
+
+                            ReadMoreText(
+                              htmlToPlainText(
+                                productDetails?.description ?? '',
+                              ),
+                              trimLines: 10,
+
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                fontFamily: FontFamily.regular,
+                                color: AppColors.gray,
+                                height: 1.4,
+                              ),
+                              colorClickableText: AppColors.mainColor,
+                              // Color of "Read more/less"
+                              trimMode: TrimMode.Line,
+                              trimCollapsedText: ' Read more',
+                              trimExpandedText: ' Read less',
+                              moreStyle: TextStyle(
+                                fontSize: 16.sp,
+                                fontFamily: FontFamily.regular,
+                                color: AppColors.mainColor,
+                              ),
+                              lessStyle: TextStyle(
+                                fontSize: 16.sp,
+                                fontFamily: FontFamily.regular,
+                                color: AppColors.mainColor,
+                              ),
+                            ),
+                            SizedBox(height: 3.h),
+                            Container(
+                              alignment: Alignment.center,
+                              child: CustomButton(
+                                title: 'Add Note',
+                                route: () {
+                                  showItemNotesDialog(context);
+
+                                  log(
+                                    'selectedVariationId :: $selectedVariationId',
+                                  );
+                                },
+                                color: AppColors.mainColor,
+                                fontcolor: AppColors.whiteColor,
+                                radius: isIpad ? 1.w : 3.w,
+                                height: isIpad ? 7.h : 5.h,
+                                fontsize: 16.sp,
+                                iconData: Icons.note,
+                                iconsize: 16.sp,
+                                width: 85.w,
+                              ),
+                            ),
+                            SizedBox(height: 1.h),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                widget.isVariation == false
+                                    ? Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 3.w,
+                                        vertical: 0.8.h,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(30),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            blurRadius: 5,
+                                            offset: Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                int currentPackSize =
+                                                    int.tryParse(
+                                                      productDetails
+                                                              ?.packsize ??
+                                                          '0',
+                                                    ) ??
+                                                    0;
+
+                                                // If first time, set the original pack size
+                                                originalPackSize ??=
+                                                    currentPackSize;
+
+                                                // Subtract the original pack size (e.g., 6 → 4 → 2)
+                                                currentPackSize -=
+                                                    originalPackSize!;
+
+                                                // Prevent going below 0
+                                                if (currentPackSize <
+                                                    originalPackSize!) {
+                                                  currentPackSize =
+                                                      originalPackSize!;
+                                                }
+
+                                                // Update productDetails
+                                                productDetails?.packsize =
+                                                    currentPackSize.toString();
+
+                                                print(
+                                                  "Decrement → currentPackSize = $currentPackSize",
+                                                );
+                                              });
+                                            },
+                                            child: CircleAvatar(
+                                              radius: isIpad ? 15.sp : 16,
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              child: Icon(
+                                                Icons.remove,
+                                                size: 18.sp,
+                                                color: AppColors.blackColor,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 2.w),
+                                          Text(
+                                            productDetails?.packsize ?? '',
+                                            style: TextStyle(
+                                              fontSize: 17.sp,
+                                              fontFamily: FontFamily.semiBold,
+                                            ),
+                                          ),
+                                          SizedBox(width: 2.w),
+                                          GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                print(
+                                                  "Before: productDetails?.packsize = ${productDetails?.packsize}",
+                                                );
+
+                                                // Convert current pack size
+                                                int currentPackSize =
+                                                    int.tryParse(
+                                                      productDetails
+                                                              ?.packsize ??
+                                                          '0',
+                                                    ) ??
+                                                    0;
+
+                                                // If first time, save original pack size
+                                                originalPackSize ??=
+                                                    currentPackSize;
+
+                                                // Add only the original pack size (e.g., 2 + 2 = 4, then 4 + 2 = 6)
+                                                currentPackSize +=
+                                                    originalPackSize!;
+
+                                                // Update
+                                                productDetails?.packsize =
+                                                    currentPackSize.toString();
+
+                                                print(
+                                                  "After: currentPackSize = $currentPackSize",
+                                                );
+                                              });
+                                            },
+
+                                            child: CircleAvatar(
+                                              radius: isIpad ? 15.sp : 16,
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              child: Icon(
+                                                Icons.add,
+                                                size: 18.sp,
+                                                color: AppColors.blackColor,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                    : productDetails?.variations?.length != 0
+                                    ? Container()
+                                    : Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 3.w,
+                                        vertical: 0.8.h,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(30),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            blurRadius: 5,
+                                            offset: Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                int currentPackSize =
+                                                    currentqty.toInt();
+
+                                                // If first time, set the original pack size
+                                                originalPackSize ??=
+                                                    currentPackSize;
+
+                                                // Subtract the original pack size (e.g., 6 → 4 → 2)
+                                                currentPackSize -=
+                                                    originalPackSize!;
+
+                                                // Prevent going below 0
+                                                if (currentPackSize <
+                                                    originalPackSize!) {
+                                                  currentPackSize =
+                                                      originalPackSize!;
+                                                }
+
+                                                // Update productDetails
+                                                currentqty = currentPackSize;
+
+                                                print(
+                                                  "Decrement → currentPackSize = $currentPackSize",
+                                                );
+                                              });
+                                            },
+                                            child: CircleAvatar(
+                                              radius: isIpad ? 15.sp : 16,
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              child: Icon(
+                                                Icons.remove,
+                                                size: 18.sp,
+                                                color: AppColors.blackColor,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 2.w),
+                                          Text(
+                                            currentqty.toString(),
+                                            style: TextStyle(
+                                              fontSize: 17.sp,
+                                              fontFamily: FontFamily.semiBold,
+                                            ),
+                                          ),
+                                          SizedBox(width: 2.w),
+                                          GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                print(
+                                                  "Before: productDetails?.packsize = ${productDetails?.packsize}",
+                                                );
+
+                                                // Convert current pack size
+                                                int currentPackSize =
+                                                    currentqty.toInt();
+
+                                                // If first time, save original pack size
+                                                originalPackSize ??=
+                                                    currentPackSize;
+
+                                                // Add only the original pack size (e.g., 2 + 2 = 4, then 4 + 2 = 6)
+                                                currentPackSize +=
+                                                    originalPackSize!;
+
+                                                // Update
+                                                currentqty = currentPackSize;
+
+                                                print(
+                                                  "After: currentPackSize = $currentPackSize",
+                                                );
+                                                addOrUpdateCartItem(
+                                                  productId:
+                                                      productDetails!.id!,
+                                                  variationId: "",
+                                                  attributeKey: "",
+                                                  attributeValue: "",
+                                                  // variant.attributes?.getValue() ?? "",
+                                                  quantity: currentPackSize,
+                                                  overridePrice:
+                                                      double.tryParse(
+                                                        currentPackSize
+                                                            .toString(),
+                                                      ) ??
+                                                      0.0,
+                                                  itemNote:
+                                                      notesController.text == ""
+                                                          ? ""
+                                                          : notesController.text
+                                                              .trim()
+                                                              .toString(),
+                                                );
+                                              });
+                                            },
+
+                                            child: CircleAvatar(
+                                              radius: isIpad ? 15.sp : 16,
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              child: Icon(
+                                                Icons.add,
+                                                size: 18.sp,
+                                                color: AppColors.blackColor,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                SizedBox(width: 4.w),
+                                Expanded(
+                                  child: CustomButton(
+                                    title: 'Add to cart',
+                                    route: () {
+                                      productDetails?.variations?.length == 0
+                                          ? _addSimpleProductsToCart()
+                                          : _addVariationProductsToCart();
+                                      // Get.back();
+
+                                      log(
+                                        'selectedVariationId :: $selectedVariationId',
+                                      );
+                                    },
+                                    color: AppColors.mainColor,
+                                    fontcolor: AppColors.whiteColor,
+                                    radius: isIpad ? 1.w : 3.w,
+                                    height: isIpad ? 7.h : 5.h,
+                                    fontsize: 16.sp,
+                                    iconData: Icons.shopping_cart_outlined,
+                                    iconsize: 16.sp,
+                                  ),
+                                ),
+
+                                SizedBox(width: 4.w),
+                              ],
+                            ),
+                            SizedBox(height: 5.h),
+                          ],
+                        ),
                       ),
                     ),
                   ),

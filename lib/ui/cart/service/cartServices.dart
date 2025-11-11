@@ -713,11 +713,11 @@ class CartService {
     final cartData = await getProductCartData(productId: productId);
 
     num totalQuantity = cartData["totalQuantity"] ?? 0;
-    print("totalQuantity====shu ave che${totalQuantity}");
+    print("totalQuantity====shu ave che$totalQuantity");
     String? cartItemKey = cartData["cartItemKey"];
     int quantityToSend =
         (totalQuantity + num.parse(packsize.toString())).toInt();
-    print("quantityToSend====>>>>>>>>>${quantityToSend}");
+    print("quantityToSend====>>>>>>>>>$quantityToSend");
     Map<String, dynamic> body =
         cartItemKey != null
             ? {"cart_item_key": cartItemKey, "quantity": quantityToSend}
@@ -734,7 +734,7 @@ class CartService {
               "quantity": quantityToSend,
               "item_note": itemNote ?? "",
             };
-    print("body shu ave che incerment ni ${body}");
+    print("body shu ave che incerment ni $body");
     final box = HiveService().getAddCartBox();
     final cacheBox = HiveService().getProductCartDataBox();
     if (!cacheBox.isOpen) await HiveService().init();
@@ -2365,7 +2365,7 @@ class CartService {
             "⚠️ Failed to sync customer → ${data['email']}: ${response.statusCode}",
           );
         }
-      } catch (e, stackTrace) {
+      } catch (e) {
         print("⚠️ Failed to sync offline customer → ${data['email']}: $e");
       }
     }

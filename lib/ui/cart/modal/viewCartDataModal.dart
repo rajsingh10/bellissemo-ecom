@@ -228,18 +228,18 @@ class LineTotal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['line_subtotal'] = this.lineSubtotal;
-    data['line_subtotal_tax'] = this.lineSubtotalTax;
-    data['line_total'] = this.lineTotal;
-    data['line_total_tax'] = this.lineTotalTax;
-    data['currency_code'] = this.currencyCode;
-    data['currency_symbol'] = this.currencySymbol;
-    data['currency_minor_unit'] = this.currencyMinorUnit;
-    data['currency_decimal_separator'] = this.currencyDecimalSeparator;
-    data['currency_thousand_separator'] = this.currencyThousandSeparator;
-    data['currency_prefix'] = this.currencyPrefix;
-    data['currency_suffix'] = this.currencySuffix;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['line_subtotal'] = lineSubtotal;
+    data['line_subtotal_tax'] = lineSubtotalTax;
+    data['line_total'] = lineTotal;
+    data['line_total_tax'] = lineTotalTax;
+    data['currency_code'] = currencyCode;
+    data['currency_symbol'] = currencySymbol;
+    data['currency_minor_unit'] = currencyMinorUnit;
+    data['currency_decimal_separator'] = currencyDecimalSeparator;
+    data['currency_thousand_separator'] = currencyThousandSeparator;
+    data['currency_prefix'] = currencyPrefix;
+    data['currency_suffix'] = currencySuffix;
     return data;
   }
 }
@@ -604,8 +604,8 @@ class Totals {
     data['currency_thousand_separator'] = currencyThousandSeparator;
     data['currency_prefix'] = currencyPrefix;
     data['currency_suffix'] = currencySuffix;
-    if (this.customerDiscount != null) {
-      data['customer_discount'] = this.customerDiscount!.toJson();
+    if (customerDiscount != null) {
+      data['customer_discount'] = customerDiscount!.toJson();
     }
     data['customer_discount_value'] = customerDiscountValue;
     return data;

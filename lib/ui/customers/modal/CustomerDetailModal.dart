@@ -43,39 +43,37 @@ class Customerdetailmodal {
     role = json['role'];
     username = json['username'];
     billing =
-        json['billing'] != null ? new Billing.fromJson(json['billing']) : null;
+        json['billing'] != null ? Billing.fromJson(json['billing']) : null;
     shipping =
-        json['shipping'] != null
-            ? new Shipping.fromJson(json['shipping'])
-            : null;
+        json['shipping'] != null ? Shipping.fromJson(json['shipping']) : null;
     isPayingCustomer = json['is_paying_customer'];
     allMetaData =
         json['all_meta_data'] != null
-            ? new AllMetaData.fromJson(json['all_meta_data'])
+            ? AllMetaData.fromJson(json['all_meta_data'])
             : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['date_created'] = this.dateCreated;
-    data['date_created_gmt'] = this.dateCreatedGmt;
-    data['date_modified'] = this.dateModified;
-    data['date_modified_gmt'] = this.dateModifiedGmt;
-    data['email'] = this.email;
-    data['first_name'] = this.firstName;
-    data['last_name'] = this.lastName;
-    data['role'] = this.role;
-    data['username'] = this.username;
-    if (this.billing != null) {
-      data['billing'] = this.billing!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['date_created'] = dateCreated;
+    data['date_created_gmt'] = dateCreatedGmt;
+    data['date_modified'] = dateModified;
+    data['date_modified_gmt'] = dateModifiedGmt;
+    data['email'] = email;
+    data['first_name'] = firstName;
+    data['last_name'] = lastName;
+    data['role'] = role;
+    data['username'] = username;
+    if (billing != null) {
+      data['billing'] = billing!.toJson();
     }
-    if (this.shipping != null) {
-      data['shipping'] = this.shipping!.toJson();
+    if (shipping != null) {
+      data['shipping'] = shipping!.toJson();
     }
-    data['is_paying_customer'] = this.isPayingCustomer;
-    if (this.allMetaData != null) {
-      data['all_meta_data'] = this.allMetaData!.toJson();
+    data['is_paying_customer'] = isPayingCustomer;
+    if (allMetaData != null) {
+      data['all_meta_data'] = allMetaData!.toJson();
     }
     return data;
   }
@@ -123,18 +121,18 @@ class Billing {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['first_name'] = this.firstName;
-    data['last_name'] = this.lastName;
-    data['company'] = this.company;
-    data['address_1'] = this.address1;
-    data['address_2'] = this.address2;
-    data['city'] = this.city;
-    data['postcode'] = this.postcode;
-    data['country'] = this.country;
-    data['state'] = this.state;
-    data['email'] = this.email;
-    data['phone'] = this.phone;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['first_name'] = firstName;
+    data['last_name'] = lastName;
+    data['company'] = company;
+    data['address_1'] = address1;
+    data['address_2'] = address2;
+    data['city'] = city;
+    data['postcode'] = postcode;
+    data['country'] = country;
+    data['state'] = state;
+    data['email'] = email;
+    data['phone'] = phone;
     return data;
   }
 }
@@ -178,17 +176,17 @@ class Shipping {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['first_name'] = this.firstName;
-    data['last_name'] = this.lastName;
-    data['company'] = this.company;
-    data['address_1'] = this.address1;
-    data['address_2'] = this.address2;
-    data['city'] = this.city;
-    data['postcode'] = this.postcode;
-    data['country'] = this.country;
-    data['state'] = this.state;
-    data['phone'] = this.phone;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['first_name'] = firstName;
+    data['last_name'] = lastName;
+    data['company'] = company;
+    data['address_1'] = address1;
+    data['address_2'] = address2;
+    data['city'] = city;
+    data['postcode'] = postcode;
+    data['country'] = country;
+    data['state'] = state;
+    data['phone'] = phone;
     return data;
   }
 }
@@ -313,44 +311,44 @@ class AllMetaData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['nickname'] = this.nickname;
-    data['first_name'] = this.firstName;
-    data['last_name'] = this.lastName;
-    data['description'] = this.description;
-    data['rich_editing'] = this.richEditing;
-    data['syntax_highlighting'] = this.syntaxHighlighting;
-    data['comment_shortcuts'] = this.commentShortcuts;
-    data['admin_color'] = this.adminColor;
-    data['use_ssl'] = this.useSsl;
-    data['show_admin_bar_front'] = this.showAdminBarFront;
-    data['locale'] = this.locale;
-    data['wp_user_level'] = this.wpUserLevel;
-    data['last_update'] = this.lastUpdate;
-    data['billing_first_name'] = this.billingFirstName;
-    data['billing_last_name'] = this.billingLastName;
-    data['billing_company'] = this.billingCompany;
-    data['billing_address_1'] = this.billingAddress1;
-    data['billing_city'] = this.billingCity;
-    data['billing_state'] = this.billingState;
-    data['billing_postcode'] = this.billingPostcode;
-    data['billing_country'] = this.billingCountry;
-    data['billing_email'] = this.billingEmail;
-    data['billing_phone'] = this.billingPhone;
-    data['shipping_first_name'] = this.shippingFirstName;
-    data['shipping_last_name'] = this.shippingLastName;
-    data['shipping_company'] = this.shippingCompany;
-    data['shipping_address_1'] = this.shippingAddress1;
-    data['shipping_city'] = this.shippingCity;
-    data['shipping_state'] = this.shippingState;
-    data['shipping_postcode'] = this.shippingPostcode;
-    data['shipping_country'] = this.shippingCountry;
-    data['company_name'] = this.companyName;
-    data['company_registration_number'] = this.companyRegistrationNumber;
-    data['vat_number'] = this.vatNumber;
-    data['contact_name'] = this.contactName;
-    data['mobile_number'] = this.mobileNumber;
-    data['company_address'] = this.companyAddress;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['nickname'] = nickname;
+    data['first_name'] = firstName;
+    data['last_name'] = lastName;
+    data['description'] = description;
+    data['rich_editing'] = richEditing;
+    data['syntax_highlighting'] = syntaxHighlighting;
+    data['comment_shortcuts'] = commentShortcuts;
+    data['admin_color'] = adminColor;
+    data['use_ssl'] = useSsl;
+    data['show_admin_bar_front'] = showAdminBarFront;
+    data['locale'] = locale;
+    data['wp_user_level'] = wpUserLevel;
+    data['last_update'] = lastUpdate;
+    data['billing_first_name'] = billingFirstName;
+    data['billing_last_name'] = billingLastName;
+    data['billing_company'] = billingCompany;
+    data['billing_address_1'] = billingAddress1;
+    data['billing_city'] = billingCity;
+    data['billing_state'] = billingState;
+    data['billing_postcode'] = billingPostcode;
+    data['billing_country'] = billingCountry;
+    data['billing_email'] = billingEmail;
+    data['billing_phone'] = billingPhone;
+    data['shipping_first_name'] = shippingFirstName;
+    data['shipping_last_name'] = shippingLastName;
+    data['shipping_company'] = shippingCompany;
+    data['shipping_address_1'] = shippingAddress1;
+    data['shipping_city'] = shippingCity;
+    data['shipping_state'] = shippingState;
+    data['shipping_postcode'] = shippingPostcode;
+    data['shipping_country'] = shippingCountry;
+    data['company_name'] = companyName;
+    data['company_registration_number'] = companyRegistrationNumber;
+    data['vat_number'] = vatNumber;
+    data['contact_name'] = contactName;
+    data['mobile_number'] = mobileNumber;
+    data['company_address'] = companyAddress;
     return data;
   }
 }

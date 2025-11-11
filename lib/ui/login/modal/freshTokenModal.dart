@@ -31,15 +31,15 @@ class FreshTokenModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['success'] = this.success;
-    data['access_token'] = this.accessToken;
-    data['refresh_token'] = this.refreshToken;
-    data['user_id'] = this.userId;
-    data['user_email'] = this.userEmail;
-    data['user_nicename'] = this.userNicename;
-    data['user_display_name'] = this.userDisplayName;
-    data['expires_in'] = this.expiresIn;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['success'] = success;
+    data['access_token'] = accessToken;
+    data['refresh_token'] = refreshToken;
+    data['user_id'] = userId;
+    data['user_email'] = userEmail;
+    data['user_nicename'] = userNicename;
+    data['user_display_name'] = userDisplayName;
+    data['expires_in'] = expiresIn;
     return data;
   }
 }

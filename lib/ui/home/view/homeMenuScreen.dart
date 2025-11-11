@@ -1830,7 +1830,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
     }
     final Map<String, String> data = {"refresh_token": token ?? ""};
 
-    print("ram na data${data}");
+    print("ram na data$data");
     final hasInternet = await checkInternet();
     print("Internet status: $hasInternet");
     checkInternet().then((internet) async {
@@ -1848,7 +1848,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
               } else {}
             })
             .catchError((error, stackTrace) {
-              print("error=====>>>>>>${stackTrace}");
+              print("error=====>>>>>>$stackTrace");
               print("Catch Error ===>>> ${error.toString()}");
             });
       } else {
@@ -1861,6 +1861,6 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
     if (token == null || token.isEmpty) return;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('login_token', token);
-    log("✅ All data loaded in token ave che ms  ${token}");
+    log("✅ All data loaded in token ave che ms  $token");
   }
 }
