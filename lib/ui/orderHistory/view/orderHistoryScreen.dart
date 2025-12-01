@@ -206,9 +206,12 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     },
                   ),
                   if (isSearchEnabled)
-                    SearchField(controller: searchController,onChanged: (value) {
-                      applySearch(value);
-                    },),
+                    SearchField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        applySearch(value);
+                      },
+                    ),
                   SizedBox(height: 1.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -563,7 +566,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                                                             AppColors.mainColor,
                                                                       ),
                                                                       child: Text(
-                                                                        "Reorder",
+                                                                        "Add to order",
                                                                         style: TextStyle(
                                                                           fontSize:
                                                                               14.sp,
@@ -821,7 +824,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                         ),
                       ),
 
-
                   // Expanded(
                   //   child: ordersList.isEmpty
                   //       ? Padding(
@@ -918,8 +920,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   //     },
                   //   ),
                   // )
-
-
                 ],
               ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
       bottomNavigationBar: SizedBox(
@@ -928,11 +928,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       ),
     );
   }
+
   Widget _buildOrderDetails(order) {
     double subtotal = 0.0;
 
     for (var item in order.lineItems ?? []) {
-      final double price = double.tryParse(item.price?.toString() ?? "0") ?? 0.0;
+      final double price =
+          double.tryParse(item.price?.toString() ?? "0") ?? 0.0;
       final int qty = item.quantity ?? 0;
       subtotal += price * qty;
     }
@@ -941,10 +943,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       children: [
         for (var item in order.lineItems ?? [])
           Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 6,
-              horizontal: 12,
-            ),
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -994,7 +993,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         _buildRow("Delivery Note:", order.orderNote ?? "N/A"),
         _buildRow(
           "Delivery Date:",
-          order.deliveryDate == "" || order.deliveryDate == "null" || order.deliveryDate == null
+          order.deliveryDate == "" ||
+                  order.deliveryDate == "null" ||
+                  order.deliveryDate == null
               ? "N/A"
               : order.deliveryDate!,
         ),
@@ -1026,17 +1027,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         children: [
           Text(
             title,
-            style: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
           ),
           Text(
             value,
-            style: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -1051,7 +1046,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       if (cachedData != null) {
         final List data = json.decode(cachedData);
         final fetchedOrders =
-        data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
+            data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
 
         setState(() {
           _allOrdersList = fetchedOrders;
@@ -1062,7 +1057,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           } else {
             // Default to newest first
             ordersList.sort(
-                  (a, b) =>
+              (a, b) =>
                   parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
             );
           }
@@ -1081,7 +1076,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       if (response.statusCode == 200) {
         final List data = json.decode(response.body);
         final fetchedOrders =
-        data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
+            data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
 
         setState(() {
           _allOrdersList = fetchedOrders;
@@ -1092,7 +1087,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           } else {
             // Default to newest first
             ordersList.sort(
-                  (a, b) =>
+              (a, b) =>
                   parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
             );
           }
@@ -1106,7 +1101,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         if (cachedData != null) {
           final List data = json.decode(cachedData);
           final fetchedOrders =
-          data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
+              data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
 
           setState(() {
             _allOrdersList = fetchedOrders;
@@ -1127,7 +1122,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       if (cachedData != null) {
         final List data = json.decode(cachedData);
         final fetchedOrders =
-        data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
+            data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
 
         setState(() {
           _allOrdersList = fetchedOrders;
@@ -1151,7 +1146,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       selectedSort = "All";
       // Reset to default sort (newest first)
       ordersList.sort(
-            (a, b) => parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
+        (a, b) => parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
       );
     });
   }
@@ -1162,10 +1157,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       ordersList = List.from(_allOrdersList);
       selectedSort = "All";
       ordersList.sort(
-            (a, b) => parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
+        (a, b) => parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
       );
     });
   }
+
   void applySearch(String query) {
     if (query.isEmpty) {
       setState(() {
@@ -1181,21 +1177,21 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     for (var order in _allOrdersList) {
       bool matchOrderId = order.id.toString().toLowerCase().contains(query);
       bool matchTotal = order.total.toString().toLowerCase().contains(query);
-      bool matchDate = formatDate(order.dateCreated).toLowerCase().contains(query);
+      bool matchDate = formatDate(
+        order.dateCreated,
+      ).toLowerCase().contains(query);
       bool matchNote = (order.orderNote ?? "").toLowerCase().contains(query);
 
       // FILTER line items
-      final filteredItems = (order.lineItems ?? []).where((item) {
-        return (item.name ?? "").toLowerCase().contains(query);
-      }).toList();
+      final filteredItems =
+          (order.lineItems ?? []).where((item) {
+            return (item.name ?? "").toLowerCase().contains(query);
+          }).toList();
 
       bool matchProduct = filteredItems.isNotEmpty;
 
-      bool matched = matchOrderId ||
-          matchTotal ||
-          matchDate ||
-          matchNote ||
-          matchProduct;
+      bool matched =
+          matchOrderId || matchTotal || matchDate || matchNote || matchProduct;
 
       if (matched) {
         filtered.add(
@@ -1220,9 +1216,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     });
   }
 
-
-
-// Future<void> _fetchOrders() async {
+  // Future<void> _fetchOrders() async {
   //   var box = HiveService().getOrdersBox();
   //
   //   if (!await checkInternet()) {
@@ -1276,5 +1270,4 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   //     );
   //   }
   // }
-
 }

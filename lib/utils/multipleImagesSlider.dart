@@ -217,7 +217,7 @@ class _ImageSliderState extends State<ImageSlider> {
                     imageUrl: widget.imageUrls.first,
                     height: double.infinity,
                     width: double.infinity,
-                    isFit: true,
+                    isFit: false,
                     radius: 20,
                   ),
                 )
@@ -231,7 +231,7 @@ class _ImageSliderState extends State<ImageSlider> {
                         imageUrl: widget.imageUrls[index],
                         height: double.infinity,
                         width: double.infinity,
-                        isFit: true,
+                        isFit: false,
                         radius: 20,
                       ),
                     );

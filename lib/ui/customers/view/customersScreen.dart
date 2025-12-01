@@ -451,7 +451,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
         ),
         child: Padding(
           padding: EdgeInsets.all(2.w),
-          child:   Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
@@ -468,18 +468,19 @@ class _CustomersScreenState extends State<CustomersScreen> {
                   ),
                   Spacer(),
                   InkWell(
-                    onTap: (){
+                    onTap: () {
                       deleteDailyData(customer.id.toString());
                     },
-                      child: Container(
-                        width: 10.w,
-                        height: 10.w,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100),
-                          color: AppColors.mainColor
-
-                        ),
-                          child: Icon(Icons.delete,color: Colors.white,))),
+                    child: Container(
+                      width: 10.w,
+                      height: 10.w,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(100),
+                        color: AppColors.mainColor,
+                      ),
+                      child: Icon(Icons.delete, color: Colors.white),
+                    ),
+                  ),
                 ],
               ),
               SizedBox(height: 0.5.h),
@@ -506,8 +507,10 @@ class _CustomersScreenState extends State<CustomersScreen> {
       ),
     );
   }
+
   DeleteCstomerModal? deleteCstomerModal;
-  bool loader =false;
+  bool loader = false;
+
   deleteDailyData(String id) {
     checkInternet().then((internet) async {
       setState(() {

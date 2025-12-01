@@ -71,6 +71,7 @@ class CustomerProvider extends ChangeNotifier {
 
     return responseJson;
   }
+
   Future<http.Response> deleteDailyData(String id) async {
     String url = "${apiEndpoints.deletecustmer}$id";
     LoginModal? loginData = await SaveDataLocal.getDataFromLocal();

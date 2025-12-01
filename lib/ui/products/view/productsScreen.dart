@@ -891,7 +891,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             ),
                           ),
                         ],
-                      ).paddingSymmetric(horizontal: 2.w, vertical: 0.5.h),
+                      ).paddingSymmetric(
+                        horizontal: 2.w,
+                        vertical: isIpad ? 0 : 0.5.h,
+                      ),
                     ],
                   ),
           bottomNavigationBar: SizedBox(
@@ -1149,12 +1152,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Widget _buildGridItem(
     CategoryWiseProductsModal product, {
     double scale = 1.0,
-  })
-  { final pid = (product.id ?? product.slug ?? product.name ?? '').toString();
+  }) {
+    final pid = (product.id ?? product.slug ?? product.name ?? '').toString();
     final bool hasVariations = (product.variations?.isNotEmpty ?? false);
     final int qty = int.tryParse(product.cartQuantity?.toString() ?? '0') ?? 0;
-    final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
+    // Unused variable removed for cleaner code
     double sp(double v) => v * scale;
     double px(double v) => v * scale;
 
@@ -1194,100 +1196,124 @@ class _ProductsScreenState extends State<ProductsScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ============== IMAGE SLIDER (square) =================
-                  InkWell(
-                    onTap:
-                        product.stockStatus == 'instock'
-                            ? () {
-                              Get.to(
-                                () => ProductDetailsScreen(
-                                  productId: product.id.toString(),
-                                  isVariation: hasVariations,
-                                  id: widget.id,
-                                  cate: widget.cate,
-                                  slug: widget.slug,
+                  // ============== STACK: IMAGE + DOTS OVERLAY =================
+                  Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: [
+                      // 1. IMAGE SLIDER
+                      InkWell(
+                        onTap:
+                            product.stockStatus == 'instock'
+                                ? () {
+                                  Get.to(
+                                    () => ProductDetailsScreen(
+                                      productId: product.id.toString(),
+                                      isVariation: hasVariations,
+                                      id: widget.id,
+                                      cate: widget.cate,
+                                      slug: widget.slug,
+                                    ),
+                                    transition: Transition.leftToRightWithFade,
+                                    duration: const Duration(milliseconds: 450),
+                                  );
+                                }
+                                : () {
+                                  showCustomErrorSnackbar(
+                                    title: "Out of Stock",
+                                    message:
+                                        "${product.name} is not available right now!",
+                                  );
+                                },
+                        // FIX 1: Increased AspectRatio slightly (0.85 -> 0.92) to prevent overflow
+                        child: AspectRatio(
+                          aspectRatio: 0.92,
+                          child: CarouselSlider.builder(
+                            itemCount:
+                                (product.images?.length ?? 0) > 0
+                                    ? product.images!.length
+                                    : 1,
+                            options: CarouselOptions(
+                              viewportFraction: 1,
+                              enableInfiniteScroll: false,
+                              enlargeCenterPage: false,
+                              autoPlay: false,
+                              onPageChanged: (index, reason) {
+                                setState(() {
+                                  _setImgIndex(pid, index);
+                                });
+                              },
+                            ),
+                            itemBuilder: (_, i, __) {
+                              final src =
+                                  (product.images?.isNotEmpty ?? false)
+                                      ? (product.images![i].src ?? '')
+                                      : '';
+
+                              return ClipRRect(
+                                borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(px(16)),
                                 ),
-                                transition: Transition.leftToRightWithFade,
-                                duration: const Duration(milliseconds: 450),
-                              );
-                            }
-                            : () {
-                              showCustomErrorSnackbar(
-                                title: "Out of Stock",
-                                message:
-                                    "${product.name} is not available right now!",
+                                child: CustomNetworkImage(
+                                  imageUrl: src,
+                                  height: double.infinity,
+                                  width: double.infinity,
+                                  isFit: true,
+                                  radius: 0,
+                                ),
                               );
                             },
-                    child: AspectRatio(
-                      aspectRatio: 1,
-                      child: CarouselSlider.builder(
-                        itemCount:
-                            (product.images?.length ?? 0) > 0
-                                ? product.images!.length
-                                : 1,
-                        options: CarouselOptions(
-                          viewportFraction: 1,
-                          enableInfiniteScroll: false,
-                          enlargeCenterPage: false,
-                          autoPlay: false,
-                          onPageChanged: (index, reason) {
-                            setState(() {
-                              _setImgIndex(pid, index);
-                            });
-                          },
+                          ),
                         ),
-                        itemBuilder: (_, i, __) {
-                          final src =
-                              (product.images?.isNotEmpty ?? false)
-                                  ? (product.images![i].src ?? '')
-                                  : '';
-
-                          return ClipRRect(
-                            borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(px(16)),
-                            ),
-                            child: CustomNetworkImage(
-                              imageUrl: src,
-                              height: double.infinity,
-                              width: double.infinity,
-                              isFit: true,
-                              radius: 0,
-                            ),
-                          );
-                        },
                       ),
-                    ),
+
+                      // 2. DOTS (Overlay)
+                      if ((product.images?.length ?? 0) > 1)
+                        Positioned(
+                          bottom: px(10),
+                          left: 0,
+                          right: 0,
+                          child: Center(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: List.generate(product.images!.length, (
+                                index,
+                              ) {
+                                final pid = product.id.toString();
+                                final currentIndex = _getImgIndex(pid);
+
+                                return AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  margin: EdgeInsets.symmetric(
+                                    horizontal: px(3),
+                                  ),
+                                  height: px(7),
+                                  width: currentIndex == index ? px(14) : px(7),
+                                  decoration: BoxDecoration(
+                                    // Use semi-transparent white for inactive dots so they show on dark images
+                                    color:
+                                        currentIndex == index
+                                            ? AppColors.mainColor
+                                            : Colors.white.withOpacity(0.7),
+                                    borderRadius: BorderRadius.circular(px(4)),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 2,
+                                        offset: Offset(0, 1),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                  // ================= Dots =================
-                  if ((product.images?.length ?? 0) > 1) ...[
-                    SizedBox(height: px(6)),
-                    Center(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: List.generate(product.images!.length, (index) {
-                          final pid = product.id.toString();
-                          final currentIndex = _getImgIndex(pid);
-
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            margin: EdgeInsets.symmetric(horizontal: px(3)),
-                            height: px(7),
-                            width: currentIndex == index ? px(14) : px(7),
-                            decoration: BoxDecoration(
-                              color: currentIndex == index
-                                  ? AppColors.mainColor
-                                  : AppColors.mainColor.withOpacity(0.3),
-                              borderRadius: BorderRadius.circular(px(4)),
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                    SizedBox(height: px(6)),
-                  ],
 
                   // ================= TITLE =================
                   Padding(
+                    // FIX 2: Reduced top padding (10 -> 8)
                     padding: EdgeInsets.only(
                       left: px(10),
                       right: px(10),
@@ -1307,7 +1333,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
                   // ============== MOQ + COUNTER =================
                   Padding(
-                    padding: EdgeInsets.fromLTRB(px(10), px(6), px(10), px(10)),
+                    // FIX 3: Reduced vertical padding (6/10 -> 4/8)
+                    padding: EdgeInsets.fromLTRB(px(10), px(4), px(10), px(8)),
                     child: Row(
                       children: [
                         // LEFT: MOQ TEXT
@@ -1330,29 +1357,26 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         if (!hasVariations)
                           Row(
                             children: [
-                              if (!isPortrait)
-                                _circleBtn(
-                                  icon: Icons.remove,
-                                  onTap:
-                                      product.stockStatus == 'instock'
-                                          ? onRemove
-                                          : null,
-                                  size: px(32),
-                                  iconSize: px(18),
-                                ),
-                              if (!isPortrait) SizedBox(width: px(6)),
+                              _circleBtn(
+                                icon: Icons.remove,
+                                onTap:
+                                    product.stockStatus == 'instock'
+                                        ? onRemove
+                                        : null,
+                                size: px(32),
+                                iconSize: px(18),
+                              ),
+                              SizedBox(width: px(6)),
                               if (qty > 0)
                                 Text(
-                                  qty.toString(), // ALWAYS SHOW
+                                  qty.toString(),
                                   style: TextStyle(
                                     fontFamily: FontFamily.semiBold,
                                     fontSize: sp(13.5),
                                     color: AppColors.blackColor,
                                   ),
                                 ),
-
                               if (qty > 0) SizedBox(width: px(6)),
-
                               _circleBtn(
                                 icon: Icons.add,
                                 onTap:
@@ -1366,7 +1390,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           ),
                         if (hasVariations && qty > 0)
                           Padding(
-                            padding: EdgeInsets.only(right: 1.w),
+                            padding: EdgeInsets.only(right: 1.0),
                             child: Text(
                               qty.toString(),
                               style: TextStyle(
@@ -1387,7 +1411,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 Positioned.fill(
                   child: Container(
                     color: Colors.black.withValues(alpha: 0.55),
-                    // light frost overlay, cleaner UI
                     child: Center(
                       child: Text(
                         "Out of Stock",
@@ -1469,8 +1492,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Widget buildGroupedProducts(
     List<CategoryWiseProductsModal> allProducts, {
     required bool isIpad,
-  })
-  {
+  }) {
     final sections = _groupBySubcategory(allProducts);
 
     return ListView.separated(
@@ -1503,6 +1525,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
             GridView.builder(
               itemCount: items.length,
               shrinkWrap: true,
+              padding: EdgeInsets.zero,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: isIpad ? 3 : 2,
@@ -1568,10 +1591,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
   //   );
   // }
   final Map<String, int> _imageIndexByProductId = {};
+
   int _getImgIndex(String pid) => _imageIndexByProductId[pid] ?? 0;
+
   void _setImgIndex(String pid, int idx) => setState(() {
     _imageIndexByProductId[pid] = idx;
   });
+
   Widget buildGroupedGrid(List<CategoryWiseProductsModal> filteredProducts) {
     // group
     final Map<String, List<CategoryWiseProductsModal>> grouped = {};

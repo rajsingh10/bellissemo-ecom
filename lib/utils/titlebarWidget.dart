@@ -176,7 +176,7 @@ Widget TitleBarIpadPotrait({
     ),
     padding: EdgeInsets.symmetric(
       horizontal: isTablet ? 2.w : 3.w,
-      vertical: isTablet ? 2.h : 1.h,
+      vertical: isTablet ? 0.h : 1.h,
     ),
     decoration: BoxDecoration(
       color: clr ?? Colors.white,

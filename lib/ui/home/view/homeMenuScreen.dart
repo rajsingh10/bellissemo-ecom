@@ -965,25 +965,25 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                                               children: [
                                                 Image.asset(
                                                   Imgs.onlyLogo,
-                                                  height: isIpad ? 06.w : 13.w,
-                                                  width: isIpad ? 07.w : 15.w,
+                                                  height: isIpad ? 08.w : 13.w,
+
                                                   fit: BoxFit.cover,
                                                 ),
-                                                Text(
-                                                  "Bellissemo App",
-                                                  style: TextStyle(
-                                                    fontSize:
-                                                        isIpad ? 20.sp : 22.sp,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: AppColors.blackColor,
-                                                    fontFamily:
-                                                        FontFamily.regular,
-                                                    letterSpacing: 1.1,
-                                                  ),
-                                                ),
+                                                // Text(
+                                                //   "Bellissemo App",
+                                                //   style: TextStyle(
+                                                //     fontSize:
+                                                //         isIpad ? 20.sp : 22.sp,
+                                                //     fontWeight: FontWeight.bold,
+                                                //     color: AppColors.blackColor,
+                                                //     fontFamily:
+                                                //         FontFamily.regular,
+                                                //     letterSpacing: 1.1,
+                                                //   ),
+                                                // ),
                                               ],
                                             ),
-                                            SizedBox(height: 1.h),
+                                            SizedBox(height: 2.h),
                                             Wrap(
                                               spacing: 0.w,
                                               runSpacing: 3.h,
@@ -1065,20 +1065,8 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                                               Image.asset(
                                                 Imgs.onlyLogo,
                                                 height: isIpad ? 06.w : 13.w,
-                                                width: isIpad ? 08.w : 15.w,
+
                                                 fit: BoxFit.cover,
-                                              ),
-                                              Text(
-                                                "Bellissemo App",
-                                                style: TextStyle(
-                                                  fontSize:
-                                                      isIpad ? 20.sp : 22.sp,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AppColors.blackColor,
-                                                  fontFamily:
-                                                      FontFamily.regular,
-                                                  letterSpacing: 1.1,
-                                                ),
                                               ),
                                             ],
                                           ),

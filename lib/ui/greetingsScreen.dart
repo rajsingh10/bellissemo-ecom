@@ -8,7 +8,6 @@ import 'package:sizer/sizer.dart';
 
 import '../ApiCalling/apiConfigs.dart';
 import '../Apicalling/sharedpreferance.dart';
-import '../utils/fontFamily.dart';
 
 class GreetingsScreen extends StatefulWidget {
   const GreetingsScreen({super.key});
@@ -45,24 +44,7 @@ class _GreetingsScreenState extends State<GreetingsScreen> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              height: 60.w,
-              width: 80.w,
-              child: Image.asset(Imgs.onlyLogo),
-            ),
-            SizedBox(height: 1.h),
-            Text(
-              "Welcome to Bellissemo App",
-              style: TextStyle(
-                fontSize: 22.sp,
-                fontWeight: FontWeight.bold,
-                color: AppColors.mainColor,
-                fontFamily: FontFamily.regular,
-                letterSpacing: 1.1,
-              ),
-            ),
-          ],
+          children: [SizedBox(height: 25.w, child: Image.asset(Imgs.onlyLogo))],
         ),
       ),
     );

@@ -55,8 +55,8 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 Image.asset(
                   Imgs.onlyLogo,
-                  height: isIpad ? 20.w : 40.w,
-                  width: isIpad ? 25.w : 50.w,
+                  height: isIpad ? 17.w : 40.w,
+
                   fit: BoxFit.cover,
                 ),
                 SizedBox(height: isIpad ? 2.h : 2.h),
