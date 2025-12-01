@@ -55,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 Image.asset(
                   Imgs.onlyLogo,
-                  height: isIpad ? 17.w : 40.w,
+                  height: isIpad ? 17.w : 22.w,
 
                   fit: BoxFit.cover,
                 ),
@@ -85,8 +85,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
           // Draggable Bottom Sheet
           DraggableScrollableSheet(
-            initialChildSize: isIpad ? 0.43 : 0.58,
-            minChildSize: isIpad ? 0.43 : 0.58,
+            initialChildSize: isIpad ? 0.43 : 0.65,
+            minChildSize: isIpad ? 0.43 : 0.65,
             maxChildSize: 0.9,
             builder: (context, scrollController) {
               return Container(

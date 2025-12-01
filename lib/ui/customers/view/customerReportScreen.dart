@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:bellissemo_ecom/apiCalling/Loader.dart';
+import 'package:bellissemo_ecom/ui/customers/modal/fetchCustomersModal.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -84,7 +85,7 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
     // TODO: implement initState
     super.initState();
     DateTime now = DateTime.now();
-
+    _fetchCustomers();
     setState(() {
       // default from date = 1 Jan of current year
       fromDate = DateTime(now.year, 1, 1);
@@ -97,7 +98,76 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
     print("toDate   => ${DateFormat('yyyy-MM-dd').format(toDate)}");
     loadInitialData();
   }
+  List<FetchCustomersModal> customersList = [];
+  int? selectedCustomerId;
+  String? selectedCustomerName;
+  Future<void> _fetchCustomers() async {
+    var box = HiveService().getCustomerBox();
 
+    if (!await checkInternet()) {
+      final cachedData = box.get('customers');
+      if (cachedData != null) {
+        final List data = json.decode(cachedData);
+        customersList =
+            data
+                .map<FetchCustomersModal>(
+                  (e) => FetchCustomersModal.fromJson(e),
+            )
+                .toList();
+      } else {
+        showCustomErrorSnackbar(
+          title: 'No Internet',
+          message: 'Please check your connection and try again.',
+        );
+      }
+      return;
+    }
+
+    try {
+      final response = await CustomerProvider().fetchCustomers();
+      if (response.statusCode == 200) {
+        final List data = json.decode(response.body);
+        customersList =
+            data
+                .map<FetchCustomersModal>(
+                  (e) => FetchCustomersModal.fromJson(e),
+            )
+                .toList();
+
+        await box.put('customers', response.body);
+      } else {
+        final cachedData = box.get('customers');
+        if (cachedData != null) {
+          final List data = json.decode(cachedData);
+          customersList =
+              data
+                  .map<FetchCustomersModal>(
+                    (e) => FetchCustomersModal.fromJson(e),
+              )
+                  .toList();
+        }
+        showCustomErrorSnackbar(
+          title: 'Server Error',
+          message: 'Something went wrong. Please try again later.',
+        );
+      }
+    } catch (_) {
+      final cachedData = box.get('customers');
+      if (cachedData != null) {
+        final List data = json.decode(cachedData);
+        customersList =
+            data
+                .map<FetchCustomersModal>(
+                  (e) => FetchCustomersModal.fromJson(e),
+            )
+                .toList();
+      }
+      showCustomErrorSnackbar(
+        title: 'Network Error',
+        message: 'Unable to connect. Please check your internet and try again.',
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,6 +191,56 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
             child: Column(
               children: [
                 // Filter type
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<int>(
+                        value: selectedCustomerId,
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(90),
+                            borderSide: BorderSide(
+                              color: AppColors.mainColor,
+                              width: 1.5,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(90),
+                            borderSide: BorderSide(
+                              color: AppColors.mainColor,
+                              width: 2.0,
+                            ),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          hintText: "Select Customer",
+                          hintStyle: TextStyle(
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        items: customersList.map((customer) {
+                          return DropdownMenuItem<int>(
+                            value: customer.id,
+                            child: Text("${customer.firstName} ${customer.lastName}"),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          final customer = customersList.firstWhere((c) => c.id == value);
+                          setState(() {
+                            selectedCustomerId = customer.id;
+                            selectedCustomerName = "${customer.firstName} ${customer.lastName}";
+                            print("zxczxczxczxzc=====>>>>>>${selectedCustomerId}");
+                            _fetchCustomerReport();
+                          });
+                        },
+                      ),
+                    )
+
+                  ],
+                ),
+                SizedBox(height: 1.h,),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -339,7 +459,7 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
           Row(
             children: [
               Text(
-                "Top Products",
+                "Order",
                 style: TextStyle(
                   fontSize: 17.sp,
                   fontFamily: FontFamily.bold,
@@ -371,9 +491,9 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
                     )
                   else ...[
                     for (var customer in customerReportList)
-                      if (customer.topProducts != null &&
-                          customer.topProducts!.isNotEmpty) ...[
-                        for (var p in customer.topProducts!)
+                      if (customer.customerOrders != null &&
+                          customer.customerOrders!.isNotEmpty) ...[
+                        for (var p in customer.customerOrders!)
                           Card(
                             elevation: 3,
                             shadowColor: Colors.white,
@@ -392,18 +512,18 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
                               child: Row(
                                 children: [
                                   // IMAGE
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: CustomNetworkImage(
-                                      imageUrl: p.image ?? "",
-                                      height: 12.w,
-                                      width: 12.w,
-                                      isFit: true,
-                                      radius: 0,
-                                    ),
-                                  ),
+                                  // ClipRRect(
+                                  //   borderRadius: BorderRadius.circular(8),
+                                  //   child: CustomNetworkImage(
+                                  //     imageUrl: p.items? ?? "",
+                                  //     height: 12.w,
+                                  //     width: 12.w,
+                                  //     isFit: true,
+                                  //     radius: 0,
+                                  //   ),
+                                  // ),
 
-                                  SizedBox(width: 3.w),
+                                  // SizedBox(width: 3.w),
 
                                   // TITLE + DETAILS
                                   Expanded(
@@ -411,9 +531,9 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          p.postTitle == null || p.postTitle!.isEmpty
+                                          p.customerName==" "||  p.customerName == null || p.customerName!.isEmpty
                                               ? "N/A"
-                                              : p.postTitle!,
+                                              : p.customerName!,
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
@@ -423,7 +543,7 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
                                           ),
                                         ),
                                         Text(
-                                          "Qty:- ${p.totalQty ?? "0"}",
+                                          "Order ID ${p.orderId ?? "0"}",
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
@@ -439,9 +559,18 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
                                   SizedBox(width: 2.w),
 
                                   // PRICE
+                                  // Text(
+                                  //   "${customer.currencySymbol} ${p.totalAmount ?? '0'}",
+                                  //   style: TextStyle(
+                                  //     fontSize: 16.sp,
+                                  //     fontFamily: FontFamily.bold,
+                                  //     color: AppColors.mainColor,
+                                  //   ),
+                                  // ),
                                   Text(
-                                    "${customer.currencySymbol} ${p.totalSpent ?? '0'}",
-                                    style: TextStyle(
+    "${customer.currencySymbol} ${p.totalAmount != null ? double.parse(p.totalAmount!).toStringAsFixed(2) : '0.00'}",
+
+    style: TextStyle(
                                       fontSize: 16.sp,
                                       fontFamily: FontFamily.bold,
                                       color: AppColors.mainColor,
@@ -490,10 +619,10 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
 
     try {
       final response = await CustomerProvider().fetchCustomerReport(
-        customerId: 0,
+        customerId: selectedCustomerId ?? 0,
         fromDate:DateFormat('yyyy-MM-dd').format(fromDate),
         toDate: DateFormat('yyyy-MM-dd').format(toDate),
-        groupBy: "monthly",
+        groupBy: selectedFilter=="Monthly"?"monthly":selectedFilter=="Yearly"?"yearly":"quarterly",
       );
 
       print("Response Body: ${response.body}");
@@ -591,6 +720,8 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
       onTap: () {
         setState(() {
           selectedFilter = label;
+          _fetchCustomerReport();
+          print("selectedFilter====>>>>${selectedFilter}");
         });
       },
       child: Container(
@@ -623,7 +754,7 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.grey.shade400),
+          border: Border.all(color: AppColors.mainColor),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

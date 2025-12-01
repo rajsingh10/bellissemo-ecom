@@ -1,12 +1,12 @@
 class CustomerReportModal {
   String? mode;
-  Null? customerId;
+ var customerId;
   DateRange? dateRange;
   List<YearlyOverview>? yearlyOverview;
   String? currency;
   String? currencySymbol;
   List<Leaderboard>? leaderboard;
-  List<TopProducts>? topProducts;
+  List<CustomerOrders>? customerOrders;
 
   CustomerReportModal(
       {this.mode,
@@ -16,7 +16,7 @@ class CustomerReportModal {
         this.currency,
         this.currencySymbol,
         this.leaderboard,
-        this.topProducts});
+        this.customerOrders});
 
   CustomerReportModal.fromJson(Map<String, dynamic> json) {
     mode = json['mode'];
@@ -38,10 +38,10 @@ class CustomerReportModal {
         leaderboard!.add(new Leaderboard.fromJson(v));
       });
     }
-    if (json['top_products'] != null) {
-      topProducts = <TopProducts>[];
-      json['top_products'].forEach((v) {
-        topProducts!.add(new TopProducts.fromJson(v));
+    if (json['customer_orders'] != null) {
+      customerOrders = <CustomerOrders>[];
+      json['customer_orders'].forEach((v) {
+        customerOrders!.add(new CustomerOrders.fromJson(v));
       });
     }
   }
@@ -62,8 +62,9 @@ class CustomerReportModal {
     if (this.leaderboard != null) {
       data['leaderboard'] = this.leaderboard!.map((v) => v.toJson()).toList();
     }
-    if (this.topProducts != null) {
-      data['top_products'] = this.topProducts!.map((v) => v.toJson()).toList();
+    if (this.customerOrders != null) {
+      data['customer_orders'] =
+          this.customerOrders!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -139,16 +140,23 @@ class Monthly {
 class Leaderboard {
   String? name;
   String? email;
+  String? customerId;
   String? orderCount;
   String? spent;
   String? avgOrder;
 
   Leaderboard(
-      {this.name, this.email, this.orderCount, this.spent, this.avgOrder});
+      {this.name,
+        this.email,
+        this.customerId,
+        this.orderCount,
+        this.spent,
+        this.avgOrder});
 
   Leaderboard.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     email = json['email'];
+    customerId = json['customer_id'];
     orderCount = json['order_count'];
     spent = json['spent'];
     avgOrder = json['avg_order'];
@@ -158,6 +166,7 @@ class Leaderboard {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['name'] = this.name;
     data['email'] = this.email;
+    data['customer_id'] = this.customerId;
     data['order_count'] = this.orderCount;
     data['spent'] = this.spent;
     data['avg_order'] = this.avgOrder;
@@ -165,39 +174,95 @@ class Leaderboard {
   }
 }
 
-class TopProducts {
-  String? iD;
-  String? postTitle;
-  String? totalQty;
-  String? totalSpent;
-  String? image;
-  String? permalink;
+class CustomerOrders {
+  String? orderId;
+  String? orderDate;
+  String? customerId;
+  String? customerName;
+ var customerEmail;
+  String? status;
+  String? totalAmount;
+  String? currency;
+  List<Items>? items;
+  String? formattedDate;
 
-  TopProducts(
-      {this.iD,
-        this.postTitle,
-        this.totalQty,
-        this.totalSpent,
-        this.image,
-        this.permalink});
+  CustomerOrders(
+      {this.orderId,
+        this.orderDate,
+        this.customerId,
+        this.customerName,
+        this.customerEmail,
+        this.status,
+        this.totalAmount,
+        this.currency,
+        this.items,
+        this.formattedDate});
 
-  TopProducts.fromJson(Map<String, dynamic> json) {
-    iD = json['ID'];
-    postTitle = json['post_title'];
-    totalQty = json['total_qty'];
-    totalSpent = json['total_spent'];
-    image = json['image'];
-    permalink = json['permalink'];
+  CustomerOrders.fromJson(Map<String, dynamic> json) {
+    orderId = json['order_id'];
+    orderDate = json['order_date'];
+    customerId = json['customer_id'];
+    customerName = json['customer_name'];
+    customerEmail = json['customer_email'];
+    status = json['status'];
+    totalAmount = json['total_amount'];
+    currency = json['currency'];
+    if (json['items'] != null) {
+      items = <Items>[];
+      json['items'].forEach((v) {
+        items!.add(new Items.fromJson(v));
+      });
+    }
+    formattedDate = json['formatted_date'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['ID'] = this.iD;
+    data['order_id'] = this.orderId;
+    data['order_date'] = this.orderDate;
+    data['customer_id'] = this.customerId;
+    data['customer_name'] = this.customerName;
+    data['customer_email'] = this.customerEmail;
+    data['status'] = this.status;
+    data['total_amount'] = this.totalAmount;
+    data['currency'] = this.currency;
+    if (this.items != null) {
+      data['items'] = this.items!.map((v) => v.toJson()).toList();
+    }
+    data['formatted_date'] = this.formattedDate;
+    return data;
+  }
+}
+
+class Items {
+  String? productId;
+  String? postTitle;
+  String? productQty;
+  String? productNetRevenue;
+  String? image;
+
+  Items(
+      {this.productId,
+        this.postTitle,
+        this.productQty,
+        this.productNetRevenue,
+        this.image});
+
+  Items.fromJson(Map<String, dynamic> json) {
+    productId = json['product_id'];
+    postTitle = json['post_title'];
+    productQty = json['product_qty'];
+    productNetRevenue = json['product_net_revenue'];
+    image = json['image'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['product_id'] = this.productId;
     data['post_title'] = this.postTitle;
-    data['total_qty'] = this.totalQty;
-    data['total_spent'] = this.totalSpent;
+    data['product_qty'] = this.productQty;
+    data['product_net_revenue'] = this.productNetRevenue;
     data['image'] = this.image;
-    data['permalink'] = this.permalink;
     return data;
   }
 }
