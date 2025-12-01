@@ -92,16 +92,15 @@ class CustomerProvider extends ChangeNotifier {
   }
 
   Future<http.Response> productReport({
-
-    required String fromDate,
-    required String toDate,
-    required String groupBy, // monthly, yearly, quarterly
+    // required String fromDate,
+    // required String toDate,
+    required String groupBy, // monthly, quarterly, yearly
+    required String mounth, // monthly, quarterly, yearly
+    // selected year
   }) async {
     String url = apiEndpoints.fetchProductreport;
 
-    LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
     String? token = await getSavedLoginToken();
-
     if (token == null || token.isEmpty) {
       throw Exception('Token not found');
     }
@@ -113,21 +112,20 @@ class CustomerProvider extends ChangeNotifier {
     };
 
     Map<String, dynamic> body = {
-      "from_date": fromDate,
-      "to_date": toDate,
-      "group_by": "monthly" // monthly, yearly, quarterly
+      "from_date": "",
+      "to_date": "",
+      "group_by": groupBy,
+      "month" : mounth
     };
 
     print("URL => $url");
     print("BODY => $body");
 
-    final response = await http
-        .post(
+    final response = await http.post(
       Uri.parse(url),
       headers: headers,
       body: jsonEncode(body),
-    )
-        .timeout(
+    ).timeout(
       const Duration(seconds: 60),
       onTimeout: () {
         throw const SocketException('Request Timeout');
@@ -136,6 +134,7 @@ class CustomerProvider extends ChangeNotifier {
 
     return responses(response);
   }
+
   Future<http.Response> Customerdetailapi(cid) async {
     String url = "${apiEndpoints.customerdetailapi}$cid";
     LoginModal? loginData = await SaveDataLocal.getDataFromLocal();

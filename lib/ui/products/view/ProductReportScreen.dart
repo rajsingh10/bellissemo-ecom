@@ -70,6 +70,41 @@ class _ProducatReportScreenState extends State<ProducatReportScreen> {
     }
   }
 
+
+  int? selectedYear;
+
+  void pickYear() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        int currentYear = DateTime.now().year;
+        List<int> years = List.generate(10, (index) => currentYear - index); // last 10 years
+        return AlertDialog(
+          title: const Text("Select Year"),
+          content: DropdownButton<int>(
+            isExpanded: true,
+            value: selectedYear,
+            hint: const Text("Select Year"),
+            items: years
+                .map((year) => DropdownMenuItem(
+              value: year,
+              child: Text(year.toString()),
+            ))
+                .toList(),
+            onChanged: (value) {
+              setState(() {
+                selectedYear = value;
+                _fetchCustomerReport();
+              });
+              Navigator.pop(context);
+            },
+          ),
+        );
+      },
+    );
+  }
+
+
   List<Map<String, dynamic>> customers = [
     {"name": "John Doe", "totalSales": 18500},
     {"name": "Emma Stone", "totalSales": 22400},
@@ -97,8 +132,11 @@ class _ProducatReportScreenState extends State<ProducatReportScreen> {
     print("toDate   => ${DateFormat('yyyy-MM-dd').format(toDate)}");
 
     loadInitialData();
+    setState(() {
+      selectedYear=2025;
+    });
   }
-
+  int? selectedMonth;
 
   @override
   Widget build(BuildContext context) {
@@ -118,70 +156,194 @@ class _ProducatReportScreenState extends State<ProducatReportScreen> {
           ),
 
           // ---------- FILTERS ----------
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Column(
+          // haresh bhai code
+          // Padding(
+          //   padding: const EdgeInsets.all(15.0),
+          //   child: Column(
+          //     children: [
+          //       // Filter type
+          //       // Row(
+          //       //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       //   children: [
+          //       //     filterChip("Monthly"),
+          //       //     filterChip("Quarterly"),
+          //       //     filterChip("Yearly"),
+          //       //   ],
+          //       // ),
+          //       // const SizedBox(height: 15),
+          //
+          //       // Date pickers
+          //       Row(
+          //         children: [
+          //           Expanded(
+          //             child: datePickerBox(
+          //               title: "From Date",
+          //               value:
+          //               fromDate == null
+          //                   ? "Select"
+          //                   : DateFormat('dd-MM-yyyy').format(fromDate!),
+          //               onTap: pickFromDate,
+          //             ),
+          //           ),
+          //           const SizedBox(width: 10),
+          //           Expanded(
+          //             child: datePickerBox(
+          //               title: "To Date",
+          //               value:
+          //               toDate == null
+          //                   ? "Select"
+          //                   : DateFormat('dd-MM-yyyy').format(toDate!),
+          //               onTap: pickToDate,
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //
+          //       // const SizedBox(height: 15),
+          //       //
+          //       // ElevatedButton(
+          //       //   style: ElevatedButton.styleFrom(
+          //       //     backgroundColor: AppColors.mainColor,
+          //       //     padding: const EdgeInsets.symmetric(
+          //       //       horizontal: 30,
+          //       //       vertical: 12,
+          //       //     ),
+          //       //   ),
+          //       //   onPressed: () {
+          //       //     // CALL YOUR API HERE
+          //       //     _fetchCustomerReport();
+          //       //   },
+          //       //   child: const Text(
+          //       //     "Apply Filter",
+          //       //     style: TextStyle(color: Colors.white),
+          //       //   ),
+          //       // ),
+          //     ],
+          //   ),
+          // ),
+
+
+
+      Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
+          children: [
+            // Date pickers + Year picker
+            Row(
               children: [
-                // Filter type
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //   children: [
-                //     filterChip("Monthly"),
-                //     filterChip("Quarterly"),
-                //     filterChip("Yearly"),
-                //   ],
+                // Expanded(
+                //   flex: 4,
+                //   child: datePickerBox(
+                //     title: "From Date",
+                //     value: fromDate == null
+                //         ? "Select"
+                //         : DateFormat('dd-MM-yyyy').format(fromDate!),
+                //     onTap: pickFromDate,
+                //   ),
                 // ),
-                // const SizedBox(height: 15),
-
-                // Date pickers
-                Row(
-                  children: [
-                    Expanded(
-                      child: datePickerBox(
-                        title: "From Date",
-                        value:
-                        fromDate == null
-                            ? "Select"
-                            : DateFormat('dd-MM-yyyy').format(fromDate!),
-                        onTap: pickFromDate,
+                // const SizedBox(width: 10),
+                // Expanded(
+                //   flex: 4,
+                //   child: datePickerBox(
+                //     title: "To Date",
+                //     value: toDate == null
+                //         ? "Select"
+                //         : DateFormat('dd-MM-yyyy').format(toDate!),
+                //     onTap: pickToDate,
+                //   ),
+                // ),
+                // const SizedBox(width: 10),
+                Expanded(
+                  flex: 2,
+                  child: GestureDetector(
+                    onTap: pickYear,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Text(
+                        selectedYear == null ? "Select Year" : selectedYear.toString(),
+                        style: const TextStyle(fontSize: 16),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: datePickerBox(
-                        title: "To Date",
-                        value:
-                        toDate == null
-                            ? "Select"
-                            : DateFormat('dd-MM-yyyy').format(toDate!),
-                        onTap: pickToDate,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-
-                // const SizedBox(height: 15),
-                //
-                // ElevatedButton(
-                //   style: ElevatedButton.styleFrom(
-                //     backgroundColor: AppColors.mainColor,
-                //     padding: const EdgeInsets.symmetric(
-                //       horizontal: 30,
-                //       vertical: 12,
-                //     ),
-                //   ),
-                //   onPressed: () {
-                //     // CALL YOUR API HERE
-                //     _fetchCustomerReport();
-                //   },
-                //   child: const Text(
-                //     "Apply Filter",
-                //     style: TextStyle(color: Colors.white),
-                //   ),
-                // ),
               ],
             ),
-          ),
+
+            const SizedBox(height: 15),
+
+            // 🔥 MONTH DROPDOWN (new added)
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  border: Border.all(color: Colors.grey),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<int>(
+                    value: selectedMonth,
+                    hint: const Text("Select Month"),
+                    items: [
+                      { "name": "January", "value": 1 },
+                      { "name": "February", "value": 2 },
+                      { "name": "March", "value": 3 },
+                      { "name": "April", "value": 4 },
+                      { "name": "May", "value": 5 },
+                      { "name": "June", "value": 6 },
+                      { "name": "July", "value": 7 },
+                      { "name": "August", "value": 8 },
+                      { "name": "September", "value": 9 },
+                      { "name": "October", "value": 10 },
+                      { "name": "November", "value": 11 },
+                      { "name": "December", "value": 12 },
+                    ].map((month) {
+                      return DropdownMenuItem<int>(
+                        value: month["value"] as int,
+                        child: Text(month["name"] as String),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedMonth = value;
+                        _fetchCustomerReport();
+                      });
+                      print("Selected Month Number ===>>> $selectedMonth");
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+
+
+        // const SizedBox(height: 15),
+
+            // ElevatedButton(
+            //   style: ElevatedButton.styleFrom(
+            //     backgroundColor: AppColors.mainColor,
+            //     padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+            //   ),
+            //   onPressed: () {
+            //
+            //   },
+            //   child: const Text(
+            //     "Apply Filter",
+            //     style: TextStyle(color: Colors.white),
+            //   ),
+            // ),
+          ],
+        ),
+      ),
+
+
 
           Row(
             children: [
@@ -659,10 +821,11 @@ class _ProducatReportScreenState extends State<ProducatReportScreen> {
 
     try {
       final response = await CustomerProvider().productReport(
+mounth: selectedMonth.toString(),
+        // fromDate:DateFormat('yyyy-MM-dd').format(fromDate),
+        // toDate:DateFormat('yyyy-MM-dd').format(toDate),
+        groupBy: selectedYear?.toString() ?? DateTime.now().year.toString(),
 
-        fromDate:DateFormat('yyyy-MM-dd').format(fromDate),
-        toDate:DateFormat('yyyy-MM-dd').format(toDate),
-        groupBy: "monthly",
       );
 
       print("Response Body: ${response.body}");
