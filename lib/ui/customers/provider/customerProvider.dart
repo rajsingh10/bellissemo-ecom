@@ -71,4 +71,34 @@ class CustomerProvider extends ChangeNotifier {
 
     return responseJson;
   }
+  Future<http.Response> deleteDailyData(String id) async {
+    String url = "${apiEndpoints.deletecustmer}$id";
+    LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
+    String token = loginData?.token ?? '';
+    print("my token :: $token");
+    if (token.isEmpty) {
+      throw Exception('Token not found');
+    }
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $token',
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    };
+    try {
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {
+          "Accept": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      print("Delete DailyData Status: ${response.statusCode}");
+      print("Delete DailyData Body: ${response.body}");
+
+      return response;
+    } catch (e) {
+      throw Exception("❌ Exception in deleteDailyData: $e");
+    }
+  }
 }

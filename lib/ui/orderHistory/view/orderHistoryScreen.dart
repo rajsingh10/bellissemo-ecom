@@ -206,7 +206,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     },
                   ),
                   if (isSearchEnabled)
-                    SearchField(controller: searchController),
+                    SearchField(controller: searchController,onChanged: (value) {
+                      applySearch(value);
+                    },),
                   SizedBox(height: 1.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -818,6 +820,106 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                           ),
                         ),
                       ),
+
+
+                  // Expanded(
+                  //   child: ordersList.isEmpty
+                  //       ? Padding(
+                  //     padding: EdgeInsets.symmetric(
+                  //       vertical: isIpad ? 2.h : 15.h,
+                  //     ),
+                  //     child: emptyWidget(
+                  //       icon: Icons.shopping_cart_outlined,
+                  //       text: 'Order History',
+                  //     ),
+                  //   )
+                  //       : ListView.builder(
+                  //     physics: const ClampingScrollPhysics(),
+                  //     itemCount: ordersList.length,
+                  //     itemBuilder: (context, index) {
+                  //       final order = ordersList[index];
+                  //
+                  //       return Padding(
+                  //         padding: const EdgeInsets.only(bottom: 12),
+                  //         child: Card(
+                  //           elevation: 2,
+                  //           shadowColor: AppColors.containerColor,
+                  //           shape: RoundedRectangleBorder(
+                  //             borderRadius: BorderRadius.circular(16),
+                  //           ),
+                  //           color: AppColors.whiteColor,
+                  //           child: ExpansionTile(
+                  //             tilePadding: const EdgeInsets.symmetric(
+                  //               horizontal: 12,
+                  //               vertical: 4,
+                  //             ),
+                  //             shape: RoundedRectangleBorder(
+                  //               borderRadius: BorderRadius.circular(16),
+                  //             ),
+                  //             backgroundColor: AppColors.whiteColor,
+                  //
+                  //             title: Column(
+                  //               crossAxisAlignment: CrossAxisAlignment.start,
+                  //               children: [
+                  //                 Row(
+                  //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //                   children: [
+                  //                     Text(
+                  //                       "Order No #${order.id}",
+                  //                       style: TextStyle(
+                  //                         fontSize: 16.sp,
+                  //                         fontWeight: FontWeight.w600,
+                  //                         fontFamily: FontFamily.bold,
+                  //                         color: AppColors.blackColor,
+                  //                       ),
+                  //                     ),
+                  //                     Text(
+                  //                       formatDate(order.dateCreated),
+                  //                       style: TextStyle(
+                  //                         fontSize: 16.sp,
+                  //                         color: AppColors.gray,
+                  //                         fontFamily: FontFamily.bold,
+                  //                       ),
+                  //                     ),
+                  //                   ],
+                  //                 ),
+                  //                 SizedBox(height: 0.5.h),
+                  //                 Row(
+                  //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //                   children: [
+                  //                     Text(
+                  //                       customerName ?? "",
+                  //                       style: TextStyle(
+                  //                         fontSize: 16.sp,
+                  //                         color: AppColors.blackColor,
+                  //                         fontFamily: FontFamily.bold,
+                  //                       ),
+                  //                     ),
+                  //                     Text(
+                  //                       "${order.currencySymbol} ${order.total}",
+                  //                       style: TextStyle(
+                  //                         fontSize: 16.sp,
+                  //                         fontWeight: FontWeight.w600,
+                  //                         fontFamily: FontFamily.bold,
+                  //                         color: AppColors.greenColor,
+                  //                       ),
+                  //                     ),
+                  //                   ],
+                  //                 ),
+                  //               ],
+                  //             ),
+                  //
+                  //             children: [
+                  //               _buildOrderDetails(order),
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       );
+                  //     },
+                  //   ),
+                  // )
+
+
                 ],
               ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
       bottomNavigationBar: SizedBox(
@@ -826,8 +928,301 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       ),
     );
   }
+  Widget _buildOrderDetails(order) {
+    double subtotal = 0.0;
 
-  // Future<void> _fetchOrders() async {
+    for (var item in order.lineItems ?? []) {
+      final double price = double.tryParse(item.price?.toString() ?? "0") ?? 0.0;
+      final int qty = item.quantity ?? 0;
+      subtotal += price * qty;
+    }
+
+    return Column(
+      children: [
+        for (var item in order.lineItems ?? [])
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 6,
+              horizontal: 12,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: CustomNetworkImage(
+                    imageUrl: item.image?.src ?? "",
+                    height: 100,
+                    width: 100,
+                    isCircle: true,
+                    isFit: true,
+                    isProfile: false,
+                  ),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.name ?? "",
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontFamily: FontFamily.semiBold,
+                          color: AppColors.blackColor,
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Text(
+                        "Qty: ${item.quantity} • ${order.currencySymbol} ${item.subtotal ?? 0}",
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color: AppColors.gray,
+                          fontFamily: FontFamily.semiBold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+        // Divider
+        Divider(),
+
+        _buildRow("Delivery Note:", order.orderNote ?? "N/A"),
+        _buildRow(
+          "Delivery Date:",
+          order.deliveryDate == "" || order.deliveryDate == "null" || order.deliveryDate == null
+              ? "N/A"
+              : order.deliveryDate!,
+        ),
+        _buildRow(
+          "Sub Total:",
+          "${order.currencySymbol} ${subtotal.toStringAsFixed(2)}",
+        ),
+        _buildRow(
+          "Shipping:",
+          "+ ${order.currencySymbol} ${order.shippingTotal ?? 0}",
+        ),
+        _buildRow(
+          "Discount:",
+          "- ${order.currencySymbol} ${(double.tryParse(order.discountTotal?.toString() ?? "0") ?? 0).toStringAsFixed(2)}",
+        ),
+        _buildRow(
+          "Total:",
+          "${order.currencySymbol} ${(double.tryParse(order.total?.toString() ?? "0") ?? 0).toStringAsFixed(2)}",
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRow(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _fetchOrders() async {
+    var box = HiveService().getOrdersBox();
+
+    if (!await checkInternet()) {
+      final cachedData = box.get('orders_$customerId');
+      if (cachedData != null) {
+        final List data = json.decode(cachedData);
+        final fetchedOrders =
+        data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
+
+        setState(() {
+          _allOrdersList = fetchedOrders;
+          ordersList = List.from(_allOrdersList);
+          // Apply current sort option after fetching
+          if (selectedSort.isNotEmpty && selectedSort != "All") {
+            sortOrders(selectedSort);
+          } else {
+            // Default to newest first
+            ordersList.sort(
+                  (a, b) =>
+                  parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
+            );
+          }
+        });
+      } else {
+        showCustomErrorSnackbar(
+          title: 'No Internet',
+          message: 'Please check your connection and try again.',
+        );
+      }
+      return;
+    }
+
+    try {
+      final response = await OrderHistoryProvider().fetchOrders(customerId);
+      if (response.statusCode == 200) {
+        final List data = json.decode(response.body);
+        final fetchedOrders =
+        data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
+
+        setState(() {
+          _allOrdersList = fetchedOrders;
+          ordersList = List.from(_allOrdersList);
+          // Apply current sort option after fetching
+          if (selectedSort.isNotEmpty && selectedSort != "All") {
+            sortOrders(selectedSort);
+          } else {
+            // Default to newest first
+            ordersList.sort(
+                  (a, b) =>
+                  parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
+            );
+          }
+        });
+
+        // Save to Hive
+        await box.put('orders_$customerId', response.body);
+      } else {
+        // Fallback: load cache if server fails
+        final cachedData = box.get('orders_$customerId');
+        if (cachedData != null) {
+          final List data = json.decode(cachedData);
+          final fetchedOrders =
+          data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
+
+          setState(() {
+            _allOrdersList = fetchedOrders;
+            ordersList = List.from(_allOrdersList);
+            if (selectedSort.isNotEmpty && selectedSort != "All") {
+              sortOrders(selectedSort);
+            }
+          });
+        }
+        showCustomErrorSnackbar(
+          title: 'Server Error',
+          message: 'Something went wrong. Please try again later.',
+        );
+      }
+    } catch (_) {
+      // Fallback: load cache on network error
+      final cachedData = box.get('orders_$customerId');
+      if (cachedData != null) {
+        final List data = json.decode(cachedData);
+        final fetchedOrders =
+        data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
+
+        setState(() {
+          _allOrdersList = fetchedOrders;
+          ordersList = List.from(_allOrdersList);
+          if (selectedSort.isNotEmpty && selectedSort != "All") {
+            sortOrders(selectedSort);
+          }
+        });
+      }
+      showCustomErrorSnackbar(
+        title: 'Network Error',
+        message: 'Unable to connect. Please check your internet and try again.',
+      );
+    }
+  }
+
+  // Add a refresh method
+  Future<void> refreshOrders() async {
+    setState(() {
+      ordersList = List.from(_allOrdersList);
+      selectedSort = "All";
+      // Reset to default sort (newest first)
+      ordersList.sort(
+            (a, b) => parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
+      );
+    });
+  }
+
+  // Or if you want a simple reset method
+  void resetOrders() {
+    setState(() {
+      ordersList = List.from(_allOrdersList);
+      selectedSort = "All";
+      ordersList.sort(
+            (a, b) => parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
+      );
+    });
+  }
+  void applySearch(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        ordersList = List.from(_allOrdersList);
+      });
+      return;
+    }
+
+    query = query.toLowerCase();
+
+    List<CustomerOrderWiseModal> filtered = [];
+
+    for (var order in _allOrdersList) {
+      bool matchOrderId = order.id.toString().toLowerCase().contains(query);
+      bool matchTotal = order.total.toString().toLowerCase().contains(query);
+      bool matchDate = formatDate(order.dateCreated).toLowerCase().contains(query);
+      bool matchNote = (order.orderNote ?? "").toLowerCase().contains(query);
+
+      // FILTER line items
+      final filteredItems = (order.lineItems ?? []).where((item) {
+        return (item.name ?? "").toLowerCase().contains(query);
+      }).toList();
+
+      bool matchProduct = filteredItems.isNotEmpty;
+
+      bool matched = matchOrderId ||
+          matchTotal ||
+          matchDate ||
+          matchNote ||
+          matchProduct;
+
+      if (matched) {
+        filtered.add(
+          CustomerOrderWiseModal(
+            id: order.id,
+            total: order.total,
+            dateCreated: order.dateCreated,
+            orderNote: order.orderNote,
+            shippingTotal: order.shippingTotal,
+            discountTotal: order.discountTotal,
+            deliveryDate: order.deliveryDate,
+            currencySymbol: order.currencySymbol,
+            lineItems: matchProduct ? filteredItems : order.lineItems,
+          ),
+        );
+      }
+    }
+
+    // 🟢 THIS PART WAS MISSING!
+    setState(() {
+      ordersList = filtered;
+    });
+  }
+
+
+
+// Future<void> _fetchOrders() async {
   //   var box = HiveService().getOrdersBox();
   //
   //   if (!await checkInternet()) {
@@ -881,127 +1276,5 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   //     );
   //   }
   // }
-  Future<void> _fetchOrders() async {
-    var box = HiveService().getOrdersBox();
 
-    if (!await checkInternet()) {
-      final cachedData = box.get('orders_$customerId');
-      if (cachedData != null) {
-        final List data = json.decode(cachedData);
-        final fetchedOrders =
-            data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
-
-        setState(() {
-          _allOrdersList = fetchedOrders;
-          ordersList = List.from(_allOrdersList);
-          // Apply current sort option after fetching
-          if (selectedSort.isNotEmpty && selectedSort != "All") {
-            sortOrders(selectedSort);
-          } else {
-            // Default to newest first
-            ordersList.sort(
-              (a, b) =>
-                  parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
-            );
-          }
-        });
-      } else {
-        showCustomErrorSnackbar(
-          title: 'No Internet',
-          message: 'Please check your connection and try again.',
-        );
-      }
-      return;
-    }
-
-    try {
-      final response = await OrderHistoryProvider().fetchOrders(customerId);
-      if (response.statusCode == 200) {
-        final List data = json.decode(response.body);
-        final fetchedOrders =
-            data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
-
-        setState(() {
-          _allOrdersList = fetchedOrders;
-          ordersList = List.from(_allOrdersList);
-          // Apply current sort option after fetching
-          if (selectedSort.isNotEmpty && selectedSort != "All") {
-            sortOrders(selectedSort);
-          } else {
-            // Default to newest first
-            ordersList.sort(
-              (a, b) =>
-                  parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
-            );
-          }
-        });
-
-        // Save to Hive
-        await box.put('orders_$customerId', response.body);
-      } else {
-        // Fallback: load cache if server fails
-        final cachedData = box.get('orders_$customerId');
-        if (cachedData != null) {
-          final List data = json.decode(cachedData);
-          final fetchedOrders =
-              data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
-
-          setState(() {
-            _allOrdersList = fetchedOrders;
-            ordersList = List.from(_allOrdersList);
-            if (selectedSort.isNotEmpty && selectedSort != "All") {
-              sortOrders(selectedSort);
-            }
-          });
-        }
-        showCustomErrorSnackbar(
-          title: 'Server Error',
-          message: 'Something went wrong. Please try again later.',
-        );
-      }
-    } catch (_) {
-      // Fallback: load cache on network error
-      final cachedData = box.get('orders_$customerId');
-      if (cachedData != null) {
-        final List data = json.decode(cachedData);
-        final fetchedOrders =
-            data.map((e) => CustomerOrderWiseModal.fromJson(e)).toList();
-
-        setState(() {
-          _allOrdersList = fetchedOrders;
-          ordersList = List.from(_allOrdersList);
-          if (selectedSort.isNotEmpty && selectedSort != "All") {
-            sortOrders(selectedSort);
-          }
-        });
-      }
-      showCustomErrorSnackbar(
-        title: 'Network Error',
-        message: 'Unable to connect. Please check your internet and try again.',
-      );
-    }
-  }
-
-  // Add a refresh method
-  Future<void> refreshOrders() async {
-    setState(() {
-      ordersList = List.from(_allOrdersList);
-      selectedSort = "All";
-      // Reset to default sort (newest first)
-      ordersList.sort(
-        (a, b) => parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
-      );
-    });
-  }
-
-  // Or if you want a simple reset method
-  void resetOrders() {
-    setState(() {
-      ordersList = List.from(_allOrdersList);
-      selectedSort = "All";
-      ordersList.sort(
-        (a, b) => parseDate(b.dateCreated).compareTo(parseDate(a.dateCreated)),
-      );
-    });
-  }
 }

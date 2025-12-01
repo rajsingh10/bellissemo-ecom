@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../apiCalling/buildErrorDialog.dart';
 import '../../../apiCalling/checkInternetModule.dart';
 import '../../../services/hiveServices.dart';
 import '../../../utils/colors.dart';
@@ -17,6 +18,7 @@ import '../../../utils/fontFamily.dart';
 import '../../../utils/searchFields.dart';
 import '../../../utils/snackBars.dart';
 import '../../../utils/titlebarWidget.dart';
+import '../modal/DeleteCstomerModal.dart';
 import '../modal/fetchCustomersModal.dart';
 import '../provider/customerProvider.dart';
 import 'addCustomerScreen.dart';
@@ -447,25 +449,12 @@ class _CustomersScreenState extends State<CustomersScreen> {
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(color: AppColors.border),
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // ClipRRect(
-            //   borderRadius: const BorderRadius.vertical(
-            //     top: Radius.circular(15),
-            //   ),
-            //   child: CustomNetworkImage(
-            //     imageUrl: customer.imageUrl ?? '',
-            //     height: isIpad ? 10.w : 20.w,
-            //     width: isIpad ? 10.w : 20.w,
-            //     isFit: true,
-            //     radius: 15,
-            //   ),
-            // ),
-            Padding(
-              padding: EdgeInsets.all(2.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: Padding(
+          padding: EdgeInsets.all(2.w),
+          child:   Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
                   Text(
                     "${customer.firstName} ${customer.lastName}",
@@ -477,30 +466,82 @@ class _CustomersScreenState extends State<CustomersScreen> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 0.5.h),
-                  // Text(
-                  //   customer.username ?? '',
-                  //   style: TextStyle(
-                  //     fontSize: 14.sp,
-                  //     fontFamily: FontFamily.regular,
-                  //     color: AppColors.gray,
-                  //   ),
-                  // ),
-                  // SizedBox(height: 0.5.h),
-                  Text(
-                    customer.email ?? '',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontFamily: FontFamily.regular,
-                      color: AppColors.gray,
-                    ),
-                  ),
+                  Spacer(),
+                  InkWell(
+                    onTap: (){
+                      deleteDailyData(customer.id.toString());
+                    },
+                      child: Container(
+                        width: 10.w,
+                        height: 10.w,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100),
+                          color: AppColors.mainColor
+
+                        ),
+                          child: Icon(Icons.delete,color: Colors.white,))),
                 ],
               ),
-            ),
-          ],
+              SizedBox(height: 0.5.h),
+              // Text(
+              //   customer.username ?? '',
+              //   style: TextStyle(
+              //     fontSize: 14.sp,
+              //     fontFamily: FontFamily.regular,
+              //     color: AppColors.gray,
+              //   ),
+              // ),
+              // SizedBox(height: 0.5.h),
+              Text(
+                customer.email ?? '',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontFamily: FontFamily.regular,
+                  color: AppColors.gray,
+                ),
+              ),
+            ],
+          ),
         ).paddingSymmetric(horizontal: 1.w, vertical: 0.5.h),
       ),
     );
+  }
+  DeleteCstomerModal? deleteCstomerModal;
+  bool loader =false;
+  deleteDailyData(String id) {
+    checkInternet().then((internet) async {
+      setState(() {
+        loader = true;
+      });
+
+      if (!internet) {
+        setState(() => loader = false);
+        buildErrorDialog(context, 'Error', "Internet Required");
+        return;
+      }
+
+      try {
+        final response = await CustomerProvider().deleteDailyData(id);
+
+        if (response.statusCode == 200) {
+          // ✅ Successfully deleted → refresh list
+          loadInitialData();
+
+          Get.snackbar(
+            "Success",
+            "Customer Delete Success",
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+            snackPosition: SnackPosition.TOP,
+          );
+        } else {
+          setState(() => loader = false);
+          buildErrorDialog(context, 'Error', "Failed to delete data");
+        }
+      } catch (error) {
+        setState(() => loader = false);
+        buildErrorDialog(context, 'Error', error.toString());
+      }
+    });
   }
 }
