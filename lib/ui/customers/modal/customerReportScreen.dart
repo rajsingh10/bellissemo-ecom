@@ -91,7 +91,7 @@ class DateRange {
 
 class YearlyOverview {
   String? year;
-  double? totalSales;
+  var totalSales;
   List<Monthly>? monthly;
 
   YearlyOverview({this.year, this.totalSales, this.monthly});
@@ -120,7 +120,7 @@ class YearlyOverview {
 
 class Monthly {
   String? month;
-  double? total;
+  var total;
 
   Monthly({this.month, this.total});
 
