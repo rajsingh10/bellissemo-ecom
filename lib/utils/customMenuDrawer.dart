@@ -19,7 +19,10 @@ import '../ApiCalling/apiConfigs.dart';
 import '../apiCalling/checkInternetModule.dart';
 import '../services/hiveServices.dart';
 import '../ui/category/view/categoryScreen.dart';
+import '../ui/customers/modal/customerReportScreen.dart';
+import '../ui/customers/view/customerReportScreen.dart';
 import '../ui/home/view/homeMenuScreen.dart';
+import '../ui/products/view/ProductReportScreen.dart';
 import '../ui/profile/modal/profileModal.dart';
 import '../ui/profile/provider/profileProvider.dart';
 import 'cachedNetworkImage.dart';
@@ -168,6 +171,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   }),
                   _drawerItem(Icons.people_alt_outlined, "Customers", () {
                     Get.to(() => CustomersScreen());
+                  }),
+                  _drawerItem(Icons.area_chart, "Customers Report", () {
+                    Get.to(() => CustomerReportScreen());
+                  }),
+                  _drawerItem(Icons.area_chart, "Product Report", () {
+                    Get.to(() => ProducatReportScreen());
                   }),
                   _drawerItem(Icons.shopping_cart_outlined, "Cart", () {
                     Get.offAll(() => CartScreen());

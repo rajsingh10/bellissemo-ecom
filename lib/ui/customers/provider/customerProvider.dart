@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:bellissemo_ecom/ui/login/modal/loginModal.dart';
@@ -43,7 +44,98 @@ class CustomerProvider extends ChangeNotifier {
 
     return responseJson;
   }
+  Future<http.Response> fetchCustomerReport({
+    required int customerId,
+    required String fromDate,
+    required String toDate,
+    required String groupBy, // monthly, yearly, quarterly
+  }) async {
+    String url = apiEndpoints.fetchCustomersreport;
 
+    LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
+    String? token = await getSavedLoginToken();
+
+    if (token == null || token.isEmpty) {
+      throw Exception('Token not found');
+    }
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $token',
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    };
+
+    Map<String, dynamic> body = {
+      "customer_id": customerId,
+      "from_date": fromDate,
+      "to_date": toDate,
+      "group_by": groupBy
+    };
+
+    print("URL => $url");
+    print("BODY => $body");
+
+    final response = await http
+        .post(
+      Uri.parse(url),
+      headers: headers,
+      body: jsonEncode(body),
+    )
+        .timeout(
+      const Duration(seconds: 60),
+      onTimeout: () {
+        throw const SocketException('Request Timeout');
+      },
+    );
+
+    return responses(response);
+  }
+
+  Future<http.Response> productReport({
+
+    required String fromDate,
+    required String toDate,
+    required String groupBy, // monthly, yearly, quarterly
+  }) async {
+    String url = apiEndpoints.fetchProductreport;
+
+    LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
+    String? token = await getSavedLoginToken();
+
+    if (token == null || token.isEmpty) {
+      throw Exception('Token not found');
+    }
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $token',
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    };
+
+    Map<String, dynamic> body = {
+      "from_date": fromDate,
+      "to_date": toDate,
+      "group_by": "monthly" // monthly, yearly, quarterly
+    };
+
+    print("URL => $url");
+    print("BODY => $body");
+
+    final response = await http
+        .post(
+      Uri.parse(url),
+      headers: headers,
+      body: jsonEncode(body),
+    )
+        .timeout(
+      const Duration(seconds: 60),
+      onTimeout: () {
+        throw const SocketException('Request Timeout');
+      },
+    );
+
+    return responses(response);
+  }
   Future<http.Response> Customerdetailapi(cid) async {
     String url = "${apiEndpoints.customerdetailapi}$cid";
     LoginModal? loginData = await SaveDataLocal.getDataFromLocal();

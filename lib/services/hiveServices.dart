@@ -12,6 +12,8 @@ class HiveService {
   late Box bannerBox;
   late Box profileBox;
   late Box customerBox;
+  late Box customerReport;
+  late Box prodductReport;
   late Box productsBox;
   late Box variationsBox;
   late Box categoryProductsBox;
@@ -38,6 +40,8 @@ class HiveService {
     bannerBox = await Hive.openBox('bannerBox');
     profileBox = await Hive.openBox('profileBox');
     customerBox = await Hive.openBox('customerBox');
+    customerReport = await Hive.openBox('customerReport');
+    prodductReport = await Hive.openBox('prodductReport');
     productsBox = await Hive.openBox('productsBox');
     variationsBox = await Hive.openBox('variationsBox');
     categoryProductsBox = await Hive.openBox('categoryProductsBox');
@@ -66,6 +70,8 @@ class HiveService {
   Box getProfileBox() => profileBox;
 
   Box getCustomerBox() => customerBox;
+  Box getCustomerReportBox() => customerReport;
+  Box getProductReportBox() => prodductReport;
 
   Box getProductsBox() => productsBox;
 
