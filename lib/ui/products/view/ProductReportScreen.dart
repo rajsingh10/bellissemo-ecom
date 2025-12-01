@@ -117,7 +117,14 @@ class _ProducatReportScreenState extends State<ProducatReportScreen> {
   @override
   void initState() {
     super.initState();
+    int currentYear = DateTime.now().year;
 
+    // 🔥 Dynamic year list (example: 2015 → 2030)
+    for (int i = currentYear - 10; i <= currentYear + 2; i++) {
+      yearList.add(i);
+    }
+
+    selectedYear = currentYear;  // 🔥 default = this year
     DateTime now = DateTime.now();
 
     setState(() {
@@ -137,6 +144,8 @@ class _ProducatReportScreenState extends State<ProducatReportScreen> {
     });
   }
   int? selectedMonth;
+
+  List<int> yearList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -255,22 +264,32 @@ class _ProducatReportScreenState extends State<ProducatReportScreen> {
                 // const SizedBox(width: 10),
                 Expanded(
                   flex: 2,
-                  child: GestureDetector(
-                    onTap: pickYear,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Text(
-                        selectedYear == null ? "Select Year" : selectedYear.toString(),
-                        style: const TextStyle(fontSize: 16),
-                        textAlign: TextAlign.center,
+                  child: Container(
+                    padding:  EdgeInsets.symmetric(vertical: 1,horizontal: 10),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.mainColor),
+                      borderRadius: BorderRadius.circular(90),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<int>(
+                        value: selectedYear,
+                        items: yearList.map((year) {
+                          return DropdownMenuItem<int>(
+                            value: year,
+                            child: Text(year.toString()),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedYear = value!;
+                          });
+                          print("Selected Year => $selectedYear");
+                        },
                       ),
                     ),
                   ),
                 ),
+
               ],
             ),
 
@@ -281,10 +300,10 @@ class _ProducatReportScreenState extends State<ProducatReportScreen> {
           children: [
             Expanded(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+                padding:  EdgeInsets.symmetric(vertical: 1,horizontal: 10),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(90),
+                  border: Border.all(color: AppColors.mainColor),
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<int>(
