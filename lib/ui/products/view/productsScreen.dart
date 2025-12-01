@@ -13,6 +13,7 @@ import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:bellissemo_ecom/utils/searchFields.dart';
 import 'package:bellissemo_ecom/utils/snackBars.dart';
 import 'package:bellissemo_ecom/utils/titlebarWidget.dart';
+import 'package:bellissemo_ecom/utils/verticleBar.dart'; // Make sure this import is correct
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -64,6 +65,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   int? customerId;
   Orientation? _lastOrientation;
   int _currentImageIndex = 0;
+  bool isIpad = 100.w >= 800; // Define isIpad property
 
   Future<void> _loadCustomer() async {
     final prefs = await SharedPreferences.getInstance();
@@ -75,20 +77,18 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   List<int> _optionsFor(Orientation orientation) {
-    if (!isIpad) return [3, 4]; // phone
+    if (!isIpad) return [2, 3]; // phone
     return orientation != Orientation.portrait
-        ? [3, 4, 5, 6] // iPad portrait
-        : [3, 4, 5]; // iPad landscape
+        ? [3, 4, 5, 6] // iPad landscape
+        : [3, 4, 5]; // iPad portrait
   }
 
-  // NEW: clamp currently selected itemsPerPage to valid list
   void _ensureValidItemsPerPage(Orientation orientation) {
     final newOptions = _optionsFor(orientation);
     if (!_listEquals(newOptions, itemsPerPageOptions)) {
       itemsPerPageOptions = newOptions;
 
       if (!itemsPerPageOptions.contains(itemsPerPage)) {
-        // choose the closest allowed value to current selection
         int closest = itemsPerPageOptions.first;
         int minDiff = (itemsPerPage - closest).abs();
         for (final v in itemsPerPageOptions) {
@@ -103,7 +103,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
   }
 
-  // tiny helper
   bool _listEquals(List<int> a, List<int> b) {
     if (identical(a, b)) return true;
     if (a.length != b.length) return false;
@@ -119,9 +118,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
   void initState() {
     super.initState();
     setState(() {
-      itemsPerPage = isIpad ? 4 : 3;
+      itemsPerPage = isIpad ? 4 : 2;
     });
-    _loadCustomer(); // instead of dummy products
+    _loadCustomer();
     searchController.addListener(() {
       _filterProducts(searchController.text);
     });
@@ -132,12 +131,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   Future<void> loadInitialData() async {
     setState(() => isLoading = true);
-
-    // Load cached data first for immediate display
     _loadCachedData();
-
     final stopwatch = Stopwatch()..start();
-
     try {
       await Future.wait([
         _fetchProducts().then((_) => setState(() {})),
@@ -152,30 +147,28 @@ class _ProductsScreenState extends State<ProductsScreen> {
       log("Error loading initial data: $e");
     } finally {
       stopwatch.stop();
-      log("All API calls completed in ${stopwatch.elapsed.inMilliseconds} ms");
       setState(() => isLoading = false);
     }
   }
 
+  // ... [Keep your existing _loadCachedData, _filterProducts, dispose methods] ...
   void _loadCachedData() {
     final productsBox = HiveService().getCategoryProductsBox();
     final subCategoriesBox = HiveService().getSubCategoriesBox();
     final pdfFileBox = HiveService().getPdfFileBox();
 
-    // ✅ use the same key pattern as fetch (_fetchProducts)
     final cachedProducts = productsBox.get('categoryProducts_${widget.id}');
     if (cachedProducts != null) {
       final List data = json.decode(cachedProducts);
       categoryWiseProductsList =
           data.map((e) => CategoryWiseProductsModal.fromJson(e)).toList();
-      _filterProducts(); // refresh filtered list
+      _filterProducts();
     }
 
     final cachedSubCategories = subCategoriesBox.get(
       'subCategories_${widget.id}',
     );
     if (cachedSubCategories != null) {
-      // ✅ fixed null check
       final List data = json.decode(cachedSubCategories);
       subCategoriesList =
           data.map((e) => FetchSubCategoriesModal.fromJson(e)).toList();
@@ -231,14 +224,16 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   @override
   void dispose() {
-    searchController.dispose(); // (good hygiene)
+    searchController.dispose();
     _scrollCtrl.dispose();
     super.dispose();
   }
 
+  // ==========================================
+  // ============ UPDATED BUILD METHOD ========
+  // ==========================================
   @override
   Widget build(BuildContext context) {
-    // Wrap with OrientationBuilder to detect rotation and force itemsPerPage = 4
     return OrientationBuilder(
       builder: (context, orientation) {
         if (_lastOrientation != orientation) {
@@ -246,908 +241,549 @@ class _ProductsScreenState extends State<ProductsScreen> {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (!mounted) return;
             setState(() {
-              // update options and clamp value safely on orientation change
               _ensureValidItemsPerPage(orientation);
             });
           });
         } else {
-          // first build or unchanged—still ensure options are correct
           _ensureValidItemsPerPage(orientation);
         }
+
+        // --- RESPONSIVE LOGIC ---
+        bool isWideDevice = 100.w >= 700;
+        bool isLandscape = orientation == Orientation.landscape;
+        bool showSideBar = isWideDevice && isLandscape;
 
         return Scaffold(
           backgroundColor: AppColors.bgColor,
           body:
               isLoading
                   ? Loader()
-                  : Stack(
+                  : showSideBar
+                  // iPad Landscape: Row (Sidebar + Content)
+                  ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        children: [
-                          // helper right above build if you like:
-                          // bool _isIpadPortrait(Orientation o) => isIpad && o == Orientation.portrait;
-                          (isIpad && orientation == Orientation.portrait)
-                              ? TitleBarIpadPotrait(
-                                title:
-                                    widget.cate == null
-                                        ? 'Products'
-                                        : widget.cate.toString(),
-                                isDrawerEnabled: true,
-                                isSearchEnabled: true,
-                                isBackEnabled: true,
-                                showDownloadButton: true,
-                                onDownload: () async {
-                                  var box = HiveService().getPdfFileBox();
-
-                                  final cachedBytes = box.get(
-                                    'pdf_bytes_${widget.slug}',
-                                  );
-                                  if (cachedBytes != null) {
-                                    await downloadFile(
-                                      null,
-                                      context,
-                                      "${widget.cate} - Catalog",
-                                      'pdf',
-                                      fileBytes: Uint8List.fromList(
-                                        cachedBytes,
-                                      ),
-                                    );
-                                    return;
-                                  }
-
-                                  if (pdfLink.isEmpty) {
-                                    showCustomErrorSnackbar(
-                                      title: "PDF Unavailable",
-                                      message:
-                                          "PDF is not available for download right now.",
-                                    );
-                                    return;
-                                  }
-
-                                  await downloadFile(
-                                    pdfLink,
-                                    context,
-                                    "${widget.cate} - Catalog - ${pdfLink.split('/').last.split('.').first}",
-                                    pdfLink.split('/').last.split('.').last,
-                                  );
-                                },
-                                onSearch: () {
-                                  setState(() {
-                                    isSearchEnabled = !isSearchEnabled;
-                                  });
-                                },
-                              )
-                              : TitleBar(
-                                title:
-                                    widget.cate == null
-                                        ? 'Products'
-                                        : widget.cate.toString(),
-                                isDrawerEnabled: true,
-                                isSearchEnabled: true,
-                                isBackEnabled: true,
-                                showDownloadButton: true,
-                                onDownload: () async {
-                                  var box = HiveService().getPdfFileBox();
-
-                                  final cachedBytes = box.get(
-                                    'pdf_bytes_${widget.slug}',
-                                  );
-                                  if (cachedBytes != null) {
-                                    await downloadFile(
-                                      null,
-                                      context,
-                                      "${widget.cate} - Catalog",
-                                      'pdf',
-                                      fileBytes: Uint8List.fromList(
-                                        cachedBytes,
-                                      ),
-                                    );
-                                    return;
-                                  }
-
-                                  if (pdfLink.isEmpty) {
-                                    showCustomErrorSnackbar(
-                                      title: "PDF Unavailable",
-                                      message:
-                                          "PDF is not available for download right now.",
-                                    );
-                                    return;
-                                  }
-
-                                  await downloadFile(
-                                    pdfLink,
-                                    context,
-                                    "${widget.cate} - Catalog - ${pdfLink.split('/').last.split('.').first}",
-                                    pdfLink.split('/').last.split('.').last,
-                                  );
-                                },
-                                onSearch: () {
-                                  setState(() {
-                                    isSearchEnabled = !isSearchEnabled;
-                                  });
-                                },
-                              ),
-
-                          isSearchEnabled
-                              ? SearchField(controller: searchController)
-                              : const SizedBox.shrink(),
-                          SizedBox(height: 1.h),
-                          Expanded(
-                            child: Scrollbar(
-                              controller: _scrollCtrl,
-                              thumbVisibility: true,
-                              // always show thumb
-                              trackVisibility: isIpad,
-                              // show track on iPad
-                              interactive: true,
-                              thickness: isIpad ? 8 : 6,
-                              radius: const Radius.circular(12),
-                              child: SingleChildScrollView(
-                                controller: _scrollCtrl,
-                                physics: const ClampingScrollPhysics(),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 3.w,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                              30,
-                                            ),
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                color: Colors.black12,
-                                                blurRadius: 6,
-                                                offset: Offset(0, 3),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                "Sort by",
-                                                style: TextStyle(
-                                                  fontSize: 15.sp,
-                                                  fontFamily:
-                                                      FontFamily.semiBold,
-                                                  color: AppColors.blackColor,
-                                                ),
-                                              ),
-                                              SizedBox(width: 3.w),
-                                              DropdownButtonHideUnderline(
-                                                child: DropdownButton<String>(
-                                                  value: selectedSort,
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                  dropdownColor: Colors.white,
-                                                  icon: Icon(
-                                                    Icons.sort,
-                                                    color: AppColors.mainColor,
-                                                  ),
-                                                  items:
-                                                      sortOptions.map((e) {
-                                                        return DropdownMenuItem(
-                                                          value: e,
-                                                          child: Text(
-                                                            e,
-                                                            style: TextStyle(
-                                                              fontSize: 15.sp,
-                                                              fontFamily:
-                                                                  FontFamily
-                                                                      .semiBold,
-                                                              color:
-                                                                  AppColors
-                                                                      .mainColor,
-                                                            ),
-                                                          ),
-                                                        );
-                                                      }).toList(),
-                                                  onChanged: (value) {
-                                                    if (value != null) {
-                                                      setState(() {
-                                                        selectedSort = value;
-                                                        _filterProducts();
-                                                      });
-                                                    }
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        InkWell(
-                                          onTap: () async {
-                                            // Initialize with previously selected filters
-                                            List<FetchSubCategoriesModal>
-                                            tempSelectedFilters =
-                                                subCategoriesList
-                                                    .where(
-                                                      (subCat) =>
-                                                          selectedFilters
-                                                              .contains(
-                                                                subCat.name,
-                                                              ),
-                                                    )
-                                                    .toList();
-
-                                            String? errorText;
-
-                                            showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return StatefulBuilder(
-                                                  builder: (context, setState) {
-                                                    return AlertDialog(
-                                                      backgroundColor:
-                                                          AppColors.whiteColor,
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              15,
-                                                            ),
-                                                      ),
-                                                      title: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text(
-                                                            "Select Filters",
-                                                            style: TextStyle(
-                                                              fontSize: 18.sp,
-                                                              fontFamily:
-                                                                  FontFamily
-                                                                      .bold,
-                                                              color:
-                                                                  AppColors
-                                                                      .blackColor,
-                                                            ),
-                                                          ),
-                                                          InkWell(
-                                                            onTap: () {
-                                                              setState(() {
-                                                                tempSelectedFilters
-                                                                    .clear();
-                                                                selectedFilters
-                                                                    .clear();
-                                                                _filterProducts();
-                                                                Get.back();
-                                                              });
-                                                            },
-                                                            child: Text(
-                                                              "Clear Filters",
-                                                              style: TextStyle(
-                                                                fontSize: 18.sp,
-                                                                fontFamily:
-                                                                    FontFamily
-                                                                        .bold,
-                                                                color:
-                                                                    AppColors
-                                                                        .mainColor,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      content:
-                                                          subCategoriesList
-                                                                  .isEmpty
-                                                              ? SizedBox(
-                                                                height: 15.h,
-                                                                child: Center(
-                                                                  child: Text(
-                                                                    "No filters available",
-                                                                    style: TextStyle(
-                                                                      fontSize:
-                                                                          16.sp,
-                                                                      fontFamily:
-                                                                          FontFamily
-                                                                              .regular,
-                                                                      color:
-                                                                          AppColors
-                                                                              .gray,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              )
-                                                              : SingleChildScrollView(
-                                                                child: Column(
-                                                                  mainAxisSize:
-                                                                      MainAxisSize
-                                                                          .min,
-                                                                  children:
-                                                                      subCategoriesList.map((
-                                                                        subCategory,
-                                                                      ) {
-                                                                        bool
-                                                                        isSelected =
-                                                                            tempSelectedFilters.contains(
-                                                                              subCategory,
-                                                                            );
-                                                                        return InkWell(
-                                                                          onTap: () {
-                                                                            setState(() {
-                                                                              if (isSelected) {
-                                                                                tempSelectedFilters.remove(
-                                                                                  subCategory,
-                                                                                );
-                                                                              } else {
-                                                                                tempSelectedFilters.add(
-                                                                                  subCategory,
-                                                                                );
-                                                                              }
-                                                                            });
-                                                                          },
-                                                                          child: Container(
-                                                                            padding: const EdgeInsets.symmetric(
-                                                                              vertical:
-                                                                                  12,
-                                                                              horizontal:
-                                                                                  10,
-                                                                            ),
-                                                                            margin: const EdgeInsets.symmetric(
-                                                                              vertical:
-                                                                                  5,
-                                                                            ),
-                                                                            child: Row(
-                                                                              children: [
-                                                                                Container(
-                                                                                  width:
-                                                                                      19.sp,
-                                                                                  height:
-                                                                                      19.sp,
-                                                                                  decoration: BoxDecoration(
-                                                                                    shape:
-                                                                                        BoxShape.circle,
-                                                                                    border: Border.all(
-                                                                                      color:
-                                                                                          isSelected
-                                                                                              ? AppColors.mainColor
-                                                                                              : AppColors.gray,
-                                                                                      width:
-                                                                                          2,
-                                                                                    ),
-                                                                                  ),
-                                                                                  child:
-                                                                                      isSelected
-                                                                                          ? Center(
-                                                                                            child: Container(
-                                                                                              width:
-                                                                                                  13.sp,
-                                                                                              height:
-                                                                                                  13.sp,
-                                                                                              decoration: BoxDecoration(
-                                                                                                color:
-                                                                                                    AppColors.mainColor,
-                                                                                                shape:
-                                                                                                    BoxShape.circle,
-                                                                                              ),
-                                                                                            ),
-                                                                                          )
-                                                                                          : const SizedBox.shrink(),
-                                                                                ),
-                                                                                const SizedBox(
-                                                                                  width:
-                                                                                      10,
-                                                                                ),
-                                                                                Expanded(
-                                                                                  child: Text(
-                                                                                    subCategory.name ??
-                                                                                        '',
-                                                                                    style: TextStyle(
-                                                                                      fontSize:
-                                                                                          16.sp,
-                                                                                      fontFamily:
-                                                                                          FontFamily.regular,
-                                                                                      color:
-                                                                                          AppColors.blackColor,
-                                                                                    ),
-                                                                                  ),
-                                                                                ),
-                                                                              ],
-                                                                            ),
-                                                                          ),
-                                                                        );
-                                                                      }).toList(),
-                                                                ),
-                                                              ),
-                                                      actions: [
-                                                        CustomButton(
-                                                          title: "Cancel",
-                                                          route:
-                                                              () => Get.back(),
-                                                          color:
-                                                              AppColors
-                                                                  .containerColor,
-                                                          fontcolor:
-                                                              AppColors
-                                                                  .blackColor,
-                                                          height: 5.h,
-                                                          width: 30.w,
-                                                          fontsize: 15.sp,
-                                                          radius: 12.0,
-                                                        ),
-                                                        CustomButton(
-                                                          title: "Confirm",
-                                                          route:
-                                                              subCategoriesList
-                                                                      .isEmpty
-                                                                  ? () {}
-                                                                  : () {
-                                                                    if (tempSelectedFilters
-                                                                        .isEmpty) {
-                                                                      setState(() {
-                                                                        errorText =
-                                                                            "Please select at least one filter!";
-                                                                      });
-                                                                    } else {
-                                                                      setState(() {
-                                                                        selectedFilters =
-                                                                            tempSelectedFilters
-                                                                                .map(
-                                                                                  (
-                                                                                    e,
-                                                                                  ) =>
-                                                                                      e.name ??
-                                                                                      '',
-                                                                                )
-                                                                                .toList();
-                                                                        _filterProducts(); // Apply filter immediately
-                                                                      });
-                                                                      Get.back();
-                                                                    }
-                                                                  },
-                                                          color:
-                                                              subCategoriesList
-                                                                      .isEmpty
-                                                                  ? AppColors
-                                                                      .gray
-                                                                  : AppColors
-                                                                      .mainColor,
-                                                          fontcolor:
-                                                              AppColors
-                                                                  .whiteColor,
-                                                          height: 5.h,
-                                                          width: 30.w,
-                                                          fontsize: 15.sp,
-                                                          radius: 12.0,
-                                                          iconData: Icons.check,
-                                                          iconsize: 17.sp,
-                                                        ),
-                                                      ],
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                            );
-                                          },
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 3.w,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
-                                              boxShadow: const [
-                                                BoxShadow(
-                                                  color: Colors.black12,
-                                                  blurRadius: 6,
-                                                  offset: Offset(0, 3),
-                                                ),
-                                              ],
-                                            ),
-                                            child: DropdownButtonHideUnderline(
-                                              child: DropdownButton<String>(
-                                                value: selectedSort,
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                dropdownColor: Colors.white,
-                                                icon: Icon(
-                                                  Icons.filter_vintage_outlined,
-                                                  color: AppColors.mainColor,
-                                                ),
-                                                items:
-                                                    sortOptions.map((e) {
-                                                      return DropdownMenuItem(
-                                                        value: e,
-                                                        child: Text(
-                                                          'Filter ',
-                                                          style: TextStyle(
-                                                            fontSize: 15.sp,
-                                                            fontFamily:
-                                                                FontFamily
-                                                                    .semiBold,
-                                                            color:
-                                                                AppColors
-                                                                    .blackColor,
-                                                          ),
-                                                        ),
-                                                      );
-                                                    }).toList(),
-                                                onChanged:
-                                                    null, // disabled selection, acts like a button
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 1.h),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 3.w,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                              30,
-                                            ),
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                color: Colors.black12,
-                                                blurRadius: 6,
-                                                offset: Offset(0, 3),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                "Items per row",
-                                                style: TextStyle(
-                                                  fontSize: 15.sp,
-                                                  fontFamily:
-                                                      FontFamily.semiBold,
-                                                  color: AppColors.blackColor,
-                                                ),
-                                              ),
-                                              SizedBox(width: 3.w),
-                                              DropdownButtonHideUnderline(
-                                                child: DropdownButton<int>(
-                                                  value: itemsPerPage,
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                  dropdownColor: Colors.white,
-                                                  style: TextStyle(
-                                                    fontSize: 15.sp,
-                                                    fontFamily:
-                                                        FontFamily.regular,
-                                                    color: AppColors.blackColor,
-                                                  ),
-                                                  icon: Icon(
-                                                    Icons
-                                                        .keyboard_arrow_down_rounded,
-                                                    color: AppColors.mainColor,
-                                                  ),
-                                                  items:
-                                                      itemsPerPageOptions.map((
-                                                        e,
-                                                      ) {
-                                                        return DropdownMenuItem(
-                                                          value: e,
-                                                          child: Text(
-                                                            e.toString(),
-                                                            style: TextStyle(
-                                                              fontSize: 15.sp,
-                                                              fontFamily:
-                                                                  FontFamily
-                                                                      .semiBold,
-                                                              color:
-                                                                  AppColors
-                                                                      .mainColor,
-                                                            ),
-                                                          ),
-                                                        );
-                                                      }).toList(),
-                                                  onChanged: (value) {
-                                                    if (value != null) {
-                                                      setState(() {
-                                                        itemsPerPage = value;
-                                                      });
-                                                    }
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    if (filteredProducts.isNotEmpty)
-                                      SizedBox(height: 1.h),
-                                    filteredProducts.isEmpty
-                                        ? Padding(
-                                          padding: EdgeInsets.symmetric(
-                                            vertical: isIpad ? 2.h : 15.h,
-                                          ),
-                                          child: emptyWidget(
-                                            icon:
-                                                Icons
-                                                    .production_quantity_limits,
-                                            text: 'Products',
-                                          ),
-                                        )
-                                        : Column(
-                                          children: [
-                                            buildGroupedGrid(filteredProducts),
-                                            SizedBox(height: 2.h),
-                                          ],
-                                        ),
-                                  ],
-                                ),
-                              ),
+                      Container(
+                        width: 8.w, // Sidebar width
+                        height: 100.h,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey.shade300,
+                              width: 1,
                             ),
                           ),
-                        ],
-                      ).paddingSymmetric(
-                        horizontal: 2.w,
-                        vertical: isIpad ? 0 : 0.5.h,
+                        ),
+                        child: VerticleBar(selected: 8),
+                      ),
+                      Expanded(
+                        child: _buildMainContent(orientation, showSideBar),
                       ),
                     ],
+                  )
+                  // Mobile/Portrait: Content Only
+                  : _buildMainContent(orientation, showSideBar),
+
+          bottomNavigationBar:
+              showSideBar
+                  ? null
+                  : SizedBox(
+                    height: isIpad ? 14.h : 10.h,
+                    child: CustomBar(selected: 8),
                   ),
-          bottomNavigationBar: SizedBox(
-            height: isIpad ? 14.h : 10.h,
-            child: CustomBar(selected: 8),
-          ),
         );
       },
     );
   }
 
-  bool isIpad = 100.w >= 800;
+  // Extracted Main Content to avoid duplication
+  Widget _buildMainContent(Orientation orientation, bool showSideBar) {
+    return Column(
+      children: [
+        // Title Bar Logic (Maintained from your original code)
+        (isIpad && orientation == Orientation.portrait)
+            ? TitleBarIpadPotrait(
+              title: widget.cate == null ? 'Products' : widget.cate.toString(),
+              isDrawerEnabled: true,
+              isSearchEnabled: true,
+              isBackEnabled: true,
+              showDownloadButton: true,
+              onDownload: _handleDownload,
+              onSearch: () {
+                setState(() {
+                  isSearchEnabled = !isSearchEnabled;
+                });
+              },
+            )
+            : TitleBar(
+              title: widget.cate == null ? 'Products' : widget.cate.toString(),
+              isDrawerEnabled: true,
+              isSearchEnabled: true,
+              isBackEnabled: true,
+              showDownloadButton: true,
+              onDownload: _handleDownload,
+              onSearch: () {
+                setState(() {
+                  isSearchEnabled = !isSearchEnabled;
+                });
+              },
+            ),
 
-  // Widget _buildGridItem(CategoryWiseProductsModal product) {
-  //   return InkWell(
-  //     onTap:
-  //         product.stockStatus == 'instock'
-  //             ? () {
-  //               Get.to(
-  //                 () => ProductDetailsScreen(
-  //                   productId: product.id.toString(),
-  //                   isVariation: product.variations?.length != 0,
-  //                   id: widget.id,
-  //                   cate: widget.cate,
-  //                   slug: widget.slug,
-  //                 ),
-  //                 transition: Transition.leftToRightWithFade,
-  //                 duration: const Duration(milliseconds: 450),
-  //               );
-  //             }
-  //             : () {
-  //               showCustomErrorSnackbar(
-  //                 title: "Out of Stock",
-  //                 message: "${product.name} is not available right now!",
-  //               );
-  //             },
-  //     child: Opacity(
-  //       opacity: product.stockStatus == 'instock' ? 1.0 : 0.4,
-  //       child: Card(
-  //         color: AppColors.cardBgColor2,
-  //         elevation: 3,
-  //         shadowColor: Colors.black45,
-  //         shape: RoundedRectangleBorder(
-  //           side: BorderSide(color: AppColors.border),
-  //           borderRadius: BorderRadius.circular(20),
-  //         ),
-  //         child: Column(
-  //           crossAxisAlignment: CrossAxisAlignment.start,
-  //           children: [
-  //             // Product Image
-  //             Expanded(
-  //               child: ClipRRect(
-  //                 borderRadius: const BorderRadius.vertical(
-  //                   top: Radius.circular(20),
-  //                 ),
-  //                 child: Stack(
-  //                   children: [
-  //                     CarouselSlider(
-  //                       options: CarouselOptions(
-  //                         height: Device.height,
-  //                         viewportFraction: 1,
-  //                         enlargeCenterPage: false,
-  //                         enableInfiniteScroll: false,
-  //                         autoPlay: true,
-  //                       ),
-  //                       items:
-  //                           (product.images ?? []).map((img) {
-  //                             return ClipRRect(
-  //                               borderRadius: BorderRadius.circular(20),
-  //                               child: CustomNetworkImage(
-  //                                 imageUrl: img.src ?? '',
-  //                                 height: double.infinity,
-  //                                 width: double.infinity,
-  //                                 isFit: true,
-  //                                 radius: 20,
-  //                               ),
-  //                             );
-  //                           }).toList(),
-  //                     ),
-  //                     if ((product.variations?.length ?? 0) == 0)
-  //                       Positioned(
-  //                         left: 6,
-  //                         right: 6,
-  //                         bottom: 6,
-  //                         child: LayoutBuilder(
-  //                           builder: (context, constraints) {
-  //                             // Inverse dynamic size
-  //                             double iconSize =
-  //                                 (60 + (120 - constraints.maxWidth)) * 0.20;
-  //                             iconSize = iconSize.clamp(
-  //                               32,
-  //                               35,
-  //                             ); // adjust limits as needed
-  //
-  //                             return IntrinsicWidth(
-  //                               child: Row(
-  //                                 mainAxisAlignment:
-  //                                     MainAxisAlignment.spaceBetween,
-  //                                 children: [
-  //                                   IconButton(
-  //                                     onPressed:
-  //                                         (product.stockStatus == "instock")
-  //                                             ? () => _removeProductFromCart(
-  //                                               product,
-  //                                             )
-  //                                             : null,
-  //                                     padding: EdgeInsets.zero,
-  //                                     constraints: const BoxConstraints(),
-  //                                     icon: Icon(
-  //                                       Icons.remove,
-  //                                       size: iconSize,
-  //                                       color: AppColors.blackColor,
-  //                                     ),
-  //                                   ),
-  //
-  //                                   IconButton(
-  //                                     onPressed:
-  //                                         (product.stockStatus == "instock")
-  //                                             ? () {
-  //                                               (product.variations?.length ??
-  //                                                           0) ==
-  //                                                       0
-  //                                                   ? _addSimpleProductsToCart(
-  //                                                     product,
-  //                                                   )
-  //                                                   : _addVariationProductsToCart(
-  //                                                     product,
-  //                                                     product
-  //                                                         .firstVariation
-  //                                                         ?.id,
-  //                                                     product
-  //                                                         .firstVariation
-  //                                                         ?.varAttributes
-  //                                                         ?.getKey(),
-  //                                                     product
-  //                                                         .firstVariation
-  //                                                         ?.varAttributes
-  //                                                         ?.getValue(),
-  //                                                   );
-  //                                             }
-  //                                             : null,
-  //                                     padding: EdgeInsets.zero,
-  //                                     constraints: const BoxConstraints(),
-  //                                     icon: Icon(
-  //                                       Icons.add,
-  //                                       size: iconSize,
-  //                                       color: AppColors.blackColor,
-  //                                     ),
-  //                                   ),
-  //                                 ],
-  //                               ),
-  //                             );
-  //                           },
-  //                         ),
-  //                       ),
-  //
-  //                     if (product.stockStatus != 'instock')
-  //                       Positioned.fill(
-  //                         child: Container(
-  //                           color: Colors.black.withValues(alpha: 0.4),
-  //                           // <-- fix here
-  //                           child: Center(
-  //                             child: Text(
-  //                               "Out of Stock",
-  //                               style: TextStyle(
-  //                                 fontSize: 14.sp,
-  //                                 fontFamily: FontFamily.bold,
-  //                                 color: Colors.white,
-  //                               ),
-  //                             ),
-  //                           ),
-  //                         ),
-  //                       ),
-  //                   ],
-  //                 ),
-  //               ),
-  //             ),
-  //
-  //             // Details
-  //             Padding(
-  //               padding: EdgeInsets.all(2.w),
-  //               child: Column(
-  //                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                 children: [
-  //                   // Title
-  //                   Text(
-  //                     product.name ?? '',
-  //                     style: TextStyle(
-  //                       fontFamily: FontFamily.bold,
-  //                       fontSize: 15.sp,
-  //                       color: AppColors.blackColor,
-  //                     ),
-  //                     maxLines: 1,
-  //                     overflow: TextOverflow.ellipsis,
-  //                   ),
-  //                   SizedBox(height: 0.5.h),
-  //
-  //                   // Pack Size + Price Row
-  //                   product.variations?.length == 0 ||
-  //                           product.variations == null
-  //                       ? Row(
-  //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                         children: [
-  //                           Text(
-  //                             product.packSize == ""
-  //                                 ? 'MOQ : 1'
-  //                                 : 'MOQ : ${product.packSize}',
-  //                             style: TextStyle(
-  //                               fontSize: 14.sp,
-  //                               fontFamily: FontFamily.regular,
-  //                               color: AppColors.gray,
-  //                             ),
-  //                           ),
-  //                           Text(
-  //                             "${product.cartQuantity == 0 || product.cartQuantity == null || product.cartQuantity == "" || product.cartQuantity == "0" ? "" : product.cartQuantity}",
-  //                             style: TextStyle(
-  //                               fontSize: 14.sp,
-  //                               fontFamily: FontFamily.semiBold,
-  //                               color: AppColors.mainColor,
-  //                             ),
-  //                           ),
-  //                         ],
-  //                       )
-  //                       : Row(
-  //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                         children: [
-  //                           Text(
-  //                             'MOQ : ${product.firstVariation?.packSize}',
-  //                             style: TextStyle(
-  //                               fontSize: 14.sp,
-  //                               fontFamily: FontFamily.regular,
-  //                               color: AppColors.gray,
-  //                             ),
-  //                           ),
-  //                           Text(
-  //                             "${product.cartQuantity == 0 || product.cartQuantity == null || product.cartQuantity == "" || product.cartQuantity == "0" ? "" : product.cartQuantity}",
-  //                             style: TextStyle(
-  //                               fontSize: 14.sp,
-  //                               fontFamily: FontFamily.semiBold,
-  //                               color: AppColors.mainColor,
-  //                             ),
-  //                           ),
-  //                         ],
-  //                       ),
-  //                 ],
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
+        isSearchEnabled
+            ? SearchField(controller: searchController)
+            : const SizedBox.shrink(),
+        SizedBox(height: 1.h),
+
+        Expanded(
+          child: Scrollbar(
+            controller: _scrollCtrl,
+            thumbVisibility: true,
+            trackVisibility: isIpad,
+            interactive: true,
+            thickness: isIpad ? 8 : 6,
+            radius: const Radius.circular(12),
+            child: SingleChildScrollView(
+              controller: _scrollCtrl,
+              physics: const ClampingScrollPhysics(),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [_buildSortButton(), _buildFilterButton()],
+                  ),
+                  SizedBox(height: 1.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [_buildItemsPerRowDropdown()],
+                  ),
+                  if (filteredProducts.isNotEmpty) SizedBox(height: 1.h),
+                  filteredProducts.isEmpty
+                      ? Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: isIpad ? 2.h : 15.h,
+                        ),
+                        child: emptyWidget(
+                          icon: Icons.production_quantity_limits,
+                          text: 'Products',
+                        ),
+                      )
+                      : Column(
+                        children: [
+                          buildGroupedGrid(filteredProducts),
+                          SizedBox(height: 2.h),
+                        ],
+                      ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    ).paddingSymmetric(
+      horizontal: showSideBar ? 1.w : 2.w, // Less padding if sidebar is present
+      vertical: isIpad ? 0 : 0.5.h,
+    );
+  }
+
+  // Extracted Helper Widgets for Cleanliness
+  Widget _buildSortButton() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 3.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
+        ],
+      ),
+      child: Row(
+        children: [
+          Text(
+            "Sort by",
+            style: TextStyle(
+              fontSize: 15.sp,
+              fontFamily: FontFamily.semiBold,
+              color: AppColors.blackColor,
+            ),
+          ),
+          SizedBox(width: 3.w),
+          DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: selectedSort,
+              borderRadius: BorderRadius.circular(12),
+              dropdownColor: Colors.white,
+              icon: Icon(Icons.sort, color: AppColors.mainColor),
+              items:
+                  sortOptions.map((e) {
+                    return DropdownMenuItem(
+                      value: e,
+                      child: Text(
+                        e,
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontFamily: FontFamily.semiBold,
+                          color: AppColors.mainColor,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    selectedSort = value;
+                    _filterProducts();
+                  });
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterButton() {
+    return InkWell(
+      onTap: () async {
+        List<FetchSubCategoriesModal> tempSelectedFilters =
+            subCategoriesList
+                .where((subCat) => selectedFilters.contains(subCat.name))
+                .toList();
+        String? errorText;
+
+        showDialog(
+          context: context,
+          builder: (context) {
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return AlertDialog(
+                  backgroundColor: AppColors.whiteColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Select Filters",
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontFamily: FontFamily.bold,
+                          color: AppColors.blackColor,
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            tempSelectedFilters.clear();
+                            selectedFilters.clear();
+                            _filterProducts();
+                            Get.back();
+                          });
+                        },
+                        child: Text(
+                          "Clear Filters",
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontFamily: FontFamily.bold,
+                            color: AppColors.mainColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  content:
+                      subCategoriesList.isEmpty
+                          ? SizedBox(
+                            height: 15.h,
+                            child: Center(
+                              child: Text(
+                                "No filters available",
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontFamily: FontFamily.regular,
+                                  color: AppColors.gray,
+                                ),
+                              ),
+                            ),
+                          )
+                          : SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children:
+                                  subCategoriesList.map((subCategory) {
+                                    bool isSelected = tempSelectedFilters
+                                        .contains(subCategory);
+                                    return InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          if (isSelected) {
+                                            tempSelectedFilters.remove(
+                                              subCategory,
+                                            );
+                                          } else {
+                                            tempSelectedFilters.add(
+                                              subCategory,
+                                            );
+                                          }
+                                        });
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 12,
+                                          horizontal: 10,
+                                        ),
+                                        margin: const EdgeInsets.symmetric(
+                                          vertical: 5,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: 19.sp,
+                                              height: 19.sp,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color:
+                                                      isSelected
+                                                          ? AppColors.mainColor
+                                                          : AppColors.gray,
+                                                  width: 2,
+                                                ),
+                                              ),
+                                              child:
+                                                  isSelected
+                                                      ? Center(
+                                                        child: Container(
+                                                          width: 13.sp,
+                                                          height: 13.sp,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                color:
+                                                                    AppColors
+                                                                        .mainColor,
+                                                                shape:
+                                                                    BoxShape
+                                                                        .circle,
+                                                              ),
+                                                        ),
+                                                      )
+                                                      : const SizedBox.shrink(),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: Text(
+                                                subCategory.name ?? '',
+                                                style: TextStyle(
+                                                  fontSize: 16.sp,
+                                                  fontFamily:
+                                                      FontFamily.regular,
+                                                  color: AppColors.blackColor,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                            ),
+                          ),
+                  actions: [
+                    CustomButton(
+                      title: "Cancel",
+                      route: () => Get.back(),
+                      color: AppColors.containerColor,
+                      fontcolor: AppColors.blackColor,
+                      height: 5.h,
+                      width: 30.w,
+                      fontsize: 15.sp,
+                      radius: 12.0,
+                    ),
+                    CustomButton(
+                      title: "Confirm",
+                      route:
+                          subCategoriesList.isEmpty
+                              ? () {}
+                              : () {
+                                if (tempSelectedFilters.isEmpty) {
+                                  setState(() {
+                                    errorText =
+                                        "Please select at least one filter!";
+                                  });
+                                } else {
+                                  setState(() {
+                                    selectedFilters =
+                                        tempSelectedFilters
+                                            .map((e) => e.name ?? '')
+                                            .toList();
+                                    _filterProducts();
+                                  });
+                                  Get.back();
+                                }
+                              },
+                      color:
+                          subCategoriesList.isEmpty
+                              ? AppColors.gray
+                              : AppColors.mainColor,
+                      fontcolor: AppColors.whiteColor,
+                      height: 5.h,
+                      width: 30.w,
+                      fontsize: 15.sp,
+                      radius: 12.0,
+                      iconData: Icons.check,
+                      iconsize: 17.sp,
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 3.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 6,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: selectedSort,
+            borderRadius: BorderRadius.circular(12),
+            dropdownColor: Colors.white,
+            icon: Icon(
+              Icons.filter_vintage_outlined,
+              color: AppColors.mainColor,
+            ),
+            items:
+                sortOptions.map((e) {
+                  return DropdownMenuItem(
+                    value: e,
+                    child: Text(
+                      'Filter ',
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        fontFamily: FontFamily.semiBold,
+                        color: AppColors.blackColor,
+                      ),
+                    ),
+                  );
+                }).toList(),
+            onChanged: null,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildItemsPerRowDropdown() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 3.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
+        ],
+      ),
+      child: Row(
+        children: [
+          Text(
+            "Items per row",
+            style: TextStyle(
+              fontSize: 15.sp,
+              fontFamily: FontFamily.semiBold,
+              color: AppColors.blackColor,
+            ),
+          ),
+          SizedBox(width: 3.w),
+          DropdownButtonHideUnderline(
+            child: DropdownButton<int>(
+              value: itemsPerPage,
+              borderRadius: BorderRadius.circular(12),
+              dropdownColor: Colors.white,
+              style: TextStyle(
+                fontSize: 15.sp,
+                fontFamily: FontFamily.regular,
+                color: AppColors.blackColor,
+              ),
+              icon: Icon(
+                Icons.keyboard_arrow_down_rounded,
+                color: AppColors.mainColor,
+              ),
+              items:
+                  itemsPerPageOptions.map((e) {
+                    return DropdownMenuItem(
+                      value: e,
+                      child: Text(
+                        e.toString(),
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontFamily: FontFamily.semiBold,
+                          color: AppColors.mainColor,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    itemsPerPage = value;
+                  });
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Extracted Download Handler
+  Future<void> _handleDownload() async {
+    var box = HiveService().getPdfFileBox();
+
+    final cachedBytes = box.get('pdf_bytes_${widget.slug}');
+    if (cachedBytes != null) {
+      await downloadFile(
+        null,
+        context,
+        "${widget.cate} - Catalog",
+        'pdf',
+        fileBytes: Uint8List.fromList(cachedBytes),
+      );
+      return;
+    }
+
+    if (pdfLink.isEmpty) {
+      showCustomErrorSnackbar(
+        title: "PDF Unavailable",
+        message: "PDF is not available for download right now.",
+      );
+      return;
+    }
+
+    await downloadFile(
+      pdfLink,
+      context,
+      "${widget.cate} - Catalog - ${pdfLink.split('/').last.split('.').first}",
+      pdfLink.split('/').last.split('.').last,
+    );
+  }
+
+  // ==========================================
+  // ======== GRID & PRODUCT LOGIC ============
+  // ==========================================
 
   Widget _buildGridItem(
     CategoryWiseProductsModal product, {
@@ -1295,7 +931,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                             ? AppColors.mainColor
                                             : Colors.white.withOpacity(0.7),
                                     borderRadius: BorderRadius.circular(px(4)),
-                                    boxShadow: [
+                                    boxShadow: const [
                                       BoxShadow(
                                         color: Colors.black12,
                                         blurRadius: 2,
@@ -1390,7 +1026,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           ),
                         if (hasVariations && qty > 0)
                           Padding(
-                            padding: EdgeInsets.only(right: 1.0),
+                            padding: const EdgeInsets.only(right: 1.0),
                             child: Text(
                               qty.toString(),
                               style: TextStyle(
@@ -1459,137 +1095,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
-  // 1) Group + sort by subcategory (and sort items inside each group if you want)
-  List<MapEntry<String, List<CategoryWiseProductsModal>>> _groupBySubcategory(
-    List<CategoryWiseProductsModal> products,
-  ) {
-    final map = <String, List<CategoryWiseProductsModal>>{};
-
-    for (final p in products) {
-      final key =
-          (p.subCategoryName?.trim().isNotEmpty ?? false)
-              ? p.subCategoryName!.trim()
-              : 'Uncategorized';
-      map.putIfAbsent(key, () => []).add(p);
-    }
-
-    final sections =
-        map.entries.toList()
-          ..sort((a, b) => a.key.toLowerCase().compareTo(b.key.toLowerCase()));
-
-    for (final e in sections) {
-      e.value.sort(
-        (a, b) => (a.name ?? '').toLowerCase().compareTo(
-          (b.name ?? '').toLowerCase(),
-        ),
-      );
-    }
-
-    return sections;
-  }
-
-  // 2) Build the grouped UI: subcategory grid -> divider -> next subcategory grid
-  Widget buildGroupedProducts(
-    List<CategoryWiseProductsModal> allProducts, {
-    required bool isIpad,
-  }) {
-    final sections = _groupBySubcategory(allProducts);
-
-    return ListView.separated(
-      padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.h),
-      itemCount: sections.length,
-      physics: const AlwaysScrollableScrollPhysics(),
-      separatorBuilder:
-          (_, __) => Padding(
-            padding: EdgeInsets.symmetric(vertical: 1.h),
-            child: Divider(thickness: 1.2, color: AppColors.border),
-          ),
-      itemBuilder: (context, index) {
-        final subcat = sections[index].key;
-        final items = sections[index].value;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.only(left: 0.5.w, bottom: 0.8.h),
-              child: Text(
-                subcat,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontFamily: FontFamily.semiBold,
-                  color: AppColors.blackColor,
-                ),
-              ),
-            ),
-            GridView.builder(
-              itemCount: items.length,
-              shrinkWrap: true,
-              padding: EdgeInsets.zero,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: isIpad ? 3 : 2,
-                crossAxisSpacing: 2.w,
-                mainAxisSpacing: 2.w,
-                childAspectRatio: 0.72,
-              ),
-              itemBuilder: (_, i) => _buildGridItem(items[i]),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  // Widget buildGroupedGrid(List<CategoryWiseProductsModal> filteredProducts) {
-  //   final Map<String, List<CategoryWiseProductsModal>> grouped = {};
-  //
-  //   for (var p in filteredProducts) {
-  //     final key =
-  //         (p.subCategoryName ?? "").trim().isEmpty
-  //             ? "Others"
-  //             : p.subCategoryName!.trim();
-  //     grouped.putIfAbsent(key, () => []).add(p);
-  //   }
-  //
-  //   final sortedGroups =
-  //       grouped.entries.toList()
-  //         ..sort((a, b) => a.key.toLowerCase().compareTo(b.key.toLowerCase()));
-  //
-  //   return ListView.builder(
-  //     shrinkWrap: true,
-  //     physics: const NeverScrollableScrollPhysics(),
-  //     itemCount: sortedGroups.length,
-  //     itemBuilder: (context, index) {
-  //       final subCategory = sortedGroups[index].key;
-  //       final products = sortedGroups[index].value;
-  //
-  //       return Column(
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         children: [
-  //           GridView.count(
-  //             shrinkWrap: true,
-  //             padding: EdgeInsets.zero,
-  //             physics: const NeverScrollableScrollPhysics(),
-  //             crossAxisCount: itemsPerPage,
-  //             childAspectRatio: 0.75,
-  //             mainAxisSpacing: 1.h,
-  //             crossAxisSpacing: 2.w,
-  //             children: products.map((p) => _buildGridItem(p)).toList(),
-  //           ),
-  //           if (index != sortedGroups.length - 1)
-  //             Padding(
-  //               padding: EdgeInsets.symmetric(vertical: 1.h),
-  //               child: const DashedDivider(
-  //                 height: 1.2,
-  //                 color: AppColors.blueColor, // or AppColors.mainColor
-  //               ),
-  //             ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
   final Map<String, int> _imageIndexByProductId = {};
 
   int _getImgIndex(String pid) => _imageIndexByProductId[pid] ?? 0;
@@ -1658,7 +1163,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 crossAxisCount: cross,
                 crossAxisSpacing: spacing,
                 mainAxisSpacing: spacing,
-                mainAxisExtent: tileHeight, // ✅ this makes height dynamic
+                mainAxisExtent: tileHeight,
               ),
               itemBuilder: (_, i) => _buildGridItem(products[i], scale: scale),
             );
@@ -1668,6 +1173,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
+  // ... [Keep your existing _fetchProducts, _addSimpleProductsToCart, _addVariationProductsToCart, _removeProductFromCart, _fetchSubCategories, _fetchPdfFile methods] ...
   Future<void> _fetchProducts() async {
     var box = HiveService().getCategoryProductsBox();
 

@@ -6,6 +6,7 @@ import 'package:bellissemo_ecom/ui/cart/View/chekOutScreen.dart';
 import 'package:bellissemo_ecom/ui/cart/modal/viewCartDataModal.dart';
 import 'package:bellissemo_ecom/utils/customMenuDrawer.dart';
 import 'package:bellissemo_ecom/utils/fontFamily.dart';
+import 'package:bellissemo_ecom/utils/verticleBar.dart'; // Ensure this is imported
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,6 +43,7 @@ class _CartScreenState extends State<CartScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKeyCART = GlobalKey<ScaffoldState>();
   String? customerName;
   int? customerId;
+  Orientation? _lastOrientation; // Track orientation
 
   Future<void> _loadCustomer() async {
     final prefs = await SharedPreferences.getInstance();
@@ -55,13 +57,9 @@ class _CartScreenState extends State<CartScreen> {
 
   Future<void> loadInitialData() async {
     setState(() => isLoading = true);
-
-    // 🔹 Load cached data first
     _loadCachedData();
-
     final stopwatch = Stopwatch()..start();
     try {
-      // 🔹 Run APIs parallel (cart + coupons)
       await Future.wait([
         _fetchCart().then((_) => setState(() {})),
         _fetchCoupons().then((_) => setState(() {})),
@@ -79,7 +77,6 @@ class _CartScreenState extends State<CartScreen> {
     var viewCartbox = HiveService().getViewCartBox();
     var couponBox = HiveService().getCouponListBox();
 
-    // 🔹 Load cached cart
     final cachedCart = viewCartbox.get('cart_$customerId');
     if (cachedCart != null && cachedCart.toString().isNotEmpty) {
       try {
@@ -90,11 +87,10 @@ class _CartScreenState extends State<CartScreen> {
         viewCartData = null;
       }
     } else {
-      viewCartData = null; // No offline cart
+      viewCartData = null;
     }
 
-    // 🔹 Load cached coupons
-    final cachedCoupons = couponBox.get('coupons'); // without customerId key
+    final cachedCoupons = couponBox.get('coupons');
     if (cachedCoupons != null && cachedCoupons.toString().isNotEmpty) {
       try {
         final List data = json.decode(cachedCoupons);
@@ -104,7 +100,7 @@ class _CartScreenState extends State<CartScreen> {
         couponslist = [];
       }
     } else {
-      couponslist = []; // No offline coupons
+      couponslist = [];
     }
 
     setState(() {});
@@ -112,7 +108,6 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _loadCustomer();
     loadInitialData();
@@ -120,1400 +115,838 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: CustomDrawer(),
-      key: _scaffoldKeyCART,
-      backgroundColor: AppColors.bgColor,
-      body:
-          isLoading
-              ? Loader()
-              : Column(
-                children: [
-                  TitleBar(
-                    drawerCallback: () {
-                      _scaffoldKeyCART.currentState?.openDrawer();
-                    },
-                    title: 'Cart',
-                    isDrawerEnabled: true,
-                    isSearchEnabled: false,
-                    onSearch: () {
-                      setState(() {
-                        isSearchEnabled = !isSearchEnabled;
-                      });
-                    },
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        if (_lastOrientation != orientation) {
+          _lastOrientation = orientation;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() {});
+          });
+        }
+
+        // --- RESPONSIVE LOGIC ---
+        bool isWideDevice = 100.w >= 700;
+        bool isLandscape = orientation == Orientation.landscape;
+        bool showSideBar = isWideDevice && isLandscape;
+
+        return Scaffold(
+          drawer: CustomDrawer(),
+          key: _scaffoldKeyCART,
+          backgroundColor: AppColors.bgColor,
+          body:
+              isLoading
+                  ? Loader()
+                  : showSideBar
+                  // iPad Landscape: Row (Sidebar + Content)
+                  ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 8.w,
+                        height: 100.h,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey.shade300,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: VerticleBar(selected: 4),
+                      ),
+                      Expanded(child: _buildMainContent()),
+                    ],
+                  )
+                  // Mobile/Portrait: Content Only
+                  : _buildMainContent(),
+          bottomNavigationBar:
+              showSideBar
+                  ? null
+                  : SizedBox(
+                    height: isIpad ? 14.h : 10.h,
+                    child: CustomBar(selected: 4),
                   ),
-                  SizedBox(height: 1.h),
-                  viewCartData?.items?.length == 0 ||
-                          viewCartData?.items?.length == null ||
-                          viewCartData?.items?.length == []
-                      ? Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: isIpad ? 2.h : 15.h,
+        );
+      },
+    );
+  }
+
+  // Extracted Main Content to handle layout cleanly
+  Widget _buildMainContent() {
+    return Column(
+      children: [
+        TitleBar(
+          drawerCallback: () {
+            _scaffoldKeyCART.currentState?.openDrawer();
+          },
+          title: 'Cart',
+          isDrawerEnabled: true,
+          isSearchEnabled: false,
+          onSearch: () {
+            setState(() {
+              isSearchEnabled = !isSearchEnabled;
+            });
+          },
+        ),
+        SizedBox(height: 1.h),
+        viewCartData?.items?.length == 0 ||
+                viewCartData?.items?.length == null ||
+                viewCartData?.items?.length == []
+            ? Padding(
+              padding: EdgeInsets.symmetric(vertical: isIpad ? 2.h : 15.h),
+              child: emptyWidget(
+                icon: Icons.shopping_cart_outlined,
+                text: 'Cart',
+              ),
+            )
+            : Expanded(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: ClampingScrollPhysics(),
+                      child: Column(
+                        children: [
+                          _buildCartItemsList(),
+                          SizedBox(height: 1.h),
+                          _buildOrderSummary(),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Checkout Section pinned to bottom of content
+                  _buildCheckoutSection(),
+                ],
+              ),
+            ),
+      ],
+    );
+  }
+
+  // Extracted List of Cart Items
+  Widget _buildCartItemsList() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: AppColors.whiteColor,
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            SizedBox(height: 1.h),
+            Column(
+              children: [
+                for (int i = 0; i < (viewCartData?.items?.length ?? 0); i++)
+                  Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(2.w),
+                        decoration: BoxDecoration(
+                          color: AppColors.whiteColor,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade300,
+                              blurRadius: 10,
+                              offset: Offset(0, 5),
+                            ),
+                          ],
                         ),
-                        child: emptyWidget(
-                          icon: Icons.shopping_cart_outlined,
-                          text: 'Cart',
-                        ),
-                      )
-                      : Expanded(
-                        child: SingleChildScrollView(
-                          physics: ClampingScrollPhysics(),
-                          child: Column(
-                            children: [
-                              Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: AppColors.whiteColor,
-                                ),
-                                child: Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Column(
-                                    children: [
-                                      SizedBox(height: 1.h),
-                                      viewCartData?.items?.length == 0 ||
-                                              viewCartData?.items?.length ==
-                                                  null ||
-                                              viewCartData?.items?.length == []
-                                          ? Text(
-                                            "No Cart Available",
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Product Image
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: CustomNetworkImage(
+                                imageUrl:
+                                    viewCartData?.items?[i].images?[0].src ??
+                                    '',
+                                height: 80,
+                                width: 80,
+                                radius: 12,
+                                isCircle: false,
+                                isFit: true,
+                              ),
+                            ),
+                            SizedBox(width: 3.w),
+
+                            // Product Details
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    viewCartData?.items?[i].name ?? "",
+                                    style: TextStyle(
+                                      fontFamily: FontFamily.bold,
+                                      fontSize: 15.sp,
+                                      color: AppColors.blackColor,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  SizedBox(height: 0.5.h),
+
+                                  IntrinsicWidth(
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: isIpad ? 0 : 2.w,
+                                        vertical: 0.5.h,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.containerColor,
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          // Decrease
+                                          GestureDetector(
+                                            onTap: () async {
+                                              final item =
+                                                  viewCartData?.items?[i];
+                                              if (item == null) {
+                                                return;
+                                              }
+
+                                              final currentQty =
+                                                  item.quantity ?? 1;
+                                              final cartService = CartService();
+                                              final packSize = int.parse(
+                                                (viewCartData
+                                                        ?.items?[i]
+                                                        .packsize)
+                                                    .toString(),
+                                              );
+
+                                              try {
+                                                if (currentQty > 1) {
+                                                  // 🔹 Just decrease quantity
+                                                  setState(() {
+                                                    item.quantity =
+                                                        currentQty - packSize;
+                                                    updateCartTotalsLocally();
+                                                  });
+
+                                                  // 🔹 Update Hive cache
+                                                  _updateHiveQuantity(
+                                                    i,
+                                                    currentQty - packSize,
+                                                  );
+
+                                                  // 🔹 Sync with server if online
+                                                  if (await checkInternet()) {
+                                                    await cartService
+                                                        .decreaseCart(
+                                                          packsize: packSize,
+                                                          cartItemKey:
+                                                              item.key ?? "",
+                                                          currentQuantity:
+                                                              currentQty,
+                                                        );
+                                                    await _fetchCart();
+                                                    setState(() {});
+                                                  }
+                                                } else {
+                                                  // 🔹 Quantity is 1, remove item
+                                                  setState(() {
+                                                    viewCartData?.items
+                                                        ?.removeAt(i);
+                                                    updateCartTotalsLocally();
+                                                  });
+
+                                                  // 🔹 Update Hive cache (remove)
+                                                  _removeHiveItem(i);
+
+                                                  // 🔹 Remove from server if online
+                                                  if (await checkInternet()) {
+                                                    await cartService
+                                                        .removeFromCart(
+                                                          cartItemKey:
+                                                              item.key ?? "",
+                                                        );
+                                                    await _fetchCart();
+                                                    setState(() {});
+                                                  }
+                                                }
+                                              } catch (e) {
+                                                showCustomErrorSnackbar(
+                                                  title: "Error",
+                                                  message:
+                                                      "Failed to update cart\n$e",
+                                                );
+                                              }
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.all(1.5.w),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.cardBgColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Icon(
+                                                Icons.remove,
+                                                size: isIpad ? 12.sp : 16.sp,
+                                                color: AppColors.blackColor,
+                                              ),
+                                            ),
+                                          ),
+
+                                          SizedBox(width: 1.w),
+
+                                          // Quantity text
+                                          Text(
+                                            (viewCartData?.items?[i].quantity ??
+                                                    0)
+                                                .toString(),
                                             style: TextStyle(
-                                              fontFamily: FontFamily.bold,
-                                              fontSize: 15.sp,
+                                              fontSize: 14.sp,
+                                              fontFamily: FontFamily.semiBold,
                                               color: AppColors.blackColor,
                                             ),
-                                          )
-                                          : Column(
-                                            children: [
-                                              for (
-                                                int i = 0;
-                                                i <
-                                                    (viewCartData
-                                                            ?.items
-                                                            ?.length ??
-                                                        0);
-                                                i++
-                                              )
-                                                Column(
-                                                  children: [
-                                                    Container(
-                                                      // margin: EdgeInsets.symmetric(vertical: 1.h, horizontal: 2.w),
-                                                      padding: EdgeInsets.all(
-                                                        2.w,
-                                                      ),
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            AppColors
-                                                                .whiteColor,
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              15,
-                                                            ),
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color:
-                                                                Colors
-                                                                    .grey
-                                                                    .shade300,
-                                                            blurRadius: 10,
-                                                            offset: Offset(
-                                                              0,
-                                                              5,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      child: Row(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          // Product Image
-                                                          ClipRRect(
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                  12,
-                                                                ),
-                                                            child: CustomNetworkImage(
-                                                              imageUrl:
-                                                                  viewCartData
-                                                                      ?.items?[i]
-                                                                      .images?[0]
-                                                                      .src ??
-                                                                  '',
-                                                              height: 80,
-                                                              width: 80,
-                                                              radius: 12,
-                                                              isCircle: false,
-                                                              isFit: true,
-                                                            ),
-                                                          ),
-                                                          SizedBox(width: 3.w),
+                                          ),
 
-                                                          // Product Details
-                                                          Expanded(
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(
+                                          SizedBox(width: 1.w),
+
+                                          // Increase
+                                          GestureDetector(
+                                            onTap: () async {
+                                              final item =
+                                                  viewCartData?.items?[i];
+                                              if (item == null) {
+                                                return;
+                                              }
+
+                                              final currentQty =
+                                                  item.quantity ?? 1;
+                                              final packSize = int.parse(
+                                                (viewCartData
+                                                        ?.items?[i]
+                                                        .packsize)
+                                                    .toString(),
+                                              );
+
+                                              // update local UI
+                                              setState(() {
+                                                item.quantity =
+                                                    currentQty + packSize;
+                                                updateCartTotalsLocally();
+                                              });
+
+                                              // update Hive cache
+                                              _updateHiveQuantity(
+                                                i,
+                                                currentQty + packSize,
+                                              );
+
+                                              // then only call server if online
+                                              if (await checkInternet()) {
+                                                try {
+                                                  await CartService().increaseCart(
+                                                    packsize: packSize,
+                                                    overrideprice:
+                                                        (double.parse(
                                                                   viewCartData
                                                                           ?.items?[i]
-                                                                          .name ??
-                                                                      "",
-                                                                  style: TextStyle(
-                                                                    fontFamily:
-                                                                        FontFamily
-                                                                            .bold,
-                                                                    fontSize:
-                                                                        15.sp,
-                                                                    color:
-                                                                        AppColors
-                                                                            .blackColor,
-                                                                  ),
-                                                                  maxLines: 2,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                                SizedBox(
-                                                                  height: 0.5.h,
-                                                                ),
+                                                                          .prices
+                                                                          ?.price ??
+                                                                      "0",
+                                                                ) /
+                                                                100)
+                                                            .toInt(),
 
-                                                                IntrinsicWidth(
-                                                                  child: Container(
-                                                                    padding: EdgeInsets.symmetric(
-                                                                      horizontal:
-                                                                          isIpad
-                                                                              ? 0
-                                                                              : 2.w,
-                                                                      vertical:
-                                                                          0.5.h,
-                                                                    ),
-                                                                    decoration: BoxDecoration(
-                                                                      color:
-                                                                          AppColors
-                                                                              .containerColor,
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                            30,
-                                                                          ),
-                                                                    ),
-                                                                    child: Row(
-                                                                      children: [
-                                                                        // Decrease
-                                                                        GestureDetector(
-                                                                          // onTap: () async {
-                                                                          //   final item =
-                                                                          //       viewCartData?.items?[i];
-                                                                          //   if (item ==
-                                                                          //       null)
-                                                                          //     return;
-                                                                          //
-                                                                          //   final cartService =
-                                                                          //       CartService();
-                                                                          //   final currentQty =
-                                                                          //       item.quantity ??
-                                                                          //       1;
-                                                                          //
-                                                                          //   try {
-                                                                          //     // 🔹 Offline/Online increase
-                                                                          //     await cartService.decreaseCart(
-                                                                          //       cartItemKey:
-                                                                          //           item.key ??
-                                                                          //           "",
-                                                                          //       currentQuantity:
-                                                                          //           currentQty,
-                                                                          //     );
-                                                                          //
-                                                                          //     // 🔹 Immediately update UI
-                                                                          //     setState(
-                                                                          //       () {
-                                                                          //         item.quantity =
-                                                                          //             currentQty -
-                                                                          //             1;
-                                                                          //         updateCartTotalsLocally();
-                                                                          //       },
-                                                                          //     );
-                                                                          //
-                                                                          //     // 🔹 Only fetch cart from server if online
-                                                                          //     if (await checkInternet()) {
-                                                                          //       await _fetchCart(); // just call it
-                                                                          //       setState(
-                                                                          //         () {},
-                                                                          //       ); // refresh UI after _fetchCart updates viewCartData
-                                                                          //     }
-                                                                          //   } catch (
-                                                                          //     e
-                                                                          //   ) {
-                                                                          //     showCustomErrorSnackbar(
-                                                                          //       title:
-                                                                          //           "Error",
-                                                                          //       message:
-                                                                          //           "Failed to update cart\n$e",
-                                                                          //     );
-                                                                          //   }
-                                                                          // },
-                                                                          onTap: () async {
-                                                                            final item =
-                                                                                viewCartData?.items?[i];
-                                                                            if (item ==
-                                                                                null) {
-                                                                              return;
-                                                                            }
-
-                                                                            final currentQty =
-                                                                                item.quantity ??
-                                                                                1;
-                                                                            final cartService =
-                                                                                CartService();
-
-                                                                            try {
-                                                                              if (currentQty >
-                                                                                  1) {
-                                                                                // 🔹 Just decrease quantity
-                                                                                setState(
-                                                                                  () {
-                                                                                    item.quantity =
-                                                                                        currentQty -
-                                                                                        int.parse(
-                                                                                          (viewCartData?.items?[i].packsize).toString(),
-                                                                                        );
-                                                                                    updateCartTotalsLocally();
-                                                                                  },
-                                                                                );
-
-                                                                                // 🔹 Update Hive cache
-                                                                                var box =
-                                                                                    HiveService().getViewCartBox();
-                                                                                final cachedData = box.get(
-                                                                                  'cart_$customerId',
-                                                                                );
-                                                                                if (cachedData !=
-                                                                                        null &&
-                                                                                    cachedData.toString().isNotEmpty) {
-                                                                                  try {
-                                                                                    final data = json.decode(
-                                                                                      cachedData,
-                                                                                    );
-                                                                                    final cachedCart = ViewCartDataModal.fromJson(
-                                                                                      data,
-                                                                                    );
-                                                                                    cachedCart.items?[i].quantity =
-                                                                                        currentQty -
-                                                                                        int.parse(
-                                                                                          (viewCartData?.items?[i].packsize).toString(),
-                                                                                        );
-                                                                                    await box.put(
-                                                                                      'cart_$customerId',
-                                                                                      json.encode(
-                                                                                        cachedCart.toJson(),
-                                                                                      ),
-                                                                                    );
-                                                                                  } catch (
-                                                                                    e
-                                                                                  ) {
-                                                                                    log(
-                                                                                      "Error updating offline cache: $e",
-                                                                                    );
-                                                                                  }
-                                                                                }
-
-                                                                                // 🔹 Sync with server if online
-                                                                                if (await checkInternet()) {
-                                                                                  await cartService.decreaseCart(
-                                                                                    packsize: int.parse(
-                                                                                      (viewCartData?.items?[i].packsize).toString(),
-                                                                                    ),
-                                                                                    cartItemKey:
-                                                                                        item.key ??
-                                                                                        "",
-                                                                                    currentQuantity:
-                                                                                        currentQty,
-                                                                                  );
-                                                                                  await _fetchCart();
-                                                                                  setState(
-                                                                                    () {},
-                                                                                  );
-                                                                                }
-                                                                              } else {
-                                                                                // 🔹 Quantity is 1, remove item
-                                                                                setState(
-                                                                                  () {
-                                                                                    viewCartData?.items?.removeAt(
-                                                                                      i,
-                                                                                    );
-                                                                                    updateCartTotalsLocally();
-                                                                                  },
-                                                                                );
-
-                                                                                // 🔹 Update Hive cache
-                                                                                var box =
-                                                                                    HiveService().getViewCartBox();
-                                                                                final cachedData = box.get(
-                                                                                  'cart_$customerId',
-                                                                                );
-                                                                                if (cachedData !=
-                                                                                        null &&
-                                                                                    cachedData.toString().isNotEmpty) {
-                                                                                  try {
-                                                                                    final data = json.decode(
-                                                                                      cachedData,
-                                                                                    );
-                                                                                    final cachedCart = ViewCartDataModal.fromJson(
-                                                                                      data,
-                                                                                    );
-                                                                                    cachedCart.items?.removeAt(
-                                                                                      i,
-                                                                                    );
-                                                                                    await box.put(
-                                                                                      'cart_$customerId',
-                                                                                      json.encode(
-                                                                                        cachedCart.toJson(),
-                                                                                      ),
-                                                                                    );
-                                                                                  } catch (
-                                                                                    e
-                                                                                  ) {
-                                                                                    log(
-                                                                                      "Error updating offline cache: $e",
-                                                                                    );
-                                                                                  }
-                                                                                }
-
-                                                                                // 🔹 Remove from server if online
-                                                                                if (await checkInternet()) {
-                                                                                  await cartService.removeFromCart(
-                                                                                    cartItemKey:
-                                                                                        item.key ??
-                                                                                        "",
-                                                                                  );
-                                                                                  await _fetchCart();
-                                                                                  setState(
-                                                                                    () {},
-                                                                                  );
-                                                                                }
-                                                                              }
-                                                                            } catch (
-                                                                              e,
-                                                                              stackTrace
-                                                                            ) {
-                                                                              showCustomErrorSnackbar(
-                                                                                title:
-                                                                                    "Error",
-                                                                                message:
-                                                                                    "Failed to update cart\n$e",
-                                                                              );
-                                                                              log(
-                                                                                "Error========>>>>>>$e",
-                                                                              );
-                                                                              log(
-                                                                                "StackTrace========>>>>>>$stackTrace",
-                                                                              );
-                                                                            }
-                                                                          },
-                                                                          child: Container(
-                                                                            padding: EdgeInsets.all(
-                                                                              1.5.w,
-                                                                            ),
-                                                                            decoration: BoxDecoration(
-                                                                              color:
-                                                                                  AppColors.cardBgColor,
-                                                                              shape:
-                                                                                  BoxShape.circle,
-                                                                            ),
-                                                                            child: Icon(
-                                                                              Icons.remove,
-                                                                              size:
-                                                                                  isIpad
-                                                                                      ? 12.sp
-                                                                                      : 16.sp,
-                                                                              color:
-                                                                                  AppColors.blackColor,
-                                                                            ),
-                                                                          ),
-                                                                        ),
-
-                                                                        SizedBox(
-                                                                          width:
-                                                                              1.w,
-                                                                        ),
-
-                                                                        // Quantity text
-                                                                        Text(
-                                                                          (viewCartData?.items?[i].quantity ??
-                                                                                  0)
-                                                                              .toString(),
-                                                                          style: TextStyle(
-                                                                            fontSize:
-                                                                                14.sp,
-                                                                            fontFamily:
-                                                                                FontFamily.semiBold,
-                                                                            color:
-                                                                                AppColors.blackColor,
-                                                                          ),
-                                                                        ),
-
-                                                                        SizedBox(
-                                                                          width:
-                                                                              1.w,
-                                                                        ),
-
-                                                                        // Increase
-                                                                        GestureDetector(
-                                                                          // onTap: () async {
-                                                                          //   final item =
-                                                                          //       viewCartData?.items?[i];
-                                                                          //   if (item ==
-                                                                          //       null)
-                                                                          //     return;
-                                                                          //
-                                                                          //   final cartService =
-                                                                          //       CartService();
-                                                                          //   final currentQty =
-                                                                          //       item.quantity ??
-                                                                          //       1;
-                                                                          //
-                                                                          //   try {
-                                                                          //     // 🔹 Offline/Online increase
-                                                                          //     await cartService.increaseCart(
-                                                                          //       cartItemKey:
-                                                                          //           item.key ??
-                                                                          //           "",
-                                                                          //       currentQuantity:
-                                                                          //           currentQty,
-                                                                          //     );
-                                                                          //
-                                                                          //     // 🔹 Immediately update UI
-                                                                          //     setState(
-                                                                          //       () {
-                                                                          //         item.quantity =
-                                                                          //             currentQty +
-                                                                          //             1;
-                                                                          //         updateCartTotalsLocally();
-                                                                          //       },
-                                                                          //     );
-                                                                          //
-                                                                          //     // 🔹 Only fetch cart from server if online
-                                                                          //     if (await checkInternet()) {
-                                                                          //       await _fetchCart(); // just call it
-                                                                          //       setState(
-                                                                          //         () {},
-                                                                          //       ); // refresh UI after _fetchCart updates viewCartData
-                                                                          //     }
-                                                                          //   } catch (
-                                                                          //     e,
-                                                                          //     stackTrace
-                                                                          //   ) {
-                                                                          //     showCustomErrorSnackbar(
-                                                                          //       title:
-                                                                          //           "Error",
-                                                                          //       message:
-                                                                          //           "Failed to update cart\n$e",
-                                                                          //     );
-                                                                          //     print(
-                                                                          //       "e========>>>>>>$e",
-                                                                          //     );
-                                                                          //     print(
-                                                                          //       "e========>>>>>>$stackTrace",
-                                                                          //     );
-                                                                          //     print(
-                                                                          //       "e========>>>>>>$stackTrace",
-                                                                          //     );
-                                                                          //   }
-                                                                          // },
-                                                                          onTap: () async {
-                                                                            final item =
-                                                                                viewCartData?.items?[i];
-                                                                            if (item ==
-                                                                                null) {
-                                                                              return;
-                                                                            }
-
-                                                                            final currentQty =
-                                                                                item.quantity ??
-                                                                                1;
-
-                                                                            // update local UI
-                                                                            setState(() {
-                                                                              item.quantity =
-                                                                                  currentQty +
-                                                                                  int.parse(
-                                                                                    (viewCartData?.items?[i].packsize).toString(),
-                                                                                  );
-                                                                              updateCartTotalsLocally();
-                                                                            });
-
-                                                                            // update Hive cache immediately
-                                                                            var box =
-                                                                                HiveService().getViewCartBox();
-                                                                            final cachedData = box.get(
-                                                                              'cart_$customerId',
-                                                                            );
-                                                                            if (cachedData !=
-                                                                                    null &&
-                                                                                cachedData.toString().isNotEmpty) {
-                                                                              try {
-                                                                                final data = json.decode(
-                                                                                  cachedData,
-                                                                                );
-                                                                                final cachedCart = ViewCartDataModal.fromJson(
-                                                                                  data,
-                                                                                );
-                                                                                cachedCart.items?[i].quantity =
-                                                                                    currentQty +
-                                                                                    1;
-                                                                                await box.put(
-                                                                                  'cart_$customerId',
-                                                                                  json.encode(
-                                                                                    cachedCart.toJson(),
-                                                                                  ),
-                                                                                );
-                                                                              } catch (
-                                                                                e
-                                                                              ) {
-                                                                                log(
-                                                                                  "Error updating offline cache: $e",
-                                                                                );
-                                                                              }
-                                                                            }
-
-                                                                            // then only call server if online
-                                                                            if (await checkInternet()) {
-                                                                              try {
-                                                                                await CartService().increaseCart(
-                                                                                  packsize: int.parse(
-                                                                                    (viewCartData?.items?[i].packsize).toString(),
-                                                                                  ),
-                                                                                  overrideprice:
-                                                                                      (double.parse(
-                                                                                                viewCartData?.items?[i].prices?.price ??
-                                                                                                    "0",
-                                                                                              ) /
-                                                                                              100)
-                                                                                          .toInt(),
-
-                                                                                  cartItemKey:
-                                                                                      item.key ??
-                                                                                      "",
-                                                                                  online:
-                                                                                      false,
-                                                                                  currentQuantity:
-                                                                                      currentQty,
-                                                                                );
-                                                                                await _fetchCart(); // refresh from server
-                                                                                setState(
-                                                                                  () {},
-                                                                                ); // refresh UI after fetch
-                                                                              } catch (
-                                                                                e
-                                                                              ) {
-                                                                                showCustomErrorSnackbar(
-                                                                                  title:
-                                                                                      "Error",
-                                                                                  message:
-                                                                                      "Failed to update cart\n$e",
-                                                                                );
-                                                                              }
-                                                                            }
-                                                                          },
-                                                                          child: Container(
-                                                                            padding: EdgeInsets.all(
-                                                                              1.5.w,
-                                                                            ),
-                                                                            decoration: BoxDecoration(
-                                                                              color:
-                                                                                  AppColors.cardBgColor,
-                                                                              shape:
-                                                                                  BoxShape.circle,
-                                                                            ),
-                                                                            child: Icon(
-                                                                              Icons.add,
-                                                                              size:
-                                                                                  isIpad
-                                                                                      ? 12.sp
-                                                                                      : 16.sp,
-                                                                              color:
-                                                                                  AppColors.blackColor,
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-
-                                                          // Price + Delete
-                                                          Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .end,
-                                                            children: [
-                                                              InkWell(
-                                                                onTap: () async {
-                                                                  setState(() {
-                                                                    isLoading =
-                                                                        true;
-                                                                  });
-                                                                  final item =
-                                                                      viewCartData
-                                                                          ?.items?[i];
-                                                                  if (item ==
-                                                                      null) {
-                                                                    return;
-                                                                  }
-
-                                                                  final cartService =
-                                                                      CartService();
-
-                                                                  try {
-                                                                    // 🔹 Offline/Online increase
-                                                                    await cartService.removeFromCart(
-                                                                      cartItemKey:
-                                                                          item.key ??
-                                                                          "",
-                                                                    );
-
-                                                                    // 🔹 Immediately update UI
-                                                                    setState(() {
-                                                                      viewCartData
-                                                                          ?.items
-                                                                          ?.removeAt(
-                                                                            i,
-                                                                          );
-                                                                      updateCartTotalsLocally();
-                                                                    });
-
-                                                                    // 🔹 Only fetch cart from server if online
-                                                                    if (await checkInternet()) {
-                                                                      await _fetchCart(); // just call it
-                                                                      setState(() {
-                                                                        isLoading =
-                                                                            false;
-                                                                      }); // refresh UI after _fetchCart updates viewCartData
-                                                                    }
-                                                                  } catch (
-                                                                    e,
-                                                                    stackTrace
-                                                                  ) {
-                                                                    showCustomErrorSnackbar(
-                                                                      title:
-                                                                          "Error",
-                                                                      message:
-                                                                          "Failed to update cart\n$e",
-                                                                    );
-                                                                    log(
-                                                                      "e========>>>>>>$e",
-                                                                    );
-                                                                    log(
-                                                                      "e========>>>>>>$stackTrace",
-                                                                    );
-                                                                    log(
-                                                                      "e========>>>>>>$stackTrace",
-                                                                    );
-                                                                  }
-                                                                  log(
-                                                                    'Hello Clear Button',
-                                                                  );
-                                                                },
-                                                                child: Icon(
-                                                                  Icons
-                                                                      .delete_outline_rounded,
-                                                                  color:
-                                                                      AppColors
-                                                                          .redColor,
-                                                                  size:
-                                                                      isIpad
-                                                                          ? 16.sp
-                                                                          : 18.sp,
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                height: 2.h,
-                                                              ),
-                                                              // Text(
-                                                              //     // ${(double.tryParse(viewCartData?.totals?.totalItems ?? '0')! / 100).toStringAsFixed(2)
-                                                              //   "\$ ${(double.parse(viewCartData?.items?[i].prices?.price ?? "")! /100).toStringAsFixed(2) }",
-                                                              //   style: TextStyle(
-                                                              //     color: AppColors.blackColor,
-                                                              //     fontSize: 14.sp,
-                                                              //     fontFamily:
-                                                              //         FontFamily.semiBold,
-                                                              //   ),
-                                                              // ),
-                                                              Container(
-                                                                child: InkWell(
-                                                                  child: Row(
-                                                                    children: [
-                                                                      // Icon(Icons.edit,color: AppColors.mainColor,),
-                                                                      // SizedBox(width: 2.w,),
-                                                                      Text(
-                                                                        '${viewCartData?.totals?.currencySymbol ?? ''} ${((double.parse(viewCartData?.items?[i].lineTotal?.lineTotal ?? "0") / (viewCartData?.items?[i].quantity ?? 1)) / 100).toStringAsFixed(2)}',
-                                                                        style: TextStyle(
-                                                                          color:
-                                                                              AppColors.blackColor,
-                                                                          fontSize:
-                                                                              14.sp,
-                                                                          fontFamily:
-                                                                              FontFamily.semiBold,
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    SizedBox(height: 1.h),
-                                                  ],
-                                                ),
-                                            ],
-                                          ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 1.h),
-                              Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: AppColors.whiteColor,
-                                ),
-                                padding: EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.receipt_long_rounded,
-                                          color: AppColors.mainColor,
-                                          size: isIpad ? 18.sp : 16.sp,
-                                        ),
-                                        SizedBox(width: 1.w),
-                                        Text(
-                                          "Order Summary",
-                                          style: TextStyle(
-                                            color: AppColors.mainColor,
-                                            fontSize: 18.sp,
-                                            fontFamily: FontFamily.semiBold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-
-                                    SizedBox(height: 2.h),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "Sub Total",
-                                          style: TextStyle(
-                                            color: AppColors.blackColor,
-                                            fontSize: 16.sp,
-                                            fontFamily: FontFamily.semiBold,
-                                          ),
-                                        ),
-                                        Text(
-                                          "${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.totalItems ?? '0')! / 100).toStringAsFixed(2)}",
-                                          style: TextStyle(
-                                            color: AppColors.blackColor,
-                                            fontSize: 16.sp,
-                                            fontFamily: FontFamily.semiBold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 1.h),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "Total Tax",
-                                          style: TextStyle(
-                                            color: AppColors.blackColor,
-                                            fontSize: 16.sp,
-                                            fontFamily: FontFamily.semiBold,
-                                          ),
-                                        ),
-                                        Text(
-                                          "${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.totalTax ?? '0')! / 100).toStringAsFixed(2)}",
-                                          style: TextStyle(
-                                            color: AppColors.blackColor,
-                                            fontSize: 16.sp,
-                                            fontFamily: FontFamily.semiBold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-
-                                    SizedBox(height: 1.h),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            InkWell(
-                                              onTap: () async {
-                                                final formKey =
-                                                    GlobalKey<FormState>();
-                                                TextEditingController
-                                                dialogController =
-                                                    TextEditingController();
-                                                String selectedType =
-                                                    "Fixed"; // default
-
-                                                final discountResult = await Get.dialog<
-                                                  Map<String, String>
-                                                >(
-                                                  Dialog(
-                                                    backgroundColor:
-                                                        Colors.transparent,
-                                                    child: StatefulBuilder(
-                                                      builder: (
-                                                        context,
-                                                        setState,
-                                                      ) {
-                                                        return IntrinsicWidth(
-                                                          stepWidth: 300,
-                                                          child: IntrinsicHeight(
-                                                            child: Container(
-                                                              padding:
-                                                                  EdgeInsets.all(
-                                                                    16,
-                                                                  ),
-                                                              decoration: BoxDecoration(
-                                                                color:
-                                                                    AppColors
-                                                                        .whiteColor,
-                                                                borderRadius:
-                                                                    BorderRadius.circular(
-                                                                      15,
-                                                                    ),
-                                                              ),
-                                                              child: Column(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                children: [
-                                                                  Text(
-                                                                    "Apply Discount",
-                                                                    style: TextStyle(
-                                                                      fontSize:
-                                                                          18.sp,
-                                                                      fontFamily:
-                                                                          FontFamily
-                                                                              .bold,
-                                                                      color:
-                                                                          AppColors
-                                                                              .blackColor,
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    height: 16,
-                                                                  ),
-
-                                                                  // 👇 Dropdown for Amount / Percentage
-                                                                  Row(
-                                                                    children: [
-                                                                      SizedBox(
-                                                                        width:
-                                                                            65.w,
-                                                                        child: DropdownButtonFormField<
-                                                                          String
-                                                                        >(
-                                                                          initialValue:
-                                                                              selectedType,
-                                                                          items:
-                                                                              [
-                                                                                    "Fixed",
-                                                                                    "Percentage",
-                                                                                  ]
-                                                                                  .map(
-                                                                                    (
-                                                                                      e,
-                                                                                    ) => DropdownMenuItem(
-                                                                                      value:
-                                                                                          e,
-                                                                                      child: Text(
-                                                                                        e,
-                                                                                      ),
-                                                                                    ),
-                                                                                  )
-                                                                                  .toList(),
-                                                                          onChanged: (
-                                                                            val,
-                                                                          ) {
-                                                                            setState(() {
-                                                                              selectedType =
-                                                                                  val!;
-                                                                              log(
-                                                                                "selectedType====>>>>> $selectedType",
-                                                                              );
-                                                                            });
-                                                                          },
-                                                                          decoration: InputDecoration(
-                                                                            disabledBorder:
-                                                                                OutlineInputBorder(),
-                                                                            labelText:
-                                                                                "Discount Type",
-                                                                            border: OutlineInputBorder(
-                                                                              borderRadius: BorderRadius.circular(
-                                                                                8,
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                  SizedBox(
-                                                                    height: 16,
-                                                                  ),
-
-                                                                  Form(
-                                                                    key:
-                                                                        formKey,
-                                                                    child: AppTextField(
-                                                                      key: ValueKey(
-                                                                        selectedType,
-                                                                      ),
-                                                                      controller:
-                                                                          dialogController,
-                                                                      hintText:
-                                                                          selectedType ==
-                                                                                  "Fixed"
-                                                                              ? "Enter Discount Fixed"
-                                                                              : "Enter Discount percentage",
-                                                                      text:
-                                                                          selectedType ==
-                                                                                  "Fixed"
-                                                                              ? "Discount Fixed"
-                                                                              : "Discount percentage",
-                                                                      isTextavailable:
-                                                                          true,
-                                                                      textInputType:
-                                                                          TextInputType
-                                                                              .number,
-                                                                      maxline:
-                                                                          1,
-                                                                      validator: (
-                                                                        value,
-                                                                      ) {
-                                                                        if (value ==
-                                                                                null ||
-                                                                            value.isEmpty) {
-                                                                          return "Please enter a discount";
-                                                                        }
-
-                                                                        final parsed =
-                                                                            double.tryParse(
-                                                                              value,
-                                                                            );
-                                                                        if (parsed ==
-                                                                            null) {
-                                                                          return "Enter a valid number";
-                                                                        }
-
-                                                                        if (parsed <=
-                                                                            0) {
-                                                                          return "Value must be greater than 0";
-                                                                        }
-
-                                                                        // 💡 Get subtotal from cart
-                                                                        final subtotalInCents =
-                                                                            double.tryParse(
-                                                                              viewCartData?.totals?.totalItems ??
-                                                                                  '0',
-                                                                            ) ??
-                                                                            0.0;
-                                                                        final subtotal =
-                                                                            subtotalInCents /
-                                                                            100;
-
-                                                                        // 🔹 Percentage should not exceed 100
-                                                                        if (selectedType ==
-                                                                                "Percentage" &&
-                                                                            parsed >
-                                                                                100) {
-                                                                          return "percentage can't be more than 100";
-                                                                        }
-
-                                                                        // 🔹 Amount should not exceed subtotal
-                                                                        if (selectedType ==
-                                                                                "Fixed" &&
-                                                                            parsed >
-                                                                                subtotal) {
-                                                                          return "Discount can't exceed${viewCartData?.totals?.currencySymbol} ${subtotal.toStringAsFixed(2)}";
-                                                                        }
-
-                                                                        return null;
-                                                                      },
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    height: 24,
-                                                                  ),
-
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
-                                                                    children: [
-                                                                      CustomButton(
-                                                                        title:
-                                                                            "Cancel",
-                                                                        route:
-                                                                            () =>
-                                                                                Get.back(),
-                                                                        color:
-                                                                            AppColors.containerColor,
-                                                                        fontcolor:
-                                                                            AppColors.blackColor,
-                                                                        height:
-                                                                            5.h,
-                                                                        width:
-                                                                            27.w,
-                                                                        fontsize:
-                                                                            15.sp,
-                                                                        radius:
-                                                                            12.0,
-                                                                      ),
-                                                                      CustomButton(
-                                                                        title:
-                                                                            "Apply Discount",
-                                                                        route: () {
-                                                                          if (!formKey
-                                                                              .currentState!
-                                                                              .validate()) {
-                                                                            return;
-                                                                          }
-
-                                                                          final charge =
-                                                                              dialogController.text.trim();
-                                                                          log(
-                                                                            "=========>>>>>>>>>>>>> $selectedType",
-                                                                          );
-
-                                                                          // 👇 Return result to parent
-                                                                          Get.back(
-                                                                            result: {
-                                                                              "type":
-                                                                                  selectedType,
-                                                                              "value":
-                                                                                  charge,
-                                                                            },
-                                                                          );
-                                                                        },
-                                                                        color:
-                                                                            AppColors.mainColor,
-                                                                        fontcolor:
-                                                                            AppColors.whiteColor,
-                                                                        height:
-                                                                            5.h,
-                                                                        width:
-                                                                            40.w,
-                                                                        fontsize:
-                                                                            15.sp,
-                                                                        radius:
-                                                                            12.0,
-                                                                        iconData:
-                                                                            Icons.check,
-                                                                        iconsize:
-                                                                            17.sp,
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        );
-                                                      },
-                                                    ),
-                                                  ),
-                                                  barrierDismissible: true,
-                                                );
-
-                                                if (discountResult != null) {
-                                                  setState(() {
-                                                    log(
-                                                      "✅ Discount Selected: $discountResult",
-                                                    );
-                                                    log(
-                                                      "=========>>>>>>>>>>>>>${selectedType.toString()}",
-                                                    );
-                                                    final cartService =
-                                                        CartService();
-
-                                                    cartService.applyDiscount(
-                                                      customerId: int.parse(
-                                                        customerId.toString(),
-                                                      ),
-                                                      discountType:
-                                                          selectedType,
-                                                      discountValue:
-                                                          double.parse(
-                                                            dialogController
-                                                                .text
-                                                                .trim(),
-                                                          ),
-                                                      enabled: true,
-                                                      onSuccess: () {
-                                                        log(
-                                                          "API call successful",
-                                                        );
-
-                                                        WidgetsBinding.instance
-                                                            .addPostFrameCallback((
-                                                              _,
-                                                            ) {
-                                                              Get.offAll(
-                                                                () =>
-                                                                    CartScreen(),
-                                                              );
-                                                              _fetchCart();
-                                                            });
-                                                      },
-                                                    );
-                                                    if (selectedType ==
-                                                        "Percentage") {
-                                                      updateCartTotalsLocally(
-                                                        offlineDiscount:
-                                                            double.parse(
-                                                              dialogController
-                                                                  .text
-                                                                  .trim(),
-                                                            ),
-                                                        discounttype:
-                                                            selectedType,
-                                                      );
-                                                    } else {
-                                                      updateCartTotalsLocally(
-                                                        offlineDiscount:
-                                                            double.parse(
-                                                              dialogController
-                                                                  .text
-                                                                  .trim(),
-                                                            ) *
-                                                            100,
-                                                        discounttype:
-                                                            selectedType,
-                                                      );
-                                                    }
-
-                                                    // Apply your discount here using discountResult["type"] and ["value"]
-                                                  });
-                                                  WidgetsBinding.instance
-                                                      .addPostFrameCallback((
-                                                        _,
-                                                      ) {
-                                                        Get.offAll(
-                                                          () => CartScreen(),
-                                                        );
-                                                        // _fetchCart();
-                                                      });
+                                                    cartItemKey: item.key ?? "",
+                                                    online: false,
+                                                    currentQuantity: currentQty,
+                                                  );
+                                                  await _fetchCart();
+                                                  setState(() {});
+                                                } catch (e) {
+                                                  showCustomErrorSnackbar(
+                                                    title: "Error",
+                                                    message:
+                                                        "Failed to update cart\n$e",
+                                                  );
                                                 }
-                                              },
-
-                                              child: Text(
-                                                'Apply Discount',
-                                                style: TextStyle(
-                                                  color: AppColors.mainColor,
-                                                  fontSize: 16.sp,
-                                                  fontFamily:
-                                                      FontFamily.semiBold,
-                                                ),
+                                              }
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.all(1.5.w),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.cardBgColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Icon(
+                                                Icons.add,
+                                                size: isIpad ? 12.sp : 16.sp,
+                                                color: AppColors.blackColor,
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                        Text(
-                                          "- ${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.customerDiscountValue ?? '0')! / 100).toStringAsFixed(2)}",
-
-                                          // "\$ ${tax.toStringAsFixed(2)}",
-                                          style: TextStyle(
-                                            color: AppColors.gray,
-                                            fontSize: 16.sp,
-                                            fontFamily: FontFamily.semiBold,
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 2.h),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "Total",
-                                          style: TextStyle(
-                                            color: AppColors.blackColor,
-                                            fontSize: 17.sp,
-                                            fontFamily: FontFamily.semiBold,
-                                          ),
-                                        ),
-                                        // Text(
-                                        //   "${viewCartData?.totals?.currencySymbol}${(double.tryParse((totalamount?.tostring ?? 0)! / 100).toStringAsFixed(2)}",
-                                        //   // "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
-                                        //   style: TextStyle(
-                                        //     color: AppColors.blackColor,
-                                        //     fontSize: 17.sp,
-                                        //     fontFamily: FontFamily.semiBold,
-                                        //   ),
-                                        // ),
-                                        Text(
-                                          "${viewCartData?.totals?.currencySymbol}${((double.tryParse(totalamount == "" || totalamount == null ? (viewCartData?.totals?.totalPrice).toString() : totalamount ?? '0') ?? 0) / 100).toStringAsFixed(2)}",
-                                          style: TextStyle(
-                                            color: AppColors.blackColor,
-                                            fontSize: 17.sp,
-                                            fontFamily: FontFamily.semiBold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 2.h),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        // Text(
-                                        //   "${viewCartData?.totals?.currencySymbol}${(double.tryParse((totalamount?.tostring ?? 0)! / 100).toStringAsFixed(2)}",
-                                        //   // "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
-                                        //   style: TextStyle(
-                                        //     color: AppColors.blackColor,
-                                        //     fontSize: 17.sp,
-                                        //     fontFamily: FontFamily.semiBold,
-                                        //   ),
-                                        // ),
-                                        viewCartData
-                                                    ?.totals
-                                                    ?.customerDiscount
-                                                    ?.enabled ==
-                                                false
-                                            ? Container()
-                                            : viewCartData
-                                                    ?.totals
-                                                    ?.customerDiscount
-                                                    ?.type ==
-                                                "percentage"
-                                            ? Text(
-                                              "*${viewCartData?.totals?.customerDiscount?.value}% Discount",
-                                              style: TextStyle(
-                                                color: AppColors.redColor,
-                                                fontSize: 17.sp,
-                                                fontFamily: FontFamily.semiBold,
-                                              ),
-                                            )
-                                            : Text(
-                                              "*${viewCartData?.totals?.currencySymbol}${viewCartData?.totals?.customerDiscount?.value} Discount",
-                                              style: TextStyle(
-                                                color: AppColors.redColor,
-                                                fontSize: 17.sp,
-                                                fontFamily: FontFamily.semiBold,
-                                              ),
-                                            ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: 1.h),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  // 👇 Shipping Checkbox
-                                  Row(
-                                    children: [
-                                      Transform.scale(
-                                        scale: 0.9,
-                                        child: Checkbox(
-                                          activeColor: AppColors.mainColor,
-                                          value: credit,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              credit = value ?? false;
-                                              log("=====>>>>>>>>$credit");
-                                              proforma = false;
-                                            });
-                                          },
-                                          materialTapTargetSize:
-                                              MaterialTapTargetSize.shrinkWrap,
-                                          visualDensity: VisualDensity.compact,
-                                        ),
+                                        ],
                                       ),
-                                      InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            credit = true;
-                                            log("=====>>>>>>>>$credit");
-                                            proforma = false;
-                                          });
-                                        },
-                                        child: Text(
-                                          "Credit",
-                                          style: TextStyle(
-                                            color: AppColors.gray,
-                                            fontSize: 16.sp,
-                                            fontFamily: FontFamily.semiBold,
-                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Price + Delete
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                InkWell(
+                                  onTap: () async {
+                                    setState(() {
+                                      isLoading = true;
+                                    });
+                                    final item = viewCartData?.items?[i];
+                                    if (item == null) return;
+
+                                    final cartService = CartService();
+
+                                    try {
+                                      // 🔹 Offline/Online increase
+                                      await cartService.removeFromCart(
+                                        cartItemKey: item.key ?? "",
+                                      );
+
+                                      // 🔹 Immediately update UI
+                                      setState(() {
+                                        viewCartData?.items?.removeAt(i);
+                                        updateCartTotalsLocally();
+                                      });
+
+                                      // 🔹 Only fetch cart from server if online
+                                      if (await checkInternet()) {
+                                        await _fetchCart();
+                                        setState(() {
+                                          isLoading = false;
+                                        });
+                                      }
+                                    } catch (e) {
+                                      showCustomErrorSnackbar(
+                                        title: "Error",
+                                        message: "Failed to update cart\n$e",
+                                      );
+                                    }
+                                  },
+                                  child: Icon(
+                                    Icons.delete_outline_rounded,
+                                    color: AppColors.redColor,
+                                    size: isIpad ? 16.sp : 18.sp,
+                                  ),
+                                ),
+                                SizedBox(height: 2.h),
+                                InkWell(
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        '${viewCartData?.totals?.currencySymbol ?? ''} ${((double.parse(viewCartData?.items?[i].lineTotal?.lineTotal ?? "0") / (viewCartData?.items?[i].quantity ?? 1)) / 100).toStringAsFixed(2)}',
+                                        style: TextStyle(
+                                          color: AppColors.blackColor,
+                                          fontSize: 14.sp,
+                                          fontFamily: FontFamily.semiBold,
                                         ),
                                       ),
                                     ],
                                   ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 1.h),
+                    ],
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
+  // Extracted Order Summary Section
+  Widget _buildOrderSummary() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: AppColors.whiteColor,
+      ),
+      padding: EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.receipt_long_rounded,
+                color: AppColors.mainColor,
+                size: isIpad ? 18.sp : 16.sp,
+              ),
+              SizedBox(width: 1.w),
+              Text(
+                "Order Summary",
+                style: TextStyle(
+                  color: AppColors.mainColor,
+                  fontSize: 18.sp,
+                  fontFamily: FontFamily.semiBold,
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: 2.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Sub Total",
+                style: TextStyle(
+                  color: AppColors.blackColor,
+                  fontSize: 16.sp,
+                  fontFamily: FontFamily.semiBold,
+                ),
+              ),
+              Text(
+                "${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.totalItems ?? '0')! / 100).toStringAsFixed(2)}",
+                style: TextStyle(
+                  color: AppColors.blackColor,
+                  fontSize: 16.sp,
+                  fontFamily: FontFamily.semiBold,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 1.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Total Tax",
+                style: TextStyle(
+                  color: AppColors.blackColor,
+                  fontSize: 16.sp,
+                  fontFamily: FontFamily.semiBold,
+                ),
+              ),
+              Text(
+                "${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.totalTax ?? '0')! / 100).toStringAsFixed(2)}",
+                style: TextStyle(
+                  color: AppColors.blackColor,
+                  fontSize: 16.sp,
+                  fontFamily: FontFamily.semiBold,
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: 1.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildApplyDiscountButton(),
+              Text(
+                "- ${viewCartData?.totals?.currencySymbol} ${(double.tryParse(viewCartData?.totals?.customerDiscountValue ?? '0')! / 100).toStringAsFixed(2)}",
+                style: TextStyle(
+                  color: AppColors.gray,
+                  fontSize: 16.sp,
+                  fontFamily: FontFamily.semiBold,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 2.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Total",
+                style: TextStyle(
+                  color: AppColors.blackColor,
+                  fontSize: 17.sp,
+                  fontFamily: FontFamily.semiBold,
+                ),
+              ),
+              Text(
+                "${viewCartData?.totals?.currencySymbol}${((double.tryParse(totalamount == "" || totalamount == null ? (viewCartData?.totals?.totalPrice).toString() : totalamount ?? '0') ?? 0) / 100).toStringAsFixed(2)}",
+                style: TextStyle(
+                  color: AppColors.blackColor,
+                  fontSize: 17.sp,
+                  fontFamily: FontFamily.semiBold,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 2.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              viewCartData?.totals?.customerDiscount?.enabled == false
+                  ? Container()
+                  : viewCartData?.totals?.customerDiscount?.type == "percentage"
+                  ? Text(
+                    "*${viewCartData?.totals?.customerDiscount?.value}% Discount",
+                    style: TextStyle(
+                      color: AppColors.redColor,
+                      fontSize: 17.sp,
+                      fontFamily: FontFamily.semiBold,
+                    ),
+                  )
+                  : Text(
+                    "*${viewCartData?.totals?.currencySymbol}${viewCartData?.totals?.customerDiscount?.value} Discount",
+                    style: TextStyle(
+                      color: AppColors.redColor,
+                      fontSize: 17.sp,
+                      fontFamily: FontFamily.semiBold,
+                    ),
+                  ),
+            ],
+          ),
+          SizedBox(height: 1.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              // Shipping Checkbox
+              Row(
+                children: [
+                  Transform.scale(
+                    scale: 0.9,
+                    child: Checkbox(
+                      activeColor: AppColors.mainColor,
+                      value: credit,
+                      onChanged: (value) {
+                        setState(() {
+                          credit = value ?? false;
+                          proforma = false;
+                        });
+                      },
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        credit = true;
+                        proforma = false;
+                      });
+                    },
+                    child: Text(
+                      "Credit",
+                      style: TextStyle(
+                        color: AppColors.gray,
+                        fontSize: 16.sp,
+                        fontFamily: FontFamily.semiBold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(width: 20),
+              // Discount Checkbox
+              Row(
+                children: [
+                  Transform.scale(
+                    scale: 0.9,
+                    child: Checkbox(
+                      activeColor: AppColors.mainColor,
+                      value: proforma,
+                      onChanged: (value) {
+                        setState(() {
+                          proforma = value ?? false;
+                          credit = false;
+                        });
+                      },
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        proforma = true;
+                        credit = false;
+                      });
+                    },
+                    child: Text(
+                      "Proforma",
+                      style: TextStyle(
+                        color: AppColors.gray,
+                        fontSize: 16.sp,
+                        fontFamily: FontFamily.semiBold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Extracted Discount Button Logic
+  Widget _buildApplyDiscountButton() {
+    return Row(
+      children: [
+        InkWell(
+          onTap: () async {
+            final formKey = GlobalKey<FormState>();
+            TextEditingController dialogController = TextEditingController();
+            String selectedType = "Fixed"; // default
+
+            final discountResult = await Get.dialog<Map<String, String>>(
+              Dialog(
+                backgroundColor: Colors.transparent,
+                child: StatefulBuilder(
+                  builder: (context, setState) {
+                    return IntrinsicWidth(
+                      stepWidth: 300,
+                      child: IntrinsicHeight(
+                        child: Container(
+                          padding: EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: AppColors.whiteColor,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                "Apply Discount",
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontFamily: FontFamily.bold,
+                                  color: AppColors.blackColor,
+                                ),
+                              ),
+                              SizedBox(height: 16),
+                              Row(
+                                children: [
                                   SizedBox(
-                                    width: 20,
-                                  ), // spacing between two checkboxes
-                                  // 👇 Discount Checkbox
-                                  Row(
-                                    children: [
-                                      Transform.scale(
-                                        scale: 0.9,
-                                        child: Checkbox(
-                                          activeColor: AppColors.mainColor,
-                                          value: proforma,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              proforma = value ?? false;
-                                              log("=====>>>>>>>>$proforma");
-                                              credit = false;
-                                            });
-                                          },
-                                          materialTapTargetSize:
-                                              MaterialTapTargetSize.shrinkWrap,
-                                          visualDensity: VisualDensity.compact,
-                                        ),
-                                      ),
-                                      InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            proforma = true;
-                                            log("=====>>>>>>>>$proforma");
-                                            credit = false;
-                                          });
-                                        },
-                                        child: Text(
-                                          "Proforma",
-                                          style: TextStyle(
-                                            color: AppColors.gray,
-                                            fontSize: 16.sp,
-                                            fontFamily: FontFamily.semiBold,
+                                    width: 65.w,
+                                    child: DropdownButtonFormField<String>(
+                                      initialValue: selectedType,
+                                      items:
+                                          ["Fixed", "Percentage"]
+                                              .map(
+                                                (e) => DropdownMenuItem(
+                                                  value: e,
+                                                  child: Text(e),
+                                                ),
+                                              )
+                                              .toList(),
+                                      onChanged: (val) {
+                                        setState(() {
+                                          selectedType = val!;
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        disabledBorder: OutlineInputBorder(),
+                                        labelText: "Discount Type",
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
                                           ),
                                         ),
                                       ),
-                                    ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 16),
+                              Form(
+                                key: formKey,
+                                child: AppTextField(
+                                  key: ValueKey(selectedType),
+                                  controller: dialogController,
+                                  hintText:
+                                      selectedType == "Fixed"
+                                          ? "Enter Discount Fixed"
+                                          : "Enter Discount percentage",
+                                  text:
+                                      selectedType == "Fixed"
+                                          ? "Discount Fixed"
+                                          : "Discount percentage",
+                                  isTextavailable: true,
+                                  textInputType: TextInputType.number,
+                                  maxline: 1,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Please enter a discount";
+                                    }
+                                    final parsed = double.tryParse(value);
+                                    if (parsed == null) {
+                                      return "Enter a valid number";
+                                    }
+                                    if (parsed <= 0) {
+                                      return "Value must be greater than 0";
+                                    }
+                                    final subtotalInCents =
+                                        double.tryParse(
+                                          viewCartData?.totals?.totalItems ??
+                                              '0',
+                                        ) ??
+                                        0.0;
+                                    final subtotal = subtotalInCents / 100;
+
+                                    if (selectedType == "Percentage" &&
+                                        parsed > 100) {
+                                      return "percentage can't be more than 100";
+                                    }
+                                    if (selectedType == "Fixed" &&
+                                        parsed > subtotal) {
+                                      return "Discount can't exceed${viewCartData?.totals?.currencySymbol} ${subtotal.toStringAsFixed(2)}";
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                              SizedBox(height: 24),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  CustomButton(
+                                    title: "Cancel",
+                                    route: () => Get.back(),
+                                    color: AppColors.containerColor,
+                                    fontcolor: AppColors.blackColor,
+                                    height: 5.h,
+                                    width: 27.w,
+                                    fontsize: 15.sp,
+                                    radius: 12.0,
+                                  ),
+                                  CustomButton(
+                                    title: "Apply Discount",
+                                    route: () {
+                                      if (!formKey.currentState!.validate()) {
+                                        return;
+                                      }
+                                      final charge =
+                                          dialogController.text.trim();
+                                      Get.back(
+                                        result: {
+                                          "type": selectedType,
+                                          "value": charge,
+                                        },
+                                      );
+                                    },
+                                    color: AppColors.mainColor,
+                                    fontcolor: AppColors.whiteColor,
+                                    height: 5.h,
+                                    width: 40.w,
+                                    fontsize: 15.sp,
+                                    radius: 12.0,
+                                    iconData: Icons.check,
+                                    iconsize: 17.sp,
                                   ),
                                 ],
                               ),
@@ -1521,101 +954,171 @@ class _CartScreenState extends State<CartScreen> {
                           ),
                         ),
                       ),
-                ],
-              ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h),
-      bottomNavigationBar: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          isLoading ||
-                  viewCartData?.items?.length == 0 ||
-                  viewCartData?.items?.length == null ||
-                  viewCartData?.items?.length == []
-              ? Container()
-              : Container(
-                padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
-                decoration: BoxDecoration(
-                  color: AppColors.whiteColor,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.shade300,
-                      blurRadius: 10,
-                      offset: Offset(0, -5),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Estimated Total
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Estimated Total",
-                          style: TextStyle(
-                            color: AppColors.blackColor,
-                            fontSize: 17.5.sp,
-                            fontFamily: FontFamily.semiBold,
-                          ),
-                        ),
-                        SizedBox(height: 0.5.h),
-                        Text(
-                          "${viewCartData?.totals?.currencySymbol}${((double.tryParse(totalamount == "" || totalamount == null ? (viewCartData?.totals?.totalPrice).toString() : totalamount ?? '0') ?? 0) / 100).toStringAsFixed(2)}",
-                          // "\$ ${(subtotal + shipping + tax).toStringAsFixed(2)}",
-                          style: TextStyle(
-                            color: AppColors.blackColor,
-                            fontSize: 18.sp,
-                            fontFamily: FontFamily.semiBold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(width: 2.w),
-                    // Checkout Button
-                    Expanded(
-                      child: CustomButton(
-                        title: 'Checkout',
-                        route: () {
-                          // if (!credit && !proforma) {
-                          //   showCustomErrorSnackbar(
-                          //     title: "Credit or Proforma",
-                          //     message: "Please Select Credit or Proforma",
-                          //   );
-                          // } else {
-                          //
-                          // }
-                          Get.to(
-                            CheckOutScreen(
-                              cridit:
-                                  proforma == false
-                                      ? ""
-                                      : credit == false
-                                      ? ""
-                                      : credit == true
-                                      ? "credit"
-                                      : "proforma",
-                            ),
-                            transition: Transition.fade,
-                            duration: const Duration(milliseconds: 450),
-                          );
-                        },
-                        color: AppColors.mainColor,
-                        fontcolor: AppColors.whiteColor,
-                        height: 5.h,
-                        fontsize: 18.sp,
-                        iconsize: 18.sp,
-                        iconData: Icons.shopping_cart_checkout_outlined,
-                        radius: isIpad ? 1.w : 3.w,
-                      ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ),
-          SizedBox(height: isIpad ? 14.h : 10.h, child: CustomBar(selected: 4)),
+              barrierDismissible: true,
+            );
+
+            if (discountResult != null) {
+              setState(() {
+                final cartService = CartService();
+                cartService.applyDiscount(
+                  customerId: int.parse(customerId.toString()),
+                  discountType: selectedType,
+                  discountValue: double.parse(dialogController.text.trim()),
+                  enabled: true,
+                  onSuccess: () {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      Get.offAll(() => CartScreen());
+                      _fetchCart();
+                    });
+                  },
+                );
+                if (selectedType == "Percentage") {
+                  updateCartTotalsLocally(
+                    offlineDiscount: double.parse(dialogController.text.trim()),
+                    discounttype: selectedType,
+                  );
+                } else {
+                  updateCartTotalsLocally(
+                    offlineDiscount:
+                        double.parse(dialogController.text.trim()) * 100,
+                    discounttype: selectedType,
+                  );
+                }
+              });
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Get.offAll(() => CartScreen());
+              });
+            }
+          },
+          child: Text(
+            'Apply Discount',
+            style: TextStyle(
+              color: AppColors.mainColor,
+              fontSize: 16.sp,
+              fontFamily: FontFamily.semiBold,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Extracted Checkout Section (Bottom Pinned)
+  Widget _buildCheckoutSection() {
+    if (isLoading ||
+        viewCartData?.items?.length == 0 ||
+        viewCartData?.items?.length == null ||
+        viewCartData?.items?.length == []) {
+      return Container();
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
+      decoration: BoxDecoration(
+        color: AppColors.whiteColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade300,
+            blurRadius: 10,
+            offset: Offset(0, -5),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Estimated Total
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Estimated Total",
+                style: TextStyle(
+                  color: AppColors.blackColor,
+                  fontSize: 17.5.sp,
+                  fontFamily: FontFamily.semiBold,
+                ),
+              ),
+              SizedBox(height: 0.5.h),
+              Text(
+                "${viewCartData?.totals?.currencySymbol}${((double.tryParse(totalamount == "" || totalamount == null ? (viewCartData?.totals?.totalPrice).toString() : totalamount ?? '0') ?? 0) / 100).toStringAsFixed(2)}",
+                style: TextStyle(
+                  color: AppColors.blackColor,
+                  fontSize: 18.sp,
+                  fontFamily: FontFamily.semiBold,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(width: 2.w),
+          // Checkout Button
+          Expanded(
+            child: CustomButton(
+              title: 'Checkout',
+              route: () {
+                Get.to(
+                  CheckOutScreen(
+                    cridit:
+                        proforma == false
+                            ? ""
+                            : credit == false
+                            ? ""
+                            : credit == true
+                            ? "credit"
+                            : "proforma",
+                  ),
+                  transition: Transition.fade,
+                  duration: const Duration(milliseconds: 450),
+                );
+              },
+              color: AppColors.mainColor,
+              fontcolor: AppColors.whiteColor,
+              height: 5.h,
+              fontsize: 18.sp,
+              iconsize: 18.sp,
+              iconData: Icons.shopping_cart_checkout_outlined,
+              radius: isIpad ? 1.w : 3.w,
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  // Helpers for Hive Updates to reduce duplicated code
+  Future<void> _updateHiveQuantity(int index, int newQty) async {
+    var box = HiveService().getViewCartBox();
+    final cachedData = box.get('cart_$customerId');
+    if (cachedData != null && cachedData.toString().isNotEmpty) {
+      try {
+        final data = json.decode(cachedData);
+        final cachedCart = ViewCartDataModal.fromJson(data);
+        cachedCart.items?[index].quantity = newQty;
+        await box.put('cart_$customerId', json.encode(cachedCart.toJson()));
+      } catch (e) {
+        log("Error updating offline cache: $e");
+      }
+    }
+  }
+
+  Future<void> _removeHiveItem(int index) async {
+    var box = HiveService().getViewCartBox();
+    final cachedData = box.get('cart_$customerId');
+    if (cachedData != null && cachedData.toString().isNotEmpty) {
+      try {
+        final data = json.decode(cachedData);
+        final cachedCart = ViewCartDataModal.fromJson(data);
+        cachedCart.items?.removeAt(index);
+        await box.put('cart_$customerId', json.encode(cachedCart.toJson()));
+      } catch (e) {
+        log("Error updating offline cache: $e");
+      }
+    }
   }
 
   double discount1 = 0.0;
@@ -1628,10 +1131,7 @@ class _CartScreenState extends State<CartScreen> {
     int? itemIndex,
     bool removeCoupon = false,
   }) async {
-    log("discounttype shu ave che =====>>>.$discounttype");
     if (viewCartData == null) return;
-
-    log("offlineDiscount======>>>>>>> $offlineDiscount");
 
     double subtotal = 0.0;
     double tax = 0.0;
@@ -1641,52 +1141,36 @@ class _CartScreenState extends State<CartScreen> {
         double.tryParse(viewCartData?.totals?.customerDiscountValue ?? '0') ??
         0.0;
 
-    // 🛒 Loop through items to calculate subtotal
     for (int i = 0; i < (viewCartData!.items?.length ?? 0); i++) {
       var item = viewCartData!.items![i];
-
       if (item.prices != null) {
         double itemPrice;
-
-        // 🎯 If specific item needs to be updated
         if (itemIndex != null && i == itemIndex && offlineitemamount != null) {
           itemPrice = offlineitemamount;
-          item.prices!.price = itemPrice.toString(); // Update item's price
-          log("Updated item price =========>>>> ${item.prices!.price}");
+          item.prices!.price = itemPrice.toString();
         } else {
           itemPrice = double.tryParse(item.prices?.price ?? '0') ?? 0.0;
         }
 
         int quantity = item.quantity ?? 0;
-        log("quantity====>>>> $quantity");
         item.lineTotal?.lineTotal = (itemPrice * quantity).toString();
-
         subtotal += itemPrice * quantity;
-
-        // Add tax per item if needed (currently zero)
-        double itemTax = 0.0;
-        tax += itemTax * quantity;
       }
     }
 
-    // 💸 Apply discount logic
     if (removeCoupon) {
       discount = 0.0;
     } else if (offlineDiscount != null) {
       if (discounttype == "percentage") {
         discount = (offlineDiscount / 100) * subtotal;
-        log("discount=====>>>>>$discount");
       } else {
         discount = offlineDiscount;
       }
     }
 
-    // 🧮 Final total price after discount
     double totalPrice = subtotal - discount;
-    log("totalPrice====>>>>>>>$totalPrice");
     if (totalPrice < 0) totalPrice = 0;
 
-    // 🧾 Update the totals in viewCartData
     setState(() {
       viewCartData!.totals = Totals(
         currencySymbol: viewCartData!.totals?.currencySymbol ?? "\$",
@@ -1701,19 +1185,10 @@ class _CartScreenState extends State<CartScreen> {
     });
     setState(() {
       totalamount1 = totalPrice.toString();
-
-      log(
-        "totalamounttotalamounttotalamounttotalamounttotalamount$totalamount",
-      );
     });
 
-    // 🗃️ Save updated cart in Hive
     var box = HiveService().getViewCartBox();
     await box.put('cart_$customerId', json.encode(viewCartData!.toJson()));
-
-    log(
-      "✅ Cart updated → subtotal=$subtotal discount=$discount totalPrice=$totalPrice",
-    );
   }
 
   String? totalamount;
@@ -1722,7 +1197,6 @@ class _CartScreenState extends State<CartScreen> {
   Future<void> _fetchCart() async {
     var box = HiveService().getViewCartBox();
 
-    // Helper to safely set couponController
     void updateCouponText() {
       final coupons = viewCartData?.coupons;
       couponController.text =
@@ -1731,145 +1205,72 @@ class _CartScreenState extends State<CartScreen> {
               : "";
     }
 
-    // ✅ Offline mode
     if (!await checkInternet()) {
       final cachedData = box.get('cart_$customerId');
-
       if (cachedData != null && cachedData.toString().isNotEmpty) {
         try {
           final data = json.decode(cachedData);
           viewCartData = ViewCartDataModal.fromJson(data);
-
           if (mounted) updateCouponText();
         } catch (e) {
-          log("Error decoding cached cart: $e");
           viewCartData = null;
         }
       } else {
         viewCartData = null;
-        if (mounted) {
-          showCustomErrorSnackbar(
-            title: 'No Internet',
-            message: 'Your cart is empty or offline data not found.',
-          );
-        }
       }
       return;
     }
 
-    // ✅ Online mode
     try {
       final response = await CartService().fetchCart(customerId);
-
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-
         if (data == null || (data['items'] as List).isEmpty) {
           viewCartData = null;
-          await box.delete('cart_$customerId'); // clear cache
+          await box.delete('cart_$customerId');
         } else {
           viewCartData = ViewCartDataModal.fromJson(data);
           setState(() {
             final rawTotalItems = viewCartData?.totals?.totalItems;
             final rawDiscount = viewCartData?.totals?.customerDiscountValue;
-
             final totalItems =
                 ((rawTotalItems is num)
                     ? rawTotalItems
                     : num.tryParse(rawTotalItems?.toString() ?? '')) ??
                 0;
-
             final discount =
                 ((rawDiscount is num)
                     ? rawDiscount
                     : num.tryParse(rawDiscount?.toString() ?? '')) ??
                 0;
-
-            final total = (totalItems as num) - (discount); // ✅ type-safe
+            final total = (totalItems as num) - (discount);
             totalamount = total.toString();
           });
-
           if (mounted) updateCouponText();
-          await box.put('cart_$customerId', response.body); // save raw JSON
+          await box.put('cart_$customerId', response.body);
         }
       } else {
-        // fallback to cache
         final cachedData = box.get('cart_$customerId');
         if (cachedData != null && cachedData.toString().isNotEmpty) {
           final data = json.decode(cachedData);
           viewCartData = ViewCartDataModal.fromJson(data);
-          setState(() {
-            final rawTotalItems = viewCartData?.totals?.totalItems;
-            final rawDiscount = viewCartData?.totals?.customerDiscountValue;
-
-            final totalItems =
-                ((rawTotalItems is num)
-                    ? rawTotalItems
-                    : num.tryParse(rawTotalItems?.toString() ?? '')) ??
-                0;
-
-            final discount =
-                ((rawDiscount is num)
-                    ? rawDiscount
-                    : num.tryParse(rawDiscount?.toString() ?? '')) ??
-                0;
-
-            final total = (totalItems as num) - (discount); // ✅ type-safe
-            totalamount = total.toString();
-          });
           if (mounted) updateCouponText();
         } else {
           viewCartData = null;
         }
-        if (mounted) {
-          showCustomErrorSnackbar(
-            title: 'Server Error',
-            message: 'Something went wrong. Please try again later.',
-          );
-        }
       }
-    } catch (e, stackTrace) {
-      log("Error fetching cart: $stackTrace");
-
-      // fallback to cache
+    } catch (e) {
       final cachedData = box.get('cart_$customerId');
       if (cachedData != null && cachedData.toString().isNotEmpty) {
         try {
           final data = json.decode(cachedData);
           viewCartData = ViewCartDataModal.fromJson(data);
-          setState(() {
-            final rawTotalItems = viewCartData?.totals?.totalItems;
-            final rawDiscount = viewCartData?.totals?.customerDiscountValue;
-
-            final totalItems =
-                ((rawTotalItems is num)
-                    ? rawTotalItems
-                    : num.tryParse(rawTotalItems?.toString() ?? '')) ??
-                0;
-
-            final discount =
-                ((rawDiscount is num)
-                    ? rawDiscount
-                    : num.tryParse(rawDiscount?.toString() ?? '')) ??
-                0;
-
-            final total = (totalItems as num) - (discount); // ✅ type-safe
-            totalamount = total.toString();
-          });
           if (mounted) updateCouponText();
         } catch (_) {
           viewCartData = null;
         }
       } else {
         viewCartData = null;
-      }
-
-      if (mounted) {
-        showCustomErrorSnackbar(
-          title: 'Network Error',
-          message:
-              'Unable to connect. Please check your internet and try again.',
-        );
       }
     }
   }
@@ -1878,17 +1279,11 @@ class _CartScreenState extends State<CartScreen> {
 
   Future<void> _fetchCoupons() async {
     var box = HiveService().getCouponListBox();
-
     if (!await checkInternet()) {
       final cachedData = box.get('coupons');
       if (cachedData != null) {
         final List data = json.decode(cachedData);
         couponslist = data.map((e) => CouponListModal.fromJson(e)).toList();
-      } else {
-        showCustomErrorSnackbar(
-          title: 'No Internet',
-          message: 'Please check your connection and try again.',
-        );
       }
       return;
     }
@@ -1898,162 +1293,22 @@ class _CartScreenState extends State<CartScreen> {
       if (response.statusCode == 200) {
         final List data = json.decode(response.body);
         couponslist = data.map((e) => CouponListModal.fromJson(e)).toList();
-
-        // Save coupons to Hive
         await box.put('coupons', response.body);
       } else {
-        // Fallback: load cache if server fails
         final cachedData = box.get('coupons');
         if (cachedData != null) {
           final List data = json.decode(cachedData);
           couponslist = data.map((e) => CouponListModal.fromJson(e)).toList();
         }
-        showCustomErrorSnackbar(
-          title: 'Server Error',
-          message: 'Something went wrong. Please try again later.',
-        );
       }
     } catch (_) {
-      // Fallback: load cache on network error
       final cachedData = box.get('coupons');
       if (cachedData != null) {
         final List data = json.decode(cachedData);
         couponslist = data.map((e) => CouponListModal.fromJson(e)).toList();
       }
-      showCustomErrorSnackbar(
-        title: 'Network Error',
-        message: 'Unable to connect. Please check your internet and try again.',
-      );
     }
   }
-
-  // void _showCouponDialog(BuildContext context) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) {
-  //       return StatefulBuilder(
-  //         builder: (context, setState) {
-  //           return AlertDialog(
-  //             shape: RoundedRectangleBorder(
-  //               borderRadius: BorderRadius.circular(16),
-  //             ),
-  //             title: Text(
-  //               "Available Coupons",
-  //               style: TextStyle(
-  //                 fontSize: 18.sp,
-  //                 fontFamily: FontFamily.semiBold,
-  //               ),
-  //             ),
-  //             content: SizedBox(
-  //               width: double.maxFinite,
-  //               child:
-  //                   couponslist.isEmpty
-  //                       ? Center(
-  //                         child: Text(
-  //                           "No Coupons Available",
-  //                           style: TextStyle(
-  //                             fontSize: 14.sp,
-  //                             color: Colors.grey,
-  //                           ),
-  //                         ),
-  //                       )
-  //                       : SingleChildScrollView(
-  //                         child: Column(
-  //                           children: [
-  //                             for (var coupon in couponslist)
-  //                               Card(
-  //                                 shape: RoundedRectangleBorder(
-  //                                   borderRadius: BorderRadius.circular(12),
-  //                                 ),
-  //                                 child: ListTile(
-  //                                   title: Text(
-  //                                     coupon.code ?? "",
-  //                                     style: TextStyle(
-  //                                       fontFamily: FontFamily.semiBold,
-  //                                     ),
-  //                                   ),
-  //                                   subtitle: Text(
-  //                                     coupon.description ?? "",
-  //                                     style: TextStyle(
-  //                                       fontFamily: FontFamily.semiBold,
-  //                                     ),
-  //                                   ),
-  //                                   trailing: TextButton(
-  //                                     onPressed: () async {
-  //                                       // set selected coupon into textfield
-  //                                       setState(() {
-  //                                         couponController.text =
-  //                                             coupon.code ?? "";
-  //                                         discount1 = double.parse(
-  //                                           coupon.amount ?? "",
-  //                                         );
-  //                                         updateCartTotalsLocally(
-  //                                           offlineDiscount: discount1,
-  //                                         );
-  //                                       });
-  //                                       log("discount1=====>>>>>$discount1");
-  //
-  //                                       final cartService = CartService();
-  //
-  //                                       await cartService.applyCoupon(
-  //                                         couponCode: couponController.text,
-  //                                         onSuccess: () {
-  //                                           log("API call successful");
-  //
-  //                                           WidgetsBinding.instance
-  //                                               .addPostFrameCallback((_) {
-  //                                                 Get.offAll(
-  //                                                   () => CartScreen(),
-  //                                                 );
-  //                                                 _fetchCart();
-  //                                               });
-  //                                         },
-  //                                       );
-  //
-  //                                       Navigator.pop(context);
-  //                                     },
-  //                                     child: Text(
-  //                                       "Apply",
-  //                                       style: TextStyle(
-  //                                         color: AppColors.mainColor,
-  //                                         fontFamily: FontFamily.semiBold,
-  //                                       ),
-  //                                     ),
-  //                                   ),
-  //                                 ),
-  //                               ),
-  //                           ],
-  //                         ),
-  //                       ),
-  //             ),
-  //             actions: [
-  //               ElevatedButton(
-  //                 onPressed: () {
-  //                   Navigator.pop(context);
-  //                 },
-  //                 style: ElevatedButton.styleFrom(
-  //                   backgroundColor: AppColors.mainColor,
-  //                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-  //                   shape: RoundedRectangleBorder(
-  //                     borderRadius: BorderRadius.circular(8),
-  //                   ),
-  //                 ),
-  //                 child: Text(
-  //                   "Cancel",
-  //                   style: TextStyle(
-  //                     color: AppColors.whiteColor,
-  //                     fontSize: 16.sp,
-  //                     fontFamily: FontFamily.semiBold,
-  //                   ),
-  //                 ),
-  //               ),
-  //             ],
-  //           );
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
 
   TextEditingController couponController = TextEditingController();
   bool credit = false;
