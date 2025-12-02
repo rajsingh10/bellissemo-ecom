@@ -288,23 +288,23 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                                 ),
                               ),
 
-                              SizedBox(width: isIpad ? 2.w : 3.5.w),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    searchBar = !searchBar;
-                                  });
-                                },
-                                child: CircleAvatar(
-                                  radius: isIpad ? 40 : 20,
-                                  backgroundColor: AppColors.containerColor,
-                                  child: Icon(
-                                    Icons.search,
-                                    color: AppColors.blackColor,
-                                    size: isIpad ? 35 : 25,
-                                  ),
-                                ),
-                              ),
+                              // SizedBox(width: isIpad ? 2.w : 3.5.w),
+                              // GestureDetector(
+                              //   onTap: () {
+                              //     setState(() {
+                              //       searchBar = !searchBar;
+                              //     });
+                              //   },
+                              //   child: CircleAvatar(
+                              //     radius: isIpad ? 40 : 20,
+                              //     backgroundColor: AppColors.containerColor,
+                              //     child: Icon(
+                              //       Icons.search,
+                              //       color: AppColors.blackColor,
+                              //       size: isIpad ? 35 : 25,
+                              //     ),
+                              //   ),
+                              // ),
 
                               SizedBox(width: isIpad ? 2.w : 3.5.w),
                               Stack(
@@ -332,13 +332,13 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 1.h),
-                      if (searchBar)
-                        SearchField(
-                          controller: searchController,
-                          hintText: "Search the entire shop",
-                        ),
-                      SizedBox(height: 1.h),
+                      // SizedBox(height: 1.h),
+                      // if (searchBar)
+                      //   SearchField(
+                      //     controller: searchController,
+                      //     hintText: "Search the entire shop",
+                      //   ),
+                      // SizedBox(height: 1.h),
                       SizedBox(height: 2.h),
                     ],
                   ),
@@ -851,10 +851,19 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                       CustomButton(
                         title: "Cancel",
                         route: () {
-                          setState(() {
-                            errorText =
-                                "Please select a customer before proceeding.";
-                          });
+                          if (selectedCustomerId != null) {
+                            // Already customer selected (stored in prefs)
+                            Get.back();     // simply close dialog
+                          } else {
+                            // No customer selected → show error
+                            setState(() {
+                              errorText = "Please select a customer before proceeding.";
+                            });
+                          }
+                          // setState(() {
+                          //   errorText =
+                          //       "Please select a customer before proceeding.";
+                          // });
                         },
                         color: AppColors.containerColor,
                         fontcolor: AppColors.blackColor,

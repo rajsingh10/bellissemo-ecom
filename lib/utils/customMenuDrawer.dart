@@ -25,6 +25,7 @@ import '../ui/home/view/homeMenuScreen.dart';
 import '../ui/products/view/ProductReportScreen.dart';
 import '../ui/profile/modal/profileModal.dart';
 import '../ui/profile/provider/profileProvider.dart';
+import '../ui/reports/view/reportsScreen.dart';
 import 'cachedNetworkImage.dart';
 import 'customButton.dart';
 
@@ -172,12 +173,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   _drawerItem(Icons.people_alt_outlined, "Customers", () {
                     Get.to(() => CustomersScreen());
                   }),
-                  _drawerItem(Icons.area_chart, "Customers Report", () {
-                    Get.to(() => CustomerReportScreen());
+                  _drawerItem(Icons.area_chart, "Report", () {
+                    Get.to(() => ReportScreen());
                   }),
-                  _drawerItem(Icons.area_chart, "Product Report", () {
-                    Get.to(() => ProducatReportScreen());
-                  }),
+                  // _drawerItem(Icons.area_chart, "Product Report", () {
+                  //   Get.to(() => ProducatReportScreen());
+                  // }),
                   _drawerItem(Icons.shopping_cart_outlined, "Cart", () {
                     Get.offAll(() => CartScreen());
                   }),

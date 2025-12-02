@@ -1249,24 +1249,29 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                   //   });
                                   //   return;
                                   // }
-                                  if (viewCartData?.billingAddress?.address1 ==
-                                      '') {
-                                    showCustomErrorSnackbar(
-                                      title: 'Address Required',
-                                      message:
-                                          'Please add an address to continue',
-                                    );
-                                  } else {
-                                    Get.back();
-                                    // sumbitOrderapi(
-                                    //   "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}",
-                                    // );
-                                    sumbitOrderapi(
-                                      selectedDate != null
-                                          ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
-                                          : null, // send null if date not selected
-                                    );
-                                  }
+                                  // if (viewCartData?.billingAddress?.address1 ==
+                                  //     '') {
+                                  //   showCustomErrorSnackbar(
+                                  //     title: 'Address Required',
+                                  //     message:
+                                  //         'Please add an address to continue',
+                                  //   );
+                                  // } else {
+                                  //   Get.back();
+                                  //   // sumbitOrderapi(
+                                  //   //   "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}",
+                                  //   // );
+                                  //   sumbitOrderapi(
+                                  //     selectedDate != null
+                                  //         ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
+                                  //         : null, // send null if date not selected
+                                  //   );
+                                  // }
+                                  sumbitOrderapi(
+                                    selectedDate != null
+                                        ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
+                                        : null, // send null if date not selected
+                                  );
                                 },
                                 color: AppColors.mainColor,
                                 fontcolor: AppColors.whiteColor,
