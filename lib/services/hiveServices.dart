@@ -70,7 +70,9 @@ class HiveService {
   Box getProfileBox() => profileBox;
 
   Box getCustomerBox() => customerBox;
+
   Box getCustomerReportBox() => customerReport;
+
   Box getProductReportBox() => prodductReport;
 
   Box getProductsBox() => productsBox;

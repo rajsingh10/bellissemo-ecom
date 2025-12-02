@@ -4,6 +4,7 @@ import 'package:bellissemo_ecom/ui/cart/View/cartScreen.dart';
 import 'package:bellissemo_ecom/ui/home/view/homeMenuScreen.dart';
 import 'package:bellissemo_ecom/ui/orderhistory/view/orderHistoryScreen.dart';
 import 'package:bellissemo_ecom/ui/profile/view/profileScreen.dart';
+import 'package:bellissemo_ecom/ui/reports/view/reportsScreen.dart';
 import 'package:bellissemo_ecom/utils/customButton.dart';
 import 'package:bellissemo_ecom/utils/fontFamily.dart';
 import 'package:flutter/material.dart';
@@ -43,6 +44,11 @@ class _VerticleBarState extends State<VerticleBar> {
     },
     {"title": "Home", "icon": Imgs.thirdImage, "page": () => HomeMenuScreen()},
     {"title": "Cart", "icon": Imgs.fourthImage, "page": () => CartScreen()},
+    {
+      "title": "Reports",
+      "icon": Imgs.reportImage,
+      "page": () => ReportScreen(),
+    },
     {
       "title": "Profile",
       "icon": Imgs.fifthImage,
@@ -166,7 +172,13 @@ class _VerticleBarState extends State<VerticleBar> {
                         onTap: () {
                           if (!isActive) {
                             setState(() => selected = index + 1);
-                            if (item["page"] != null) {
+                            if (item["title"] == 'Reports') {
+                              Get.to(
+                                item["page"],
+                                transition: Transition.fade,
+                                duration: const Duration(milliseconds: 450),
+                              );
+                            } else if (item["page"] != null) {
                               Get.offAll(
                                 item["page"],
                                 transition: Transition.fade,

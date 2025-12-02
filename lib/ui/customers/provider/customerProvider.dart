@@ -44,6 +44,7 @@ class CustomerProvider extends ChangeNotifier {
 
     return responseJson;
   }
+
   Future<http.Response> fetchCustomerReport({
     required int customerId,
     required String fromDate,
@@ -69,24 +70,20 @@ class CustomerProvider extends ChangeNotifier {
       "customer_id": customerId,
       "from_date": fromDate,
       "to_date": toDate,
-      "group_by": groupBy
+      "group_by": groupBy,
     };
 
     print("URL => $url");
     print("BODY => $body");
 
     final response = await http
-        .post(
-      Uri.parse(url),
-      headers: headers,
-      body: jsonEncode(body),
-    )
+        .post(Uri.parse(url), headers: headers, body: jsonEncode(body))
         .timeout(
-      const Duration(seconds: 60),
-      onTimeout: () {
-        throw const SocketException('Request Timeout');
-      },
-    );
+          const Duration(seconds: 60),
+          onTimeout: () {
+            throw const SocketException('Request Timeout');
+          },
+        );
 
     return responses(response);
   }
@@ -115,22 +112,20 @@ class CustomerProvider extends ChangeNotifier {
       "from_date": "",
       "to_date": "",
       "group_by": groupBy,
-      "month" : mounth
+      "month": mounth,
     };
 
     print("URL => $url");
     print("BODY => $body");
 
-    final response = await http.post(
-      Uri.parse(url),
-      headers: headers,
-      body: jsonEncode(body),
-    ).timeout(
-      const Duration(seconds: 60),
-      onTimeout: () {
-        throw const SocketException('Request Timeout');
-      },
-    );
+    final response = await http
+        .post(Uri.parse(url), headers: headers, body: jsonEncode(body))
+        .timeout(
+          const Duration(seconds: 60),
+          onTimeout: () {
+            throw const SocketException('Request Timeout');
+          },
+        );
 
     return responses(response);
   }

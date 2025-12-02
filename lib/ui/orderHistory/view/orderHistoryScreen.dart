@@ -17,6 +17,7 @@ import '../../../services/hiveServices.dart';
 import '../../../utils/cachedNetworkImage.dart';
 import '../../../utils/colors.dart';
 import '../../../utils/customBottombar.dart';
+import '../../../utils/customButton.dart';
 import '../../../utils/emptyWidget.dart';
 import '../../../utils/searchFields.dart';
 import '../../../utils/snackBars.dart';
@@ -40,6 +41,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
   final List<String> sortOptions = [
     "All",
+    "Customer",
     "Newest First",
     "Oldest First",
     "Yesterday",
@@ -56,11 +58,17 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   List<CustomerOrderWiseModal> _allOrdersList = [];
 
   void sortOrders(String option) {
+    // If Customer is selected, show the dialog and don't sort yet
+    if (option == "Customer") {
+      _showCustomerFilterDialog();
+      return;
+    }
+
     setState(() {
       selectedSort = option;
       final now = DateTime.now();
 
-      // Reset to all orders first before applying filters
+      // Reset to all orders first before applying date filters
       ordersList = List.from(_allOrdersList);
 
       if (option == "All") {
@@ -118,6 +126,93 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   date.isBefore(endOfMonth.add(const Duration(days: 1)));
             }).toList();
       }
+    });
+  }
+
+  /// Extracts unique customer names and shows them in a dialog
+  void _showCustomerFilterDialog() {
+    // 1. Get unique names from the master list
+    Set<String> uniqueNames = {};
+    for (var order in _allOrdersList) {
+      if (order.customerName != null && order.customerName!.isNotEmpty) {
+        uniqueNames.add(order.customerName!);
+      }
+    }
+
+    // 2. Convert to list and sort alphabetically
+    List<String> sortedNames = uniqueNames.toList()..sort();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20), // Rounded corners
+          ),
+          title: Text(
+            "Select Customer",
+            style: TextStyle(fontFamily: FontFamily.bold, fontSize: 16.sp),
+          ),
+          content: SizedBox(
+            width: double.minPositive,
+            height: 20.h, // Constrain height
+            child:
+                sortedNames.isEmpty
+                    ? Center(child: Text("No customers found"))
+                    : ListView.separated(
+                      itemCount: sortedNames.length,
+                      separatorBuilder:
+                          (ctx, index) => Divider(color: Colors.grey.shade300),
+                      itemBuilder: (ctx, index) {
+                        final name = sortedNames[index];
+                        return ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(
+                            name,
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontFamily: FontFamily.semiBold,
+                              color: AppColors.blackColor,
+                            ),
+                          ),
+                          onTap: () {
+                            // Select this customer
+                            _filterBySpecificCustomer(name);
+                            Navigator.pop(context); // Close dialog
+                          },
+                        );
+                      },
+                    ),
+          ),
+          actions: [
+            CustomButton(
+              title: "Cancel",
+              route: () {
+                Get.back(); // Close dialog
+              },
+              color: AppColors.containerColor,
+              fontcolor: AppColors.blackColor,
+              height: 5.h,
+              width: 30.w,
+              fontsize: 15.sp,
+              radius: 12.0,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Filters the list by the selected customer name
+  void _filterBySpecificCustomer(String name) {
+    setState(() {
+      selectedSort = "Customer"; // Update dropdown UI
+
+      // Filter from the master list
+      ordersList =
+          _allOrdersList.where((order) {
+            return (order.customerName ?? "") == name;
+          }).toList();
     });
   }
 
@@ -919,37 +1014,38 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     List<CustomerOrderWiseModal> filtered = [];
 
     for (var order in _allOrdersList) {
+      // 1. Search by Order ID
       bool matchOrderId = order.id.toString().toLowerCase().contains(query);
+
+      // 2. Search by Total Amount
       bool matchTotal = order.total.toString().toLowerCase().contains(query);
+
+      // 3. Search by Date
       bool matchDate = formatDate(
         order.dateCreated,
       ).toLowerCase().contains(query);
+
+      // 4. Search by Order Note
       bool matchNote = (order.orderNote ?? "").toLowerCase().contains(query);
 
-      final filteredItems =
-          (order.lineItems ?? []).where((item) {
-            return (item.name ?? "").toLowerCase().contains(query);
-          }).toList();
+      // 5. NEW: Search by Customer Name
+      bool matchCustomerName = (order.customerName ?? "")
+          .toLowerCase()
+          .contains(query);
 
-      bool matchProduct = filteredItems.isNotEmpty;
+      // --- Removed Product Name Search Logic ---
 
       bool matched =
-          matchOrderId || matchTotal || matchDate || matchNote || matchProduct;
+          matchOrderId ||
+          matchTotal ||
+          matchDate ||
+          matchNote ||
+          matchCustomerName;
 
       if (matched) {
-        filtered.add(
-          CustomerOrderWiseModal(
-            id: order.id,
-            total: order.total,
-            dateCreated: order.dateCreated,
-            orderNote: order.orderNote,
-            shippingTotal: order.shippingTotal,
-            discountTotal: order.discountTotal,
-            deliveryDate: order.deliveryDate,
-            currencySymbol: order.currencySymbol,
-            lineItems: matchProduct ? filteredItems : order.lineItems,
-          ),
-        );
+        // We no longer need to create a new object with filtered items
+        // because we are matching the Order itself, not specific items inside it.
+        filtered.add(order);
       }
     }
 

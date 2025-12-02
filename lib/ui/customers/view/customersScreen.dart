@@ -471,28 +471,18 @@ class _CustomersScreenState extends State<CustomersScreen> {
                     onTap: () {
                       deleteDailyData(customer.id.toString());
                     },
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        // Responsive size -> 8% of width but with limit
-                        double size = constraints.maxWidth * 0.08;
-
-                        // Min & Max safe limits (phone & iPad supported)
-                        size = size.clamp(40, 65); // min 40px, max 65px
-
-                        return Container(
-                          width: size,
-                          height: size,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.mainColor,
-                          ),
-                          child: Icon(
-                            Icons.delete,
-                            color: Colors.white,
-                            size: size * 0.45,
-                          ),
-                        );
-                      },
+                    child: Container(
+                      width: isIpad ? 60 : 40, // fixed size for all devices
+                      height: isIpad ? 60 : 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.mainColor,
+                      ),
+                      child: Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                        size: isIpad ? 30 : 20, // keep icon small too
+                      ),
                     ),
                   ),
                 ],

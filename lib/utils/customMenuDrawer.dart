@@ -19,10 +19,7 @@ import '../ApiCalling/apiConfigs.dart';
 import '../apiCalling/checkInternetModule.dart';
 import '../services/hiveServices.dart';
 import '../ui/category/view/categoryScreen.dart';
-import '../ui/customers/modal/customerReportScreen.dart';
-import '../ui/customers/view/customerReportScreen.dart';
 import '../ui/home/view/homeMenuScreen.dart';
-import '../ui/products/view/ProductReportScreen.dart';
 import '../ui/profile/modal/profileModal.dart';
 import '../ui/profile/provider/profileProvider.dart';
 import '../ui/reports/view/reportsScreen.dart';
@@ -38,6 +35,7 @@ class CustomDrawer extends StatefulWidget {
 
 bool isIpad = 100.w >= 800;
 bool isLoading = true;
+bool isFiltering = true;
 
 class _CustomDrawerState extends State<CustomDrawer> {
   @override
@@ -176,9 +174,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   _drawerItem(Icons.area_chart, "Report", () {
                     Get.to(() => ReportScreen());
                   }),
-                  // _drawerItem(Icons.area_chart, "Product Report", () {
-                  //   Get.to(() => ProducatReportScreen());
-                  // }),
                   _drawerItem(Icons.shopping_cart_outlined, "Cart", () {
                     Get.offAll(() => CartScreen());
                   }),

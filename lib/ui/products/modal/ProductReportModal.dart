@@ -7,14 +7,15 @@ class ProductReportModal {
   String? currency;
   String? currencySymbol;
 
-  ProductReportModal(
-      {this.groupBy,
-        this.from,
-        this.to,
-        this.data,
-        this.topCategories,
-        this.currency,
-        this.currencySymbol});
+  ProductReportModal({
+    this.groupBy,
+    this.from,
+    this.to,
+    this.data,
+    this.topCategories,
+    this.currency,
+    this.currencySymbol,
+  });
 
   ProductReportModal.fromJson(Map<String, dynamic> json) {
     groupBy = json['group_by'];
@@ -65,16 +66,17 @@ class Data {
   var permalink;
   String? monthName;
 
-  Data(
-      {this.productId,
-        this.year,
-        this.period,
-        this.totalQty,
-        this.totalRevenue,
-        this.productName,
-        this.image,
-        this.permalink,
-        this.monthName});
+  Data({
+    this.productId,
+    this.year,
+    this.period,
+    this.totalQty,
+    this.totalRevenue,
+    this.productName,
+    this.image,
+    this.permalink,
+    this.monthName,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
     productId = json['product_id'];

@@ -1,6 +1,6 @@
 class CustomerReportModal {
   String? mode;
- var customerId;
+  var customerId;
   DateRange? dateRange;
   List<YearlyOverview>? yearlyOverview;
   String? currency;
@@ -8,22 +8,24 @@ class CustomerReportModal {
   List<Leaderboard>? leaderboard;
   List<CustomerOrders>? customerOrders;
 
-  CustomerReportModal(
-      {this.mode,
-        this.customerId,
-        this.dateRange,
-        this.yearlyOverview,
-        this.currency,
-        this.currencySymbol,
-        this.leaderboard,
-        this.customerOrders});
+  CustomerReportModal({
+    this.mode,
+    this.customerId,
+    this.dateRange,
+    this.yearlyOverview,
+    this.currency,
+    this.currencySymbol,
+    this.leaderboard,
+    this.customerOrders,
+  });
 
   CustomerReportModal.fromJson(Map<String, dynamic> json) {
     mode = json['mode'];
     customerId = json['customer_id'];
-    dateRange = json['date_range'] != null
-        ? new DateRange.fromJson(json['date_range'])
-        : null;
+    dateRange =
+        json['date_range'] != null
+            ? new DateRange.fromJson(json['date_range'])
+            : null;
     if (json['yearly_overview'] != null) {
       yearlyOverview = <YearlyOverview>[];
       json['yearly_overview'].forEach((v) {
@@ -145,13 +147,14 @@ class Leaderboard {
   String? spent;
   String? avgOrder;
 
-  Leaderboard(
-      {this.name,
-        this.email,
-        this.customerId,
-        this.orderCount,
-        this.spent,
-        this.avgOrder});
+  Leaderboard({
+    this.name,
+    this.email,
+    this.customerId,
+    this.orderCount,
+    this.spent,
+    this.avgOrder,
+  });
 
   Leaderboard.fromJson(Map<String, dynamic> json) {
     name = json['name'];
@@ -179,24 +182,25 @@ class CustomerOrders {
   String? orderDate;
   String? customerId;
   String? customerName;
- var customerEmail;
+  var customerEmail;
   String? status;
   String? totalAmount;
   String? currency;
   List<Items>? items;
   String? formattedDate;
 
-  CustomerOrders(
-      {this.orderId,
-        this.orderDate,
-        this.customerId,
-        this.customerName,
-        this.customerEmail,
-        this.status,
-        this.totalAmount,
-        this.currency,
-        this.items,
-        this.formattedDate});
+  CustomerOrders({
+    this.orderId,
+    this.orderDate,
+    this.customerId,
+    this.customerName,
+    this.customerEmail,
+    this.status,
+    this.totalAmount,
+    this.currency,
+    this.items,
+    this.formattedDate,
+  });
 
   CustomerOrders.fromJson(Map<String, dynamic> json) {
     orderId = json['order_id'];
@@ -241,12 +245,13 @@ class Items {
   String? productNetRevenue;
   String? image;
 
-  Items(
-      {this.productId,
-        this.postTitle,
-        this.productQty,
-        this.productNetRevenue,
-        this.image});
+  Items({
+    this.productId,
+    this.postTitle,
+    this.productQty,
+    this.productNetRevenue,
+    this.image,
+  });
 
   Items.fromJson(Map<String, dynamic> json) {
     productId = json['product_id'];

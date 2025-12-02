@@ -26,7 +26,6 @@ import '../../../utils/customBottombar.dart';
 import '../../../utils/customMenuDrawer.dart';
 import '../../../utils/fontFamily.dart';
 import '../../../utils/images.dart';
-import '../../../utils/searchFields.dart';
 import '../../../utils/snackBars.dart';
 import '../../cart/service/cartServices.dart';
 import '../../customers/modal/fetchCustomersModal.dart';
@@ -305,7 +304,6 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                               //     ),
                               //   ),
                               // ),
-
                               SizedBox(width: isIpad ? 2.w : 3.5.w),
                               Stack(
                                 children: [
@@ -853,11 +851,12 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                         route: () {
                           if (selectedCustomerId != null) {
                             // Already customer selected (stored in prefs)
-                            Get.back();     // simply close dialog
+                            Get.back(); // simply close dialog
                           } else {
                             // No customer selected → show error
                             setState(() {
-                              errorText = "Please select a customer before proceeding.";
+                              errorText =
+                                  "Please select a customer before proceeding.";
                             });
                           }
                           // setState(() {
