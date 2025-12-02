@@ -20,7 +20,7 @@ class OrderHistoryProvider extends ChangeNotifier {
   }
 
   Future<http.Response> fetchOrders(id) async {
-    String url = "${apiEndpoints.orderHistory}$id&per_page=100&page=1";
+    String url = "${apiEndpoints.orderHistory}";
     // LoginModal? loginData = await SaveDataLocal.getDataFromLocal();
     String? token = await getSavedLoginToken();
 

@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../apiCalling/checkInternetModule.dart';
+import '../../../apiCalling/checkInternetModule.dart' as CheckInternet;
 import '../../../services/hiveServices.dart';
 import '../../../utils/cachedNetworkImage.dart';
 import '../../../utils/colors.dart';
@@ -79,11 +80,18 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
     {"name": "Sophia Lee", "totalSales": 31800},
   ];
   bool isIpad = 100.w >= 800;
-
+  bool isOnline = true;
+  checkConnection() async {
+    bool status = await CheckInternet.checkInternet(); // તમારા module મુજબ
+    setState(() {
+      isOnline = status;
+    });
+  }
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    checkConnection();
     DateTime now = DateTime.now();
     _fetchCustomers();
     setState(() {
@@ -186,123 +194,126 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
           ),
 
           // ---------- FILTERS ----------
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Column(
-              children: [
-                // Filter type
-                Row(
-                  children: [
-                    Expanded(
-                      child: DropdownButtonFormField<int>(
-                        value: selectedCustomerId,
-                        decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(90),
-                            borderSide: BorderSide(
-                              color: AppColors.mainColor,
-                              width: 1.5,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(90),
-                            borderSide: BorderSide(
-                              color: AppColors.mainColor,
-                              width: 2.0,
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          hintText: "Select Customer",
-                          hintStyle: TextStyle(
-                            color: Colors.grey[600],
+        isOnline
+            ? Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(
+            children: [
+              // Filter type
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<int>(
+                      value: selectedCustomerId,
+                      decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(90),
+                          borderSide: BorderSide(
+                            color: AppColors.mainColor,
+                            width: 1.5,
                           ),
                         ),
-                        items: customersList.map((customer) {
-                          return DropdownMenuItem<int>(
-                            value: customer.id,
-                            child: Text("${customer.firstName} ${customer.lastName}"),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          final customer = customersList.firstWhere((c) => c.id == value);
-                          setState(() {
-                            selectedCustomerId = customer.id;
-                            selectedCustomerName = "${customer.firstName} ${customer.lastName}";
-                            print("zxczxczxczxzc=====>>>>>>${selectedCustomerId}");
-                            _fetchCustomerReport();
-                          });
-                        },
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(90),
+                          borderSide: BorderSide(
+                            color: AppColors.mainColor,
+                            width: 2.0,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        hintText: "Select Customer",
+                        hintStyle: TextStyle(
+                          color: Colors.grey[600],
+                        ),
                       ),
-                    )
-
-                  ],
-                ),
-                SizedBox(height: 1.h,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-
-                    filterChip("Monthly"),
-                    filterChip("Quarterly"),
-                    filterChip("Yearly"),
-                  ],
-                ),
-                const SizedBox(height: 15),
-
-                // Date pickers
-                Row(
-                  children: [
-                    Expanded(
-                      child: datePickerBox(
-                        title: "From Date",
-                        value:
-                            fromDate == null
-                                ? "Select"
-                                : DateFormat('dd-MM-yyyy').format(fromDate!),
-                        onTap: pickFromDate,
-                      ),
+                      items: customersList.map((customer) {
+                        return DropdownMenuItem<int>(
+                          value: customer.id,
+                          child: Text("${customer.firstName} ${customer.lastName}"),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        final customer = customersList.firstWhere((c) => c.id == value);
+                        setState(() {
+                          selectedCustomerId = customer.id;
+                          selectedCustomerName = "${customer.firstName} ${customer.lastName}";
+                          print("zxczxczxczxzc=====>>>>>>${selectedCustomerId}");
+                          _fetchCustomerReport();
+                        });
+                      },
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: datePickerBox(
-                        title: "To Date",
-                        value:
-                            toDate == null
-                                ? "Select"
-                                : DateFormat('dd-MM-yyyy').format(toDate!),
-                        onTap: pickToDate,
-                      ),
-                    ),
-                  ],
-                ),
+                  )
 
-                // const SizedBox(height: 15),
-                //
-                // ElevatedButton(
-                //   style: ElevatedButton.styleFrom(
-                //     backgroundColor: AppColors.mainColor,
-                //     padding: const EdgeInsets.symmetric(
-                //       horizontal: 30,
-                //       vertical: 12,
-                //     ),
-                //   ),
-                //   onPressed: () {
-                //     // CALL YOUR API HERE
-                //     // getCustomerData(selectedFilter, fromDate, toDate);
-                //   },
-                //   child: const Text(
-                //     "Apply Filter",
-                //     style: TextStyle(color: Colors.white),
-                //   ),
-                // ),
-              ],
-            ),
+                ],
+              ),
+              SizedBox(height: 1.h,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+
+                  filterChip("Monthly"),
+                  filterChip("Quarterly"),
+                  filterChip("Yearly"),
+                ],
+              ),
+              const SizedBox(height: 15),
+
+              // Date pickers
+              Row(
+                children: [
+                  Expanded(
+                    child: datePickerBox(
+                      title: "From Date",
+                      value:
+                      fromDate == null
+                          ? "Select"
+                          : DateFormat('dd-MM-yyyy').format(fromDate!),
+                      onTap: pickFromDate,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: datePickerBox(
+                      title: "To Date",
+                      value:
+                      toDate == null
+                          ? "Select"
+                          : DateFormat('dd-MM-yyyy').format(toDate!),
+                      onTap: pickToDate,
+                    ),
+                  ),
+                ],
+              ),
+
+              // const SizedBox(height: 15),
+              //
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor: AppColors.mainColor,
+              //     padding: const EdgeInsets.symmetric(
+              //       horizontal: 30,
+              //       vertical: 12,
+              //     ),
+              //   ),
+              //   onPressed: () {
+              //     // CALL YOUR API HERE
+              //     // getCustomerData(selectedFilter, fromDate, toDate);
+              //   },
+              //   child: const Text(
+              //     "Apply Filter",
+              //     style: TextStyle(color: Colors.white),
+              //   ),
+              // ),
+            ],
           ),
+        ):SizedBox(),
 
-          const Divider(),
+
+
+        const Divider(),
           Row(
             children: [
               Text(

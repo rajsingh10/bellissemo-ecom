@@ -438,7 +438,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      customerName ?? "",
+                                      order.customerName ?? "",
                                       style: TextStyle(
                                         fontSize: 16.sp,
                                         color: AppColors.blackColor,

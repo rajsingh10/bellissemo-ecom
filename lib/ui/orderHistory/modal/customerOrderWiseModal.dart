@@ -26,6 +26,7 @@ class CustomerOrderWiseModal {
   String? createdVia;
   String? customerNote;
   String? deliveryDate;
+  String? customerName;
   String? orderNote;
   String? signatureUrl;
   String? dateCompleted;
@@ -63,6 +64,7 @@ class CustomerOrderWiseModal {
     this.total,
     this.totalTax,
     this.deliveryDate,
+    this.customerName,
     this.customerId,
     this.orderKey,
     this.billing,
@@ -100,6 +102,7 @@ class CustomerOrderWiseModal {
     pricesIncludeTax = json['prices_include_tax'];
     dateCreated = json['date_created'];
     deliveryDate = json['delivery_date'];
+    customerName = json['customer_name'];
     dateModified = json['date_modified'];
     discountTotal = json['discount_total'];
     discountTax = json['discount_tax'];
@@ -162,6 +165,8 @@ class CustomerOrderWiseModal {
     data['date_modified'] = dateModified;
     data['discount_total'] = discountTotal;
     data['delivery_date'] = deliveryDate;
+
+    data['customer_name'] = customerName;
     data['discount_tax'] = discountTax;
     data['shipping_total'] = shippingTotal;
     data['shipping_tax'] = shippingTax;
