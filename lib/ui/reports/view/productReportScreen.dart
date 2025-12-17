@@ -461,7 +461,7 @@ class _ProductReportScreenState extends State<ProductReportScreen> {
                                             Icons
                                                 .keyboard_arrow_down, // ↓ arrow
                                             color: AppColors.mainColor,
-                                            size: 28,
+                                            size: 20.sp,
                                           ),
                                           title: Row(
                                             children: [
@@ -488,7 +488,7 @@ class _ProductReportScreenState extends State<ProductReportScreen> {
                                                       overflow:
                                                           TextOverflow.ellipsis,
                                                       style: TextStyle(
-                                                        fontSize: 16.sp,
+                                                        fontSize: 18.sp,
                                                         fontFamily:
                                                             FontFamily.bold,
                                                       ),
@@ -496,7 +496,7 @@ class _ProductReportScreenState extends State<ProductReportScreen> {
                                                     Text(
                                                       "Qty : ${p.totalQty ?? '0'}",
                                                       style: TextStyle(
-                                                        fontSize: 14.sp,
+                                                        fontSize: 18.sp,
                                                         fontFamily:
                                                             FontFamily.semiBold,
                                                       ),
@@ -507,7 +507,7 @@ class _ProductReportScreenState extends State<ProductReportScreen> {
                                               Text(
                                                 "${customer.currencySymbol} ${p.totalRevenue ?? '0'}",
                                                 style: TextStyle(
-                                                  fontSize: 16.sp,
+                                                  fontSize: 18.sp,
                                                   fontFamily: FontFamily.bold,
                                                   color: AppColors.mainColor,
                                                 ),
@@ -574,18 +574,17 @@ class _ProductReportScreenState extends State<ProductReportScreen> {
                                                                         FontFamily
                                                                             .bold,
                                                                     fontSize:
-                                                                        14.sp,
+                                                                        16.sp,
                                                                   ),
                                                                 ),
                                                                 Text(
                                                                   order.formattedDate ??
                                                                       '',
                                                                   style: TextStyle(
-                                                                    fontSize:
-                                                                        12.sp,
-                                                                    color:
-                                                                        Colors
-                                                                            .grey,
+                                                                    color: AppColors.gray,
+                                                                    fontSize: 16.sp,
+                                                                    fontFamily:
+                                                                    FontFamily.bold,
                                                                   ),
                                                                 ),
                                                               ],
@@ -600,19 +599,19 @@ class _ProductReportScreenState extends State<ProductReportScreen> {
                                                                 Text(
                                                                   "Qty: ${order.quantity}",
                                                                   style: TextStyle(
-                                                                    fontSize:
-                                                                        13.sp,
+                                                                    color: AppColors.blackColor,
+                                                                    fontSize: 15.sp,
+                                                                    fontFamily:
+                                                                    FontFamily.bold,
                                                                   ),
                                                                 ),
                                                                 Text(
                                                                   "${productReportOrderModal?.currencySymbol}${order.totalPrice}",
                                                                   style: TextStyle(
+                                                                    color: AppColors.mainColor,
+                                                                    fontSize: 15.sp,
                                                                     fontFamily:
-                                                                        FontFamily
-                                                                            .bold,
-                                                                    color:
-                                                                        AppColors
-                                                                            .mainColor,
+                                                                    FontFamily.bold,
                                                                   ),
                                                                 ),
                                                               ],

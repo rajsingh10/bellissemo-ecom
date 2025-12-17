@@ -549,13 +549,16 @@ class _CartScreenState extends State<CartScreen> {
                                 Row(
                                   children: [
                                     InkWell(
-                                      onTap: (){
-                                        print("viewCartData?.items?[i]====>>>>${viewCartData?.items?[i]}");
-                                        _showEditPriceDialog(viewCartData?.items?[i].id ?? 0,i);
+                                      onTap: () {
+                                        print(
+                                          "viewCartData?.items?[i]====>>>>${viewCartData?.items?[i]}",
+                                        );
+                                        _showEditPriceDialog(
+                                          viewCartData?.items?[i].id ?? 0,
+                                          i,
+                                        );
                                       },
-                                      child: Icon(
-                                        Icons.edit,
-                                      ),
+                                      child: Icon(Icons.edit),
                                     ),
                                     Text(
                                       '${viewCartData?.totals?.currencySymbol ?? ''} ${((double.parse(viewCartData?.items?[i].lineTotal?.lineTotal ?? "0") / (viewCartData?.items?[i].quantity ?? 1)) / 100).toStringAsFixed(2)}',
@@ -582,9 +585,6 @@ class _CartScreenState extends State<CartScreen> {
       ),
     );
   }
-
-
-
 
   // Extracted Order Summary Section
   Widget _buildOrderSummary() {
@@ -1122,10 +1122,7 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
-
-
-
-  Future<void> _showEditPriceDialog(int id,index) async {
+  Future<void> _showEditPriceDialog(int id, index) async {
     print("index shu ave che ===>>>>>index${index}");
     final formKey = GlobalKey<FormState>();
     TextEditingController dialogController = TextEditingController();
@@ -1197,39 +1194,35 @@ class _CartScreenState extends State<CartScreen> {
                         route: () async {
                           if (!formKey.currentState!.validate()) return;
 
-                          final double enteredPrice =
-                          double.parse(dialogController.text.trim());
-setState(() {
-  updateCartTotalsLocally(
-    offlineitemamount:
-    enteredPrice *
-        100,
-    itemIndex:
-    index,
-  );
-});
+                          final double enteredPrice = double.parse(
+                            dialogController.text.trim(),
+                          );
+                          setState(() {
+                            updateCartTotalsLocally(
+                              offlineitemamount: enteredPrice * 100,
+                              itemIndex: index,
+                            );
+                          });
+
                           /// UI UPDATE
                           setState(() {
                             if (selectedVariant != null) {
-                              selectedVariant!.price =
-                                  enteredPrice.toString();
+                              selectedVariant!.price = enteredPrice.toString();
                             } else {
-                              productDetails?.price =
-                                  enteredPrice.toString();
+                              productDetails?.price = enteredPrice.toString();
                             }
                           });
 
                           /// BACKEND UPDATE
                           await CartService().updateProductPrice(
                             price: enteredPrice,
-                            productId:
-                            (selectedVariationId ?? id).toString(),
+                            productId: (selectedVariationId ?? id).toString(),
                             userId: customerId ?? 0,
                           );
 
                           Get.back(); // close dialog
                           Get.back();
-                          Get.offAll(CartScreen());// close dialog
+                          Get.offAll(CartScreen()); // close dialog
                         },
                         color: AppColors.mainColor,
                         fontcolor: AppColors.whiteColor,
@@ -1251,7 +1244,6 @@ setState(() {
       barrierDismissible: true,
     );
   }
-
 
   Future<void> _removeHiveItem(int index) async {
     var box = HiveService().getViewCartBox();
@@ -1277,8 +1269,7 @@ setState(() {
     double? offlineitemamount,
     int? itemIndex,
     bool removeCoupon = false,
-  }) async
-  {
+  }) async {
     if (viewCartData == null) return;
 
     double subtotal = 0.0;
@@ -1338,10 +1329,6 @@ setState(() {
     var box = HiveService().getViewCartBox();
     await box.put('cart_$customerId', json.encode(viewCartData!.toJson()));
   }
-
-
-
-
 
   String? totalamount;
   String? totalamount1;
