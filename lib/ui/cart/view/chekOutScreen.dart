@@ -1311,12 +1311,12 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         final data = json.decode(cachedData);
         viewCartData = ViewCartDataModal.fromJson(data);
       } else {
-        showCustomErrorSnackbar(
-
-          context,
-          title: 'No Internet',
-          message: 'Please check your connection and try again.',
-        );
+        // showCustomErrorSnackbar(
+        //
+        //   context,
+        //   title: 'No Internet',
+        //   message: 'Please check your connection and try again.',
+        // );
       }
       return;
     }
@@ -1371,11 +1371,11 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
             totalamount = total.toString();
           });
         }
-        showCustomErrorSnackbar(
-          context,
-          title: 'Server Error',
-          message: 'Something went wrong. Please try again later.',
-        );
+        // showCustomErrorSnackbar(
+        //   context,
+        //   title: 'Server Error',
+        //   message: 'Something went wrong. Please try again later.',
+        // );
       }
     } catch (_) {
       final cachedData = box.get('cart_$customerId');
@@ -1402,11 +1402,11 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
           totalamount = total.toString();
         });
       }
-      showCustomErrorSnackbar(
-        context,
-        title: 'Network Error',
-        message: 'Unable to connect. Please check your internet and try again.',
-      );
+      // showCustomErrorSnackbar(
+      //   context,
+      //   title: 'Network Error',
+      //   message: 'Unable to connect. Please check your internet and try again.',
+      // );
     }
   }
 
@@ -1481,12 +1481,12 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         Get.offAll(HomeMenuScreen());
       }
     } catch (e, stackTrace) {
-      showCustomErrorSnackbar(
-        context,
-        title: "Error",
-        message: "Something went wrong while adding product.\n$e",
-      );
-      print("dssfsdf============>>>>>>>>$stackTrace");
+      // showCustomErrorSnackbar(
+      //   context,
+      //   title: "Error",
+      //   message: "Something went wrong while adding product.\n$e",
+      // );
+      // print("dssfsdf============>>>>>>>>$stackTrace");
       setState(() {
         isAddingToCart = false;
       });

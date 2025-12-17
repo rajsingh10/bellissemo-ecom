@@ -519,7 +519,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               final cardWidth = screenWidth * (isIpad ? 0.25 : 0.35);
               final borderRadius = screenWidth * 0.035;
               final fontSize = screenWidth * 0.035;
-              final iconSize = screenWidth * (isIpad ? 0.025 : 0.045);
+              final iconSize = screenWidth * (isIpad ? 0.025 : 0.060);
 
               return GestureDetector(
                 onTap: () {
@@ -636,7 +636,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             Text(
                               variantQty.toString(),
                               style: TextStyle(
-                                fontSize: fontSize * (isIpad ? 0.5 : 0.75),
+                                fontSize: fontSize * (isIpad ? 0.5 : 0.96),
                                 fontFamily: FontFamily.semiBold,
                                 color: AppColors.blackColor,
                               ),
