@@ -305,7 +305,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
         profile = ProfileModal.fromJson(data);
       } else {
         showCustomErrorSnackbar(
-          title: 'No Internet',
+          context,title: 'No Internet',
           message: 'Please check your connection and try again.',
         );
       }
@@ -325,7 +325,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
           profile = ProfileModal.fromJson(data);
         }
         showCustomErrorSnackbar(
-          title: 'Server Error',
+          context,title: 'Server Error',
           message: 'Something went wrong. Please try again later.',
         );
       }
@@ -336,7 +336,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
         profile = ProfileModal.fromJson(data);
       }
       showCustomErrorSnackbar(
-        title: 'Network Error',
+        context,title: 'Network Error',
         message: 'Unable to connect. Please check your internet and try again.',
       );
     }

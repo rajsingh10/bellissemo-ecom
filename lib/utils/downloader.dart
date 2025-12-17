@@ -156,7 +156,7 @@ Future<void> downloadFile(
 
     if (Navigator.canPop(context)) Navigator.of(context).pop();
     showCustomSuccessSnackbar(
-      title: 'File Downloaded',
+      context,title: 'File Downloaded',
       message: 'File Saved to ${cleanFilePath(filePath)}',
     );
     // print('file path : $filePath');
@@ -165,7 +165,7 @@ Future<void> downloadFile(
     if (Navigator.canPop(context)) Navigator.of(context).pop();
     // Fluttertoast.showToast(msg: "Error occurred: $e");
     showCustomErrorSnackbar(
-      title: 'Sorry',
+      context,title: 'Sorry',
       message:
           'There was an error while downloading the file please try again later...',
     );

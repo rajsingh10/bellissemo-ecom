@@ -374,7 +374,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
       } else {
         print("❌ No internet and no cached data found");
         showCustomErrorSnackbar(
-          title: 'No Internet',
+          context,title: 'No Internet',
           message: 'Please check your connection and try again.',
         );
         hasData = false;
@@ -409,7 +409,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
         }
 
         showCustomErrorSnackbar(
-          title: 'Server Error',
+          context,title: 'Server Error',
           message: 'Something went wrong. Please try again later.',
         );
       }
@@ -427,7 +427,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
       }
 
       showCustomErrorSnackbar(
-        title: 'Network Error',
+        context,title: 'Network Error',
         message: 'Unable to connect. Please check your internet and try again.',
       );
     } finally {

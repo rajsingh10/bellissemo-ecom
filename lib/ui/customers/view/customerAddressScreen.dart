@@ -256,6 +256,7 @@ class _CustomerAddressScreenState extends State<CustomerAddressScreen> {
 
                       if (response != null && response.statusCode == 200) {
                         showCustomSuccessSnackbar(
+                          context,
                           title: "Address Updated",
                           message:
                               "Your address has been successfully updated.",
@@ -267,6 +268,7 @@ class _CustomerAddressScreenState extends State<CustomerAddressScreen> {
                         Get.to(CheckOutScreen(cridit: widget.crdit ?? ""));
                       } else if (response != null) {
                         showCustomErrorSnackbar(
+                          context,
                           title: "Update Failed",
                           message:
                               "Server error (${response.statusCode}). Please try again.",
@@ -276,6 +278,7 @@ class _CustomerAddressScreenState extends State<CustomerAddressScreen> {
                         });
                       } else {
                         showCustomSuccessSnackbar(
+                          context,
                           title: "Offline Mode",
                           message:
                               "Address saved offline. It will sync once internet is back.",
@@ -286,7 +289,7 @@ class _CustomerAddressScreenState extends State<CustomerAddressScreen> {
                       }
                     } catch (e) {
                       showCustomErrorSnackbar(
-                        title: "Unexpected Error",
+                        context,title: "Unexpected Error",
                         message: "Something went wrong: $e",
                       );
                       setState(() {

@@ -290,6 +290,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               data.map((e) => FetchCategoriesModal.fromJson(e)).toList();
         }
         showCustomErrorSnackbar(
+          context,
           title: 'Server Error',
           message: 'Something went wrong. Loaded cached data (if available).',
         );
@@ -303,6 +304,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             data.map((e) => FetchCategoriesModal.fromJson(e)).toList();
       }
       showCustomErrorSnackbar(
+        context,
         title: 'Network Error',
         message: 'Unable to connect. Loaded cached data (if available).',
       );

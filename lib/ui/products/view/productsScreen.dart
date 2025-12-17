@@ -766,7 +766,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
     if (pdfLink.isEmpty) {
       showCustomErrorSnackbar(
-        title: "PDF Unavailable",
+        context,title: "PDF Unavailable",
         message: "PDF is not available for download right now.",
       );
       return;
@@ -854,7 +854,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                 }
                                 : () {
                                   showCustomErrorSnackbar(
-                                    title: "Out of Stock",
+                                    context,title: "Out of Stock",
                                     message:
                                         "${product.name} is not available right now!",
                                   );
@@ -1191,7 +1191,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         _filterProducts();
       } else {
         showCustomErrorSnackbar(
-          title: 'No Internet',
+          context,title: 'No Internet',
           message: 'Please check your connection and try again.',
         );
       }
@@ -1227,7 +1227,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           _filterProducts();
         }
         showCustomErrorSnackbar(
-          title: 'Server Error',
+          context,title: 'Server Error',
           message: 'Something went wrong. Please try again later.',
         );
       }
@@ -1244,7 +1244,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         _filterProducts();
       }
       showCustomErrorSnackbar(
-        title: 'Network Error',
+        context,title: 'Network Error',
         message: 'Unable to connect. Please check your internet and try again.',
       );
     }
@@ -1280,7 +1280,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
       }
     } catch (e) {
       showCustomErrorSnackbar(
-        title: "Error",
+        context,title: "Error",
         message: "Something went wrong while adding product.\n$e",
       );
       log('Error : $e');
@@ -1324,7 +1324,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
       }
     } catch (e) {
       showCustomErrorSnackbar(
-        title: "Error",
+        context,title: "Error",
         message: "Something went wrong while adding product.\n$e",
       );
     } finally {
@@ -1347,7 +1347,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
       if (currentQty <= 0) {
         showCustomErrorSnackbar(
-          title: "Cart Empty",
+          context,title: "Cart Empty",
           message: "No items in cart to remove.",
         );
         return;
@@ -1371,19 +1371,19 @@ class _ProductsScreenState extends State<ProductsScreen> {
               response.data?["message"] ?? "Product quantity removed.";
         } else if (response.statusCode == 204) {
           showCustomErrorSnackbar(
-            title: "Cart Empty",
+            context,title: "Cart Empty",
             message: "No items in cart to remove.",
           );
         }
       } else {
         showCustomSuccessSnackbar(
-          title: "Offline Mode",
+          context,title: "Offline Mode",
           message: "Cart updated offline. It will sync when internet is back.",
         );
       }
     } catch (e, stackTrace) {
       showCustomErrorSnackbar(
-        title: "Error",
+        context,title: "Error",
         message: "Something went wrong while updating cart.\n$e",
       );
       log('Error : $stackTrace');
@@ -1432,7 +1432,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
       }
 
       showCustomErrorSnackbar(
-        title: 'Network Error',
+        context,title: 'Network Error',
         message: 'Unable to connect. Loaded cached data (if available).',
       );
     }

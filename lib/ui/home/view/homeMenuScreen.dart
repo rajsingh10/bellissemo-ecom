@@ -520,7 +520,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
         profile = ProfileModal.fromJson(data);
       } else {
         showCustomErrorSnackbar(
-          title: 'No Internet',
+          context,title: 'No Internet',
           message: 'Please check your connection and try again.',
         );
       }
@@ -540,7 +540,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
           profile = ProfileModal.fromJson(data);
         }
         showCustomErrorSnackbar(
-          title: 'Server Error',
+          context,title: 'Server Error',
           message: 'Something went wrong. Please try again later.',
         );
       }
@@ -551,7 +551,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
         profile = ProfileModal.fromJson(data);
       }
       showCustomErrorSnackbar(
-        title: 'Network Error',
+        context,title: 'Network Error',
         message: 'Unable to connect. Please check your internet and try again.',
       );
     }
@@ -572,7 +572,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                 .toList();
       } else {
         showCustomErrorSnackbar(
-          title: 'No Internet',
+          context,title: 'No Internet',
           message: 'Please check your connection and try again.',
         );
       }
@@ -603,7 +603,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                   .toList();
         }
         showCustomErrorSnackbar(
-          title: 'Server Error',
+          context,title: 'Server Error',
           message: 'Something went wrong. Please try again later.',
         );
       }
@@ -619,7 +619,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
                 .toList();
       }
       showCustomErrorSnackbar(
-        title: 'Network Error',
+        context,   title: 'Network Error',
         message: 'Unable to connect. Please check your internet and try again.',
       );
     }
@@ -638,7 +638,7 @@ class _HomeMenuScreenState extends State<HomeMenuScreen> {
     } catch (e) {
       setState(() => isAddingToCart = false);
       showCustomErrorSnackbar(
-        title: "Error",
+        context, title: "Error",
         message: "Failed to clear cart.\n$e",
       );
     } finally {

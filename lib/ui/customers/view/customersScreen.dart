@@ -103,14 +103,14 @@ class _CustomersScreenState extends State<CustomersScreen> {
       } else {
         _loadCachedData();
         showCustomErrorSnackbar(
-          title: 'Server Error',
+          context,title: 'Server Error',
           message: 'Something went wrong. Please try again later.',
         );
       }
     } catch (_) {
       _loadCachedData();
       showCustomErrorSnackbar(
-        title: 'Network Error',
+        context,title: 'Network Error',
         message: 'Unable to connect. Please check your internet and try again.',
       );
     }

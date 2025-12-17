@@ -922,7 +922,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         });
       } else {
         showCustomErrorSnackbar(
-          title: 'No Internet',
+          context,  title: 'No Internet',
           message: 'Please check your connection and try again.',
         );
       }
@@ -966,7 +966,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           });
         }
         showCustomErrorSnackbar(
-          title: 'Server Error',
+          context,title: 'Server Error',
           message: 'Something went wrong. Please try again later.',
         );
       }
@@ -986,7 +986,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         });
       }
       showCustomErrorSnackbar(
-        title: 'Network Error',
+        context,title: 'Network Error',
         message: 'Unable to connect. Please check your internet and try again.',
       );
     }

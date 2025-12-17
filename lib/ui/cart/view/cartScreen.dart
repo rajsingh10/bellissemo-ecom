@@ -374,6 +374,7 @@ class _CartScreenState extends State<CartScreen> {
                                                 }
                                               } catch (e) {
                                                 showCustomErrorSnackbar(
+                                                  context,
                                                   title: "Error",
                                                   message:
                                                       "Failed to update cart\n$e",
@@ -465,6 +466,7 @@ class _CartScreenState extends State<CartScreen> {
                                                   setState(() {});
                                                 } catch (e) {
                                                   showCustomErrorSnackbar(
+                                                    context,
                                                     title: "Error",
                                                     message:
                                                         "Failed to update cart\n$e",
@@ -528,6 +530,7 @@ class _CartScreenState extends State<CartScreen> {
                                       }
                                     } catch (e) {
                                       showCustomErrorSnackbar(
+                                        context,
                                         title: "Error",
                                         message: "Failed to update cart\n$e",
                                       );

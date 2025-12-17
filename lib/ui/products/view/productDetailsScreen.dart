@@ -149,7 +149,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         // Offline AND No Cache -> This triggers the Error Widget in build()
         print("❌ No internet and no cached data found");
         showCustomErrorSnackbar(
-          title: 'No Connection',
+          context,  title: 'No Connection',
           message: 'Connect to the internet to view this product.',
         );
       } else {
@@ -181,7 +181,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         // If API fails but we haven't loaded cache yet
         if (productDetails == null) {
           showCustomErrorSnackbar(
-            title: 'Server Error',
+            context,title: 'Server Error',
             message: 'Something went wrong. Please try again later.',
           );
         }
@@ -190,7 +190,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       print("❌ Exception: $e");
       if (productDetails == null) {
         showCustomErrorSnackbar(
-          title: 'Network Error',
+          context,title: 'Network Error',
           message: 'Unable to connect. Please check your internet.',
         );
       }
@@ -940,7 +940,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       }
     } catch (e) {
       showCustomErrorSnackbar(
-        title: "Error",
+        context,title: "Error",
         message: "Something went wrong while adding product.\n$e",
       );
       if (!mounted) return;
@@ -973,7 +973,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       }
     } catch (e) {
       showCustomErrorSnackbar(
-        title: "Error",
+        context,title: "Error",
         message: "Something went wrong while adding product.\n$e",
       );
       if (!mounted) return;

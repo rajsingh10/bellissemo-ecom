@@ -262,6 +262,7 @@ class _CreateCustomerPageState extends State<CreateCustomerPage> {
                           bool hasInternet = await checkInternet();
                           if (!hasInternet) {
                             showCustomSuccessSnackbar(
+                              context,
                               title: "Offline Mode",
                               message:
                                   "Customer saved locally. Will sync automatically when online.",
@@ -269,6 +270,7 @@ class _CreateCustomerPageState extends State<CreateCustomerPage> {
                             Get.to(() => CustomersScreen());
                           } else {
                             showCustomErrorSnackbar(
+                              context,
                               title: 'There was an error while adding customer',
                               message: 'Please try again',
                             );

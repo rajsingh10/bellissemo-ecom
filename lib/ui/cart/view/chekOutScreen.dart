@@ -1312,6 +1312,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         viewCartData = ViewCartDataModal.fromJson(data);
       } else {
         showCustomErrorSnackbar(
+
+          context,
           title: 'No Internet',
           message: 'Please check your connection and try again.',
         );
@@ -1370,6 +1372,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
           });
         }
         showCustomErrorSnackbar(
+          context,
           title: 'Server Error',
           message: 'Something went wrong. Please try again later.',
         );
@@ -1400,6 +1403,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         });
       }
       showCustomErrorSnackbar(
+        context,
         title: 'Network Error',
         message: 'Unable to connect. Please check your internet and try again.',
       );
@@ -1451,6 +1455,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
 
       if (response != null && response.statusCode == 200) {
         showCustomSuccessSnackbar(
+          context,
           title: "Order added successfully",
           message: "This order has been successfully added.",
         );
@@ -1466,6 +1471,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
           viewCartData = null; // or empty model
         });
         showCustomSuccessSnackbar(
+          context,
           title: "Offline Mode",
           message: "Product added offline. It will sync once internet is back.",
         );
@@ -1476,6 +1482,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
       }
     } catch (e, stackTrace) {
       showCustomErrorSnackbar(
+        context,
         title: "Error",
         message: "Something went wrong while adding product.\n$e",
       );

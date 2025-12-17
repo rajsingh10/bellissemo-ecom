@@ -351,7 +351,7 @@ class _LoginScreenState extends State<LoginScreen> {
         SaveDataLocal.saveLogInData(loginData!);
         await saveLoginToken(loginData?.token);
         showCustomSuccessSnackbar(
-          title: 'Login Successful',
+          context,title: 'Login Successful',
           message:
               internet
                   ? 'Welcome to Bellissemo!'
@@ -380,13 +380,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   await handleSuccessfulLogin(response.body);
                 } else if (response.statusCode == 403) {
                   showCustomErrorSnackbar(
-                    title: 'Login Failed',
+                    context,title: 'Login Failed',
                     message: 'Invalid username or password. Please try again.',
                   );
                   setState(() => isLogin = false);
                 } else {
                   showCustomErrorSnackbar(
-                    title: 'Server Error',
+                    context,title: 'Server Error',
                     message: 'Something went wrong. Please try again later.',
                   );
                   setState(() => isLogin = false);
@@ -397,7 +397,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 print("🛑 Stacktrace: $stacktrace");
 
                 showCustomErrorSnackbar(
-                  title: 'Network Error',
+                  context,title: 'Network Error',
                   message: 'Unable to connect. Please check your internet.',
                 );
                 setState(() => isLogin = false);
@@ -416,7 +416,7 @@ class _LoginScreenState extends State<LoginScreen> {
             await handleSuccessfulLogin(cachedData);
           } else {
             showCustomErrorSnackbar(
-              title: 'Login Failed',
+              context,title: 'Login Failed',
               message:
                   'No saved login found for this account. Connect to the internet and try again.',
             );
@@ -428,7 +428,7 @@ class _LoginScreenState extends State<LoginScreen> {
         print("📌 Stacktrace: $s");
 
         showCustomErrorSnackbar(
-          title: 'Unexpected Error',
+          context,  title: 'Unexpected Error',
           message: 'Something went wrong. Please try again.',
         );
         setState(() => isLogin = false);

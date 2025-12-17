@@ -126,7 +126,7 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
                 .toList();
       } else {
         showCustomErrorSnackbar(
-          title: 'No Internet',
+          context,title: 'No Internet',
           message: 'Please check your connection and try again.',
         );
       }
@@ -157,7 +157,7 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
                   .toList();
         }
         showCustomErrorSnackbar(
-          title: 'Server Error',
+          context,title: 'Server Error',
           message: 'Something went wrong. Please try again later.',
         );
       }
@@ -173,7 +173,7 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
                 .toList();
       }
       showCustomErrorSnackbar(
-        title: 'Network Error',
+        context,title: 'Network Error',
         message: 'Unable to connect. Please check your internet and try again.',
       );
     }
@@ -333,180 +333,180 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
                           : SizedBox(),
 
                       const Divider(),
-                      Row(
-                        children: [
-                          Text(
-                            "LeadBoard",
-                            style: TextStyle(
-                              fontSize: 17.sp,
-                              fontFamily: FontFamily.bold,
-                              color: AppColors.blackColor,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      SizedBox(height: 1.h),
-
-                      SizedBox(
-                        height: isIpad ? 21.h : 14.h,
-                        child:
-                            customerReportList.isEmpty ||
-                                    customerReportList[0].leaderboard == null ||
-                                    customerReportList[0].leaderboard!.isEmpty
-                                ? Center(
-                                  child: Text(
-                                    "No Leaderboard Available",
-                                    style: TextStyle(
-                                      fontSize: 16.sp,
-                                      fontFamily: FontFamily.bold,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                )
-                                : ListView.builder(
-                                  padding: EdgeInsets.zero,
-                                  scrollDirection: Axis.horizontal,
-
-                                  itemCount:
-                                      customerReportList[0].leaderboard!.length,
-
-                                  itemBuilder: (context, index) {
-                                    var customer = customerReportList[0];
-                                    var leadbord = customer.leaderboard?[index];
-
-                                    return Card(
-                                      elevation: 3,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 2.w,
-                                          vertical: 1.h,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                // NAME
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      "Customer Name :- ",
-                                                      style: TextStyle(
-                                                        fontSize: 16.sp,
-                                                        fontFamily:
-                                                            FontFamily.bold,
-                                                        color:
-                                                            AppColors.mainColor,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      leadbord?.name ?? "N/A",
-                                                      style: TextStyle(
-                                                        fontSize: 16.sp,
-                                                        fontFamily:
-                                                            FontFamily.bold,
-                                                        color:
-                                                            AppColors
-                                                                .blackColor,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-
-                                                // EMAIL
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      "Customer Email :- ",
-                                                      style: TextStyle(
-                                                        fontSize: 16.sp,
-                                                        fontFamily:
-                                                            FontFamily.bold,
-                                                        color:
-                                                            AppColors.mainColor,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      leadbord?.email ?? "N/A",
-                                                      style: TextStyle(
-                                                        fontSize: 16.sp,
-                                                        fontFamily:
-                                                            FontFamily.bold,
-                                                        color:
-                                                            AppColors
-                                                                .blackColor,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-
-                                                // SPENT
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      "Spent :- ",
-                                                      style: TextStyle(
-                                                        fontSize: 16.sp,
-                                                        fontFamily:
-                                                            FontFamily.bold,
-                                                        color:
-                                                            AppColors.mainColor,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      "${customer.currencySymbol} ${leadbord?.spent ?? "0"}",
-                                                      style: TextStyle(
-                                                        fontSize: 16.sp,
-                                                        fontFamily:
-                                                            FontFamily.bold,
-                                                        color:
-                                                            AppColors
-                                                                .blackColor,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-
-                                                // AVG ORDER
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      "AvgOrder :- ",
-                                                      style: TextStyle(
-                                                        fontSize: 16.sp,
-                                                        fontFamily:
-                                                            FontFamily.bold,
-                                                        color:
-                                                            AppColors.mainColor,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      "${customer.currencySymbol} ${leadbord?.avgOrder ?? "0"}",
-                                                      style: TextStyle(
-                                                        fontSize: 16.sp,
-                                                        fontFamily:
-                                                            FontFamily.bold,
-                                                        color:
-                                                            AppColors
-                                                                .blackColor,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                      ),
+                      // Row(
+                      //   children: [
+                      //     Text(
+                      //       "LeadBoard",
+                      //       style: TextStyle(
+                      //         fontSize: 17.sp,
+                      //         fontFamily: FontFamily.bold,
+                      //         color: AppColors.blackColor,
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+                      //
+                      // SizedBox(height: 1.h),
+                      //
+                      // SizedBox(
+                      //   height: isIpad ? 21.h : 14.h,
+                      //   child:
+                      //       customerReportList.isEmpty ||
+                      //               customerReportList[0].leaderboard == null ||
+                      //               customerReportList[0].leaderboard!.isEmpty
+                      //           ? Center(
+                      //             child: Text(
+                      //               "No Leaderboard Available",
+                      //               style: TextStyle(
+                      //                 fontSize: 16.sp,
+                      //                 fontFamily: FontFamily.bold,
+                      //                 color: Colors.grey,
+                      //               ),
+                      //             ),
+                      //           )
+                      //           : ListView.builder(
+                      //             padding: EdgeInsets.zero,
+                      //             scrollDirection: Axis.horizontal,
+                      //
+                      //             itemCount:
+                      //                 customerReportList[0].leaderboard!.length,
+                      //
+                      //             itemBuilder: (context, index) {
+                      //               var customer = customerReportList[0];
+                      //               var leadbord = customer.leaderboard?[index];
+                      //
+                      //               return Card(
+                      //                 elevation: 3,
+                      //                 shape: RoundedRectangleBorder(
+                      //                   borderRadius: BorderRadius.circular(12),
+                      //                 ),
+                      //                 child: Container(
+                      //                   padding: EdgeInsets.symmetric(
+                      //                     horizontal: 2.w,
+                      //                     vertical: 1.h,
+                      //                   ),
+                      //                   child: Row(
+                      //                     children: [
+                      //                       Column(
+                      //                         crossAxisAlignment:
+                      //                             CrossAxisAlignment.start,
+                      //                         children: [
+                      //                           // NAME
+                      //                           Row(
+                      //                             children: [
+                      //                               Text(
+                      //                                 "Customer Name :- ",
+                      //                                 style: TextStyle(
+                      //                                   fontSize: 16.sp,
+                      //                                   fontFamily:
+                      //                                       FontFamily.bold,
+                      //                                   color:
+                      //                                       AppColors.mainColor,
+                      //                                 ),
+                      //                               ),
+                      //                               Text(
+                      //                                 leadbord?.name ?? "N/A",
+                      //                                 style: TextStyle(
+                      //                                   fontSize: 16.sp,
+                      //                                   fontFamily:
+                      //                                       FontFamily.bold,
+                      //                                   color:
+                      //                                       AppColors
+                      //                                           .blackColor,
+                      //                                 ),
+                      //                               ),
+                      //                             ],
+                      //                           ),
+                      //
+                      //                           // EMAIL
+                      //                           Row(
+                      //                             children: [
+                      //                               Text(
+                      //                                 "Customer Email :- ",
+                      //                                 style: TextStyle(
+                      //                                   fontSize: 16.sp,
+                      //                                   fontFamily:
+                      //                                       FontFamily.bold,
+                      //                                   color:
+                      //                                       AppColors.mainColor,
+                      //                                 ),
+                      //                               ),
+                      //                               Text(
+                      //                                 leadbord?.email ?? "N/A",
+                      //                                 style: TextStyle(
+                      //                                   fontSize: 16.sp,
+                      //                                   fontFamily:
+                      //                                       FontFamily.bold,
+                      //                                   color:
+                      //                                       AppColors
+                      //                                           .blackColor,
+                      //                                 ),
+                      //                               ),
+                      //                             ],
+                      //                           ),
+                      //
+                      //                           // SPENT
+                      //                           Row(
+                      //                             children: [
+                      //                               Text(
+                      //                                 "Spent :- ",
+                      //                                 style: TextStyle(
+                      //                                   fontSize: 16.sp,
+                      //                                   fontFamily:
+                      //                                       FontFamily.bold,
+                      //                                   color:
+                      //                                       AppColors.mainColor,
+                      //                                 ),
+                      //                               ),
+                      //                               Text(
+                      //                                 "${customer.currencySymbol} ${leadbord?.spent ?? "0"}",
+                      //                                 style: TextStyle(
+                      //                                   fontSize: 16.sp,
+                      //                                   fontFamily:
+                      //                                       FontFamily.bold,
+                      //                                   color:
+                      //                                       AppColors
+                      //                                           .blackColor,
+                      //                                 ),
+                      //                               ),
+                      //                             ],
+                      //                           ),
+                      //
+                      //                           // AVG ORDER
+                      //                           Row(
+                      //                             children: [
+                      //                               Text(
+                      //                                 "AvgOrder :- ",
+                      //                                 style: TextStyle(
+                      //                                   fontSize: 16.sp,
+                      //                                   fontFamily:
+                      //                                       FontFamily.bold,
+                      //                                   color:
+                      //                                       AppColors.mainColor,
+                      //                                 ),
+                      //                               ),
+                      //                               Text(
+                      //                                 "${customer.currencySymbol} ${leadbord?.avgOrder ?? "0"}",
+                      //                                 style: TextStyle(
+                      //                                   fontSize: 16.sp,
+                      //                                   fontFamily:
+                      //                                       FontFamily.bold,
+                      //                                   color:
+                      //                                       AppColors
+                      //                                           .blackColor,
+                      //                                 ),
+                      //                               ),
+                      //                             ],
+                      //                           ),
+                      //                         ],
+                      //                       ),
+                      //                     ],
+                      //                   ),
+                      //                 ),
+                      //               );
+                      //             },
+                      //           ),
+                      // ),
 
                       SizedBox(height: 1.h),
                       Row(
@@ -733,7 +733,7 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
           isFiltering = false;
         });
         showCustomErrorSnackbar(
-          title: 'Server Error',
+          context,title: 'Server Error',
           message: 'Something went wrong. Please try again later.',
         );
       }
@@ -745,7 +745,7 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
       });
       _loadCachedCustomerReport();
       showCustomErrorSnackbar(
-        title: 'Network Error',
+        context,title: 'Network Error',
         message: 'Unable to connect. Please check your internet and try again.',
       );
     }
