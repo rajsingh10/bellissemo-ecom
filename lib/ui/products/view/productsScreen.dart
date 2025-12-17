@@ -787,7 +787,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Widget _buildGridItem(
     CategoryWiseProductsModal product, {
     double scale = 1.0,
-  }) {
+  })
+  {
     final pid = (product.id ?? product.slug ?? product.name ?? '').toString();
     final bool hasVariations = (product.variations?.isNotEmpty ?? false);
     final int qty = int.tryParse(product.cartQuantity?.toString() ?? '0') ?? 0;
