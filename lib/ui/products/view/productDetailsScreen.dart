@@ -154,10 +154,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         );
       } else {
         // Offline BUT Cache Exists -> User sees cached data
-        showCustomErrorSnackbar(
-          title: 'Offline Mode',
-          message: 'Showing offline data.',
-        );
+        // showCustomErrorSnackbar(
+        //   title: 'Offline Mode',
+        //   message: 'Showing offline data.',
+        // );
       }
       return;
     }

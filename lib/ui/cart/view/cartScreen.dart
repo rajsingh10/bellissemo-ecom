@@ -691,7 +691,7 @@ class _CartScreenState extends State<CartScreen> {
                   ? Container()
                   : viewCartData?.totals?.customerDiscount?.type == "percentage"
                   ? Text(
-                    "*${viewCartData?.totals?.customerDiscount?.value}% Discount",
+                    "*Applied ${viewCartData?.totals?.customerDiscount?.value}% Discount",
                     style: TextStyle(
                       color: AppColors.redColor,
                       fontSize: 17.sp,
@@ -699,7 +699,7 @@ class _CartScreenState extends State<CartScreen> {
                     ),
                   )
                   : Text(
-                    "*${viewCartData?.totals?.currencySymbol}${viewCartData?.totals?.customerDiscount?.value==""||viewCartData?.totals?.customerDiscount?.value==null?"0":viewCartData?.totals?.customerDiscount?.value} Discount",
+                    "*Applied ${viewCartData?.totals?.currencySymbol}${viewCartData?.totals?.customerDiscount?.value == "" || viewCartData?.totals?.customerDiscount?.value == null ? "0" : viewCartData?.totals?.customerDiscount?.value} Discount",
                     style: TextStyle(
                       color: AppColors.redColor,
                       fontSize: 17.sp,
@@ -833,7 +833,7 @@ class _CartScreenState extends State<CartScreen> {
                                   SizedBox(
                                     width: 65.w,
                                     child: DropdownButtonFormField<String>(
-                                      value: selectedType,
+                                      initialValue: selectedType,
                                       items:
                                           ["Fixed", "Percentage"]
                                               .map(

@@ -64,7 +64,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
   String? customerName;
   int? customerId;
   Orientation? _lastOrientation;
-  int _currentImageIndex = 0;
   bool isIpad = 100.w >= 800; // Define isIpad property
 
   Future<void> _loadCustomer() async {
@@ -1107,15 +1106,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
     // group
     final Map<String, List<CategoryWiseProductsModal>> grouped = {};
     for (var p in filteredProducts) {
-      final key =
-          (p.subCategoryName ?? "").trim().isEmpty
-              ? "Others"
-              : p.subCategoryName!.trim();
+      final key = (p.subCategoryName ?? "").trim().isEmpty
+          ? "Others"
+          : p.subCategoryName!.trim();
       grouped.putIfAbsent(key, () => []).add(p);
     }
-    final sortedGroups =
-        grouped.entries.toList()
-          ..sort((a, b) => a.key.toLowerCase().compareTo(b.key.toLowerCase()));
+    final sortedGroups = grouped.entries.toList()
+      ..sort((a, b) => a.key.toLowerCase().compareTo(b.key.toLowerCase()));
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -1127,7 +1124,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         // scale factor relative to your base card width 220
         final scale = (colWidth / 220.0).clamp(0.75, 1.15);
 
-        // Base dynamic sizing (no overflow now)
+        // Base dynamic sizing
         final double imageHeight = colWidth; // square image
         final double titleHeight = 20 * scale; // ~1 line title
         final double moqRowHeight = 40 * scale; // MOQ + counter row
@@ -1135,17 +1132,20 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
         // ✅ dots add height only if needed
         final bool hasMultipleImages = filteredProducts.any(
-          (p) => (p.images?.length ?? 0) > 1,
+              (p) => (p.images?.length ?? 0) > 1,
         );
         final double dotsHeight = hasMultipleImages ? (14 * scale) : 0;
 
-        // FINAL dynamic height
-        final double tileHeight =
-            imageHeight +
+        // ============================================================
+        // FIX: Add a buffer (+15) to account for font line-height
+        // variations and card shadows.
+        // ============================================================
+        final double tileHeight = imageHeight +
             titleHeight +
             moqRowHeight +
             verticalPadding +
-            dotsHeight;
+            dotsHeight +
+            15.0;
 
         return ListView.builder(
           shrinkWrap: true,

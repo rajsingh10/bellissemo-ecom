@@ -4,8 +4,11 @@ import 'dart:developer';
 import 'package:bellissemo_ecom/apiCalling/Loader.dart';
 import 'package:bellissemo_ecom/utils/customMenuDrawer.dart';
 import 'package:bellissemo_ecom/utils/verticleBar.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../apiCalling/checkInternetModule.dart';
@@ -18,6 +21,8 @@ import '../../../utils/fontFamily.dart';
 import '../../../utils/searchFields.dart';
 import '../../../utils/snackBars.dart';
 import '../../../utils/titlebarWidget.dart';
+import '../../products/modal/categoryWiseProductsModal.dart';
+import '../../products/provider/productsProvider.dart';
 import '../../products/view/productsScreen.dart';
 import '../modal/fetchCategoriesModal.dart';
 import '../provider/categoriesProvider.dart';
@@ -36,7 +41,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   List<FetchCategoriesModal> filteredCategories = [];
   List<FetchCategoriesModal> categoriesList = [];
-
+  int? customerId;
   String selectedSort = "All";
   final List<String> sortOptions = ["All", "A-Z", "Z-A"];
 
@@ -56,8 +61,160 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       _filterCategories(searchController.text);
     });
 
-    // Initial check for loading
+    _loadCustomer();
+  }
+
+  Future<void> _loadCustomer() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      customerId = prefs.getInt("customerId");
+    });
     loadInitialData();
+  }
+
+  Future<void> _startBackgroundFullSync(
+      List<FetchCategoriesModal> categoriesToSync,
+      int? cId,
+      ) async {
+    // 1. Check internet silently
+    if (!await checkInternet()) return;
+
+    // 2. Start the timer
+    final stopwatch = Stopwatch()..start();
+    log("🚀 Background Sync Started...");
+
+    var productBox = HiveService().getCategoryProductsBox();
+    var detailsBox = HiveService().getProductDetailsBox();
+    var subCatBox = HiveService().getSubCategoriesBox();
+    var pdfBox = HiveService().getPdfFileBox();
+    var cacheManager = DefaultCacheManager();
+
+    // Loop through Categories
+    for (var category in categoriesToSync) {
+      if (category.id == null) continue;
+      String catId = category.id.toString();
+      String catSlug = category.slug ?? '';
+
+      // --- Cache Category Image ---
+      if (category.image?.src != null) {
+        try {
+          await cacheManager.getSingleFile(category.image!.src!);
+        } catch (e) {}
+      }
+
+      // --- Fetch & Cache SubCategories ---
+      try {
+        if (!subCatBox.containsKey('subCategories_$catId')) {
+          final subResponse = await CategoriesProvider().fetchSubCategoriesApi(
+            catId,
+          );
+          if (subResponse.statusCode == 200) {
+            await subCatBox.put('subCategories_$catId', subResponse.body);
+          }
+        }
+      } catch (e) {}
+
+      // --- Fetch & Cache PDF Data + Bytes ---
+      try {
+        if (catSlug.isNotEmpty && !pdfBox.containsKey('pdf_$catSlug')) {
+          final pdfResponse = await CategoriesProvider().fetchPdfFileApi(
+            catSlug,
+          );
+          if (pdfResponse.statusCode == 200) {
+            await pdfBox.put('pdf_$catSlug', pdfResponse.body);
+
+            // Download PDF Bytes silently
+            var data = json.decode(pdfResponse.body);
+            String pdfUrl = data['saved_url'] ?? '';
+            if (pdfUrl.isNotEmpty) {
+              try {
+                Dio dio = Dio(
+                  BaseOptions(headers: {"User-Agent": "Mozilla/5.0"}),
+                );
+                final bytesRes = await dio.get<List<int>>(
+                  pdfUrl,
+                  options: Options(responseType: ResponseType.bytes),
+                );
+                if (bytesRes.data != null) {
+                  await pdfBox.put('pdf_bytes_$catSlug', bytesRes.data);
+                }
+              } catch (e) {}
+            }
+          }
+        }
+      } catch (e) {}
+
+      // --- Fetch & Cache Products ---
+      String catCacheKey = 'categoryProducts_$catId';
+      List<CategoryWiseProductsModal> productsInThisCategory = [];
+
+      try {
+        final response = await ProductsProvider().categoryWiseProductsApi(
+          catId,
+          cId,
+        );
+        if (response.statusCode == 200) {
+          await productBox.put(catCacheKey, response.body);
+          final List data = json.decode(response.body);
+          productsInThisCategory =
+              data.map((e) => CategoryWiseProductsModal.fromJson(e)).toList();
+        }
+      } catch (e) {
+        if (productBox.containsKey(catCacheKey)) {
+          final List data = json.decode(productBox.get(catCacheKey));
+          productsInThisCategory =
+              data.map((e) => CategoryWiseProductsModal.fromJson(e)).toList();
+        }
+      }
+
+      // --- Loop Products: Images & Details ---
+      for (var product in productsInThisCategory) {
+        if (product.id == null) continue;
+        String pId = product.id.toString();
+
+        // Cache Thumbnail
+        if (product.images != null) {
+          for (var img in product.images!) {
+            if (img.src != null) {
+              try {
+                cacheManager.getSingleFile(img.src!);
+              } catch (e) {}
+            }
+          }
+        }
+
+        // Cache Product Details
+        String detailCacheKey = 'productDetails$pId';
+        if (!detailsBox.containsKey(detailCacheKey)) {
+          try {
+            final detailResponse = await ProductsProvider().productDetailsApi(
+              pId,
+              cId,
+            );
+            if (detailResponse.statusCode == 200) {
+              await detailsBox.put(detailCacheKey, detailResponse.body);
+            }
+          } catch (e) {}
+          // Small delay to prevent CPU choking, but kept short
+          await Future.delayed(const Duration(milliseconds: 1));
+        }
+      }
+    }
+
+    // 3. Stop Timer & Format Time
+    stopwatch.stop();
+
+    // Helper functions for formatting
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String threeDigits(int n) => n.toString().padLeft(3, "0");
+
+    String hours = twoDigits(stopwatch.elapsed.inHours);
+    String minutes = twoDigits(stopwatch.elapsed.inMinutes.remainder(60));
+    String seconds = twoDigits(stopwatch.elapsed.inSeconds.remainder(60));
+    String millis = threeDigits(stopwatch.elapsed.inMilliseconds.remainder(1000));
+
+    log("🏁 DATA SYNC FINISHED");
+    log("⏱️ Total Time Taken: $hours:$minutes:$seconds($millis milliseconds)");
   }
 
   Future<void> loadInitialData() async {
@@ -91,6 +248,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   Future<void> _fetchCategories() async {
     var box = HiveService().getCategoriesBox();
+
+    // --- Offline Logic ---
     if (!await checkInternet()) {
       final cachedData = box.get('categories');
       if (cachedData != null) {
@@ -100,14 +259,30 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       }
       return;
     }
+
+    // --- Online Logic ---
     try {
       final response = await CategoriesProvider().fetchCategoriesApi();
       if (response.statusCode == 200) {
         final List data = json.decode(response.body);
-        categoriesList =
+
+        // Parse list for UI
+        List<FetchCategoriesModal> fetchedList =
             data.map((e) => FetchCategoriesModal.fromJson(e)).toList();
+
+        // Update UI immediately
+        setState(() {
+          categoriesList = fetchedList;
+        });
+
+        // Save Categories to cache
         await box.put('categories', response.body);
+
+        // 🟢 TRIGGER SYNC: Pass the list explicitly so it survives page changes
+        // We do NOT await this. It runs in background.
+        _startBackgroundFullSync(fetchedList, customerId);
       } else {
+        // Error handling...
         final cachedData = box.get('categories');
         if (cachedData != null) {
           final List data = json.decode(cachedData);
@@ -120,6 +295,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         );
       }
     } catch (_) {
+      // Network Error handling...
       final cachedData = box.get('categories');
       if (cachedData != null) {
         final List data = json.decode(cachedData);
@@ -154,6 +330,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       currentPage = 0;
     });
   }
+
+  // ... [Keep your _getCrossAxisCount, build, _buildMainContent, and other widgets as they were] ...
 
   int _getCrossAxisCount(BuildContext context) {
     // 4 columns if sidebar is shown, otherwise 2
@@ -307,6 +485,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       ],
     ).paddingSymmetric(horizontal: 3.w, vertical: 0.5.h);
   }
+
+  // ... [Helper widgets: _buildSortDropdown, _buildItemsPerPageDropdown, _buildPagination, _pageButton, _buildGridItem remain the same] ...
 
   Widget _buildSortDropdown(bool isLargeLayout) {
     return Container(

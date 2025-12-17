@@ -53,6 +53,7 @@ dependencies:
   http_parser:
   intl:
   permission_handler:
+  flutter_cache_manager:
   shimmer:
   table_calendar:
   modal_progress_hud_nsn:
