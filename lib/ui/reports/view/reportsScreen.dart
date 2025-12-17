@@ -127,7 +127,7 @@ class _ReportScreenState extends State<ReportScreen> {
           ),
         ),
       ],
-    );
+    ).paddingSymmetric(horizontal: 2.w,vertical: 1.h);
   }
 
   Widget _drawerItem(IconData icon, String title, VoidCallback onTap) {

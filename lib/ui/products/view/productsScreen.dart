@@ -783,16 +783,18 @@ class _ProductsScreenState extends State<ProductsScreen> {
   // ==========================================
   // ======== GRID & PRODUCT LOGIC ============
   // ==========================================
-
   Widget _buildGridItem(
-    CategoryWiseProductsModal product, {
-    double scale = 1.0,
-  })
-  {
+      CategoryWiseProductsModal product, {
+        double scale = 1.0,
+      }) {
     final pid = (product.id ?? product.slug ?? product.name ?? '').toString();
     final bool hasVariations = (product.variations?.isNotEmpty ?? false);
     final int qty = int.tryParse(product.cartQuantity?.toString() ?? '0') ?? 0;
-    // Unused variable removed for cleaner code
+
+    /// 🔥 HOT / DEAL condition
+    final bool isHot =
+        product.onSale == true;
+
     double sp(double v) => v * scale;
     double px(double v) => v * scale;
 
@@ -823,7 +825,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
         color: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(px(16)),
-          side: BorderSide(color: AppColors.border.withValues(alpha: 0.25)),
+          side: BorderSide(
+            color: AppColors.border.withValues(alpha: 0.25),
+          ),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(px(16)),
@@ -832,46 +836,44 @@ class _ProductsScreenState extends State<ProductsScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ============== STACK: IMAGE + DOTS OVERLAY =================
+                  // ================= IMAGE STACK =================
                   Stack(
                     alignment: Alignment.bottomCenter,
                     children: [
-                      // 1. IMAGE SLIDER
                       InkWell(
-                        onTap:
-                            product.stockStatus == 'instock'
-                                ? () {
-                                  Get.to(
-                                    () => ProductDetailsScreen(
-                                      productId: product.id.toString(),
-                                      isVariation: hasVariations,
-                                      id: widget.id,
-                                      cate: widget.cate,
-                                      slug: widget.slug,
-                                    ),
-                                    transition: Transition.leftToRightWithFade,
-                                    duration: const Duration(milliseconds: 450),
-                                  );
-                                }
-                                : () {
-                                  showCustomErrorSnackbar(
-                                    context,title: "Out of Stock",
-                                    message:
-                                        "${product.name} is not available right now!",
-                                  );
-                                },
-                        // FIX 1: Increased AspectRatio slightly (0.85 -> 0.92) to prevent overflow
+                        onTap: product.stockStatus == 'instock'
+                            ? () {
+                          Get.to(
+                                () => ProductDetailsScreen(
+                              productId: product.id.toString(),
+                              isVariation: hasVariations,
+                              id: widget.id,
+                              cate: widget.cate,
+                              slug: widget.slug,
+                            ),
+                            transition:
+                            Transition.leftToRightWithFade,
+                            duration:
+                            const Duration(milliseconds: 450),
+                          );
+                        }
+                            : () {
+                          showCustomErrorSnackbar(
+                            context,
+                            title: "Out of Stock",
+                            message:
+                            "${product.name} is not available right now!",
+                          );
+                        },
                         child: AspectRatio(
                           aspectRatio: 0.92,
                           child: CarouselSlider.builder(
-                            itemCount:
-                                (product.images?.length ?? 0) > 0
-                                    ? product.images!.length
-                                    : 1,
+                            itemCount: (product.images?.length ?? 0) > 0
+                                ? product.images!.length
+                                : 1,
                             options: CarouselOptions(
                               viewportFraction: 1,
                               enableInfiniteScroll: false,
-                              enlargeCenterPage: false,
                               autoPlay: false,
                               onPageChanged: (index, reason) {
                                 setState(() {
@@ -881,9 +883,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             ),
                             itemBuilder: (_, i, __) {
                               final src =
-                                  (product.images?.isNotEmpty ?? false)
-                                      ? (product.images![i].src ?? '')
-                                      : '';
+                              (product.images?.isNotEmpty ?? false)
+                                  ? (product.images![i].src ?? '')
+                                  : '';
 
                               return ClipRRect(
                                 borderRadius: BorderRadius.vertical(
@@ -902,59 +904,73 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         ),
                       ),
 
-                      // 2. DOTS (Overlay)
+                      /// 🔥 HOT / DEAL FIRE BADGE
+                      if (isHot)
+                        Positioned(
+                          top: px(8),
+                          right: px(8),
+                          child: Container(
+                            padding: EdgeInsets.all(px(6)),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child:
+                            Icon(
+                              Icons.local_fire_department,
+                              color: Colors.white,
+                              size: px(18),
+                            ),
+                          ),
+                        ),
+
+                      /// IMAGE DOTS
                       if ((product.images?.length ?? 0) > 1)
                         Positioned(
                           bottom: px(10),
-                          left: 0,
-                          right: 0,
-                          child: Center(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: List.generate(product.images!.length, (
-                                index,
-                              ) {
-                                final pid = product.id.toString();
-                                final currentIndex = _getImgIndex(pid);
-
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: List.generate(
+                              product.images!.length,
+                                  (index) {
+                                final currentIndex =
+                                _getImgIndex(product.id.toString());
                                 return AnimatedContainer(
-                                  duration: const Duration(milliseconds: 300),
+                                  duration:
+                                  const Duration(milliseconds: 300),
                                   margin: EdgeInsets.symmetric(
                                     horizontal: px(3),
                                   ),
                                   height: px(7),
-                                  width: currentIndex == index ? px(14) : px(7),
+                                  width: currentIndex == index
+                                      ? px(14)
+                                      : px(7),
                                   decoration: BoxDecoration(
-                                    // Use semi-transparent white for inactive dots so they show on dark images
-                                    color:
-                                        currentIndex == index
-                                            ? AppColors.mainColor
-                                            : Colors.white.withOpacity(0.7),
-                                    borderRadius: BorderRadius.circular(px(4)),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: Colors.black12,
-                                        blurRadius: 2,
-                                        offset: Offset(0, 1),
-                                      ),
-                                    ],
+                                    color: currentIndex == index
+                                        ? AppColors.mainColor
+                                        : Colors.white.withOpacity(0.7),
+                                    borderRadius:
+                                    BorderRadius.circular(px(4)),
                                   ),
                                 );
-                              }),
+                              },
                             ),
                           ),
                         ),
                     ],
                   ),
 
-                  // ================= TITLE =================
+                  /// TITLE
                   Padding(
-                    // FIX 2: Reduced top padding (10 -> 8)
-                    padding: EdgeInsets.only(
-                      left: px(10),
-                      right: px(10),
-                      top: px(8),
-                    ),
+                    padding: EdgeInsets.fromLTRB(
+                        px(10), px(8), px(10), 0),
                     child: Text(
                       product.name ?? '',
                       maxLines: 1,
@@ -967,26 +983,22 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     ),
                   ),
 
-                  // ============== MOQ + COUNTER =================
+                  /// MOQ + COUNTER
                   Padding(
-                    // FIX 3: Reduced vertical padding (6/10 -> 4/8)
-                    padding: EdgeInsets.fromLTRB(px(10), px(4), px(10), px(8)),
+                    padding:
+                    EdgeInsets.fromLTRB(px(10), px(4), px(10), px(8)),
                     child: Row(
                       children: [
-                        // LEFT: MOQ TEXT
                         Expanded(
                           child: Text(
                             hasVariations
                                 ? 'MOQ : ${product.firstVariation?.packSize ?? "-"}'
                                 : (product.packSize == ""
-                                    ? 'MOQ : 1'
-                                    : 'MOQ : ${product.packSize}'),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                                ? 'MOQ : 1'
+                                : 'MOQ : ${product.packSize}'),
                             style: TextStyle(
                               fontSize: sp(14),
                               fontFamily: FontFamily.regular,
-                              color: AppColors.blackColor,
                             ),
                           ),
                         ),
@@ -995,46 +1007,32 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             children: [
                               _circleBtn(
                                 icon: Icons.remove,
-                                onTap:
-                                    product.stockStatus == 'instock'
-                                        ? onRemove
-                                        : null,
+                                onTap: product.stockStatus == 'instock'
+                                    ? onRemove
+                                    : null,
                                 size: px(32),
                                 iconSize: px(18),
                               ),
-                              SizedBox(width: px(6)),
-                              if (qty > 0)
+                              if (qty > 0) ...[
+                                SizedBox(width: px(6)),
                                 Text(
                                   qty.toString(),
                                   style: TextStyle(
                                     fontFamily: FontFamily.semiBold,
                                     fontSize: sp(13.5),
-                                    color: AppColors.blackColor,
                                   ),
                                 ),
-                              if (qty > 0) SizedBox(width: px(6)),
+                              ],
+                              SizedBox(width: px(6)),
                               _circleBtn(
                                 icon: Icons.add,
-                                onTap:
-                                    product.stockStatus == 'instock'
-                                        ? onAdd
-                                        : null,
+                                onTap: product.stockStatus == 'instock'
+                                    ? onAdd
+                                    : null,
                                 size: px(32),
                                 iconSize: px(18),
                               ),
                             ],
-                          ),
-                        if (hasVariations && qty > 0)
-                          Padding(
-                            padding: const EdgeInsets.only(right: 1.0),
-                            child: Text(
-                              qty.toString(),
-                              style: TextStyle(
-                                fontFamily: FontFamily.semiBold,
-                                fontSize: sp(13.5),
-                                color: AppColors.blackColor,
-                              ),
-                            ),
                           ),
                       ],
                     ),
@@ -1042,7 +1040,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 ],
               ),
 
-              // OUT OF STOCK veil
+              /// OUT OF STOCK OVERLAY
               if (product.stockStatus != 'instock')
                 Positioned.fill(
                   child: Container(
@@ -1053,7 +1051,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         style: TextStyle(
                           fontSize: sp(16),
                           fontFamily: FontFamily.bold,
-                          color: AppColors.whiteColor,
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -1065,6 +1063,289 @@ class _ProductsScreenState extends State<ProductsScreen> {
       ),
     );
   }
+
+  /// wroking code
+  // Widget _buildGridItem(
+  //   CategoryWiseProductsModal product, {
+  //   double scale = 1.0,
+  // })
+  // {
+  //   final pid = (product.id ?? product.slug ?? product.name ?? '').toString();
+  //   final bool hasVariations = (product.variations?.isNotEmpty ?? false);
+  //   final int qty = int.tryParse(product.cartQuantity?.toString() ?? '0') ?? 0;
+  //   // Unused variable removed for cleaner code
+  //   double sp(double v) => v * scale;
+  //   double px(double v) => v * scale;
+  //
+  //   void onAdd() {
+  //     if (product.stockStatus != "instock") return;
+  //     if (!hasVariations) {
+  //       _addSimpleProductsToCart(product);
+  //     } else {
+  //       _addVariationProductsToCart(
+  //         product,
+  //         product.firstVariation?.id,
+  //         product.firstVariation?.varAttributes?.getKey(),
+  //         product.firstVariation?.varAttributes?.getValue(),
+  //       );
+  //     }
+  //   }
+  //
+  //   void onRemove() {
+  //     if (product.stockStatus != "instock") return;
+  //     _removeProductFromCart(product);
+  //   }
+  //
+  //   return Opacity(
+  //     opacity: product.stockStatus == 'instock' ? 1.0 : 0.45,
+  //     child: Card(
+  //       elevation: 2,
+  //       shadowColor: Colors.black12,
+  //       color: Colors.white,
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(px(16)),
+  //         side: BorderSide(color: AppColors.border.withValues(alpha: 0.25)),
+  //       ),
+  //       child: ClipRRect(
+  //         borderRadius: BorderRadius.circular(px(16)),
+  //         child: Stack(
+  //           children: [
+  //             Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 // ============== STACK: IMAGE + DOTS OVERLAY =================
+  //                 Stack(
+  //                   alignment: Alignment.bottomCenter,
+  //                   children: [
+  //                     // 1. IMAGE SLIDER
+  //                     InkWell(
+  //                       onTap:
+  //                           product.stockStatus == 'instock'
+  //                               ? () {
+  //                                 Get.to(
+  //                                   () => ProductDetailsScreen(
+  //                                     productId: product.id.toString(),
+  //                                     isVariation: hasVariations,
+  //                                     id: widget.id,
+  //                                     cate: widget.cate,
+  //                                     slug: widget.slug,
+  //                                   ),
+  //                                   transition: Transition.leftToRightWithFade,
+  //                                   duration: const Duration(milliseconds: 450),
+  //                                 );
+  //                               }
+  //                               : () {
+  //                                 showCustomErrorSnackbar(
+  //                                   context,title: "Out of Stock",
+  //                                   message:
+  //                                       "${product.name} is not available right now!",
+  //                                 );
+  //                               },
+  //                       // FIX 1: Increased AspectRatio slightly (0.85 -> 0.92) to prevent overflow
+  //                       child: AspectRatio(
+  //                         aspectRatio: 0.92,
+  //                         child: CarouselSlider.builder(
+  //                           itemCount:
+  //                               (product.images?.length ?? 0) > 0
+  //                                   ? product.images!.length
+  //                                   : 1,
+  //                           options: CarouselOptions(
+  //                             viewportFraction: 1,
+  //                             enableInfiniteScroll: false,
+  //                             enlargeCenterPage: false,
+  //                             autoPlay: false,
+  //                             onPageChanged: (index, reason) {
+  //                               setState(() {
+  //                                 _setImgIndex(pid, index);
+  //                               });
+  //                             },
+  //                           ),
+  //                           itemBuilder: (_, i, __) {
+  //                             final src =
+  //                                 (product.images?.isNotEmpty ?? false)
+  //                                     ? (product.images![i].src ?? '')
+  //                                     : '';
+  //
+  //                             return ClipRRect(
+  //                               borderRadius: BorderRadius.vertical(
+  //                                 top: Radius.circular(px(16)),
+  //                               ),
+  //                               child: CustomNetworkImage(
+  //                                 imageUrl: src,
+  //                                 height: double.infinity,
+  //                                 width: double.infinity,
+  //                                 isFit: true,
+  //                                 radius: 0,
+  //                               ),
+  //                             );
+  //                           },
+  //                         ),
+  //                       ),
+  //                     ),
+  //
+  //                     // 2. DOTS (Overlay)
+  //                     if ((product.images?.length ?? 0) > 1)
+  //                       Positioned(
+  //                         bottom: px(10),
+  //                         left: 0,
+  //                         right: 0,
+  //                         child: Center(
+  //                           child: Row(
+  //                             mainAxisSize: MainAxisSize.min,
+  //                             children: List.generate(product.images!.length, (
+  //                               index,
+  //                             ) {
+  //                               final pid = product.id.toString();
+  //                               final currentIndex = _getImgIndex(pid);
+  //
+  //                               return AnimatedContainer(
+  //                                 duration: const Duration(milliseconds: 300),
+  //                                 margin: EdgeInsets.symmetric(
+  //                                   horizontal: px(3),
+  //                                 ),
+  //                                 height: px(7),
+  //                                 width: currentIndex == index ? px(14) : px(7),
+  //                                 decoration: BoxDecoration(
+  //                                   // Use semi-transparent white for inactive dots so they show on dark images
+  //                                   color:
+  //                                       currentIndex == index
+  //                                           ? AppColors.mainColor
+  //                                           : Colors.white.withOpacity(0.7),
+  //                                   borderRadius: BorderRadius.circular(px(4)),
+  //                                   boxShadow: const [
+  //                                     BoxShadow(
+  //                                       color: Colors.black12,
+  //                                       blurRadius: 2,
+  //                                       offset: Offset(0, 1),
+  //                                     ),
+  //                                   ],
+  //                                 ),
+  //                               );
+  //                             }),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                   ],
+  //                 ),
+  //
+  //                 // ================= TITLE =================
+  //                 Padding(
+  //                   // FIX 2: Reduced top padding (10 -> 8)
+  //                   padding: EdgeInsets.only(
+  //                     left: px(10),
+  //                     right: px(10),
+  //                     top: px(8),
+  //                   ),
+  //                   child: Text(
+  //                     product.name ?? '',
+  //                     maxLines: 1,
+  //                     overflow: TextOverflow.ellipsis,
+  //                     style: TextStyle(
+  //                       fontFamily: FontFamily.semiBold,
+  //                       fontSize: sp(14),
+  //                       color: AppColors.blackColor,
+  //                     ),
+  //                   ),
+  //                 ),
+  //
+  //                 // ============== MOQ + COUNTER =================
+  //                 Padding(
+  //                   // FIX 3: Reduced vertical padding (6/10 -> 4/8)
+  //                   padding: EdgeInsets.fromLTRB(px(10), px(4), px(10), px(8)),
+  //                   child: Row(
+  //                     children: [
+  //                       // LEFT: MOQ TEXT
+  //                       Expanded(
+  //                         child: Text(
+  //                           hasVariations
+  //                               ? 'MOQ : ${product.firstVariation?.packSize ?? "-"}'
+  //                               : (product.packSize == ""
+  //                                   ? 'MOQ : 1'
+  //                                   : 'MOQ : ${product.packSize}'),
+  //                           maxLines: 1,
+  //                           overflow: TextOverflow.ellipsis,
+  //                           style: TextStyle(
+  //                             fontSize: sp(14),
+  //                             fontFamily: FontFamily.regular,
+  //                             color: AppColors.blackColor,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                       if (!hasVariations)
+  //                         Row(
+  //                           children: [
+  //                             _circleBtn(
+  //                               icon: Icons.remove,
+  //                               onTap:
+  //                                   product.stockStatus == 'instock'
+  //                                       ? onRemove
+  //                                       : null,
+  //                               size: px(32),
+  //                               iconSize: px(18),
+  //                             ),
+  //                             SizedBox(width: px(6)),
+  //                             if (qty > 0)
+  //                               Text(
+  //                                 qty.toString(),
+  //                                 style: TextStyle(
+  //                                   fontFamily: FontFamily.semiBold,
+  //                                   fontSize: sp(13.5),
+  //                                   color: AppColors.blackColor,
+  //                                 ),
+  //                               ),
+  //                             if (qty > 0) SizedBox(width: px(6)),
+  //                             _circleBtn(
+  //                               icon: Icons.add,
+  //                               onTap:
+  //                                   product.stockStatus == 'instock'
+  //                                       ? onAdd
+  //                                       : null,
+  //                               size: px(32),
+  //                               iconSize: px(18),
+  //                             ),
+  //                           ],
+  //                         ),
+  //                       if (hasVariations && qty > 0)
+  //                         Padding(
+  //                           padding: const EdgeInsets.only(right: 1.0),
+  //                           child: Text(
+  //                             qty.toString(),
+  //                             style: TextStyle(
+  //                               fontFamily: FontFamily.semiBold,
+  //                               fontSize: sp(13.5),
+  //                               color: AppColors.blackColor,
+  //                             ),
+  //                           ),
+  //                         ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //
+  //             // OUT OF STOCK veil
+  //             if (product.stockStatus != 'instock')
+  //               Positioned.fill(
+  //                 child: Container(
+  //                   color: Colors.black.withValues(alpha: 0.55),
+  //                   child: Center(
+  //                     child: Text(
+  //                       "Out of Stock",
+  //                       style: TextStyle(
+  //                         fontSize: sp(16),
+  //                         fontFamily: FontFamily.bold,
+  //                         color: AppColors.whiteColor,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _circleBtn({
     required IconData icon,

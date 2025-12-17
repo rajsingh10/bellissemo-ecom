@@ -25,7 +25,10 @@ import '../../../utils/titlebarWidget.dart';
 import '../modal/customerOrderWiseModal.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
-  const OrderHistoryScreen({super.key});
+  var orderid;
+  bool orderidtrue;
+
+  OrderHistoryScreen({super.key,this.orderid,this.orderidtrue = false,});
 
   @override
   State<OrderHistoryScreen> createState() => _OrderHistoryScreenState();
@@ -246,7 +249,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     _loadCachedData();
     final stopwatch = Stopwatch()..start();
     try {
-      await Future.wait([_fetchOrders().then((_) => setState(() {}))]);
+      await Future.wait([_fetchOrders().then((_) => setState(() {
+
+      }))]);
     } catch (e) {
       log("Error loading initial data: $e");
     } finally {
@@ -356,6 +361,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             });
           },
         ),
+
+
         if (isSearchEnabled)
           SearchField(
             controller: searchController,
@@ -948,7 +955,15 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             );
           }
         });
-
+        if (widget.orderidtrue == true) {
+          setState(() {
+            isSearchEnabled=true;
+            applySearch(widget.orderid);
+          });
+          searchController.addListener(() {
+            applySearch(widget.orderid);
+          });
+        }
         await box.put('orders_$customerId', response.body);
       } else {
         final cachedData = box.get('orders_$customerId');
@@ -964,6 +979,15 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               sortOrders(selectedSort);
             }
           });
+          if (widget.orderidtrue == true) {
+            setState(() {
+              applySearch(widget.orderid);
+              isSearchEnabled=true;
+            });
+            searchController.addListener(() {
+              applySearch(widget.orderid);
+            });
+          }
         }
         showCustomErrorSnackbar(
           context,title: 'Server Error',
@@ -984,6 +1008,15 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             sortOrders(selectedSort);
           }
         });
+        if (widget.orderidtrue == true) {
+          setState(() {
+            applySearch(widget.orderid);
+            isSearchEnabled=true;
+          });
+          searchController.addListener(() {
+            applySearch(widget.orderid);
+          });
+        }
       }
       showCustomErrorSnackbar(
         context,title: 'Network Error',

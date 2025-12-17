@@ -18,6 +18,7 @@ import '../../../utils/snackBars.dart';
 import '../../../utils/titlebarWidget.dart';
 import '../../customers/modal/customerReportScreen.dart';
 import '../../customers/provider/customerProvider.dart';
+import '../../orderHistory/view/orderHistoryScreen.dart';
 
 class CustomerReportScreen extends StatefulWidget {
   const CustomerReportScreen({super.key});
@@ -547,105 +548,110 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
                                   if (customer.customerOrders != null &&
                                       customer.customerOrders!.isNotEmpty) ...[
                                     for (var p in customer.customerOrders!)
-                                      Card(
-                                        elevation: 3,
-                                        shadowColor: Colors.white,
-                                        margin: EdgeInsets.symmetric(
-                                          horizontal: 2.w,
-                                          vertical: 1.h,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                        ),
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(
+                                      InkWell(
+                                        onTap: (){
+                                          Get.to(OrderHistoryScreen(orderid:p.orderId ,orderidtrue: true,));
+                                        },
+                                        child: Card(
+                                          elevation: 3,
+                                          shadowColor: Colors.white,
+                                          margin: EdgeInsets.symmetric(
                                             horizontal: 2.w,
-                                            vertical: 1.2.h,
+                                            vertical: 1.h,
                                           ),
-                                          child: Row(
-                                            children: [
-                                              // IMAGE
-                                              // ClipRRect(
-                                              //   borderRadius: BorderRadius.circular(8),
-                                              //   child: CustomNetworkImage(
-                                              //     imageUrl: p.items? ?? "",
-                                              //     height: 12.w,
-                                              //     width: 12.w,
-                                              //     isFit: true,
-                                              //     radius: 0,
-                                              //   ),
-                                              // ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 2.w,
+                                              vertical: 1.2.h,
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                // IMAGE
+                                                // ClipRRect(
+                                                //   borderRadius: BorderRadius.circular(8),
+                                                //   child: CustomNetworkImage(
+                                                //     imageUrl: p.items? ?? "",
+                                                //     height: 12.w,
+                                                //     width: 12.w,
+                                                //     isFit: true,
+                                                //     radius: 0,
+                                                //   ),
+                                                // ),
 
-                                              // SizedBox(width: 3.w),
+                                                // SizedBox(width: 3.w),
 
-                                              // TITLE + DETAILS
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      p.customerName == " " ||
-                                                              p.customerName ==
-                                                                  null ||
-                                                              p
-                                                                  .customerName!
-                                                                  .isEmpty
-                                                          ? "N/A"
-                                                          : p.customerName!,
-                                                      maxLines: 2,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                        fontSize: 16.sp,
-                                                        fontFamily:
-                                                            FontFamily.bold,
-                                                        color:
-                                                            AppColors
-                                                                .blackColor,
+                                                // TITLE + DETAILS
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        p.customerName == " " ||
+                                                                p.customerName ==
+                                                                    null ||
+                                                                p
+                                                                    .customerName!
+                                                                    .isEmpty
+                                                            ? "N/A"
+                                                            : p.customerName!,
+                                                        maxLines: 2,
+                                                        overflow:
+                                                            TextOverflow.ellipsis,
+                                                        style: TextStyle(
+                                                          fontSize: 16.sp,
+                                                          fontFamily:
+                                                              FontFamily.bold,
+                                                          color:
+                                                              AppColors
+                                                                  .blackColor,
+                                                        ),
                                                       ),
-                                                    ),
-                                                    Text(
-                                                      "Order No #${p.orderId ?? "0"}",
-                                                      maxLines: 2,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                        fontSize: 16.sp,
-                                                        fontFamily:
-                                                            FontFamily.bold,
-                                                        color:
-                                                            AppColors
-                                                                .blackColor,
+                                                      Text(
+                                                        "Order No #${p.orderId ?? "0"}",
+                                                        maxLines: 2,
+                                                        overflow:
+                                                            TextOverflow.ellipsis,
+                                                        style: TextStyle(
+                                                          fontSize: 16.sp,
+                                                          fontFamily:
+                                                              FontFamily.bold,
+                                                          color:
+                                                              AppColors
+                                                                  .blackColor,
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
 
-                                              SizedBox(width: 2.w),
+                                                SizedBox(width: 2.w),
 
-                                              // PRICE
-                                              // Text(
-                                              //   "${customer.currencySymbol} ${p.totalAmount ?? '0'}",
-                                              //   style: TextStyle(
-                                              //     fontSize: 16.sp,
-                                              //     fontFamily: FontFamily.bold,
-                                              //     color: AppColors.mainColor,
-                                              //   ),
-                                              // ),
-                                              Text(
-                                                "${customer.currencySymbol} ${p.totalAmount != null ? double.parse(p.totalAmount!).toStringAsFixed(2) : '0.00'}",
+                                                // PRICE
+                                                // Text(
+                                                //   "${customer.currencySymbol} ${p.totalAmount ?? '0'}",
+                                                //   style: TextStyle(
+                                                //     fontSize: 16.sp,
+                                                //     fontFamily: FontFamily.bold,
+                                                //     color: AppColors.mainColor,
+                                                //   ),
+                                                // ),
+                                                Text(
+                                                  "${customer.currencySymbol} ${p.totalAmount != null ? double.parse(p.totalAmount!).toStringAsFixed(2) : '0.00'}",
 
-                                                style: TextStyle(
-                                                  fontSize: 16.sp,
-                                                  fontFamily: FontFamily.bold,
-                                                  color: AppColors.mainColor,
+                                                  style: TextStyle(
+                                                    fontSize: 16.sp,
+                                                    fontFamily: FontFamily.bold,
+                                                    color: AppColors.mainColor,
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
