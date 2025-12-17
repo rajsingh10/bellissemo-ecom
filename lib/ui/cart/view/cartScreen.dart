@@ -23,6 +23,7 @@ import '../../../utils/emptyWidget.dart';
 import '../../../utils/snackBars.dart';
 import '../../../utils/textFields.dart';
 import '../../../utils/titlebarWidget.dart';
+import '../../products/modal/productDetailsModal.dart';
 import '../modal/copunsListModal.dart';
 import '../service/cartServices.dart';
 
@@ -44,6 +45,8 @@ class _CartScreenState extends State<CartScreen> {
   String? customerName;
   int? customerId;
   Orientation? _lastOrientation; // Track orientation
+  AllVariations? selectedVariant;
+  int? selectedVariationId;
 
   Future<void> _loadCustomer() async {
     final prefs = await SharedPreferences.getInstance();
@@ -543,19 +546,26 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                                 ),
                                 SizedBox(height: 2.h),
-                                InkWell(
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        '${viewCartData?.totals?.currencySymbol ?? ''} ${((double.parse(viewCartData?.items?[i].lineTotal?.lineTotal ?? "0") / (viewCartData?.items?[i].quantity ?? 1)) / 100).toStringAsFixed(2)}',
-                                        style: TextStyle(
-                                          color: AppColors.blackColor,
-                                          fontSize: 14.sp,
-                                          fontFamily: FontFamily.semiBold,
-                                        ),
+                                Row(
+                                  children: [
+                                    InkWell(
+                                      onTap: (){
+                                        print("viewCartData?.items?[i]====>>>>${viewCartData?.items?[i]}");
+                                        _showEditPriceDialog(viewCartData?.items?[i].id ?? 0,i);
+                                      },
+                                      child: Icon(
+                                        Icons.edit,
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                    Text(
+                                      '${viewCartData?.totals?.currencySymbol ?? ''} ${((double.parse(viewCartData?.items?[i].lineTotal?.lineTotal ?? "0") / (viewCartData?.items?[i].quantity ?? 1)) / 100).toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                        color: AppColors.blackColor,
+                                        fontSize: 14.sp,
+                                        fontFamily: FontFamily.semiBold,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -572,6 +582,9 @@ class _CartScreenState extends State<CartScreen> {
       ),
     );
   }
+
+
+
 
   // Extracted Order Summary Section
   Widget _buildOrderSummary() {
@@ -1109,6 +1122,137 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
+
+
+
+  Future<void> _showEditPriceDialog(int id,index) async {
+    print("index shu ave che ===>>>>>index${index}");
+    final formKey = GlobalKey<FormState>();
+    TextEditingController dialogController = TextEditingController();
+
+    await Get.dialog(
+      Dialog(
+        backgroundColor: Colors.transparent,
+        child: IntrinsicWidth(
+          stepWidth: 300,
+          child: IntrinsicHeight(
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.whiteColor,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Edit Price",
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontFamily: FontFamily.bold,
+                    ),
+                  ),
+                  SizedBox(height: 2.h),
+
+                  /// PRICE FIELD
+                  Form(
+                    key: formKey,
+                    child: AppTextField(
+                      controller: dialogController,
+                      hintText: "Enter New Price",
+                      text: "New Price",
+                      isTextavailable: true,
+                      textInputType: TextInputType.number,
+                      maxline: 1,
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            double.tryParse(value) == null) {
+                          return "Enter a valid price";
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+
+                  SizedBox(height: 24),
+
+                  /// BUTTONS
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CustomButton(
+                        title: "Cancel",
+                        route: () => Get.back(),
+                        color: AppColors.containerColor,
+                        fontcolor: AppColors.blackColor,
+                        height: 5.h,
+                        width: 27.w,
+                        fontsize: 15.sp,
+                        radius: 12.0,
+                      ),
+
+                      CustomButton(
+                        title: "Update",
+                        route: () async {
+                          if (!formKey.currentState!.validate()) return;
+
+                          final double enteredPrice =
+                          double.parse(dialogController.text.trim());
+setState(() {
+  updateCartTotalsLocally(
+    offlineitemamount:
+    enteredPrice *
+        100,
+    itemIndex:
+    index,
+  );
+});
+                          /// UI UPDATE
+                          setState(() {
+                            if (selectedVariant != null) {
+                              selectedVariant!.price =
+                                  enteredPrice.toString();
+                            } else {
+                              productDetails?.price =
+                                  enteredPrice.toString();
+                            }
+                          });
+
+                          /// BACKEND UPDATE
+                          await CartService().updateProductPrice(
+                            price: enteredPrice,
+                            productId:
+                            (selectedVariationId ?? id).toString(),
+                            userId: customerId ?? 0,
+                          );
+
+                          Get.back(); // close dialog
+                          Get.back();
+                          Get.offAll(CartScreen());// close dialog
+                        },
+                        color: AppColors.mainColor,
+                        fontcolor: AppColors.whiteColor,
+                        height: 5.h,
+                        width: 40.w,
+                        fontsize: 15.sp,
+                        radius: 12.0,
+                        iconData: Icons.check,
+                        iconsize: 17.sp,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: true,
+    );
+  }
+
+
   Future<void> _removeHiveItem(int index) async {
     var box = HiveService().getViewCartBox();
     final cachedData = box.get('cart_$customerId');
@@ -1133,7 +1277,8 @@ class _CartScreenState extends State<CartScreen> {
     double? offlineitemamount,
     int? itemIndex,
     bool removeCoupon = false,
-  }) async {
+  }) async
+  {
     if (viewCartData == null) return;
 
     double subtotal = 0.0;
@@ -1193,6 +1338,10 @@ class _CartScreenState extends State<CartScreen> {
     var box = HiveService().getViewCartBox();
     await box.put('cart_$customerId', json.encode(viewCartData!.toJson()));
   }
+
+
+
+
 
   String? totalamount;
   String? totalamount1;
