@@ -43,4 +43,5 @@ class apiEndpoints {
   static String refreshToken = "$baseUrl/wp-json/jwt-auth/v1/token/refresh";
   static String setprice = "$baseUrl/wp-json/custom-pricing/v1/set";
   static String addcustomer = "$baseUrl/wp-json/wc/v3/customers";
+  static String productreportorder = "$baseUrl/wp-json/custom-wc/v1/reports/product-orders";
 }

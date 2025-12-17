@@ -4,9 +4,11 @@ import 'dart:developer';
 import 'package:bellissemo_ecom/apiCalling/Loader.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../apiCalling/apiConfigs.dart';
 import '../../../apiCalling/checkInternetModule.dart';
 import '../../../services/hiveServices.dart';
 import '../../../utils/cachedNetworkImage.dart';
@@ -17,6 +19,7 @@ import '../../../utils/snackBars.dart';
 import '../../../utils/titlebarWidget.dart';
 import '../../customers/provider/customerProvider.dart';
 import '../../products/modal/ProductReportModal.dart';
+import '../Modal/ProductReportOrderModal.dart';
 
 class ProductReportScreen extends StatefulWidget {
   const ProductReportScreen({super.key});
@@ -429,7 +432,6 @@ class _ProductReportScreenState extends State<ProductReportScreen> {
                                     for (var p in customer.data!)
                                       Card(
                                         elevation: 3,
-                                        shadowColor: Colors.white,
                                         margin: EdgeInsets.symmetric(
                                           horizontal: 2.w,
                                           vertical: 1.h,
@@ -439,12 +441,29 @@ class _ProductReportScreenState extends State<ProductReportScreen> {
                                             10,
                                           ),
                                         ),
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(
+                                        child: ExpansionTile(
+                                          tilePadding: EdgeInsets.symmetric(
                                             horizontal: 2.w,
-                                            vertical: 1.2.h,
+                                            vertical: 1.h,
                                           ),
-                                          child: Row(
+                                          childrenPadding: EdgeInsets.symmetric(
+                                            horizontal: 2.w,
+                                            vertical: 1.h,
+                                          ),
+                                          onExpansionChanged: (expanded) {
+                                            if (expanded) {
+                                              fetchProductOrderReport(
+                                                p.productId,
+                                              );
+                                            }
+                                          },
+                                          trailing: Icon(
+                                            Icons
+                                                .keyboard_arrow_down, // ↓ arrow
+                                            color: AppColors.mainColor,
+                                            size: 28,
+                                          ),
+                                          title: Row(
                                             children: [
                                               ClipRRect(
                                                 borderRadius:
@@ -457,20 +476,14 @@ class _ProductReportScreenState extends State<ProductReportScreen> {
                                                   radius: 0,
                                                 ),
                                               ),
-
                                               SizedBox(width: 3.w),
-
                                               Expanded(
                                                 child: Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      p.productName == null ||
-                                                              p.productName ==
-                                                                  ""
-                                                          ? "N/A"
-                                                          : p.productName!,
+                                                      p.productName ?? "N/A",
                                                       maxLines: 2,
                                                       overflow:
                                                           TextOverflow.ellipsis,
@@ -478,31 +491,19 @@ class _ProductReportScreenState extends State<ProductReportScreen> {
                                                         fontSize: 16.sp,
                                                         fontFamily:
                                                             FontFamily.bold,
-                                                        color:
-                                                            AppColors
-                                                                .blackColor,
                                                       ),
                                                     ),
                                                     Text(
-                                                      "Qty:- ${p.totalQty ?? ""}",
-                                                      maxLines: 2,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
+                                                      "Qty : ${p.totalQty ?? '0'}",
                                                       style: TextStyle(
-                                                        fontSize: 16.sp,
+                                                        fontSize: 14.sp,
                                                         fontFamily:
-                                                            FontFamily.bold,
-                                                        color:
-                                                            AppColors
-                                                                .blackColor,
+                                                            FontFamily.semiBold,
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
-
-                                              SizedBox(width: 2.w),
-
                                               Text(
                                                 "${customer.currencySymbol} ${p.totalRevenue ?? '0'}",
                                                 style: TextStyle(
@@ -513,6 +514,115 @@ class _ProductReportScreenState extends State<ProductReportScreen> {
                                               ),
                                             ],
                                           ),
+
+                                          /// 👇 EXPANDED DETAILS
+                                          children: [
+                                            if (productReportOrderModal
+                                                    ?.orders
+                                                    ?.isEmpty ??
+                                                true)
+                                              Padding(
+                                                padding: const EdgeInsets.all(
+                                                  12,
+                                                ),
+                                                child: Text(
+                                                  "No Order Details Available",
+                                                  style: TextStyle(
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                              )
+                                            else
+                                              Column(
+                                                children:
+                                                    productReportOrderModal!.orders!.map((
+                                                      order,
+                                                    ) {
+                                                      return Container(
+                                                        margin: EdgeInsets.only(
+                                                          bottom: 8,
+                                                        ),
+                                                        padding: EdgeInsets.all(
+                                                          10,
+                                                        ),
+                                                        decoration: BoxDecoration(
+                                                          color:
+                                                              Colors
+                                                                  .grey
+                                                                  .shade100,
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                8,
+                                                              ),
+                                                        ),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            /// LEFT
+                                                            Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  order.customerName ??
+                                                                      '',
+                                                                  style: TextStyle(
+                                                                    fontFamily:
+                                                                        FontFamily
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        14.sp,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  order.formattedDate ??
+                                                                      '',
+                                                                  style: TextStyle(
+                                                                    fontSize:
+                                                                        12.sp,
+                                                                    color:
+                                                                        Colors
+                                                                            .grey,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+
+                                                            /// RIGHT
+                                                            Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .end,
+                                                              children: [
+                                                                Text(
+                                                                  "Qty: ${order.quantity}",
+                                                                  style: TextStyle(
+                                                                    fontSize:
+                                                                        13.sp,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  "${productReportOrderModal?.currencySymbol}${order.totalPrice}",
+                                                                  style: TextStyle(
+                                                                    fontFamily:
+                                                                        FontFamily
+                                                                            .bold,
+                                                                    color:
+                                                                        AppColors
+                                                                            .mainColor,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      );
+                                                    }).toList(),
+                                              ),
+                                          ],
                                         ),
                                       ),
                                   ] else ...[
@@ -600,7 +710,8 @@ class _ProductReportScreenState extends State<ProductReportScreen> {
       } else {
         _loadCachedCustomerReport();
         showCustomErrorSnackbar(
-          context,title: 'Server Error',
+          context,
+          title: 'Server Error',
           message: 'Something went wrong. Please try again later.',
         );
         setState(() {
@@ -613,7 +724,8 @@ class _ProductReportScreenState extends State<ProductReportScreen> {
 
       _loadCachedCustomerReport();
       showCustomErrorSnackbar(
-        context,title: 'Network Error',
+        context,
+        title: 'Network Error',
         message: 'Unable to connect. Please check your internet and try again.',
       );
       setState(() {
@@ -725,5 +837,54 @@ class _ProductReportScreenState extends State<ProductReportScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> fetchProductOrderReport(var productId) async {
+    setState(() => isFiltering = true);
+
+    final Box box = HiveService().getProductReportorderBox();
+
+    try {
+      final response = await CustomerProvider().productOrderReport(
+        productId: productId,
+      );
+
+      if (response.statusCode == 200) {
+        print("run thay gay api ");
+
+        // SAVE RESPONSE IN HIVE
+        await box.put('product_order_$productId', response.body);
+
+        final decoded = json.decode(response.body);
+        productReportOrderModal = ProductReportOrderModal.fromJson(decoded);
+      } else {
+        _loadProductOrderFromHive(box, productId);
+
+        showCustomErrorSnackbar(
+          context,
+          title: 'Server Error',
+          message: 'Showing cached data',
+        );
+      }
+    } catch (e) {
+      _loadProductOrderFromHive(box, productId);
+
+      showCustomErrorSnackbar(
+        context,
+        title: 'Offline',
+        message: 'Showing cached data',
+      );
+    }
+
+    setState(() => isFiltering = false);
+  }
+
+  void _loadProductOrderFromHive(Box box, var productId) {
+    final cached = box.get('product_order_$productId');
+
+    if (cached != null) {
+      final decoded = json.decode(cached);
+      productReportOrderModal = ProductReportOrderModal.fromJson(decoded);
+    }
   }
 }

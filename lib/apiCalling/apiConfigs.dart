@@ -20,6 +20,7 @@ import '../ui/products/modal/fetchPdfFileModal.dart';
 import '../ui/products/modal/fetchProductsModal.dart';
 import '../ui/products/modal/productDetailsModal.dart';
 import '../ui/profile/modal/profileModal.dart';
+import '../ui/reports/Modal/ProductReportOrderModal.dart';
 
 class apiConfig {
   static String baseUrl = 'https://www.bellissemo.com';
@@ -47,3 +48,4 @@ ReorderModal? reorderModal;
 FreshTokenModal? freshToken;
 AddCustomerModal? addCustomerModal;
 Customerdetailmodal? customer;
+ProductReportOrderModal?productReportOrderModal;

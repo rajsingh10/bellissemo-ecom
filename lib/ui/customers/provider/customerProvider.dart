@@ -94,7 +94,8 @@ class CustomerProvider extends ChangeNotifier {
     required String groupBy, // monthly, quarterly, yearly
     required String mounth, // monthly, quarterly, yearly
     // selected year
-  }) async {
+  }) async
+  {
     String url = apiEndpoints.fetchProductreport;
 
     String? token = await getSavedLoginToken();
@@ -129,6 +130,43 @@ class CustomerProvider extends ChangeNotifier {
 
     return responses(response);
   }
+
+  Future<http.Response> productOrderReport({
+    required var productId,
+  }) async {
+    String url = apiEndpoints.productreportorder;
+
+    String? token = await getSavedLoginToken();
+    if (token == null || token.isEmpty) {
+      throw Exception('Token not found');
+    }
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    Map<String, dynamic> body = {
+      "product_id": productId,
+    };
+
+    final response = await http
+        .post(
+      Uri.parse(url),
+      headers: headers,
+      body: jsonEncode(body),
+    )
+        .timeout(
+      const Duration(seconds: 60),
+      onTimeout: () {
+        throw const SocketException('Request Timeout');
+      },
+    );
+
+    return responses(response);
+  }
+
 
   Future<http.Response> Customerdetailapi(cid) async {
     String url = "${apiEndpoints.customerdetailapi}$cid";
