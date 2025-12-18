@@ -134,36 +134,29 @@ Widget TitleBar({
   bool isBackEnabled = false,
   bool showDownloadButton = false,
 }) {
+  final context = Get.context!;
   final bool isTablet = 100.w >= 800;
   final bool isPortrait =
-      MediaQuery.of(Get.context!).orientation == Orientation.portrait;
+      MediaQuery.of(context).orientation == Orientation.portrait;
 
-  // ---------------- BUTTON ----------------
+  // 🔥 STATUS BAR HEIGHT (NOTCH / DYNAMIC ISLAND / iPad)
+  final double statusBarHeight = MediaQuery.of(context).padding.top;
+
   Widget buildButton(IconData icon, VoidCallback? onTap) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
-      child: SizedBox(
-        height: isPortrait ? 40 : 50, // ⬆️ bigger
-        width: isPortrait ? 40 : 50,
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.mainColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
-          ),
-          alignment: Alignment.center,
-          child: Icon(
-            icon,
-            color: AppColors.mainColor,
-            size: isPortrait ? 20 : 24, // ⬆️ bigger
-          ),
+      child: Container(
+        height: 40,
+        width: 40,
+        decoration: BoxDecoration(
+          color: AppColors.mainColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
         ),
+        alignment: Alignment.center,
+        child: Icon(icon, color: AppColors.mainColor, size: 20),
       ),
     );
-  }
-
-  Widget buildDownloadButton() {
-    return buildButton(Icons.download_rounded, onDownload);
   }
 
   final List<Widget> rightButtons = [];
@@ -173,79 +166,70 @@ Widget TitleBar({
   }
 
   if (showDownloadButton) {
-    rightButtons.add(buildDownloadButton());
+    rightButtons.add(buildButton(Icons.download_rounded, onDownload));
   }
 
-  // ---------------- TITLE BAR ----------------
-  return Container(
-    margin: EdgeInsets.only(
-      top: isPortrait ? 1.2.h : (isTablet ? 4.h : 3.h),
-      bottom: isPortrait ? 0.6.h : 1.h,
-    ),
-    padding: EdgeInsets.symmetric(
-      horizontal: isTablet ? 2.w : 3.w,
-      vertical: isPortrait ? 8 : 14, // ⬆️ more breathing
-    ),
-    decoration: BoxDecoration(
-      color: clr ?? Colors.white,
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.1),
-          blurRadius: 8,
-          offset: const Offset(0, 4),
+  return Column(
+    children: [
+      SizedBox(height: isTablet ? 72 : 6.h),
+      Container(
+        // 🔴 RED AREA COVER THAI JASHE
+        padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.h),
+        decoration: BoxDecoration(
+          color: clr ?? Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+          borderRadius: BorderRadius.circular(isTablet ? 20 : 14),
         ),
-      ],
-      borderRadius: BorderRadius.circular(isTablet ? 20 : 14),
-    ),
-    child: SizedBox(
-      height: isPortrait ? 52 : (isTablet ? 68 : 60), // ⬆️ bar height
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // -------- LEFT --------
-          if (isBackEnabled)
-            buildButton(Icons.arrow_back_rounded, () => Get.back())
-          else if (isDrawerEnabled)
-            buildButton(Icons.menu_rounded, drawerCallback)
-          else
-            SizedBox(width: isPortrait ? 40 : 50),
+        child: Row(
+          children: [
+            // LEFT
+            if (isBackEnabled)
+              buildButton(Icons.arrow_back_rounded, () => Get.back())
+            else if (isDrawerEnabled)
+              buildButton(Icons.menu_rounded, drawerCallback)
+            else
+              const SizedBox(width: 40),
 
-          // -------- TITLE --------
-          Expanded(
-            child: Center(
-              child: Text(
-                title ?? "",
-                style: TextStyle(
-                  fontSize: isPortrait ? 15 : 19, // ⬆️ slightly bigger
-                  fontFamily: FontFamily.regular,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.blackColor,
+            // TITLE
+            Expanded(
+              child: Center(
+                child: Text(
+                  title ?? "",
+                  style: TextStyle(
+                    fontSize: isTablet ? 18 : 15,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.blackColor,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
-          ),
 
-          // -------- RIGHT --------
-          Row(
-            children: List.generate(
-              rightButtons.length,
-                  (i) => Row(
-                children: [
-                  rightButtons[i],
-                  if (i != rightButtons.length - 1)
-                    SizedBox(width: isTablet ? 2.w : 3.w),
-                ],
-              ),
+            // RIGHT
+            Row(
+              children:
+                  rightButtons
+                      .map(
+                        (e) => Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: e,
+                        ),
+                      )
+                      .toList(),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
+    ],
   );
 }
-
 
 // Widget TitleBarIpadPotrait({
 //   required String? title,
@@ -433,71 +417,72 @@ Widget TitleBarIpadPotrait({
   }
 
   // ---------------- TITLE BAR ----------------
-  return Container(
-    margin: EdgeInsets.only(
-      top: 1.5.h,   // 🔥 reduced for iPad portrait
-      bottom: 0.8.h,
-    ),
-    padding: EdgeInsets.symmetric(
-      horizontal: 2.w,
-      vertical: 8, // 🔥 fixed padding (no h / sp)
-    ),
-    decoration: BoxDecoration(
-      color: clr ?? Colors.white,
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.1),
-          blurRadius: 8,
-          offset: const Offset(0, 4),
+  return Column(
+    children: [
+      SizedBox(height: isTablet ? 72 : 4.h),
+      Container(
+        margin: EdgeInsets.only(
+          top: 1.5.h, // 🔥 reduced for iPad portrait
+          bottom: 0.8.h,
         ),
-      ],
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: SizedBox(
-      height: 56, // 🔥 FINAL HEIGHT for iPad portrait
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // -------- LEFT --------
-          if (isBackEnabled)
-            buildButton(Icons.arrow_back_rounded, () => Get.back())
-          else if (isDrawerEnabled)
-            buildButton(Icons.menu_rounded, drawerCallback)
-          else
-            const SizedBox(width: 40),
+        padding: EdgeInsets.symmetric(
+          horizontal: 2.w,
+          vertical: 8, // 🔥 fixed padding (no h / sp)
+        ),
+        decoration: BoxDecoration(
+          color: clr ?? Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // -------- LEFT --------
+            if (isBackEnabled)
+              buildButton(Icons.arrow_back_rounded, () => Get.back())
+            else if (isDrawerEnabled)
+              buildButton(Icons.menu_rounded, drawerCallback)
+            else
+              const SizedBox(width: 40),
 
-          // -------- TITLE --------
-          Expanded(
-            child: Center(
-              child: Text(
-                title ?? "",
-                style: TextStyle(
-                  fontSize: 16, // ❌ no sp
-                  fontFamily: FontFamily.regular,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.blackColor,
+            // -------- TITLE --------
+            Expanded(
+              child: Center(
+                child: Text(
+                  title ?? "",
+                  style: TextStyle(
+                    fontSize: 16, // ❌ no sp
+                    fontFamily: FontFamily.regular,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.blackColor,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
-          ),
 
-          // -------- RIGHT --------
-          Row(
-            children: List.generate(
-              rightButtons.length,
-                  (i) => Row(
-                children: [
-                  rightButtons[i],
-                  if (i != rightButtons.length - 1)
-                    SizedBox(width: 2.w),
-                ],
+            // -------- RIGHT --------
+            Row(
+              children: List.generate(
+                rightButtons.length,
+                (i) => Row(
+                  children: [
+                    rightButtons[i],
+                    if (i != rightButtons.length - 1) SizedBox(width: 2.w),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
+    ],
   );
 }

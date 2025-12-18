@@ -157,10 +157,10 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
                   )
                   .toList();
         }
-        showCustomErrorSnackbar(
-          context,title: 'Server Error',
-          message: 'Something went wrong. Please try again later.',
-        );
+        // showCustomErrorSnackbar(
+        //   context,title: 'Server Error',
+        //   message: 'Something went wrong. Please try again later.',
+        // );
       }
     } catch (_) {
       final cachedData = box.get('customers');
@@ -173,10 +173,10 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
                 )
                 .toList();
       }
-      showCustomErrorSnackbar(
-        context,title: 'Network Error',
-        message: 'Unable to connect. Please check your internet and try again.',
-      );
+      // showCustomErrorSnackbar(
+      //   context,title: 'Network Error',
+      //   message: 'Unable to connect. Please check your internet and try again.',
+      // );
     }
   }
 
@@ -695,6 +695,10 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
 
     if (!await checkInternet()) {
       _loadCachedCustomerReport();
+      setState(() {
+        isFiltering = false;
+        isLoading = false;
+      });
       return;
     }
 
@@ -738,10 +742,10 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
         setState(() {
           isFiltering = false;
         });
-        showCustomErrorSnackbar(
-          context,title: 'Server Error',
-          message: 'Something went wrong. Please try again later.',
-        );
+        // showCustomErrorSnackbar(
+        //   context,title: 'Server Error',
+        //   message: 'Something went wrong. Please try again later.',
+        // );
       }
     } catch (e, stackTrace) {
       print("Error Fetching Customer Report: $e");
@@ -750,10 +754,10 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
         isFiltering = false;
       });
       _loadCachedCustomerReport();
-      showCustomErrorSnackbar(
-        context,title: 'Network Error',
-        message: 'Unable to connect. Please check your internet and try again.',
-      );
+      // showCustomErrorSnackbar(
+      //   context,title: 'Network Error',
+      //   message: 'Unable to connect. Please check your internet and try again.',
+      // );
     }
   }
 
@@ -770,7 +774,9 @@ class _CustomerReportScreenState extends State<CustomerReportScreen> {
       });
       log("Error loading customers: $e");
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 

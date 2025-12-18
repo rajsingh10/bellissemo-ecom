@@ -120,7 +120,7 @@ class _ProductReportScreenState extends State<ProductReportScreen> {
                           _scaffoldKeyCustomerreport.currentState?.openDrawer();
                         },
                       ),
-
+                      SizedBox(height: 1.h),
                       // 🔥 SHOW FILTERS ONLY WHEN INTERNET IS AVAILABLE
                       if (hasInternetConnection) ...[
                         Column(
@@ -581,10 +581,14 @@ class _ProductReportScreenState extends State<ProductReportScreen> {
                                                                   order.formattedDate ??
                                                                       '',
                                                                   style: TextStyle(
-                                                                    color: AppColors.gray,
-                                                                    fontSize: 16.sp,
+                                                                    color:
+                                                                        AppColors
+                                                                            .gray,
+                                                                    fontSize:
+                                                                        16.sp,
                                                                     fontFamily:
-                                                                    FontFamily.bold,
+                                                                        FontFamily
+                                                                            .bold,
                                                                   ),
                                                                 ),
                                                               ],
@@ -599,19 +603,27 @@ class _ProductReportScreenState extends State<ProductReportScreen> {
                                                                 Text(
                                                                   "Qty: ${order.quantity}",
                                                                   style: TextStyle(
-                                                                    color: AppColors.blackColor,
-                                                                    fontSize: 15.sp,
+                                                                    color:
+                                                                        AppColors
+                                                                            .blackColor,
+                                                                    fontSize:
+                                                                        15.sp,
                                                                     fontFamily:
-                                                                    FontFamily.bold,
+                                                                        FontFamily
+                                                                            .bold,
                                                                   ),
                                                                 ),
                                                                 Text(
                                                                   "${productReportOrderModal?.currencySymbol}${order.totalPrice}",
                                                                   style: TextStyle(
-                                                                    color: AppColors.mainColor,
-                                                                    fontSize: 15.sp,
+                                                                    color:
+                                                                        AppColors
+                                                                            .mainColor,
+                                                                    fontSize:
+                                                                        15.sp,
                                                                     fontFamily:
-                                                                    FontFamily.bold,
+                                                                        FontFamily
+                                                                            .bold,
                                                                   ),
                                                                 ),
                                                               ],
@@ -859,20 +871,20 @@ class _ProductReportScreenState extends State<ProductReportScreen> {
       } else {
         _loadProductOrderFromHive(box, productId);
 
-        showCustomErrorSnackbar(
-          context,
-          title: 'Server Error',
-          message: 'Showing cached data',
-        );
+        // showCustomErrorSnackbar(
+        //   context,
+        //   title: 'Server Error',
+        //   message: 'Showing cached data',
+        // );
       }
     } catch (e) {
       _loadProductOrderFromHive(box, productId);
 
-      showCustomErrorSnackbar(
-        context,
-        title: 'Offline',
-        message: 'Showing cached data',
-      );
+      // showCustomErrorSnackbar(
+      //   context,
+      //   title: 'Offline',
+      //   message: 'Showing cached data',
+      // );
     }
 
     setState(() => isFiltering = false);
